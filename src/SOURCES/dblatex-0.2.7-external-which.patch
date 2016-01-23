@@ -1,0 +1,12 @@
+diff -up dblatex-0.2.7/setup.py.external_which dblatex-0.2.7/setup.py
+--- dblatex-0.2.7/setup.py.external_which	2007-04-26 21:08:56.000000000 +0200
++++ dblatex-0.2.7/setup.py	2007-07-22 19:35:05.000000000 +0200
+@@ -147,7 +147,7 @@ os.environ["SGML_CATALOG_FILES"] = cat
+ 
+ def find_programs(utils):
+     sys.path.append("lib")
+-    from contrib.which import which
++    import which
+     util_paths = {}
+     missed = []
+     for util in utils:
