@@ -1,5 +1,5 @@
 Name:		hootenanny
-Version:	0.2.20_204_gfc1455e_dirty
+Version:	0.2.20_277_gd3bbfc9_dirty
 Release:	1%{?dist}
 Summary:	Hootenanny is a vector conflation suite.
 
@@ -8,7 +8,7 @@ License:	GPLv3
 URL:		https://github.com/ngageoint/hootenanny
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:	git doxygen wget w3m words automake gcc
+BuildRequires:	git doxygen wget w3m words automake gcc zip unzip
 Source0:        %{name}-%{version}.tar.gz
 
 %description
@@ -41,10 +41,32 @@ This package contains the core algorithms and command line interface.
 
 %build
 source ./SetupEnv.sh
-./configure --with-rnd -q && make -s %{?_smp_mflags}
+./configure --with-rnd -q \
+	--prefix=$RPM_BUILD_ROOT/usr/ \
+	--datarootdir=$RPM_BUILD_ROOT/usr/share/hootenanny/ \
+        --docdir=$RPM_BUILD_ROOT/usr/share/doc/hootenanny/ \
+	--localstatedir=$RPM_BUILD_ROOT/var/lib/hootenanny/ \
+	--sysconfdir=$RPM_BUILD_ROOT/etc/
+
+echo Remove this stuff
+cp ~/hootenanny/conf/*.rf ~/hootenanny/conf/words1.sqlite conf/
+
+# Use ccache if it is available
+cp LocalConfig.pri.orig LocalConfig.pri
+command -v ccache >/dev/null 2>&1 && echo "QMAKE_CXX=ccache g++" >> LocalConfig.pri
+
+make -s %{?_smp_mflags}
 
 %install
 
+./configure --with-rnd -q \
+	--prefix=$RPM_BUILD_ROOT/usr/ \
+	--datarootdir=$RPM_BUILD_ROOT/usr/share/hootenanny/ \
+        --docdir=$RPM_BUILD_ROOT/usr/share/doc/hootenanny/ \
+	--localstatedir=$RPM_BUILD_ROOT/var/lib/hootenanny/ \
+	--sysconfdir=$RPM_BUILD_ROOT/etc/
+
+make install
 
 %check
 source ./SetupEnv.sh
@@ -54,6 +76,12 @@ HootTest --slow
 rm -rf %{buildroot}
 
 %files core
+%{_includedir}/hoot
+%{_libdir}/*
+%docdir /usr/share/docs/hootenanny/*
+%config /var/lib/hootenanny/conf/hoot.json
+%config /var/lib/hootenanny/conf/DatabaseConfig.sh
+
 
 %package core-devel-deps
 Summary:	Development dependencies for Hootenanny Core
@@ -65,6 +93,8 @@ Requires:       gdb
 Requires:       geos-devel = 3.4.2
 Requires:       git glpk-devel libicu-devel nodejs-devel opencv-devel
 Requires:       postgresql91-devel proj-devel protobuf-devel python-argparse python-devel qt-devel v8-devel
+# Needed to build the documentation
+Requires:       texlive-collection-langcyrillic
 
 %description core-devel-deps
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -87,10 +117,10 @@ Requires:	asciidoc cppunit dblatex doxygen FileGDB_API
 Requires:       gdal >= 1.10.1
 Requires: 	gdal-esri-epsg >= 1.10.1
 Requires:       geos = 3.4.2, gnuplot, graphviz
-# Needed by gnuplot
+# Needed by gnuplot for report generation
 Requires:       liberation-fonts-common liberation-sans-fonts
 Requires:       libxslt nodejs opencv postgresql91-libs protobuf qt
-Requires:       texlive texlive-collection-langcyrillic
+Requires:       texlive
 Requires:       unzip w3m wget words
 Requires:       zip
 

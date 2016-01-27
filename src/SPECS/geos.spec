@@ -7,7 +7,7 @@ Group:		Applications/Engineering
 License:	LGPLv2
 URL:		http://trac.osgeo.org/geos/
 Source0:	http://download.osgeo.org/%{name}/%{name}-%{version}.tar.bz2
-Patch0:		geos-gcc43.patch
+Patch0:		geos-centos67.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	doxygen libtool
@@ -56,7 +56,7 @@ PHP module to build applications using GEOS and PHP
 
 %prep
 %setup -q 
-%patch0 -p0 -b .gcc43
+%patch0 -p1 -b .centos67
 
 %build
 

@@ -1,6 +1,8 @@
+.*.swp
 el6
 tmp
 src/BUILD
 src/BUILDROOT
 src/RPMS
 src/SRPMS
+src/SOURCES/hoot*.tar.gz

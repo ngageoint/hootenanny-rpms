@@ -14,8 +14,8 @@ el6: el6-src/* custom-rpms
 	rm -rf el6
 	mkdir -p el6
 	cp -l el6-src/* el6/
-	cp -l src/RPMS/noarch/* el6/
-	cp -l src/RPMS/x86_64/* el6/
+	cp src/RPMS/noarch/* el6/
+	cp src/RPMS/x86_64/* el6/
 	createrepo el6
 
 custom-rpms:
