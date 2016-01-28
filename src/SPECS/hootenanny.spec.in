@@ -63,9 +63,10 @@ make -s %{?_smp_mflags}
 
 make install
 echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
+cp -R test-files $RPM_BUILD_ROOT/var/lib/hootenanny/
+ln -s /usr/lib64 $RPM_BUILD_ROOT/var/lib/hootenanny/lib
 rm $RPM_BUILD_ROOT/var/lib/hootenanny/conf/words.sqlite
 cd $RPM_BUILD_ROOT/var/lib/hootenanny/conf/; ln -s words1.sqlite words.sqlite
-cp -R test-files $RPM_BUILD_ROOT/var/lib/hootenanny/
 
 %check
 source ./SetupEnv.sh
