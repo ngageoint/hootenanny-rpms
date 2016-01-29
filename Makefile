@@ -1,5 +1,5 @@
 
-all: el6
+all: copy-rpms
 
 hoot: | hoot-rpms copy-rpms
 
@@ -17,7 +17,7 @@ deps: force
 
 el6: el6-src/* custom-rpms
 
-copy-rpms: force
+copy-rpms: el6
 	rm -rf el6
 	mkdir -p el6
 	cp -l el6-src/* el6/
