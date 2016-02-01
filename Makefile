@@ -21,35 +21,68 @@ deps: force
 	sudo yum install -y \
 	  ant \
 	  armadillo-devel \
+	  automake \
+	  bison \
+	  boost-devel \
+	  cairo-devel \
 	  cfitsio-devel \
 	  CharLS-devel \
+	  chrpath \
+	  createrepo \
+	  ctags \
 	  curl-devel \
+	  doxygen \
+	  emacs \
+	  emacs-el \
+	  erlang \
+	  flex \
 	  freexl-devel \
 	  g2clib-static \
+	  gcc \
+	  gd-devel 
+	  giflib-devel \
+	  git \
 	  hdf-devel \
 	  hdf5-devel \
 	  hdf-static \
+	  help2man \
+	  info \
+	  java-1.6.0-openjdk-devel \
 	  java-devel \
 	  libdap-devel \
 	  libgta-devel \
+	  libjpeg-turbo-devel \
+	  libotf \
+	  libpng-devel \
 	  librx-devel \
 	  libspatialite-devel \
+	  libX11-devel \
+	  libXt-devel \
+	  libxslt \
+	  lua-devel \
+	  m17n-lib* \
+	  m4 \
 	  netcdf-devel \
+	  pango-devel \
 	  pcre-devel \
+	  perl-macros \
 	  proj-devel \
+	  pygtk2 \
+	  python-devel \
+	  python-which \
+	  readline-devel \
+	  rpm-build \
 	  ruby-devel \
 	  sqlite-devel \
+	  tetex-tex4ht \
+	  tex* \
+	  transfig \
 	  xerces-c-devel \
 	  xz-devel \
-	  java-1.6.0-openjdk-devel \
-	  createrepo \
-	  git \
-	  doxygen \
+	  zlib-devel \
 	  wget \
 	  w3m \
 	  words \
-	  automake \
-	  gcc \
 	  rpm-build \
 	  m4 \
 	  emacs \
@@ -61,7 +94,6 @@ deps: force
 	  texlive-collection-latex \
 	  texlive-collection-xetex \
 	  texlive-collection-htmlxml \
-	  transfig \
 	  texlive-epstopdf-bin \
 	  texlive-xmltex-bin \
 	  texlive-anysize \
