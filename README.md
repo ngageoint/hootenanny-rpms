@@ -10,11 +10,12 @@ hoot, but until then you can use the following to create your own RPM repo.
 * Clone this repo into your home directory (we'll assume `$HOME/hootenanny-rpms`)
 * Run:
 ```
-make deps
+ln -s $HOME/hootenanny-rpms/src $HOME/rpmbuild
+sudo make deps
 make
 ```
 
-* You'll have a new set of RPMS build int `$HOME/hootenanny-rpms/el6`
+* You'll have a new set of RPMS built in `$HOME/hootenanny-rpms/el6`
 * Add a new repo in `/etc/yum.repos.d/`
 ```
 [hoot]

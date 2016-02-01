@@ -8,7 +8,16 @@ License:	GPLv3
 URL:		https://github.com/ngageoint/hootenanny
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:	git doxygen wget w3m words automake gcc zip unzip
+BuildRequires:  autoconf automake boost-devel cppunit-devel doxygen gcc-c++
+BuildRequires:  gdal-devel >= 1.10.1
+BuildRequires:  gdb
+BuildRequires:  geos-devel = 3.4.2
+BuildRequires:  git glpk-devel libicu-devel nodejs-devel opencv-devel
+BuildRequires:  postgresql91-devel proj-devel protobuf-devel python-argparse python-devel qt-devel
+# Needed to build the documentation
+BuildRequires:  texlive-collection-langcyrillic
+BuildRequires:  unzip v8-devel w3m wget words zip
+
 Source0:        %{name}-%{version}.tar.gz
 
 %description
@@ -47,9 +56,6 @@ source ./SetupEnv.sh
         --docdir=$RPM_BUILD_ROOT/usr/share/doc/hootenanny/ \
 	--localstatedir=$RPM_BUILD_ROOT/var/lib/hootenanny/ \
 	--sysconfdir=$RPM_BUILD_ROOT/etc/
-
-echo Remove this stuff
-cp ~/hootenanny/conf/*.rf ~/hootenanny/conf/words1.sqlite conf/
 
 # Use ccache if it is available
 cp LocalConfig.pri.orig LocalConfig.pri
