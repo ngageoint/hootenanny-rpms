@@ -1,4 +1,5 @@
 .*.swp
+.vagrant
 el6
 tmp
 src/BUILD

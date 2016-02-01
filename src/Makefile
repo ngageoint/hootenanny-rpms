@@ -17,7 +17,7 @@ not-hoot: \
 
 hoot: \
 	RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm \
-	
+
 FileGDB-install: RPMS/x86_64/FileGDB_API-1.3-1.el6.x86_64.rpm
 	yum list installed FileGDB_API || sudo yum install $<
 
@@ -36,9 +36,9 @@ SPECS/hootenanny.spec: SPECS/hootenanny.spec.in $(wildcard SOURCES/hootenanny*.t
 	cat SPECS/hootenanny.spec.in | sed -e "s/%%HOOT_VERSION%%/$(hootversion)/g" >> SPECS/hootenanny.spec
 
 RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm: SPECS/hootenanny.spec
+	# Silly way to replace the gdal/geos RPMs
 	sudo yum -y remove gdal-devel gdal geos geos-devel
 	sudo yum -y install RPMS/x86_64/gdal-1.10.1-3.el6.x86_64.rpm RPMS/x86_64/gdal-devel-1.10.1-3.el6.x86_64.rpm RPMS/x86_64/geos-devel-3.4.2-1.el6.x86_64.rpm RPMS/x86_64/gdal-libs-1.10.1-3.el6.x86_64.rpm RPMS/x86_64/geos-3.4.2-1.el6.x86_64.rpm RPMS/x86_64/gdal-java-1.10.1-3.el6.x86_64.rpm
-
 	rm -rf BUILD/hootenanny-* BUILDROOT/hootenanny-* RPMS/x86_64/hootenanny-* SRPMS/hootenanny-*
 	rpmbuild -ba $<
 

@@ -53,10 +53,8 @@ deps: force
 	  rpm-build \
 	  m4 \
 	  emacs \
-	  perl-macros \
 	  erlang \
 	  python-devel \
-	  python-which \
 	  libxslt \
 	  ImageMagick \
 	  texlive-base \
