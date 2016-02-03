@@ -5,27 +5,24 @@ well as source RPMs that are custom built for Hootenanny.
 At some point in the future we'll host a RPM repo where you can simply install
 hoot, but until then you can use the following to create your own RPM repo.
 
-* Install a basic CentOS 6.7 instance (other versions may work, but have not been
-  tested).
-* Clone this repo into your home directory (we'll assume `$HOME/hootenanny-rpms`)
-* Run:
 ```
-ln -s $HOME/hootenanny-rpms/src $HOME/rpmbuild
-sudo make deps
-make
-```
-
-* You'll have a new set of RPMS built in `$HOME/hootenanny-rpms/el6`
-* Add a new repo in `/etc/yum.repos.d/`
-```
-[hoot]
-name=hoot
-baseurl=file:///<YOUR HOME DIR HERE>/hootenanny-rpms/el6/
-enabled=1
-gpgcheck=0
+sudo apt-get install nfs-kernel-server vagrant
+export VERSION=<PICK A RELEASED VERSION OF HOOT>
+git clone https://github.com/ngageoint/hootenanny-rpms.git
+cd hootenanny-rpms
+wget
+https://github.com/ngageoint/hootenanny/releases/download/$VERSION/hootenanny-$VERSION.tar.gz
+-O src/SOURCES/hootenanny-$VERSION.tar.gz
+# Build the Hoot RPMs and all supporting RPMs
+make vagrant-build
+# Test the new Hoot RPMs
+make vagrant-test
 ```
 
-* Then to install hootenanny:
+* You'll have a new set of RPMS built in `hootenanny-rpms/el6`
+* The RPMs can be served out using your favorite web server and accessed via
+  yum.
+* After yum is configured properly, to install hootenanny:
 ```
 sudo yum install hootenanny-core
 ```

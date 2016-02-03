@@ -16,7 +16,7 @@ BuildRequires:  git glpk-devel libicu-devel
 BuildRequires:  log4cxx-devel nodejs-devel opencv-devel
 BuildRequires:  postgresql91-devel proj-devel protobuf-devel python-argparse python-devel qt-devel
 # Needed to build the documentation
-BuildRequires:  texlive-collection-langcyrillic
+BuildRequires:  texlive
 BuildRequires:  unzip v8-devel w3m wget words zip
 
 Source0:        %{name}-%{version}.tar.gz
@@ -108,6 +108,7 @@ rm -rf %{buildroot}
 %{_sharedstatedir}/%{name}/conf/DatabaseConfig.sh
 %{_sharedstatedir}/%{name}
 %{_sysconfdir}/profile.d/hootenanny.sh
+%{_sysconfdir}/asciidoc/filters/
 
 
 
@@ -121,7 +122,7 @@ Requires:       geos-devel = 3.4.2
 Requires:       git glpk-devel libicu-devel log4cxx-devel nodejs-devel opencv-devel
 Requires:       postgresql91-devel proj-devel protobuf-devel python-argparse python-devel qt-devel v8-devel
 # Needed to build the documentation
-Requires:       texlive-collection-langcyrillic
+Requires:       texlive
 
 %description core-devel-deps
 Hootenanny was developed to provide an open source, standards-based approach to

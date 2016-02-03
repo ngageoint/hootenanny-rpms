@@ -8,9 +8,27 @@ hoot-rpms:
 
 force:
 
-clean: .PHONY
+clean:
 	rm -rf el6
 	cd src; $(MAKE) clean
+
+ValidHootTarball:
+	test "$(words $(wildcard src/SOURCES/hootenanny*.tar.gz))" != "1" && (echo "Did not find exactly one hoot tarball in SOURCES. Too many? Do you need to download one? https://github.com/ngageoint/hootenanny/releases"; exit -1) || true
+
+vagrant-build: ValidHootTarball
+	vagrant up
+	# If we have words1.sqlite locally don't copy it down from github.
+	[ -e $$HOOT_HOME/conf/words1.sqlite ] && cat $$HOOT_HOME/conf/words1.sqlite | vagrant ssh -c "cat > /tmp/words1.sqlite"
+	vagrant ssh -c "cd hootenanny-rpms && make deps && make"
+
+vagrant-clean:
+	vagrant halt
+	vagrant destroy -f
+	cd test && vagrant halt && vagrant destroy -f
+
+vagrant-test:
+	cd test; vagrant up
+	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --exclude=.*RubberSheetConflateTest.sh --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh --slow"
 
 deps: force
 	sudo true || true
@@ -18,8 +36,12 @@ deps: force
 	sudo cp repos/RPM-GPG-KEY-EPEL-6 /etc/pki/rpm-gpg/
 	sudo yum clean metadata
 	sudo true || true
+	sudo yum update -y
+	sudo true || true
 	sudo yum install -y \
 	  ant \
+	  apr-devel \
+	  apr-util-devel \
 	  armadillo-devel \
 	  automake \
 	  bison \
@@ -39,7 +61,7 @@ deps: force
 	  freexl-devel \
 	  g2clib-static \
 	  gcc \
-	  gd-devel 
+	  gd-devel \
 	  giflib-devel \
 	  git \
 	  hdf-devel \
@@ -65,11 +87,9 @@ deps: force
 	  netcdf-devel \
 	  pango-devel \
 	  pcre-devel \
-	  perl-macros \
 	  proj-devel \
 	  pygtk2 \
 	  python-devel \
-	  python-which \
 	  readline-devel \
 	  rpm-build \
 	  ruby-devel \
@@ -90,23 +110,6 @@ deps: force
 	  python-devel \
 	  libxslt \
 	  ImageMagick \
-	  texlive-base \
-	  texlive-collection-latex \
-	  texlive-collection-xetex \
-	  texlive-collection-htmlxml \
-	  texlive-epstopdf-bin \
-	  texlive-xmltex-bin \
-	  texlive-anysize \
-	  texlive-appendix \
-	  texlive-changebar \
-	  texlive-jknapltx \
-	  texlive-multirow \
-	  texlive-overpic \
-	  texlive-pdfpages \
-	  texlive-subfigure \
-	  texlive-stmaryrd \
-	  texlive-latex \
-	  chrpath \
 	  expat-devel \
 	  fontconfig-devel \
 	  geos-devel \
@@ -121,7 +124,6 @@ deps: force
 	  unixODBC-devel \
 	  gcc-c++ \
 	  php-devel \
-	  boost-devel \
 	  libicu-devel \
 	  cppunit-devel \
 	  python-argparse \

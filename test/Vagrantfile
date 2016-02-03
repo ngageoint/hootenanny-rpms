@@ -26,26 +26,18 @@ Vagrant.configure(2) do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  config.vm.network "private_network", ip: "192.168.33.10"
-  #config.vm.network "private_network", type: "dhcp"
+  # config.vm.network "private_network", ip: "192.168.33.10"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
   # your network.
-  #config.vm.network "public_network"
+  config.vm.network "public_network"
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
-
-  config.nfs.map_uid = Process.uid
-  config.nfs.map_gid = Process.gid
-  config.vm.synced_folder ".", "/home/vagrant/.hootenanny-rpms-nfs", type: "nfs",
-    # Enabled async, this makes small file writes much faster (e.g. unzip)
-    :linux__nfs_options => ['rw','no_subtree_check','all_squash','async']
-  config.bindfs.bind_folder "/home/vagrant/.hootenanny-rpms-nfs",
-    "/home/vagrant/hootenanny-rpms", perms: nil
+  config.vm.synced_folder "../el6", "/home/vagrant/el6"
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -69,31 +61,20 @@ Vagrant.configure(2) do |config|
   #   push.app = "YOUR_ATLAS_USERNAME/YOUR_APPLICATION_NAME"
   # end
 
-  # This makes caching more efficient if you're using squid or similar.
-  if "#{ENV['http_proxy']}" != ""
-    config.vm.provision "proxy", type: "shell", inline: <<-SHELL
-      cat /etc/yum.repos.d/CentOS-Base.repo | sed -e s/mirrorlist=/#mirrorlist=/g | sed -e s/#baseurl=/baseurl=/g  sudo tee /etc/yum.repos.d/CentOS-Base.repo
-      cat /etc/yum.repos.d/epel.repo | sed -e s/mirrorlist=/#mirrorlist=/g | sed -e s/#baseurl=/baseurl=/g  sudo tee /etc/yum.repos.d/epel.repo
-
-      echo "proxy=#{ENV['http_proxy']}" | sudo tee -a /etc/yum.conf
-
-      # wget (maybe others?) will use the proxy
-      echo "export http_proxy=#{ENV['http_proxy']}" >> .bashrc
-    SHELL
-  end
-
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
-    ln -s hootenanny-rpms/src/ rpmbuild
+    set -e
+    set -x
+    echo "[hoot]" | sudo tee /etc/yum.repos.d/hoot.repo
+    echo "name=hoot" | sudo tee -a /etc/yum.repos.d/hoot.repo
+    echo "baseurl=file:///home/vagrant/el6/" | sudo tee -a /etc/yum.repos.d/hoot.repo
+    echo "gpgcheck=0" | sudo tee -a /etc/yum.repos.d/hoot.repo
     sudo yum -y update
-
-    # Enable NTP to synchronize clock
-    sudo yum install ntp
-    sudo chkconfig ntpd on
-    sudo ntpdate pool.ntp.org
-    sudo /etc/init.d/ntpd start
-
+    sudo yum -y install hootenanny-core
+    cd /var/lib/hootenanny
+    sudo HootTest --slow --exclude=.*RubberSheetConflateTest.sh \
+        --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh
   SHELL
 end

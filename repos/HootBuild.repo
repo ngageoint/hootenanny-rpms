@@ -28,7 +28,8 @@ gpgcheck=1
 
 [kde]
 name=kde
-mirrorlist=http://apt.kde-redhat.org/apt/kde-redhat/redhat/mirrors-stable
+baseurl=http://download.kdeforge.net/kde-redhat/redhat/$releasever/$basearch/stable
+#mirrorlist=http://apt.kde-redhat.org/apt/kde-redhat/redhat/mirrors-stable
 gpgkey=http://apt.kde-redhat.org/apt/kde-redhat/kde-redhat.RPM-GPG-KEY
 #gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-kde-redhat
 enabled=1
