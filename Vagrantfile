@@ -90,7 +90,7 @@ Vagrant.configure(2) do |config|
     sudo yum -y update
 
     # Enable NTP to synchronize clock
-    sudo yum install ntp
+    sudo yum -y install ntp
     sudo chkconfig ntpd on
     sudo ntpdate pool.ntp.org
     sudo /etc/init.d/ntpd start
