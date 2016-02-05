@@ -13,6 +13,9 @@ cd hootenanny-rpms
 wget
 https://github.com/ngageoint/hootenanny/releases/download/$VERSION/hootenanny-$VERSION.tar.gz
 -O src/SOURCES/hootenanny-$VERSION.tar.gz
+
+# Install bindfs plugin for mounting nfs
+vagrant plugin install vagrant-bindfs
 # Clean out any old vagrant machine that is laying around from a previous
 # attempt. You should run this before building if you try a build and it
 # fails.
