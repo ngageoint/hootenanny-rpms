@@ -13,6 +13,10 @@ cd hootenanny-rpms
 wget
 https://github.com/ngageoint/hootenanny/releases/download/$VERSION/hootenanny-$VERSION.tar.gz
 -O src/SOURCES/hootenanny-$VERSION.tar.gz
+# Clean out any old vagrant machine that is laying around from a previous
+# attempt. You should run this before building if you try a build and it
+# fails.
+make vagrant-clean
 # Build the Hoot RPMs and all supporting RPMs
 make vagrant-build
 # Test the new Hoot RPMs
