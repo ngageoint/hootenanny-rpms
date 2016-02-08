@@ -6,13 +6,20 @@ At some point in the future we'll host a RPM repo where you can simply install
 hoot, but until then you can use the following to create your own RPM repo.
 
 ```
+# Build a fresh hoot tarball (the branch matters)
+git clone https://github.com/ngageoint/hootenanny.git
+cd hootenanny
+git checkout r6921
+scripts/ezBuild.sh
+make archive
+
+# Install local deps for running vagrant
 sudo apt-get install nfs-kernel-server vagrant
-export VERSION=<PICK A RELEASED VERSION OF HOOT>
+cd ..
 git clone https://github.com/ngageoint/hootenanny-rpms.git
 cd hootenanny-rpms
-wget
-https://github.com/ngageoint/hootenanny/releases/download/$VERSION/hootenanny-$VERSION.tar.gz
--O src/SOURCES/hootenanny-$VERSION.tar.gz
+git checkout r6921
+cp ../hootenanny/<Your new tarball> src/SOURCES/
 
 # Install bindfs plugin for mounting nfs
 vagrant plugin install vagrant-bindfs
