@@ -16,6 +16,8 @@ ValidHootTarball:
 	test "$(words $(wildcard src/SOURCES/hootenanny*.tar.gz))" != "1" && (echo "Did not find exactly one hoot tarball in SOURCES. Too many? Do you need to download one? https://github.com/ngageoint/hootenanny/releases"; exit -1) || true
 
 vagrant-build: ValidHootTarball
+	# Install the bindfs plugin if it doesn't exist
+	(vagrant plugin list | grep -q bindfs) || vagrant plugin install vagrant-bindfs
 	vagrant up
 	# If we have words1.sqlite locally don't copy it down from github.
 	[ -e $$HOOT_HOME/conf/words1.sqlite ] && cat $$HOOT_HOME/conf/words1.sqlite | vagrant ssh -c "cat > /tmp/words1.sqlite"

@@ -8,3 +8,4 @@ src/RPMS
 src/SPECS/hootenanny.spec
 src/SRPMS
 src/SOURCES/hoot*.tar.gz
+**VagrantfileLocal
