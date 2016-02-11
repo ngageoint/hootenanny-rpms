@@ -8,6 +8,11 @@ all: not-hoot hoot
 clean:
 	rm -rf tmp BUILD/* BUILDROOT/* SRPMS/* RPMS/*
 
+# Clean out all hoot specific RPMs and build files. Also remote tmp. This will force
+# a reinstall of build deps -- handy in vagrant.
+clean-hoot:
+	rm -rf BUILD/hoot* BUILDROOT/hoot* SRPMS/hoot* RPMS/x86_64/hoot* tmp
+
 not-hoot: \
 	RPMS/noarch/autoconf-2.69-3.el6.noarch.rpm \
 	RPMS/noarch/dblatex-0.3-5.el6.noarch.rpm \
@@ -21,6 +26,11 @@ not-hoot: \
 
 hoot: \
 	RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm \
+
+hoot-deps: not-hoot tmp/log4cxx-install
+	# Silly way to replace the gdal/geos RPMs
+	sudo yum -y remove gdal-devel gdal geos geos-devel
+	sudo yum -y install RPMS/x86_64/* RPMS/noarch/*
 
 tmp/FileGDB-install: RPMS/x86_64/FileGDB_API-1.3-1.el6.x86_64.rpm
 	yum list installed FileGDB_API || sudo yum -y install $<
@@ -48,11 +58,7 @@ SPECS/hootenanny.spec: SPECS/hootenanny.spec.in $(wildcard SOURCES/hootenanny*.t
 	mv SPECS/hootenanny.spec /tmp/hootenanny-`date +%s`.spec || true
 	cat SPECS/hootenanny.spec.in | sed -e "s/%%HOOT_VERSION%%/$(hootversion)/g" >> SPECS/hootenanny.spec
 
-RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm: SPECS/hootenanny.spec \
-	not-hoot tmp/log4cxx-install
-	# Silly way to replace the gdal/geos RPMs
-	sudo yum -y remove gdal-devel gdal geos geos-devel
-	sudo yum -y install RPMS/x86_64/gdal-1.10.1-3.el6.x86_64.rpm RPMS/x86_64/gdal-devel-1.10.1-3.el6.x86_64.rpm RPMS/x86_64/geos-devel-3.4.2-1.el6.x86_64.rpm RPMS/x86_64/gdal-libs-1.10.1-3.el6.x86_64.rpm RPMS/x86_64/geos-3.4.2-1.el6.x86_64.rpm RPMS/x86_64/gdal-java-1.10.1-3.el6.x86_64.rpm RPMS/x86_64/gdal-esri-epsg-1.10.1-1.el6.x86_64.rpm
+RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm: SPECS/hootenanny.spec hoot-deps
 	rm -rf BUILD/hootenanny-* BUILDROOT/hootenanny-* RPMS/x86_64/hootenanny-* SRPMS/hootenanny-*
 	rpmbuild -ba $<
 
