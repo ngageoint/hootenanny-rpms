@@ -1,0 +1,36 @@
+[postgresql]
+name=Postgres Packages for Enterprise Linux 6 - $basearch
+baseurl=http://yum.postgresql.org/9.2/redhat/rhel-6-$basearch/
+enabled=1
+gpgcheck=0
+
+[texlive]
+name=texlive
+baseurl=https://jnovy.fedorapeople.org/texlive/2011/packages.el6/
+enabled=0
+gpgcheck=0
+
+[nodesource]
+name=Node.js Packages for Enterprise Linux 6 - $basearch
+baseurl=https://rpm.nodesource.com/pub/el/6/$basearch
+failovermethod=priority
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/NODESOURCE-GPG-SIGNING-KEY-EL
+
+[nodesource-source]
+name=Node.js for Enterprise Linux 6 - $basearch - Source
+baseurl=https://rpm.nodesource.com/pub/el/6/SRPMS
+failovermethod=priority
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/NODESOURCE-GPG-SIGNING-KEY-EL
+gpgcheck=1
+
+[kde]
+name=kde
+baseurl=http://download.kdeforge.net/kde-redhat/redhat/$releasever/$basearch/stable
+#mirrorlist=http://apt.kde-redhat.org/apt/kde-redhat/redhat/mirrors-stable
+gpgkey=http://apt.kde-redhat.org/apt/kde-redhat/kde-redhat.RPM-GPG-KEY
+#gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-kde-redhat
+enabled=1
+skip_if_unavailable=1
