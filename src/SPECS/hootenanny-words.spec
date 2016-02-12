@@ -19,8 +19,8 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %prep
 cd %{_topdir}/SOURCES
-rm %{words_filename}
-wget %{words_url}
+[ -e %{words_filename} ] && rm %{words_filename}
+wget -nv %{words_url}
 cd %{_topdir}/BUILD
 cp %{_topdir}/SOURCES/%{words_filename} ./
 /bin/chmod -Rf a+rX,u+w,g-w,o-w .
@@ -34,6 +34,8 @@ cd $RPM_BUILD_ROOT%{deploy_dir}; ln -s %{words_filename} words.sqlite
 
 %clean
 rm -rf $RPM_BUILD_ROOT
+[ -e %{_topdir}/SOURCES/%{words_filename} ] && rm %{_topdir}/SOURCES/%{words_filename}
+[ -e %{_topdir}/BUILD/%{words_filename} ] && rm %{_topdir}/BUILD/%{words_filename}
 
 %files
 %{deploy_dir}/%{words_filename}
