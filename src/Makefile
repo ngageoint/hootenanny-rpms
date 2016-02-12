@@ -17,6 +17,7 @@ not-hoot: \
 	RPMS/noarch/autoconf-2.69-3.el6.noarch.rpm \
 	RPMS/noarch/dblatex-0.3-5.el6.noarch.rpm \
 	RPMS/noarch/python-which-1.1.0-12.el6.noarch.rpm \
+	RPMS/noarch/hootenanny-words-1.0.0-1.el6.noarch.rpm \
 	RPMS/x86_64/FileGDB_API-1.3-1.el6.x86_64.rpm \
 	RPMS/x86_64/gdal-1.10.1-3.el6.x86_64.rpm \
 	RPMS/x86_64/gdal-esri-epsg-1.10.1-1.el6.x86_64.rpm \
@@ -88,4 +89,7 @@ RPMS/noarch/python-which-1.1.0-12.el6.noarch.rpm: SPECS/python-which.spec
 
 RPMS/x86_64/log4cxx-0.10.0-14.el6.x86_64.rpm: SPECS/log4cxx.spec
 	rpmbuild -ba $<
+
+RPMS/noarch/hootenanny-words-1.0.0-1.el6.noarch.rpm: SPECS/hootenanny-words.spec
+	rpmbuild -ba -vv --define "_topdir `pwd`" $<
 
