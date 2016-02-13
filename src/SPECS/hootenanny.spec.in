@@ -8,7 +8,17 @@ License:	GPLv3
 URL:		https://github.com/ngageoint/hootenanny
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:	git doxygen wget w3m words automake gcc zip unzip log4cxx-devel
+BuildRequires:  autoconf automake boost-devel cppunit-devel doxygen gcc-c++
+BuildRequires:  gdal-devel >= 1.10.1
+BuildRequires:  gdb
+BuildRequires:  geos-devel = 3.4.2
+BuildRequires:  git glpk-devel libicu-devel
+BuildRequires:  log4cxx-devel nodejs-devel opencv-devel
+BuildRequires:  postgresql91-devel proj-devel protobuf-devel python-argparse python-devel qt-devel
+# Needed to build the documentation
+BuildRequires:  texlive
+BuildRequires:  unzip v8-devel w3m wget words zip
+
 Source0:        %{name}-%{version}.tar.gz
 
 %description
@@ -50,9 +60,6 @@ source ./SetupEnv.sh
 	--libdir=$RPM_BUILD_ROOT/usr/lib64 \
 	--sysconfdir=$RPM_BUILD_ROOT/etc/
 
-echo Remove this stuff
-cp ~/hootenanny/conf/*.rf ~/hootenanny/conf/words1.sqlite conf/
-
 # Use ccache if it is available
 cp LocalConfig.pri.orig LocalConfig.pri
 command -v ccache >/dev/null 2>&1 && echo "QMAKE_CXX=ccache g++" >> LocalConfig.pri
@@ -63,10 +70,17 @@ make -s %{?_smp_mflags}
 
 make install
 echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
-cp -R test-files $RPM_BUILD_ROOT/var/lib/hootenanny/
+chmod 755 $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
+cp -R test-files/ $RPM_BUILD_ROOT/var/lib/hootenanny/
 ln -s /usr/lib64 $RPM_BUILD_ROOT/var/lib/hootenanny/lib
 rm $RPM_BUILD_ROOT/var/lib/hootenanny/conf/words.sqlite
 cd $RPM_BUILD_ROOT/var/lib/hootenanny/conf/; ln -s words1.sqlite words.sqlite
+rm $RPM_BUILD_ROOT/usr/bin/HootEnv.sh
+# This allows all the tests to run.
+mkdir -p $RPM_BUILD_ROOT/var/lib/hootenanny/hoot-core-test/src/test/
+ln -s /var/lib/hootenanny/test-files/ $RPM_BUILD_ROOT/var/lib/hootenanny/hoot-core-test/src/test/resources
+# This makes it so HootEnv.sh resolves hoot home properly.
+ln -s /var/lib/hootenanny/bin/HootEnv.sh $RPM_BUILD_ROOT/usr/bin/HootEnv.sh
 
 %check
 source ./SetupEnv.sh
@@ -90,8 +104,11 @@ rm -rf %{buildroot}
 %{_bindir}/*
 %config %{_sharedstatedir}/%{name}/conf/hoot.json
 %config %{_sharedstatedir}/%{name}/conf/DatabaseConfig.sh
+%{_sharedstatedir}/%{name}/conf/hoot.json
+%{_sharedstatedir}/%{name}/conf/DatabaseConfig.sh
 %{_sharedstatedir}/%{name}
 %{_sysconfdir}/profile.d/hootenanny.sh
+%{_sysconfdir}/asciidoc/filters/
 
 
 
@@ -100,14 +117,13 @@ Summary:	Development dependencies for Hootenanny Core
 Group:		Development/Libraries
 Requires:	%{name}-core-deps = %{version}-%{release}
 Requires:	autoconf automake boost-devel cppunit-devel gcc-c++
-Requires:       gdal-devel >= 1.10.1
 Requires:       gdb
 Requires:       geos-devel = 3.4.2
 Requires:       git glpk-devel libicu-devel log4cxx-devel nodejs-devel opencv-devel
 Requires:       postgresql91-devel proj-devel protobuf-devel python-argparse python-devel qt-devel v8-devel
 Requires:	stxxl-devel
 # Needed to build the documentation
-Requires:       texlive-collection-langcyrillic
+Requires:       texlive
 
 %description core-devel-deps
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -127,7 +143,7 @@ core. Use this if you want to build from github.
 Summary:	Dependencies for Hootenanny Core
 Group:		Development/Libraries
 Requires:	asciidoc cppunit dblatex doxygen FileGDB_API
-Requires:       gdal >= 1.10.1
+Requires:       gdal-devel >= 1.10.1
 Requires: 	gdal-esri-epsg >= 1.10.1
 Requires:       geos = 3.4.2, gnuplot, graphviz
 # Needed by gnuplot for report generation
