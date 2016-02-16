@@ -10,13 +10,16 @@ URL:		https://github.com/ngageoint/hootenanny
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  autoconf automake boost-devel cppunit-devel doxygen gcc-c++
 BuildRequires:  gdal-devel >= 1.10.1
+BuildRequires:  gdal-python >= 1.10.1
+BuildRequires: 	gdal-esri-epsg >= 1.10.1
 BuildRequires:  gdb
 BuildRequires:  geos-devel = 3.4.2
 BuildRequires:  git glpk-devel graphviz libicu-devel
 BuildRequires:  log4cxx-devel nodejs-devel opencv-devel
 BuildRequires:  postgresql91-devel proj-devel protobuf-devel python-argparse python-devel qt-devel
 # Needed to build the documentation
-BuildRequires:  texlive
+BuildRequires:  texlive libxslt 
+BuildRequires:  gnuplot
 BuildRequires:  unzip v8-devel w3m wget words zip
 
 Source0:        %{name}-%{version}.tar.gz
@@ -143,7 +146,8 @@ Summary:	Dependencies for Hootenanny Core
 Group:		Development/Libraries
 Requires:	asciidoc cppunit dblatex doxygen FileGDB_API
 Requires:       gdal-devel >= 1.10.1
-Requires: 	gdal-esri-epsg >= 1.10.1
+Requires:       gdal-python >= 1.10.1
+Requires: 	    gdal-esri-epsg >= 1.10.1
 Requires:       geos = 3.4.2, gnuplot, graphviz
 # Needed by gnuplot for report generation
 Requires:       liberation-fonts-common liberation-sans-fonts
