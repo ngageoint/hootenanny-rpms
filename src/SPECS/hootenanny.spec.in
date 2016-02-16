@@ -12,7 +12,7 @@ BuildRequires:  autoconf automake boost-devel cppunit-devel doxygen gcc-c++
 BuildRequires:  gdal-devel >= 1.10.1
 BuildRequires:  gdb
 BuildRequires:  geos-devel = 3.4.2
-BuildRequires:  git glpk-devel libicu-devel
+BuildRequires:  git glpk-devel graphviz libicu-devel
 BuildRequires:  log4cxx-devel nodejs-devel opencv-devel
 BuildRequires:  postgresql91-devel proj-devel protobuf-devel python-argparse python-devel qt-devel
 # Needed to build the documentation
