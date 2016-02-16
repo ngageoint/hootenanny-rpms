@@ -23,7 +23,7 @@ cd tmp
 
 [ -e hootenanny ] || git clone https://github.com/ngageoint/hootenanny.git
 cd hootenanny
-git pull
+git fetch
 git reset
 # Clean sometimes refuses to delete these directories. Odd.
 rm -rf docs/node_modules hoot-core/tmp/ hoot-core-test/tmp tgs/tmp 
