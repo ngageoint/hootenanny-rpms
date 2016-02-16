@@ -49,7 +49,7 @@ tmp/python-which-install: RPMS/noarch/python-which-1.1.0-12.el6.noarch.rpm
 
 # Just run the install part.
 hoot-test-install: SPECS/hootenanny.spec
-	rpmbuild --short-circuit -bi SPECS/hootenanny.spec	
+	rpmbuild --define "_topdir `pwd`" --short-circuit -bi SPECS/hootenanny.spec
 
 SPECS/hootenanny.spec: SPECS/hootenanny.spec.in $(wildcard SOURCES/hootenanny*.tar.gz)
 	test "$(words $(wildcard SOURCES/hootenanny*.tar.gz))" == "0" && (echo "Did not find a hoot tarball in SOURCES. Do you need to download one? https://github.com/ngageoint/hootenanny/releases"; exit -1) || true
