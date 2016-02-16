@@ -13,6 +13,7 @@ BuildRequires:  gdal-devel >= 1.10.1
 BuildRequires:  gdb
 BuildRequires:  geos-devel = 3.4.2
 BuildRequires:  git glpk-devel graphviz libicu-devel
+BuildRequires:  libspatialite-devel
 BuildRequires:  log4cxx-devel nodejs-devel opencv-devel
 BuildRequires:  postgresql91-devel proj-devel protobuf-devel python-argparse python-devel qt-devel
 # Needed to build the documentation
@@ -119,7 +120,9 @@ Requires:	%{name}-core-deps = %{version}-%{release}
 Requires:	autoconf automake boost-devel cppunit-devel gcc-c++
 Requires:       gdb
 Requires:       geos-devel = 3.4.2
-Requires:       git glpk-devel libicu-devel log4cxx-devel nodejs-devel opencv-devel
+Requires:       git glpk-devel libicu-devel
+Requires:       libspatialite-devel
+Requires:       log4cxx-devel nodejs-devel opencv-devel
 Requires:       postgresql91-devel proj-devel protobuf-devel python-argparse python-devel qt-devel v8-devel
 Requires:	stxxl-devel
 # Needed to build the documentation
