@@ -89,6 +89,7 @@ RPMS/noarch/python-which-1.1.0-12.el6.noarch.rpm: SPECS/python-which.spec
 RPMS/x86_64/log4cxx-0.10.0-14.el6.x86_64.rpm: SPECS/log4cxx.spec
 	rpmbuild --define "_topdir `pwd`" -ba $<
 
-RPMS/x86_64/stxxl-1.3.1-1.el6.x86_64.rpm: SPECS/stxxl.spec
+RPMS/x86_64/stxxl-1.3.1-1.el6.x68_64.rpm: SPECS/stxxl.spec
 	rpmbuild --define "_topdir `pwd`" -ba $<
+
 
