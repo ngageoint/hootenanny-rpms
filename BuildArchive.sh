@@ -47,7 +47,7 @@ make -s clean
 rm -f hootenanny-*.tar.gz hootenanny-services-*.war
 rm -f /home/vagrant/hootenanny-rpms/src/SOURCES/hootenanny-*.tar.gz
 
-[ -e /tmp/words1.sqlite ] || cp /tmp/words1.sqlite conf/
+[ -e /tmp/words1.sqlite ] && cp /tmp/words1.sqlite conf/
 make -s -j `grep -c ^processor /proc/cpuinfo`
 make -s -j `grep -c ^processor /proc/cpuinfo` archive
 
