@@ -1,6 +1,6 @@
 
 # Default branch of hoot to build
-GIT_COMMIT?=develop
+GIT_COMMIT?=origin/develop
 
 all: hoot
 
@@ -45,7 +45,7 @@ vagrant-build: | vagrant-build-archive vagrant-build-rpms
 
 vagrant-build-rpms: ValidHootTarball vagrant-build-deps
 	vagrant up
-	vagrant ssh -c "cd hootenanny-rpms && make -j `grep -c ^processor /proc/cpuinfo`"
+	vagrant ssh -c "cd hootenanny-rpms && make"
 
 vagrant-build-archive: vagrant-build-deps
 	vagrant up
@@ -68,6 +68,10 @@ deps: force
 	sudo cp repos/RPM-GPG-KEY-EPEL-6 /etc/pki/rpm-gpg/
 	sudo yum clean metadata
 	sudo true || true
+	# Sometimes the yum update fails getting the metadata. Try several times and ignore
+	# the first two if they error
+	sudo yum update -y || sleep 30
+	sudo yum update -y || sleep 30
 	sudo yum update -y
 	sudo true || true
 	sudo yum install -y \
@@ -96,6 +100,7 @@ deps: force
 	  gd-devel \
 	  giflib-devel \
 	  git \
+	  graphviz \
 	  hdf-devel \
 	  hdf5-devel \
 	  hdf-static \

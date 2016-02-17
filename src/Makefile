@@ -5,13 +5,12 @@ hootversion=$(patsubst SOURCES/hootenanny-%.tar.gz,%,$(hoottarball))
 
 all: not-hoot hoot
 
-clean:
+clean: clean-hoot
 	rm -rf tmp BUILD/* BUILDROOT/* SRPMS/* RPMS/*
 
-# Clean out all hoot specific RPMs and build files. Also remote tmp. This will force
-# a reinstall of build deps -- handy in vagrant.
+# Clean out all hoot specific RPMs and build files.
 clean-hoot:
-	rm -rf BUILD/hoot* BUILDROOT/hoot* SRPMS/hoot* RPMS/x86_64/hoot* tmp
+	rm -rf BUILD/hoot* BUILDROOT/hoot* SRPMS/hoot* RPMS/x86_64/hoot* SPECS/hootenanny.spec
 
 not-hoot: \
 	RPMS/noarch/hootenanny-words-1.0.0-1.el6.noarch.rpm \
@@ -28,8 +27,8 @@ not-hoot: \
 hoot: \
 	RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm \
 
-hoot-deps: not-hoot tmp/log4cxx-install
-	# Silly way to replace the gdal/geos RPMs
+hoot-deps: not-hoot
+	# Silly way to force a replacement of the gdal/geos RPMs
 	sudo yum -y remove gdal-devel gdal geos geos-devel
 	sudo yum -y install RPMS/x86_64/* RPMS/noarch/*
 
@@ -55,8 +54,8 @@ hoot-test-install: SPECS/hootenanny.spec
 SPECS/hootenanny.spec: SPECS/hootenanny.spec.in $(wildcard SOURCES/hootenanny*.tar.gz)
 	test "$(words $(wildcard SOURCES/hootenanny*.tar.gz))" == "0" && (echo "Did not find a hoot tarball in SOURCES. Do you need to download one? https://github.com/ngageoint/hootenanny/releases"; exit -1) || true
 	test $(words $(wildcard SOURCES/hootenanny*.tar.gz)) == "1" || (echo "Found more than 1 hoot tarball please remove the extra tarballs. $(wildcard SOURCES/hootenanny*.tar.gz)"; exit -1)
-	echo "# Do not modify directly, please modify hootenanny.spec.in instead." > SPECS/hootenanny.spec
 	mv SPECS/hootenanny.spec /tmp/hootenanny-`date +%s`.spec || true
+	echo "# Do not modify directly, please modify hootenanny.spec.in instead." > SPECS/hootenanny.spec
 	cat SPECS/hootenanny.spec.in | sed -e "s/%%HOOT_VERSION%%/$(hootversion)/g" >> SPECS/hootenanny.spec
 
 RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm: SPECS/hootenanny.spec hoot-deps
