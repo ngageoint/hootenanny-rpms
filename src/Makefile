@@ -13,6 +13,7 @@ clean-hoot:
 	rm -rf BUILD/hoot* BUILDROOT/hoot* SRPMS/hoot* RPMS/x86_64/hoot* SPECS/hootenanny.spec
 
 not-hoot: \
+	RPMS/noarch/hootenanny-words-1.0.0-1.el6.noarch.rpm \
 	RPMS/noarch/autoconf-2.69-3.el6.noarch.rpm \
 	RPMS/noarch/dblatex-0.3-5.el6.noarch.rpm \
 	RPMS/noarch/python-which-1.1.0-12.el6.noarch.rpm \
@@ -92,4 +93,7 @@ RPMS/x86_64/log4cxx-0.10.0-14.el6.x86_64.rpm: SPECS/log4cxx.spec
 RPMS/x86_64/stxxl-1.3.1-1.el6.x86_64.rpm: SPECS/stxxl.spec
 	rpmbuild --define "_topdir `pwd`" -ba $<
 
+
+RPMS/noarch/hootenanny-words-1.0.0-1.el6.noarch.rpm: SPECS/hootenanny-words.spec
+	rpmbuild -ba -vv --define "_topdir `pwd`" $<
 
