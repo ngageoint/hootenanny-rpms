@@ -1,6 +1,6 @@
 
 # Default branch of hoot to build
-GIT_COMMIT?=develop
+GIT_COMMIT?=origin/develop
 
 all: hoot
 
