@@ -22,6 +22,7 @@ not-hoot: \
 	RPMS/x86_64/geos-3.4.2-1.el6.x86_64.rpm \
 	RPMS/x86_64/gnuplot-4.6.1-1.el6.x86_64.rpm \
 	RPMS/x86_64/log4cxx-0.10.0-14.el6.x86_64.rpm \
+	RPMS/x86_64/stxxl-1.3.1-1.el6.x86_64.rpm \
 
 hoot: \
 	RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm \
@@ -29,7 +30,7 @@ hoot: \
 hoot-deps: not-hoot
 	# Silly way to force a replacement of the gdal/geos RPMs
 	sudo yum -y remove gdal-devel gdal geos geos-devel
-	sudo yum -y install RPMS/x86_64/* RPMS/noarch/*
+	sudo yum -y install RPMS/x86_64/* RPMS/noarch/* libspatialite-devel
 
 tmp/FileGDB-install: RPMS/x86_64/FileGDB_API-1.3-1.el6.x86_64.rpm
 	yum list installed FileGDB_API || sudo yum -y install $<
@@ -48,7 +49,7 @@ tmp/python-which-install: RPMS/noarch/python-which-1.1.0-12.el6.noarch.rpm
 
 # Just run the install part.
 hoot-test-install: SPECS/hootenanny.spec
-	rpmbuild --short-circuit -bi SPECS/hootenanny.spec	
+	rpmbuild --define "_topdir `pwd`" --short-circuit -bi SPECS/hootenanny.spec
 
 SPECS/hootenanny.spec: SPECS/hootenanny.spec.in $(wildcard SOURCES/hootenanny*.tar.gz)
 	test "$(words $(wildcard SOURCES/hootenanny*.tar.gz))" == "0" && (echo "Did not find a hoot tarball in SOURCES. Do you need to download one? https://github.com/ngageoint/hootenanny/releases"; exit -1) || true
@@ -59,32 +60,36 @@ SPECS/hootenanny.spec: SPECS/hootenanny.spec.in $(wildcard SOURCES/hootenanny*.t
 
 RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm: SPECS/hootenanny.spec hoot-deps
 	rm -rf BUILD/hootenanny-* BUILDROOT/hootenanny-* RPMS/x86_64/hootenanny-* SRPMS/hootenanny-*
-	rpmbuild -ba $<
+	rpmbuild --define "_topdir `pwd`" -ba $<
 
 RPMS/noarch/autoconf-2.69-3.el6.noarch.rpm: SPECS/autoconf.spec
-	rpmbuild -ba $<
+	rpmbuild --define "_topdir `pwd`" -ba $<
 
 RPMS/noarch/dblatex-0.3-5.el6.noarch.rpm: SPECS/dblatex.spec tmp/python-which-install
-	rpmbuild -ba $<
+	rpmbuild --define "_topdir `pwd`" -ba $<
 
 RPMS/x86_64/FileGDB_API-1.3-1.el6.x86_64.rpm: SPECS/FileGDB_API.spec
-	rpmbuild -ba $<
+	rpmbuild --define "_topdir `pwd`" -ba $<
 
 RPMS/x86_64/gdal-1.10.1-3.el6.x86_64.rpm: SPECS/gdal.spec tmp/FileGDB-install
-	rpmbuild -ba $<
+	rpmbuild --define "_topdir `pwd`" -ba $<
 
 RPMS/x86_64/geos-3.4.2-1.el6.x86_64.rpm: SPECS/geos.spec
-	rpmbuild -ba $<
+	rpmbuild --define "_topdir `pwd`" -ba $<
 
 RPMS/x86_64/gdal-esri-epsg-1.10.1-1.el6.x86_64.rpm: SPECS/gdal-esri-epsg.spec tmp/FileGDB-install
-	rpmbuild -ba $<
+	rpmbuild --define "_topdir `pwd`" -ba $<
 
 RPMS/x86_64/gnuplot-4.6.1-1.el6.x86_64.rpm: SPECS/gnuplot.spec
-	rpmbuild -ba $<
+	rpmbuild --define "_topdir `pwd`" -ba $<
 
 RPMS/noarch/python-which-1.1.0-12.el6.noarch.rpm: SPECS/python-which.spec
-	rpmbuild -ba $<
+	rpmbuild --define "_topdir `pwd`" -ba $<
 
 RPMS/x86_64/log4cxx-0.10.0-14.el6.x86_64.rpm: SPECS/log4cxx.spec
-	rpmbuild -ba $<
+	rpmbuild --define "_topdir `pwd`" -ba $<
+
+RPMS/x86_64/stxxl-1.3.1-1.el6.x86_64.rpm: SPECS/stxxl.spec
+	rpmbuild --define "_topdir `pwd`" -ba $<
+
 

@@ -29,6 +29,8 @@ git reset
 rm -rf docs/node_modules hoot-core/tmp/ hoot-core-test/tmp tgs/tmp 
 git clean -d -f -f -x || echo "It is ok if this fails, it sometimes mysteriously doesn't clean"
 git checkout $GIT_COMMIT
+# Do a pull just in case a branch was specified.
+git pull || echo "Ignore the failure."
 cp LocalConfig.pri.orig LocalConfig.pri
 echo "QMAKE_CXX=ccache g++" >> LocalConfig.pri
 
@@ -45,7 +47,7 @@ make -s clean
 rm -f hootenanny-*.tar.gz hootenanny-services-*.war
 rm -f /home/vagrant/hootenanny-rpms/src/SOURCES/hootenanny-*.tar.gz
 
-[ -e /tmp/words1.sqlite ] || cp /tmp/words1.sqlite conf/
+[ -e /tmp/words1.sqlite ] && cp /tmp/words1.sqlite conf/
 make -s -j `grep -c ^processor /proc/cpuinfo`
 make -s -j `grep -c ^processor /proc/cpuinfo` archive
 
