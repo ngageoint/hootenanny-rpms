@@ -60,7 +60,7 @@ vagrant-clean:
 
 vagrant-test:
 	cd test; vagrant up
-	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --exclude=.*RubberSheetConflateTest.sh --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh --slow"
+	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --diff --exclude=.*RubberSheetConflateTest.sh --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh --slow"
 
 deps: force
 	sudo true || true
