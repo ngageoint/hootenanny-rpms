@@ -5,8 +5,9 @@ Summary:	Hootenanny words dictionary
 BuildArch:	noarch
 
 %define words_filename	words1.sqlite
+%define words_compress	%{words_filename}.bz2
 %define deploy_dir /var/lib/hootenanny/conf
-%define words_url  https://github.com/ngageoint/hootenanny/releases/download/v0.2.16/%{words_filename}
+%define words_url  https://s3.amazonaws.com/hoot-rpms/support-files/%{words_compress}
 
 Group:		Applications/Engineering
 License:	GPLv3
@@ -19,10 +20,10 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %prep
 cd %{_topdir}/SOURCES
-[ -e %{words_filename} ] && rm %{words_filename}
+[ -e %{words_compress} ] && rm %{words_compress}
 wget -nv %{words_url}
 cd %{_topdir}/BUILD
-cp %{_topdir}/SOURCES/%{words_filename} ./
+bzcat %{_topdir}/SOURCES/%{words_compress} > %{words_filename}
 /bin/chmod -Rf a+rX,u+w,g-w,o-w .
 
 %build
@@ -34,7 +35,7 @@ cd $RPM_BUILD_ROOT%{deploy_dir}; ln -s %{words_filename} words.sqlite
 
 %clean
 rm -rf $RPM_BUILD_ROOT
-[ -e %{_topdir}/SOURCES/%{words_filename} ] && rm %{_topdir}/SOURCES/%{words_filename}
+[ -e %{_topdir}/SOURCES/%{words_compress} ] && rm %{_topdir}/SOURCES/%{words_compress}
 [ -e %{_topdir}/BUILD/%{words_filename} ] && rm %{_topdir}/BUILD/%{words_filename}
 
 %files
