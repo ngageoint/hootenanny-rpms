@@ -25,6 +25,7 @@ cd tmp
 cd hootenanny
 git fetch
 git reset
+git submodule update --init --recursive
 # Clean sometimes refuses to delete these directories. Odd.
 rm -rf docs/node_modules hoot-core/tmp/ hoot-core-test/tmp tgs/tmp 
 git clean -d -f -f -x || echo "It is ok if this fails, it sometimes mysteriously doesn't clean"
@@ -37,7 +38,7 @@ echo "QMAKE_CXX=ccache g++" >> LocalConfig.pri
 source SetupEnv.sh
 
 # Configure makefiles, we aren't testing services with RPMs yet.
-aclocal && autoconf && autoheader && automake && ./configure -q --with-rnd
+aclocal && autoconf && autoheader && automake && ./configure -q --with-rnd --with-services
 
 # Use the default database
 cp conf/DatabaseConfig.sh.orig conf/DatabaseConfig.sh
