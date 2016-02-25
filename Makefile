@@ -77,6 +77,7 @@ deps: force
 	sudo true || true
 	sudo yum install -y \
 	  ant \
+	  apache-maven \
 	  apr-devel \
 	  apr-util-devel \
 	  armadillo-devel \
