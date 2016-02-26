@@ -30,7 +30,7 @@ hoot: \
 hoot-deps: not-hoot
 	# Silly way to force a replacement of the gdal/geos RPMs
 	sudo yum -y remove gdal-devel gdal geos geos-devel
-	sudo yum -y install RPMS/x86_64/* RPMS/noarch/* libspatialite-devel
+	sudo yum -y install RPMS/x86_64/* RPMS/noarch/* libspatialite-devel postgis2_92
 
 tmp/FileGDB-install: RPMS/x86_64/FileGDB_API-1.3-1.el6.x86_64.rpm
 	yum list installed FileGDB_API || sudo yum -y install $<
