@@ -75,6 +75,7 @@ make -s clean
 # Remove any old archives
 rm -f hootenanny-*.tar.gz hootenanny-services-*.war
 rm -f /home/vagrant/hootenanny-rpms/src/SOURCES/hootenanny-*.tar.gz
+rm -f /home/vagrant/hootenanny-rpms/src/SOURCES/hootenanny-services*.war
 
 [ -e /tmp/words1.sqlite ] && cp /tmp/words1.sqlite conf/
 make -s -j `grep -c ^processor /proc/cpuinfo`

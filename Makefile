@@ -165,7 +165,7 @@ deps: force
 	  libicu-devel \
 	  cppunit-devel \
 	  python-argparse \
-	  el6-src/* \
+	  el6-src/*
 
 el6: el6-src/* custom-rpms
 
