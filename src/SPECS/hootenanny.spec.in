@@ -75,7 +75,7 @@ make -s %{?_smp_mflags}
 
 # UI stuff
 mkdir -p $RPM_BUILD_ROOT/var/lib/tomcat6/webapps
-cp hoot-service/target/hoot-service*.war $RPM_BUILD_ROOT/var/lib/tomcat6/webapps/hoot-services.war
+cp hoot-services/target/hoot-services*.war $RPM_BUILD_ROOT/var/lib/tomcat6/webapps/hoot-services.war
 
 make install
 echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
