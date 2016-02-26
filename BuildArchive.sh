@@ -7,6 +7,8 @@ set -x
 
 echo $GIT_COMMIT
 
+export JAVA_HOME=/etc/alternatives/jre_1.8.0
+
 sudo yum install -y ccache
 
 cd /home/vagrant/hootenanny-rpms/src/
@@ -27,7 +29,7 @@ git fetch
 git reset
 git submodule update --init --recursive
 # Clean sometimes refuses to delete these directories. Odd.
-rm -rf docs/node_modules hoot-core/tmp/ hoot-core-test/tmp tgs/tmp 
+rm -rf docs/node_modules hoot-core/tmp/ hoot-core-test/tmp tgs/tmp
 git clean -d -f -f -x || echo "It is ok if this fails, it sometimes mysteriously doesn't clean"
 git checkout $GIT_COMMIT
 # Do a pull just in case a branch was specified.
@@ -36,6 +38,32 @@ cp LocalConfig.pri.orig LocalConfig.pri
 echo "QMAKE_CXX=ccache g++" >> LocalConfig.pri
 
 source SetupEnv.sh
+
+# init and start Postgres
+export PG_VERSION=9.2
+sudo service postgresql-$PG_VERSION initdb
+sudo service postgresql-$PG_VERSION start
+# set Postgres to autostart
+sudo /sbin/chkconfig --add postgresql-$PG_VERSION
+sudo /sbin/chkconfig postgresql-$PG_VERSION on
+# create Hoot services db
+if ! sudo -u postgres psql -lqt | grep -i --quiet hoot; then
+    sudo -u postgres createuser --superuser hoot
+    sudo -u postgres psql -c "alter user hoot with password 'hoottest';"
+    sudo -u postgres createdb hoot --owner=hoot
+    sudo -u postgres createdb wfsstoredb --owner=hoot
+    sudo -u postgres psql -d hoot -c 'create extension hstore;'
+    sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='wfsstoredb'"
+    sudo -u postgres psql -d wfsstoredb -c 'create extension postgis;'
+    sudo -u postgres psql -d wfsstoredb -c "GRANT ALL on geometry_columns TO PUBLIC;"
+    sudo -u postgres psql -d wfsstoredb -c "GRANT ALL on geography_columns TO PUBLIC;"
+    sudo -u postgres psql -d wfsstoredb -c "GRANT ALL on spatial_ref_sys TO PUBLIC;"
+fi
+if ! sudo grep -i --quiet hoot /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf; then
+    sudo sed -i '1ihost    all            hoot            127.0.0.1/32            md5' /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
+    sudo sed -i '1ihost    all            hoot            ::1/128                 md5' /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
+    sudo /etc/init.d/postgresql-$PG_VERSION restart
+fi
 
 # Configure makefiles, we aren't testing services with RPMs yet.
 aclocal && autoconf && autoheader && automake && ./configure -q --with-rnd --with-services
@@ -56,4 +84,4 @@ make -s -j `grep -c ^processor /proc/cpuinfo` archive
 timeout 600s HootTest --exclude=.*RubberSheetConflateTest.sh --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh --slow
 
 cp -l hootenanny-*.tar.gz /home/vagrant/hootenanny-rpms/src/SOURCES/
-
+cp -l hootenanny-services*.war /home/vagrant/hootenanny-rpms/src/SOURCES/

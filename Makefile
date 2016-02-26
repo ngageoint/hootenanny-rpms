@@ -157,7 +157,6 @@ deps: force
 	  mysql-devel \
 	  numpy \
 	  poppler-devel \
-	  postgresql-devel \
 	  ruby \
 	  swig \
 	  unixODBC-devel \
