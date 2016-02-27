@@ -1,5 +1,8 @@
+TARBALLS := $(wildcard src/SOURCES/hootenanny*.tar.gz)
+DOCBALLS := $(wildcard src/SOURCES/hootenanny*-documentation.tar.gz)
+HOOTBALL := $(filter-out $(DOCBALLS), $(TARBALLS))
 
-hoottarball=$(lastword $(sort $(wildcard SOURCES/hootenanny*.tar.gz)))
+hoottarball=$(lastword $(sort $(HOOTBALL)))
 
 hootversion=$(patsubst SOURCES/hootenanny-%.tar.gz,%,$(hoottarball))
 
@@ -51,9 +54,9 @@ tmp/python-which-install: RPMS/noarch/python-which-1.1.0-12.el6.noarch.rpm
 hoot-test-install: SPECS/hootenanny.spec
 	rpmbuild --define "_topdir `pwd`" --short-circuit -bi SPECS/hootenanny.spec
 
-SPECS/hootenanny.spec: SPECS/hootenanny.spec.in $(wildcard SOURCES/hootenanny*.tar.gz)
-	test "$(words $(wildcard SOURCES/hootenanny*.tar.gz))" == "0" && (echo "Did not find a hoot tarball in SOURCES. Do you need to download one? https://github.com/ngageoint/hootenanny/releases"; exit -1) || true
-	test $(words $(wildcard SOURCES/hootenanny*.tar.gz)) == "1" || (echo "Found more than 1 hoot tarball please remove the extra tarballs. $(wildcard SOURCES/hootenanny*.tar.gz)"; exit -1)
+SPECS/hootenanny.spec: SPECS/hootenanny.spec.in  $(HOOTBALL)
+	test $(words $(HOOTBALL)) == 0 && (echo "Did not find a hoot tarball in SOURCES. Do you need to download one? https://github.com/ngageoint/hootenanny/releases"; exit -1) || true
+	test $(words $(HOOTBALL)) == 1 || (echo "Found more than 1 hoot tarball please remove the extra tarballs. $HOOTBALL"; exit -1)
 	mv SPECS/hootenanny.spec /tmp/hootenanny-`date +%s`.spec || true
 	echo "# Do not modify directly, please modify hootenanny.spec.in instead." > SPECS/hootenanny.spec
 	cat SPECS/hootenanny.spec.in | sed -e "s/%%HOOT_VERSION%%/$(hootversion)/g" >> SPECS/hootenanny.spec

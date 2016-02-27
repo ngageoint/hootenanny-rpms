@@ -1,6 +1,9 @@
 
 # Default branch of hoot to build
 GIT_COMMIT?=origin/develop
+TARBALLS := $(wildcard src/SOURCES/hootenanny*.tar.gz)
+DOCBALLS := $(wildcard src/SOURCES/hootenanny*-documentation.tar.gz)
+HOOTBALL := $(filter-out $(DOCBALLS), $(TARBALLS))
 
 all: hoot
 
@@ -25,7 +28,7 @@ clean-hoot:
 	cd src; $(MAKE) clean-hoot
 
 ValidHootTarball:
-	test "$(words $(wildcard src/SOURCES/hootenanny*.tar.gz))" != "1" && (echo "Did not find exactly one hoot tarball in SOURCES. Too many? Do you need to download one? https://github.com/ngageoint/hootenanny/releases"; exit -1) || true
+	test $(words $(HOOTBALL)) != 1 && (echo "Did not find exactly one hoot tarball in SOURCES. Too many? Do you need to download one? https://github.com/ngageoint/hootenanny/releases"; exit -1) || true
 
 vagrant-build-up: vagrant-plugins
 	vagrant up
