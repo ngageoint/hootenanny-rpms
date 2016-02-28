@@ -56,7 +56,7 @@ hoot-test-install: SPECS/hootenanny.spec
 
 SPECS/hootenanny.spec: SPECS/hootenanny.spec.in  $(HOOTBALL)
 	test $(words $(HOOTBALL)) == 0 && (echo "Did not find a hoot tarball in SOURCES. Do you need to download one? https://github.com/ngageoint/hootenanny/releases"; exit -1) || true
-	test $(words $(HOOTBALL)) == 1 || (echo "Found more than 1 hoot tarball please remove the extra tarballs. $HOOTBALL"; exit -1)
+	test $(words $(HOOTBALL)) == 1 || (echo "Found more than 1 hoot tarball please remove the extra tarballs. $(HOOTBALL)"; exit -1)
 	mv SPECS/hootenanny.spec /tmp/hootenanny-`date +%s`.spec || true
 	echo "# Do not modify directly, please modify hootenanny.spec.in instead." > SPECS/hootenanny.spec
 	cat SPECS/hootenanny.spec.in | sed -e "s/%%HOOT_VERSION%%/$(hootversion)/g" >> SPECS/hootenanny.spec
