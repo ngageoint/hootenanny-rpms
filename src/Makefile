@@ -1,5 +1,5 @@
-TARBALLS := $(wildcard src/SOURCES/hootenanny*.tar.gz)
-DOCBALLS := $(wildcard src/SOURCES/hootenanny*-documentation.tar.gz)
+TARBALLS := $(wildcard SOURCES/hootenanny*.tar.gz)
+DOCBALLS := $(wildcard SOURCES/hootenanny*-documentation.tar.gz)
 HOOTBALL := $(filter-out $(DOCBALLS), $(TARBALLS))
 
 hoottarball=$(lastword $(sort $(HOOTBALL)))
