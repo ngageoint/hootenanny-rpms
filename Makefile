@@ -111,7 +111,7 @@ deps: force
 	  hdf-static \
 	  help2man \
 	  info \
-	  java-1.6.0-openjdk-devel \
+	  java-1.7.0-openjdk-devel \
 	  java-devel \
 	  libdap-devel \
 	  libgta-devel \

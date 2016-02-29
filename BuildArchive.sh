@@ -7,7 +7,7 @@ set -x
 
 echo $GIT_COMMIT
 
-export JAVA_HOME=/etc/alternatives/jre_1.8.0
+export JAVA_HOME=/etc/alternatives/jre_1.7.0
 
 sudo yum install -y ccache
 
