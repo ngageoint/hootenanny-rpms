@@ -99,7 +99,9 @@ source ./SetupEnv.sh
 # https://github.com/ngageoint/hootenanny/issues/279
 # https://github.com/ngageoint/hootenanny/issues/281
 HootTest --exclude=.*RubberSheetConflateTest.sh \
-	--exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh \
+    --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh \
+    --exclude=.*ConflationStatsReportTest.sh \
+    --exclude=.*Osm2OgrTranslation.sh \
 	--slow
 
 %clean
