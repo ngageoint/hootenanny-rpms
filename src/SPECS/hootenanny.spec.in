@@ -17,7 +17,8 @@ BuildRequires:  geos-devel = 3.4.2
 BuildRequires:  git glpk-devel graphviz libicu-devel
 BuildRequires:  libspatialite-devel
 BuildRequires:  log4cxx-devel nodejs-devel opencv-devel
-BuildRequires:  postgresql91-devel proj-devel protobuf-devel python-argparse python-devel qt-devel
+BuildRequires:  postgresql-devel >= 9.1
+BuildRequires:  proj-devel protobuf-devel python-argparse python-devel qt-devel
 # Needed to build the documentation
 BuildRequires:  texlive libxslt
 BuildRequires:  gnuplot
@@ -56,6 +57,7 @@ This package contains the core algorithms and command line interface.
 
 %build
 source ./SetupEnv.sh
+export JAVA_HOME=/etc/alternatives/jre_1.8.0
 # The dir configurations set the install directory to work with EL's dir structure
 ./configure --with-rnd --with-services -q \
 	--prefix=$RPM_BUILD_ROOT/usr/ \
@@ -201,7 +203,8 @@ Requires:       geos-devel = 3.4.2
 Requires:       git glpk-devel libicu-devel
 Requires:       libspatialite-devel
 Requires:       log4cxx-devel nodejs-devel opencv-devel
-Requires:       postgresql91-devel proj-devel protobuf-devel python-argparse python-devel qt-devel v8-devel
+Requires:       postgresql-devel >= 9.1
+Requires:       proj-devel protobuf-devel python-argparse python-devel qt-devel v8-devel
 Requires:	stxxl-devel
 # Needed to build the documentation
 Requires:       texlive
@@ -230,8 +233,9 @@ Requires: 	    gdal-esri-epsg >= 1.10.1
 Requires:       geos = 3.4.2, gnuplot, graphviz
 # Needed by gnuplot for report generation
 Requires:       liberation-fonts-common liberation-sans-fonts
-Requires:       libxslt log4cxx nodejs opencv postgresql91-libs protobuf qt
-Requires:	stxxl
+Requires:       libxslt log4cxx nodejs opencv  protobuf qt
+Requires:       postgresql-libs >= 9.1
+Requires:       stxxl
 Requires:       texlive
 Requires:       unzip w3m wget words
 Requires:       zip
