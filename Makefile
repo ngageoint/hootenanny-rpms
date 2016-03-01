@@ -123,6 +123,7 @@ deps: force
 	  m17n-lib* \
 	  m4 \
 	  netcdf-devel \
+	  npm \
 	  pango-devel \
 	  pcre-devel \
 	  proj-devel \
