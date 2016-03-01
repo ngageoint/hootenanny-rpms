@@ -15,6 +15,7 @@ BuildRequires: 	gdal-esri-epsg >= 1.10.1
 BuildRequires:  gdb
 BuildRequires:  geos-devel = 3.4.2
 BuildRequires:  git glpk-devel graphviz libicu-devel
+BuildRequires:	hootenanny-words = 1.0.0
 BuildRequires:  libspatialite-devel
 BuildRequires:  log4cxx-devel nodejs-devel opencv-devel
 BuildRequires:  postgresql-devel >= 9.1
@@ -84,8 +85,6 @@ echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hoot
 chmod 755 $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
 cp -R test-files/ $RPM_BUILD_ROOT/var/lib/hootenanny/
 ln -s /usr/lib64 $RPM_BUILD_ROOT/var/lib/hootenanny/lib
-rm $RPM_BUILD_ROOT/var/lib/hootenanny/conf/words.sqlite
-cd $RPM_BUILD_ROOT/var/lib/hootenanny/conf/; ln -s words1.sqlite words.sqlite
 rm $RPM_BUILD_ROOT/usr/bin/HootEnv.sh
 # This allows all the tests to run.
 mkdir -p $RPM_BUILD_ROOT/var/lib/hootenanny/hoot-core-test/src/test/
@@ -203,6 +202,7 @@ Requires:	autoconf automake boost-devel cppunit-devel gcc-c++
 Requires:       gdb
 Requires:       geos-devel = 3.4.2
 Requires:       git glpk-devel libicu-devel
+Requires:	hootenanny-words = 1.0.0
 Requires:       libspatialite-devel
 Requires:       log4cxx-devel nodejs-devel opencv-devel
 Requires:       postgresql-devel >= 9.1
@@ -233,6 +233,7 @@ Requires:       gdal-devel >= 1.10.1
 Requires:       gdal-python >= 1.10.1
 Requires: 	    gdal-esri-epsg >= 1.10.1
 Requires:       geos = 3.4.2, gnuplot, graphviz
+Requires:	hootenanny-words = 1.0.0
 # Needed by gnuplot for report generation
 Requires:       liberation-fonts-common liberation-sans-fonts
 Requires:       libxslt log4cxx nodejs opencv  protobuf qt
