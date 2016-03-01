@@ -54,5 +54,5 @@ make -s -j `grep -c ^processor /proc/cpuinfo` archive
 # Run the tests that are known to be good on CentOS with a generous timeout
 timeout 600s HootTest --exclude=.*RubberSheetConflateTest.sh --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh --slow
 
-cp -l hootenanny-*.tar.gz /home/vagrant/hootenanny-rpms/src/SOURCES/
+cp -l hootenanny-[0-9]*.tar.gz /home/vagrant/hootenanny-rpms/src/SOURCES/
 
