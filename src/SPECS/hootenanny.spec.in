@@ -125,7 +125,7 @@ rm -rf %{buildroot}
 %package ui
 Summary:    Hootenanny UI and Services
 Requires:   %{name}-core = %{version}-%{release}
-Requires:   postgis2_91
+Requires:   postgis2 >= 9.1
 Requires:   tomcat6
 Group:      Applications/Engineering
 
