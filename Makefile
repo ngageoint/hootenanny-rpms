@@ -60,6 +60,7 @@ vagrant-clean:
 	mkdir -p el6
 	cd test && vagrant halt && vagrant destroy -f
 	rmdir --ignore-fail-on-non-empty el6 || true
+	rm -f src/tmp/*-install
 
 vagrant-test:
 	cd test; vagrant up
