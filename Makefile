@@ -70,7 +70,6 @@ deps: force
 	sudo true || true
 	sudo cp repos/HootBuild.repo /etc/yum.repos.d
 	sudo cp repos/RPM-GPG-KEY-EPEL-6 /etc/pki/rpm-gpg/
-	sudo cp repos/NODESOURCE-GPG-SIGNING-KEY-EL /etc/pki/rpm-gpg/
 	sudo yum clean metadata
 	sudo true || true
 	# Sometimes the yum update fails getting the metadata. Try several times and ignore
@@ -128,6 +127,7 @@ deps: force
 	  m17n-lib* \
 	  m4 \
 	  netcdf-devel \
+	  nodejs \
 	  npm \
 	  pango-devel \
 	  pcre-devel \
