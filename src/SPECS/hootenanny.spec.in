@@ -124,7 +124,7 @@ rm -rf %{buildroot}
 %package ui
 Summary:    Hootenanny UI and Services
 Requires:   %{name}-core = %{version}-%{release}
-Requires:   postgis2 >= 9.1
+Requires:   postgis2_92 >= 2.1
 Requires:   tomcat6
 Group:      Applications/Engineering
 
@@ -148,7 +148,7 @@ This package contains the UI and web services.
 
 %package autostart
 Summary:    Hootenanny Autostart
-Requires:   %{name}-core = %{version}-%{release}
+Requires:   %{name}-ui = %{version}-%{release}
 Group:      Applications/Engineering
 
 %description autostart
@@ -190,9 +190,45 @@ if ! sudo grep -i --quiet hoot /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf; then
     sudo sed -i '1ihost    all            hoot            ::1/128                 md5' /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
     sudo /etc/init.d/postgresql-$PG_VERSION restart
 fi
+# set Tomcat to autostart
+sudo /sbin/chkconfig --add tomcat6
+sudo /sbin/chkconfig tomcat6 on
+if ! grep -i --quiet HOOT /usr/sbin/tomcat6; then
+    echo "Configuring tomcat6 environment"
+    sudo bash -c "cat >> /usr/sbin/tomcat6" <<EOT
+#--------------
+# Hoot Settings
+#--------------
+HOOT_HOME=/var/lib/hoot
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:$HOOT_HOME/lib:$HOOT_HOME/pretty-pipes/lib
+GDAL_DATA=/usr/local/share/gdal
+GDAL_LIB_DIR=/usr/local/lib
+HOOT_WORKING_NAME=hoot
+QT_HOME=/usr/local/qt-everywhere-opensource-src-4.8.6
+PSQL_HOME=/usr/pgsql-$PG_VERSION
+PATH=$HOOT_HOME/bin:/usr/local/lib:/usr/local/bin:$PATH:$QT_HOME/bin:$PSQL_HOME/bin
+EOT
+fi
+# Create Tomcat context path for tile images
+if ! grep -i --quiet 'ingest/processed' /etc/tomcat6/server.xml; then
+    echo "Adding Tomcat context path for tile images"
+    sudo sed -i.bak "s@<\/Host>@ <Context docBase=\"\/var\/lib\/hootenanny\/ingest\/processed\" path=\"\/static\" \/>\n &@" /etc/tomcat6/server.xml
+fi
+# Allow linking in Tomcat context
+if ! grep -i --quiet 'allowLinking="true"' /etc/tomcat6/context.xml; then
+    echo "Set allowLinking to true in Tomcat context"
+    sudo sed -i.bak "s@^<Context>@<Context allowLinking=\"true\">@" /etc/tomcat6/context.xml
+fi
+sudo /etc/init.d/tomcat6 start
 
-
-
+echo "Configuring firewall..."
+sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
+sudo iptables -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080
+sudo iptables -A OUTPUT -t nat -s 0/0 -d 127/8 -p tcp --dport 80 -j REDIRECT --to-ports 8080
+sudo service iptables save
+sudo service iptables restart
+sudo service tomcat6 restart
 
 %package core-devel-deps
 Summary:	Development dependencies for Hootenanny Core
