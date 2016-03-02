@@ -58,7 +58,7 @@ This package contains the core algorithms and command line interface.
 
 %build
 source ./SetupEnv.sh
-export JAVA_HOME=/etc/alternatives/jre_1.8.0
+export JAVA_HOME=/etc/alternatives/jre_1.7.0
 # The dir configurations set the install directory to work with EL's dir structure
 ./configure --with-rnd --with-services -q \
 	--prefix=$RPM_BUILD_ROOT/usr/ \
