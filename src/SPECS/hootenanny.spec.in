@@ -125,6 +125,7 @@ rm -rf %{buildroot}
 Summary:    Hootenanny UI and Services
 Requires:   %{name}-core = %{version}-%{release}
 Requires:   postgresql-server >= 9.1
+Requires:   postgresql-contrib >= 9.1
 Requires:   postgis2_92 >= 2.1
 Requires:   tomcat6
 Group:      Applications/Engineering
