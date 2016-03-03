@@ -124,6 +124,7 @@ rm -rf %{buildroot}
 %package ui
 Summary:    Hootenanny UI and Services
 Requires:   %{name}-core = %{version}-%{release}
+Requires:   postgresql-server >= 9.1
 Requires:   postgis2_92 >= 2.1
 Requires:   tomcat6
 Group:      Applications/Engineering
@@ -274,6 +275,7 @@ Requires:	hootenanny-words = 1.0.0
 Requires:       liberation-fonts-common liberation-sans-fonts
 Requires:       libxslt log4cxx nodejs opencv  protobuf qt
 Requires:       postgresql-libs >= 9.1
+Requires:       qt-postgresql
 Requires:       stxxl
 Requires:       texlive
 Requires:       unzip w3m wget words
