@@ -1,21 +1,21 @@
-Name:		hootenanny
-Version:	%%HOOT_VERSION%%
-Release:	1%{?dist}
-Summary:	Hootenanny - we merge maps.
+Name:       hootenanny
+Version:    %%HOOT_VERSION%%
+Release:    1%{?dist}
+Summary:    Hootenanny - we merge maps.
 
-Group:		Applications/Engineering
-License:	GPLv3
-URL:		https://github.com/ngageoint/hootenanny
+Group:      Applications/Engineering
+License:    GPLv3
+URL:        https://github.com/ngageoint/hootenanny
 
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  autoconf automake boost-devel cppunit-devel doxygen gcc-c++
 BuildRequires:  gdal-devel >= 1.10.1
 BuildRequires:  gdal-python >= 1.10.1
-BuildRequires: 	gdal-esri-epsg >= 1.10.1
+BuildRequires:  gdal-esri-epsg >= 1.10.1
 BuildRequires:  gdb
 BuildRequires:  geos-devel = 3.4.2
 BuildRequires:  git glpk-devel graphviz libicu-devel
-BuildRequires:	hootenanny-words = 1.0.0
+BuildRequires:  hootenanny-words = 1.0.0
 BuildRequires:  libspatialite-devel
 BuildRequires:  log4cxx-devel nodejs-devel opencv-devel
 BuildRequires:  postgresql-devel >= 9.1
@@ -26,7 +26,6 @@ BuildRequires:  gnuplot
 BuildRequires:  unzip v8-devel w3m wget words zip
 
 Source0:        %{name}-%{version}.tar.gz
-Source1:        %{name}-services-%{version}.war
 
 %description
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -38,9 +37,9 @@ where the user's workflow determines the best reference dataset and source
 content, geometry and attributes, to transfer to the output map.
 
 %package core
-Summary:	Hootenanny Core
+Summary:    Hootenanny Core
 Requires:   %{name}-core-deps = %{version}-%{release}
-Group:		Applications/Engineering
+Group:      Applications/Engineering
 
 %description core
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -61,12 +60,12 @@ source ./SetupEnv.sh
 export JAVA_HOME=/etc/alternatives/jre_1.7.0
 # The dir configurations set the install directory to work with EL's dir structure
 ./configure --with-rnd --with-services -q \
-	--prefix=$RPM_BUILD_ROOT/usr/ \
-	--datarootdir=$RPM_BUILD_ROOT/usr/share/hootenanny/ \
-        --docdir=$RPM_BUILD_ROOT/usr/share/doc/hootenanny/ \
-	--localstatedir=$RPM_BUILD_ROOT/var/lib/hootenanny/ \
-	--libdir=$RPM_BUILD_ROOT/usr/lib64 \
-	--sysconfdir=$RPM_BUILD_ROOT/etc/
+    --prefix=$RPM_BUILD_ROOT/usr/ \
+    --datarootdir=$RPM_BUILD_ROOT/usr/share/hootenanny/ \
+    --docdir=$RPM_BUILD_ROOT/usr/share/doc/hootenanny/ \
+    --localstatedir=$RPM_BUILD_ROOT/var/lib/hootenanny/ \
+    --libdir=$RPM_BUILD_ROOT/usr/lib64 \
+    --sysconfdir=$RPM_BUILD_ROOT/etc/
 
 # Use ccache if it is available
 cp LocalConfig.pri.orig LocalConfig.pri
@@ -79,6 +78,9 @@ make -s %{?_smp_mflags}
 # UI stuff
 mkdir -p $RPM_BUILD_ROOT/var/lib/tomcat6/webapps
 cp hoot-services/target/hoot-services*.war $RPM_BUILD_ROOT/var/lib/tomcat6/webapps/hoot-services.war
+cp -R hoot-ui/ $RPM_BUILD_ROOT/var/lib/tomcat6/webapps/hootenanny-id
+cp node-mapnik-server/init.d/centos-rpm $RPM_BUILD_ROOT/etc/init.d/node-mapnik-server
+cp -R node-mapnik-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-mapnik-server
 
 make install
 echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
@@ -101,7 +103,9 @@ HootTest --exclude=.*RubberSheetConflateTest.sh \
     --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh \
     --exclude=.*ConflationStatsReportTest.sh \
     --exclude=.*Osm2OgrTranslation.sh \
-	--slow
+    --slow
+cd hoot-services
+make test
 
 %clean
 rm -rf %{buildroot}
@@ -121,16 +125,19 @@ rm -rf %{buildroot}
 %{_sysconfdir}/asciidoc/filters/
 
 
-%package ui
+
+
+%package services-ui
 Summary:    Hootenanny UI and Services
 Requires:   %{name}-core = %{version}-%{release}
 Requires:   postgresql-server >= 9.1
 Requires:   postgresql-contrib >= 9.1
 Requires:   postgis2_92 >= 2.1
 Requires:   tomcat6
+Requires:   liquibase
 Group:      Applications/Engineering
 
-%description ui
+%description services-ui
 Hootenanny was developed to provide an open source, standards-based approach to
 geospatial vector data conflation. Hootenanny is designed to facilitate
 automated and semi-automated conflation of critical foundation GEOINT features
@@ -141,16 +148,65 @@ content, geometry and attributes, to transfer to the output map.
 
 This package contains the UI and web services.
 
-%files ui
-%{_sharedstatedir}/tomcat6/webapps/hoot-services.war
+%files services-ui
+%attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat6/webapps/hoot-services.war
+%attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat6/webapps/hootenanny-id
+#%{_sharedstatedir}/etc/init.d/node-mapnik-server
 
-%post ui
+#the order of operations during an upgrade is:
+#
+#    1. Run the %pre section of the RPM being installed.
+#    2. Install the files that the RPM provides.
+#    3. Run the %post section of the RPM.
+#    4. Run the %preun of the old package.
+#    5. Delete any old files not overwritten by the newer version. (This step deletes files that the new package does not require.)
+#    6. Run the %postun hook of the old package.
+
+%pre services-ui
+if [ "$1" = "1" ]; then
+    # Perform tasks to prepare for the initial installation
+    echo "Do Nothing - Pre initial installation"
+elif [ "$1" = "2" ]; then
+    # Perform whatever maintenance must occur before the upgrade begins
+    echo "Pre upgrade"
+    /var/lib/hootenanny/scripts/HootServicesUiRpmPreUpgrade.sh
+fi
+
+%post services-ui
+if [ "$1" = "1" ]; then
+    # Perform tasks to prepare for the initial installation
+    echo "Post initial installation"
+    /var/lib/hootenanny/scripts/HootServicesUiRpmPostInstall.sh
+elif [ "$1" = "2" ]; then
+    # Perform whatever maintenance must occur after the upgrade
+    echo "Post upgrade"
+    /var/lib/hootenanny/scripts/HootServicesUiRpmPostUpgrade.sh
+fi
+
+%preun services-ui
+if [ "$1" = "0" ]; then
+    # Perform tasks to prepare for the initial uninstallation
+    echo "Do Nothing - Pre uninstallation"
+elif [ "$1" = "1" ]; then
+    # Perform whatever maintenance must occur before the upgrade begins
+    echo "Do Nothing - Pre uninstallation for upgrade"
+fi
+
+%postun services-ui
+if [ "$1" = "0" ]; then
+    # Perform tasks to prepare for the uninstallation
+    echo "Post uninstallation"
+    /var/lib/hootenanny/scripts/HootServicesUiRpmPostUninstall.sh
+elif [ "$1" = "1" ]; then
+    # Perform whatever maintenance must occur before the upgrade begins
+    echo "Do Nothing - Post uninstallation for upgrade"
+fi
 
 
 
-%package autostart
+%package    autostart
 Summary:    Hootenanny Autostart
-Requires:   %{name}-ui = %{version}-%{release}
+Requires:   %{name}-services-ui = %{version}-%{release}
 Group:      Applications/Engineering
 
 %description autostart
@@ -162,90 +218,50 @@ points-of-interest (POI's) (points). Conflation happens at the dataset level,
 where the user's workflow determines the best reference dataset and source
 content, geometry and attributes, to transfer to the output map.
 
-This package contains the autostart config for PostgreSQL and Tomcat.
+This package sets the PostgreSQL and Tomcat and NodeJS services to autostart
+to run Hootenanny.
 
 %files autostart
 
 %post autostart
-# init and start Postgres
-export PG_VERSION=9.2
-sudo service postgresql-$PG_VERSION initdb
-sudo service postgresql-$PG_VERSION start
 # set Postgres to autostart
+export PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
 sudo /sbin/chkconfig --add postgresql-$PG_VERSION
 sudo /sbin/chkconfig postgresql-$PG_VERSION on
-# create Hoot services db
-if ! sudo -u postgres psql -lqt | grep -i --quiet hoot; then
-    sudo -u postgres createuser --superuser hoot
-    sudo -u postgres psql -c "alter user hoot with password 'hoottest';"
-    sudo -u postgres createdb hoot --owner=hoot
-    sudo -u postgres createdb wfsstoredb --owner=hoot
-    sudo -u postgres psql -d hoot -c 'create extension hstore;'
-    sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='wfsstoredb'"
-    sudo -u postgres psql -d wfsstoredb -c 'create extension postgis;'
-    sudo -u postgres psql -d wfsstoredb -c "GRANT ALL on geometry_columns TO PUBLIC;"
-    sudo -u postgres psql -d wfsstoredb -c "GRANT ALL on geography_columns TO PUBLIC;"
-    sudo -u postgres psql -d wfsstoredb -c "GRANT ALL on spatial_ref_sys TO PUBLIC;"
-fi
-if ! sudo grep -i --quiet hoot /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf; then
-    sudo sed -i '1ihost    all            hoot            127.0.0.1/32            md5' /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
-    sudo sed -i '1ihost    all            hoot            ::1/128                 md5' /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
-    sudo /etc/init.d/postgresql-$PG_VERSION restart
-fi
 # set Tomcat to autostart
 sudo /sbin/chkconfig --add tomcat6
 sudo /sbin/chkconfig tomcat6 on
-if ! grep -i --quiet HOOT /usr/sbin/tomcat6; then
-    echo "Configuring tomcat6 environment"
-    sudo bash -c "cat >> /usr/sbin/tomcat6" <<EOT
-#--------------
-# Hoot Settings
-#--------------
-HOOT_HOME=/var/lib/hoot
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:$HOOT_HOME/lib:$HOOT_HOME/pretty-pipes/lib
-GDAL_DATA=/usr/local/share/gdal
-GDAL_LIB_DIR=/usr/local/lib
-HOOT_WORKING_NAME=hoot
-QT_HOME=/usr/local/qt-everywhere-opensource-src-4.8.6
-PSQL_HOME=/usr/pgsql-$PG_VERSION
-PATH=$HOOT_HOME/bin:/usr/local/lib:/usr/local/bin:$PATH:$QT_HOME/bin:$PSQL_HOME/bin
-EOT
-fi
-# Create Tomcat context path for tile images
-if ! grep -i --quiet 'ingest/processed' /etc/tomcat6/server.xml; then
-    echo "Adding Tomcat context path for tile images"
-    sudo sed -i.bak "s@<\/Host>@ <Context docBase=\"\/var\/lib\/hootenanny\/ingest\/processed\" path=\"\/static\" \/>\n &@" /etc/tomcat6/server.xml
-fi
-# Allow linking in Tomcat context
-if ! grep -i --quiet 'allowLinking="true"' /etc/tomcat6/context.xml; then
-    echo "Set allowLinking to true in Tomcat context"
-    sudo sed -i.bak "s@^<Context>@<Context allowLinking=\"true\">@" /etc/tomcat6/context.xml
-fi
-sudo /etc/init.d/tomcat6 start
+# set NodeJS node-mapnik-server to autostart
+sudo /sbin/chkconfig --add node-mapnik-server
+sudo /sbin/chkconfig node-mapnik-server on
 
-echo "Configuring firewall..."
-sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
-sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
-sudo iptables -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080
-sudo iptables -A OUTPUT -t nat -s 0/0 -d 127/8 -p tcp --dport 80 -j REDIRECT --to-ports 8080
-sudo service iptables save
-sudo service iptables restart
-sudo service tomcat6 restart
+%postun autostart
+# set Postgres to NOT autostart
+export PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
+sudo /sbin/chkconfig --del postgresql-$PG_VERSION
+# set Tomcat to NOT autostart
+sudo /sbin/chkconfig --del tomcat6
+# set NodeJS node-mapnik-server to NOT autostart
+sudo /sbin/chkconfig --del node-mapnik-server
+
+
+
+
 
 %package core-devel-deps
-Summary:	Development dependencies for Hootenanny Core
-Group:		Development/Libraries
-Requires:	%{name}-core-deps = %{version}-%{release}
-Requires:	autoconf automake boost-devel cppunit-devel gcc-c++
+Summary:    Development dependencies for Hootenanny Core
+Group:      Development/Libraries
+Requires:   %{name}-core-deps = %{version}-%{release}
+Requires:   autoconf automake boost-devel cppunit-devel gcc-c++
 Requires:       gdb
 Requires:       geos-devel = 3.4.2
 Requires:       git glpk-devel libicu-devel
-Requires:	hootenanny-words = 1.0.0
+Requires:   hootenanny-words = 1.0.0
 Requires:       libspatialite-devel
 Requires:       log4cxx-devel nodejs-devel opencv-devel
 Requires:       postgresql-devel >= 9.1
 Requires:       proj-devel protobuf-devel python-argparse python-devel qt-devel v8-devel
-Requires:	stxxl-devel
+Requires:   stxxl-devel
 # Needed to build the documentation
 Requires:       texlive
 
@@ -264,14 +280,14 @@ core. Use this if you want to build from github.
 %files core-devel-deps
 
 %package core-deps
-Summary:	Dependencies for Hootenanny Core
-Group:		Development/Libraries
-Requires:	asciidoc cppunit dblatex doxygen FileGDB_API
+Summary:    Dependencies for Hootenanny Core
+Group:      Development/Libraries
+Requires:   asciidoc cppunit dblatex doxygen FileGDB_API
 Requires:       gdal-devel >= 1.10.1
 Requires:       gdal-python >= 1.10.1
-Requires: 	    gdal-esri-epsg >= 1.10.1
+Requires:       gdal-esri-epsg >= 1.10.1
 Requires:       geos = 3.4.2, gnuplot, graphviz
-Requires:	hootenanny-words = 1.0.0
+Requires:   hootenanny-words = 1.0.0
 # Needed by gnuplot for report generation
 Requires:       liberation-fonts-common liberation-sans-fonts
 Requires:       libxslt log4cxx nodejs opencv  protobuf qt
@@ -297,7 +313,7 @@ This packages contains the dependencies to run the Hootenanny core.
 
 %changelog
 * Thu Feb 25 2016 Brian Hatchl <brian.hatchl@digitalglobe.com> - 0.2.23+
-- Adding ui and autostart packages
+- Adding ui-services and autostart packages
 
 * Fri Jan 29 2016 Ben Marchant <benjamin.marchant@digitalglobe.com> - 0.2.21+
 - Adding stxxl and stxxl-devel
