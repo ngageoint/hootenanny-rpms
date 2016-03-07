@@ -131,7 +131,6 @@ deps: force
 	  npm \
 	  pango-devel \
 	  pcre-devel \
-	  postgis2_92 \
 	  proj-devel \
 	  pygtk2 \
 	  python-devel \
