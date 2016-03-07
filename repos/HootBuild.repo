@@ -14,7 +14,7 @@ gpgcheck=0
 name=Node.js Packages for Enterprise Linux 6 - $basearch
 baseurl=https://rpm.nodesource.com/pub/el/6/$basearch
 failovermethod=priority
-enabled=1
+enabled=0
 gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/NODESOURCE-GPG-SIGNING-KEY-EL
 
