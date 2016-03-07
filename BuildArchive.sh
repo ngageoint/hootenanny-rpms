@@ -40,7 +40,7 @@ echo "QMAKE_CXX=ccache g++" >> LocalConfig.pri
 source SetupEnv.sh
 
 # init and start Postgres
-export PG_VERSION=9.2
+export PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
 sudo service postgresql-$PG_VERSION initdb
 sudo service postgresql-$PG_VERSION start
 # set Postgres to autostart
