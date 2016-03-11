@@ -63,11 +63,10 @@ vagrant-test:
 	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --diff --exclude=.*RubberSheetConflateTest.sh --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh --slow"
 
 deps: force
-	sudo true || true
 	sudo cp repos/HootBuild.repo /etc/yum.repos.d
 	sudo cp repos/RPM-GPG-KEY-EPEL-6 /etc/pki/rpm-gpg/
 	sudo yum clean metadata
-	sudo true || true
+	sudo yum remove -y geos* gdal*
 	# Sometimes the yum update fails getting the metadata. Try several times and ignore
 	# the first two if they error
 	sudo yum update -y || sleep 30
