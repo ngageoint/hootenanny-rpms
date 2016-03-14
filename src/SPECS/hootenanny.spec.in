@@ -107,7 +107,7 @@ HootTest --exclude=.*RubberSheetConflateTest.sh \
     --exclude=.*Osm2OgrTranslation.sh \
     --slow
 cd hoot-services
-make test
+make test -s
 
 %clean
 rm -rf %{buildroot}
