@@ -137,6 +137,7 @@ Requires:   postgresql-contrib >= 9.1
 Requires:   postgis2_92 >= 2.1
 Requires:   tomcat6
 Requires:   liquibase
+Requires:   pwgen
 Group:      Applications/Engineering
 
 %description services-ui
