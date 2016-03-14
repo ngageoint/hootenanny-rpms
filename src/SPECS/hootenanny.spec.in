@@ -120,8 +120,6 @@ rm -rf %{buildroot}
 %{_bindir}/*
 %config %{_sharedstatedir}/%{name}/conf/hoot.json
 %config %{_sharedstatedir}/%{name}/conf/DatabaseConfig.sh
-%{_sharedstatedir}/%{name}/conf/hoot.json
-%{_sharedstatedir}/%{name}/conf/DatabaseConfig.sh
 %{_sharedstatedir}/%{name}
 %{_sysconfdir}/profile.d/hootenanny.sh
 %{_sysconfdir}/asciidoc/filters/
@@ -154,7 +152,7 @@ This package contains the UI and web services.
 %files services-ui
 %attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat6/webapps/hoot-services.war
 %attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat6/webapps/hootenanny-id
-#%{_sharedstatedir}/etc/init.d/node-mapnik-server
+%{_sharedstatedir}/etc/init.d/node-mapnik-server
 
 #the order of operations during an upgrade is:
 #
