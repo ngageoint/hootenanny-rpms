@@ -97,6 +97,7 @@ ln -s /var/lib/hootenanny/bin/HootEnv.sh $RPM_BUILD_ROOT/usr/bin/HootEnv.sh
 
 %check
 source ./SetupEnv.sh
+export JAVA_HOME=/etc/alternatives/jre_1.7.0
 # The excluded tests are failing on CentOS now and waiting on a fix
 # https://github.com/ngageoint/hootenanny/issues/279
 # https://github.com/ngageoint/hootenanny/issues/281
