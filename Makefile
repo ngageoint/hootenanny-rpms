@@ -64,7 +64,7 @@ vagrant-clean:
 
 vagrant-test:
 	cd test; vagrant up
-	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --diff --exclude=.*RubberSheetConflateTest.sh --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh --slow"
+	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --diff --exclude=.*RubberSheetConflateTest.sh --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh --exclude=.*ServiceDbTest.sh --exclude=.*ServicesDb.* --slow"
 
 deps: force
 	sudo cp repos/HootBuild.repo /etc/yum.repos.d
