@@ -31,6 +31,7 @@ git clean -d -f -f -x || echo "It is ok if this fails, it sometimes mysteriously
 git checkout $GIT_COMMIT
 # Do a pull just in case a branch was specified.
 git pull || echo "Ignore the failure."
+git submodule update --init --recursive
 cp LocalConfig.pri.orig LocalConfig.pri
 echo "QMAKE_CXX=ccache g++" >> LocalConfig.pri
 
