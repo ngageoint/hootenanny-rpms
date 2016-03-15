@@ -15,16 +15,16 @@ hoot-rpms:
 force:
 
 # Clean out all the RPMs
-clean:
-	rm -rf el6
+clean: clean-hoot
 	cd src; $(MAKE) clean
 
 # Clean out everything
 clean-all: vagrant-clean clean
 
-# Cleans out the RPM el6 stash, and all the hoot source/rpms
+# Cleans out the RPM el6 stash, archive hoot, and all the hoot source/rpms
 clean-hoot:
 	rm -rf el6
+	rm -rf tmp/hootenanny
 	cd src; $(MAKE) clean-hoot
 
 ValidHootTarball:
