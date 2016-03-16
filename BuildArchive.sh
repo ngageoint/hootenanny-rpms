@@ -5,7 +5,6 @@
 set -e
 set -x
 
-export GIT_COMMIT=origin/rpm-services-ui
 echo $GIT_COMMIT
 
 export JAVA_HOME=/etc/alternatives/jre_1.7.0
