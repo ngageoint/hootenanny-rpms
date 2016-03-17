@@ -73,9 +73,11 @@ command -v ccache >/dev/null 2>&1 && echo "QMAKE_CXX=ccache g++" >> LocalConfig.
 
 make -s %{?_smp_mflags}
 
+# This may be causing failure due to node-mapnik dependency on
+# Requires: libc.so.6(GLIBC_2.14)(64bit)
 # Install node modules
-cd node-mapnik-server
-npm install
+#cd node-mapnik-server
+#npm install
 
 %install
 
