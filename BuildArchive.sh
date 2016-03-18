@@ -48,7 +48,7 @@ sudo service postgresql-$PG_VERSION start
 sudo /sbin/chkconfig --add postgresql-$PG_VERSION
 sudo /sbin/chkconfig postgresql-$PG_VERSION on
 # create Hoot services db
-if ! sudo -u postgres psql -lqt | grep -i --quiet hoot; then
+if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw hoot; then
     sudo -u postgres createuser --superuser hoot
     sudo -u postgres psql -c "alter user hoot with password 'hoottest';"
     sudo -u postgres createdb hoot --owner=hoot
