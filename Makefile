@@ -5,10 +5,9 @@ TARBALLS := $(wildcard src/SOURCES/hootenanny*.tar.gz)
 DOCBALLS := $(wildcard src/SOURCES/hootenanny*-documentation.tar.gz)
 HOOTBALL := $(filter-out $(DOCBALLS), $(TARBALLS))
 
-all: hoot
+all: copy-rpms
 
-hoot: | hoot-rpms copy-rpms
-
+# a convenience target for building hoot RPMs and no others.
 hoot-rpms:
 	cd src; $(MAKE) hoot
 
