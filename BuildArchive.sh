@@ -5,6 +5,9 @@
 set -e
 set -x
 
+if [ -z "$GIT_COMMIT" ]; then
+    export GIT_COMMIT=develop
+fi
 echo $GIT_COMMIT
 
 export JAVA_HOME=/etc/alternatives/jre_1.7.0
@@ -49,7 +52,7 @@ sudo /sbin/chkconfig --add postgresql-$PG_VERSION
 sudo /sbin/chkconfig postgresql-$PG_VERSION on
 # create Hoot services db
 if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw hoot; then
-    sudo -u postgres createuser --superuser hoot
+    sudo -u postgres createuser --superuser hoot || true
     sudo -u postgres psql -c "alter user hoot with password 'hoottest';"
     sudo -u postgres createdb hoot --owner=hoot
     sudo -u postgres createdb wfsstoredb --owner=hoot
