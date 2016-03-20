@@ -26,7 +26,8 @@ $testSh = <<-SHELL
     sudo yum -y update
     cd /var/lib/hootenanny
     sudo HootTest --slow --exclude=.*RubberSheetConflateTest.sh \
-        --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh
+        --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh \
+        --exclude=.*ServiceDbTest.sh
  SHELL
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
