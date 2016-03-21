@@ -19,17 +19,6 @@ $provisionSh = <<-SHELL
     sudo yum -y install hootenanny-autostart
  SHELL
 
-$testSh = <<-SHELL
-    set -e
-    set -x
-
-    sudo yum -y update
-    cd /var/lib/hootenanny
-    sudo HootTest --slow --exclude=.*RubberSheetConflateTest.sh \
-        --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh \
-        --exclude=.*ServiceDbTest.sh
- SHELL
-
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
@@ -98,7 +87,6 @@ Vagrant.configure(2) do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: $provisionSh
-  config.vm.provision "shell", inline: $testSh, run: "always"
 end
 
 # Allow local overrides of vagrant settings
