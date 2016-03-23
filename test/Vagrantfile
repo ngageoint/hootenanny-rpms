@@ -16,10 +16,7 @@ $provisionSh = <<-SHELL
     echo "baseurl=file:///home/vagrant/el6/" | sudo tee -a /etc/yum.repos.d/hoot.repo
     echo "gpgcheck=0" | sudo tee -a /etc/yum.repos.d/hoot.repo
     sudo yum -y update
-    sudo yum -y install hootenanny-core
-    cd /var/lib/hootenanny
-    sudo HootTest --slow --exclude=.*RubberSheetConflateTest.sh \
-        --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh
+    sudo yum -y install hootenanny-autostart
  SHELL
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
@@ -33,7 +30,8 @@ Vagrant.configure(2) do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "https://github.com/CommanderK5/packer-centos-template/releases/download/0.6.7/vagrant-centos-6.7.box"
+  config.vm.box = "CommanderK5/vagrant-centos-6.7.box"
+  config.vm.box_url = "https://github.com/CommanderK5/packer-centos-template/releases/download/0.6.7/vagrant-centos-6.7.box"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs

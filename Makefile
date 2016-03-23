@@ -1,11 +1,13 @@
 
 # Default branch of hoot to build
 GIT_COMMIT?=origin/develop
+TARBALLS := $(wildcard src/SOURCES/hootenanny*.tar.gz)
+DOCBALLS := $(wildcard src/SOURCES/hootenanny*-documentation.tar.gz)
+HOOTBALL := $(filter-out $(DOCBALLS), $(TARBALLS))
 
-all: hoot
+all: copy-rpms
 
-hoot: | hoot-rpms copy-rpms
-
+# a convenience target for building hoot RPMs and no others.
 hoot-rpms:
 	cd src; $(MAKE) hoot
 
@@ -25,7 +27,7 @@ clean-hoot:
 	cd src; $(MAKE) clean-hoot
 
 ValidHootTarball:
-	test "$(words $(wildcard src/SOURCES/hootenanny*.tar.gz))" != "1" && (echo "Did not find exactly one hoot tarball in SOURCES. Too many? Do you need to download one? https://github.com/ngageoint/hootenanny/releases"; exit -1) || true
+	test $(words $(HOOTBALL)) != 1 && (echo "Did not find exactly one hoot tarball in SOURCES. Too many? Do you need to download one? https://github.com/ngageoint/hootenanny/releases"; exit -1) || true
 
 vagrant-build-up: vagrant-plugins
 	vagrant up
@@ -57,10 +59,14 @@ vagrant-clean:
 	mkdir -p el6
 	cd test && vagrant halt && vagrant destroy -f
 	rmdir --ignore-fail-on-non-empty el6 || true
+	rm -f src/tmp/*-install
 
 vagrant-test:
 	cd test; vagrant up
-	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --diff --exclude=.*RubberSheetConflateTest.sh --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh --slow"
+	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --diff \
+		--exclude=.*RubberSheetConflateTest.sh \
+		--exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh \
+		--slow"
 
 deps: force
 	sudo cp repos/HootBuild.repo /etc/yum.repos.d
@@ -75,6 +81,7 @@ deps: force
 	sudo true || true
 	sudo yum install -y \
 	  ant \
+	  apache-maven \
 	  apr-devel \
 	  apr-util-devel \
 	  armadillo-devel \
@@ -105,7 +112,7 @@ deps: force
 	  hdf-static \
 	  help2man \
 	  info \
-	  java-1.6.0-openjdk-devel \
+	  java-1.7.0-openjdk-devel \
 	  java-devel \
 	  libdap-devel \
 	  libgta-devel \
@@ -156,7 +163,6 @@ deps: force
 	  mysql-devel \
 	  numpy \
 	  poppler-devel \
-	  postgresql-devel \
 	  ruby \
 	  swig \
 	  unixODBC-devel \

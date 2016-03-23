@@ -1,11 +1,13 @@
-diff -Nur gdal-1.9.0-fedora/swig/java/java.opt gdal-1.9.0-fedora-java/swig/java/java.opt
---- gdal-1.9.0-fedora/swig/java/java.opt	2012-01-04 08:03:40.000000000 +0100
-+++ gdal-1.9.0-fedora-java/swig/java/java.opt	2012-02-03 08:44:55.837978697 +0100
-@@ -5,6 +5,6 @@
+diff -ru gdal-1.10.1-fedora/swig/java/java.opt gdal-1.10.1-fedora-java/swig/java/java.opt
+--- gdal-1.10.1-fedora/swig/java/java.opt	2013-08-26 16:01:11.000000000 -0400
++++ gdal-1.10.1-fedora-java/swig/java/java.opt	2016-03-15 11:25:12.223016300 -0400
+@@ -1,7 +1,8 @@
+ #
+ # Java Stuff
+ #JAVA_HOME = "C:\Program Files\Java\jdk1.6.0_16"
+-JAVA_HOME = /usr/lib/jvm/java-6-openjdk/
++# Use the default java 1.6 -JRS
++JAVA_HOME=/usr/lib/jvm/java-1.6.0
+ JAVADOC=$(JAVA_HOME)/bin/javadoc
  JAVAC=$(JAVA_HOME)/bin/javac
  JAVA=$(JAVA_HOME)/bin/java
- JAR=$(JAVA_HOME)/bin/jar
--JAVA_INCLUDE=-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
-+JAVA_INCLUDE=-I/usr/lib/jvm/java/include/ -I/usr/lib/jvm/java/include/linux
- 
- 

@@ -1,26 +1,27 @@
-Name:		hootenanny
-Version:	%%HOOT_VERSION%%
-Release:	1%{?dist}
-Summary:	Hootenanny - we merge maps.
+Name:       hootenanny
+Version:    %%HOOT_VERSION%%
+Release:    1%{?dist}
+Summary:    Hootenanny - we merge maps.
 
-Group:		Applications/Engineering
-License:	GPLv3
-URL:		https://github.com/ngageoint/hootenanny
+Group:      Applications/Engineering
+License:    GPLv3
+URL:        https://github.com/ngageoint/hootenanny
 
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  autoconf automake boost-devel cppunit-devel doxygen gcc-c++
 BuildRequires:  gdal-devel >= 1.10.1
 BuildRequires:  gdal-python >= 1.10.1
-BuildRequires: 	gdal-esri-epsg >= 1.10.1
+BuildRequires:  gdal-esri-epsg >= 1.10.1
 BuildRequires:  gdb
 BuildRequires:  geos-devel = 3.4.2
 BuildRequires:  git glpk-devel graphviz libicu-devel
-BuildRequires:	hootenanny-words = 1.0.0
+BuildRequires:  hootenanny-words = 1.0.0
 BuildRequires:  libspatialite-devel
 BuildRequires:  log4cxx-devel nodejs-devel opencv-devel
-BuildRequires:  postgresql91-devel proj-devel protobuf-devel python-argparse python-devel qt-devel
+BuildRequires:  postgresql-devel >= 9.1
+BuildRequires:  proj-devel protobuf-devel python-argparse python-devel qt-devel
 # Needed to build the documentation
-BuildRequires:  texlive libxslt 
+BuildRequires:  texlive libxslt
 BuildRequires:  gnuplot
 BuildRequires:  unzip v8-devel w3m wget words zip
 
@@ -36,9 +37,9 @@ where the user's workflow determines the best reference dataset and source
 content, geometry and attributes, to transfer to the output map.
 
 %package core
-Summary:	Hootenanny Core
-Requires:       %{name}-core-deps
-Group:		Applications/Engineering
+Summary:    Hootenanny Core
+Requires:   %{name}-core-deps = %{version}-%{release}
+Group:      Applications/Engineering
 
 %description core
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -56,14 +57,15 @@ This package contains the core algorithms and command line interface.
 
 %build
 source ./SetupEnv.sh
-# The dir configurations set the install directory to work with EL's dir structure	
-./configure --with-rnd -q \
-	--prefix=$RPM_BUILD_ROOT/usr/ \
-	--datarootdir=$RPM_BUILD_ROOT/usr/share/hootenanny/ \
-        --docdir=$RPM_BUILD_ROOT/usr/share/doc/hootenanny/ \
-	--localstatedir=$RPM_BUILD_ROOT/var/lib/hootenanny/ \
-	--libdir=$RPM_BUILD_ROOT/usr/lib64 \
-	--sysconfdir=$RPM_BUILD_ROOT/etc/
+export JAVA_HOME=/etc/alternatives/jre_1.7.0
+# The dir configurations set the install directory to work with EL's dir structure
+./configure --with-rnd --with-services -q \
+    --prefix=$RPM_BUILD_ROOT/usr/ \
+    --datarootdir=$RPM_BUILD_ROOT/usr/share/hootenanny/ \
+    --docdir=$RPM_BUILD_ROOT/usr/share/doc/hootenanny/ \
+    --localstatedir=$RPM_BUILD_ROOT/var/lib/hootenanny/ \
+    --libdir=$RPM_BUILD_ROOT/usr/lib64 \
+    --sysconfdir=$RPM_BUILD_ROOT/etc/
 
 # Use ccache if it is available
 cp LocalConfig.pri.orig LocalConfig.pri
@@ -71,7 +73,22 @@ command -v ccache >/dev/null 2>&1 && echo "QMAKE_CXX=ccache g++" >> LocalConfig.
 
 make -s %{?_smp_mflags}
 
+# This may be causing failure due to node-mapnik dependency on
+# Requires: libc.so.6(GLIBC_2.14)(64bit)
+# Install node modules
+#cd node-mapnik-server
+#npm install
+
 %install
+
+# UI stuff
+mkdir -p $RPM_BUILD_ROOT/var/lib/tomcat6/webapps
+cp hoot-services/target/hoot-services*.war $RPM_BUILD_ROOT/var/lib/tomcat6/webapps/hoot-services.war
+cp -R hoot-ui/ $RPM_BUILD_ROOT/var/lib/tomcat6/webapps/hootenanny-id
+mkdir -p $RPM_BUILD_ROOT/etc/init.d
+cp node-mapnik-server/init.d/centos-rpm $RPM_BUILD_ROOT/etc/init.d/node-mapnik-server
+mkdir -p $RPM_BUILD_ROOT/var/lib/hootenanny
+cp -R node-mapnik-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-mapnik-server
 
 make install
 echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
@@ -87,12 +104,17 @@ ln -s /var/lib/hootenanny/bin/HootEnv.sh $RPM_BUILD_ROOT/usr/bin/HootEnv.sh
 
 %check
 source ./SetupEnv.sh
+export JAVA_HOME=/etc/alternatives/jre_1.7.0
 # The excluded tests are failing on CentOS now and waiting on a fix
 # https://github.com/ngageoint/hootenanny/issues/279
 # https://github.com/ngageoint/hootenanny/issues/281
 HootTest --exclude=.*RubberSheetConflateTest.sh \
-	--exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh \
-	--quick
+    --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh \
+    --exclude=.*ConflationStatsReportTest.sh \
+    --exclude=.*Osm2OgrTranslation.sh \
+    --slow
+cd hoot-services
+make test -s
 
 %clean
 rm -rf %{buildroot}
@@ -105,27 +127,149 @@ rm -rf %{buildroot}
 %{_bindir}/*
 %config %{_sharedstatedir}/%{name}/conf/hoot.json
 %config %{_sharedstatedir}/%{name}/conf/DatabaseConfig.sh
-%{_sharedstatedir}/%{name}/conf/hoot.json
-%{_sharedstatedir}/%{name}/conf/DatabaseConfig.sh
 %{_sharedstatedir}/%{name}
 %{_sysconfdir}/profile.d/hootenanny.sh
 %{_sysconfdir}/asciidoc/filters/
 
 
 
+
+%package services-ui
+Summary:    Hootenanny UI and Services
+Requires:   %{name}-core = %{version}-%{release}
+Requires:   postgresql-server >= 9.1
+Requires:   postgresql-contrib >= 9.1
+Requires:   postgis2_92 >= 2.1
+Requires:   tomcat6
+Requires:   liquibase
+Requires:   pwgen
+Group:      Applications/Engineering
+
+%description services-ui
+Hootenanny was developed to provide an open source, standards-based approach to
+geospatial vector data conflation. Hootenanny is designed to facilitate
+automated and semi-automated conflation of critical foundation GEOINT features
+in the topographic domain, namely roads (polylines), buildings (polygons), and
+points-of-interest (POI's) (points). Conflation happens at the dataset level,
+where the user's workflow determines the best reference dataset and source
+content, geometry and attributes, to transfer to the output map.
+
+This package contains the UI and web services.
+
+%files services-ui
+%attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat6/webapps/hoot-services.war
+%attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat6/webapps/hootenanny-id
+/etc/init.d/node-mapnik-server
+
+#the order of operations during an upgrade is:
+#
+#    1. Run the %pre section of the RPM being installed.
+#    2. Install the files that the RPM provides.
+#    3. Run the %post section of the RPM.
+#    4. Run the %preun of the old package.
+#    5. Delete any old files not overwritten by the newer version. (This step deletes files that the new package does not require.)
+#    6. Run the %postun hook of the old package.
+
+%pre services-ui
+if [ "$1" = "1" ]; then
+    # Perform tasks to prepare for the initial installation
+    echo "Do Nothing - Pre initial installation"
+elif [ "$1" = "2" ]; then
+    # Perform whatever maintenance must occur before the upgrade begins
+    echo "Pre upgrade"
+    /var/lib/hootenanny/scripts/HootServicesUiRpmPreUpgrade.sh
+fi
+
+%post services-ui
+if [ "$1" = "1" ]; then
+    # Perform tasks to prepare for the initial installation
+    echo "Post initial installation"
+    /var/lib/hootenanny/scripts/HootServicesUiRpmPostInstall.sh
+elif [ "$1" = "2" ]; then
+    # Perform whatever maintenance must occur after the upgrade
+    echo "Post upgrade"
+    /var/lib/hootenanny/scripts/HootServicesUiRpmPostUpgrade.sh
+fi
+
+%preun services-ui
+if [ "$1" = "0" ]; then
+    # Perform tasks to prepare for the initial uninstallation
+    echo "Do Nothing - Pre uninstallation"
+elif [ "$1" = "1" ]; then
+    # Perform whatever maintenance must occur before the upgrade begins
+    echo "Do Nothing - Pre uninstallation for upgrade"
+fi
+
+%postun services-ui
+if [ "$1" = "0" ]; then
+    # Perform tasks to prepare for the uninstallation
+    echo "Post uninstallation"
+    /var/lib/hootenanny/scripts/HootServicesUiRpmPostUninstall.sh
+elif [ "$1" = "1" ]; then
+    # Perform whatever maintenance must occur before the upgrade begins
+    echo "Do Nothing - Post uninstallation for upgrade"
+fi
+
+
+
+%package    autostart
+Summary:    Hootenanny Autostart
+Requires:   %{name}-services-ui = %{version}-%{release}
+Group:      Applications/Engineering
+
+%description autostart
+Hootenanny was developed to provide an open source, standards-based approach to
+geospatial vector data conflation. Hootenanny is designed to facilitate
+automated and semi-automated conflation of critical foundation GEOINT features
+in the topographic domain, namely roads (polylines), buildings (polygons), and
+points-of-interest (POI's) (points). Conflation happens at the dataset level,
+where the user's workflow determines the best reference dataset and source
+content, geometry and attributes, to transfer to the output map.
+
+This package sets the PostgreSQL and Tomcat and NodeJS services to autostart
+to run Hootenanny.
+
+%files autostart
+
+%post autostart
+# set Postgres to autostart
+export PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
+sudo /sbin/chkconfig --add postgresql-$PG_VERSION
+sudo /sbin/chkconfig postgresql-$PG_VERSION on
+# set Tomcat to autostart
+sudo /sbin/chkconfig --add tomcat6
+sudo /sbin/chkconfig tomcat6 on
+# set NodeJS node-mapnik-server to autostart
+sudo /sbin/chkconfig --add node-mapnik-server
+sudo /sbin/chkconfig node-mapnik-server on
+
+%postun autostart
+# set Postgres to NOT autostart
+export PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
+sudo /sbin/chkconfig --del postgresql-$PG_VERSION
+# set Tomcat to NOT autostart
+sudo /sbin/chkconfig --del tomcat6
+# set NodeJS node-mapnik-server to NOT autostart
+sudo /sbin/chkconfig --del node-mapnik-server
+
+
+
+
+
 %package core-devel-deps
-Summary:	Development dependencies for Hootenanny Core
-Group:		Development/Libraries
-Requires:	%{name}-core-deps = %{version}-%{release}
-Requires:	autoconf automake boost-devel cppunit-devel gcc-c++
+Summary:    Development dependencies for Hootenanny Core
+Group:      Development/Libraries
+Requires:   %{name}-core-deps = %{version}-%{release}
+Requires:   autoconf automake boost-devel cppunit-devel gcc-c++
 Requires:       gdb
 Requires:       geos-devel = 3.4.2
 Requires:       git glpk-devel libicu-devel
-Requires:	hootenanny-words = 1.0.0
+Requires:   hootenanny-words = 1.0.0
 Requires:       libspatialite-devel
 Requires:       log4cxx-devel nodejs-devel opencv-devel
-Requires:       postgresql91-devel proj-devel protobuf-devel python-argparse python-devel qt-devel v8-devel
-Requires:	stxxl-devel
+Requires:       postgresql-devel >= 9.1
+Requires:       proj-devel protobuf-devel python-argparse python-devel qt-devel v8-devel
+Requires:   stxxl-devel
 # Needed to build the documentation
 Requires:       texlive
 
@@ -144,18 +288,20 @@ core. Use this if you want to build from github.
 %files core-devel-deps
 
 %package core-deps
-Summary:	Dependencies for Hootenanny Core
-Group:		Development/Libraries
-Requires:	asciidoc cppunit dblatex doxygen FileGDB_API
+Summary:    Dependencies for Hootenanny Core
+Group:      Development/Libraries
+Requires:   asciidoc cppunit dblatex doxygen FileGDB_API
 Requires:       gdal-devel >= 1.10.1
 Requires:       gdal-python >= 1.10.1
-Requires: 	    gdal-esri-epsg >= 1.10.1
+Requires:       gdal-esri-epsg >= 1.10.1
 Requires:       geos = 3.4.2, gnuplot, graphviz
-Requires:	hootenanny-words = 1.0.0
+Requires:   hootenanny-words = 1.0.0
 # Needed by gnuplot for report generation
 Requires:       liberation-fonts-common liberation-sans-fonts
-Requires:       libxslt log4cxx nodejs opencv postgresql91-libs protobuf qt
-Requires:	stxxl
+Requires:       libxslt log4cxx nodejs opencv  protobuf qt
+Requires:       postgresql-libs >= 9.1
+Requires:       qt-postgresql
+Requires:       stxxl
 Requires:       texlive
 Requires:       unzip w3m wget words
 Requires:       zip
@@ -174,6 +320,9 @@ This packages contains the dependencies to run the Hootenanny core.
 %files core-deps
 
 %changelog
+* Thu Feb 25 2016 Brian Hatchl <brian.hatchl@digitalglobe.com> - 0.2.23+
+- Adding ui-services and autostart packages
+
 * Fri Jan 29 2016 Ben Marchant <benjamin.marchant@digitalglobe.com> - 0.2.21+
 - Adding stxxl and stxxl-devel
 
