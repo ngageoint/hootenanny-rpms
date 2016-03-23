@@ -74,7 +74,6 @@ deps: force
 	sudo cp repos/HootBuild.repo /etc/yum.repos.d
 	sudo cp repos/RPM-GPG-KEY-EPEL-6 /etc/pki/rpm-gpg/
 	sudo yum clean metadata
-	sudo yum remove -y geos* gdal*
 	# Sometimes the yum update fails getting the metadata. Try several times and ignore
 	# the first two if they error
 	sudo yum update -y || sleep 30

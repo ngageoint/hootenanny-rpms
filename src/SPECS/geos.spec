@@ -1,6 +1,6 @@
 Name:		geos
 Version:	3.4.2
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	GEOS is a C++ port of the Java Topology Suite
 
 Group:		Applications/Engineering
@@ -12,6 +12,7 @@ Patch0:		geos-centos67.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	doxygen libtool
 BuildRequires:	python-devel php-devel
+Provides: 	%{name}-hoot
 
 %{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 %{!?php_sitearch: %define php_sitearch %{_libdir}/php/modules}
@@ -27,6 +28,8 @@ functions such as IsValid()
 Summary:	Development files for GEOS
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-hoot
+Provides: 	%{name}-devel-hoot
 
 %description devel
 GEOS (Geometry Engine - Open Source) is a C++ port of the Java Topology 
@@ -42,6 +45,7 @@ use GEOS
 Summary:	Python modules for GEOS
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-hoot
 
 %description python
 Python module to build applications using GEOS and python
@@ -50,6 +54,7 @@ Python module to build applications using GEOS and python
 Summary:	PHP modules for GEOS
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-hoot
 
 %description php
 PHP module to build applications using GEOS and PHP

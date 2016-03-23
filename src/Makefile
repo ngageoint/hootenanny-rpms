@@ -35,8 +35,6 @@ hoot: \
 	RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm \
 
 hoot-deps: not-hoot
-	# Silly way to force a replacement of the gdal/geos RPMs
-	sudo yum -y remove gdal-devel gdal geos geos-devel
 	sudo yum -y install RPMS/x86_64/* RPMS/noarch/* libspatialite-devel postgis2_92
 
 tmp/log4cxx-install: RPMS/x86_64/log4cxx-0.10.0-14.el6.x86_64.rpm
@@ -75,10 +73,10 @@ $(FILEGDB_RPM): SPECS/FileGDB_API.spec
 
 RPMS/x86_64/gdal-1.10.1-3.el6.x86_64.rpm: SPECS/gdal.spec $(FILEGDB_RPM)
 	$(INSTALL_FILEGDB)
-	rpmbuild --define "_topdir `pwd`" -ba $<
+	rpmbuild --define "_smp_mflags -j"`nproc` --define "_topdir `pwd`" -ba $<
 
 RPMS/x86_64/geos-3.4.2-1.el6.x86_64.rpm: SPECS/geos.spec
-	rpmbuild --define "_topdir `pwd`" -ba $<
+	rpmbuild --define "_smp_mflags -j"`nproc` --define "_topdir `pwd`" -ba $<
 
 RPMS/x86_64/gdal-esri-epsg-1.10.1-1.el6.x86_64.rpm: SPECS/gdal-esri-epsg.spec
 	rpmbuild --define "_topdir `pwd`" -ba $<
