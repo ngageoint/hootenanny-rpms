@@ -34,8 +34,9 @@ not-hoot: \
 hoot: \
 	RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm \
 
-hoot-deps: not-hoot
+tmp/hoot-deps: not-hoot
 	sudo yum -y install RPMS/x86_64/* RPMS/noarch/*
+	touch $@
 
 tmp/log4cxx-install: RPMS/x86_64/log4cxx-0.10.0-14.el6.x86_64.rpm
 	yum list installed log4cxx || sudo yum -y install RPMS/x86_64/log4cxx*
@@ -58,7 +59,7 @@ SPECS/hootenanny.spec: SPECS/hootenanny.spec.in  $(HOOTBALL)
 	echo "# Do not modify directly, please modify hootenanny.spec.in instead." > SPECS/hootenanny.spec
 	cat SPECS/hootenanny.spec.in | sed -e "s/%%HOOT_VERSION%%/$(hootversion)/g" >> SPECS/hootenanny.spec
 
-RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm: SPECS/hootenanny.spec hoot-deps
+RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm: SPECS/hootenanny.spec tmp/hoot-deps
 	rm -rf BUILD/hootenanny-* BUILDROOT/hootenanny-* RPMS/x86_64/hootenanny-* SRPMS/hootenanny-*
 	rpmbuild --define "_topdir `pwd`" -ba $<
 
