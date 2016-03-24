@@ -20,7 +20,7 @@ cd /home/vagrant/hootenanny-rpms/src/
 # -j seems to cause errors -- fix another time...
 #make -s -j `grep -c ^processor /proc/cpuinfo` hoot-deps
 rm -f RPMS/x86_64/hoot*.rpm
-make hoot-deps
+make tmp/hoot-deps
 
 cd /home/vagrant/hootenanny-rpms
 mkdir -p tmp
