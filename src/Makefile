@@ -35,7 +35,7 @@ hoot: \
 	RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm \
 
 hoot-deps: not-hoot
-	sudo yum -y install RPMS/x86_64/* RPMS/noarch/* libspatialite-devel postgis2_92
+	sudo yum -y install RPMS/x86_64/* RPMS/noarch/*
 
 tmp/log4cxx-install: RPMS/x86_64/log4cxx-0.10.0-14.el6.x86_64.rpm
 	yum list installed log4cxx || sudo yum -y install RPMS/x86_64/log4cxx*
