@@ -18,7 +18,9 @@ clean: clean-hoot
 clean-hoot:
 	rm -rf BUILD/hoot* BUILDROOT/hoot* SRPMS/hoot* RPMS/x86_64/hoot* SPECS/hootenanny.spec
 
-not-hoot: \
+not-hoot: tmp/not-hoot
+
+tmp/not-hoot: \
 	RPMS/noarch/hootenanny-words-1.0.0-1.el6.noarch.rpm \
 	RPMS/noarch/autoconf-2.69-3.el6.noarch.rpm \
 	RPMS/noarch/dblatex-0.3-5.el6.noarch.rpm \
@@ -29,12 +31,13 @@ not-hoot: \
 	RPMS/x86_64/geos-3.4.2-1.el6.x86_64.rpm \
 	RPMS/x86_64/gnuplot-4.6.1-1.el6.x86_64.rpm \
 	RPMS/x86_64/log4cxx-0.10.0-14.el6.x86_64.rpm \
-	RPMS/x86_64/stxxl-1.3.1-1.el6.x86_64.rpm \
+	RPMS/x86_64/stxxl-1.3.1-1.el6.x86_64.rpm
+	touch $@
 
 hoot: \
 	RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm \
 
-tmp/hoot-deps: not-hoot
+tmp/hoot-deps: tmp/not-hoot
 	sudo yum -y install RPMS/x86_64/* RPMS/noarch/*
 	touch $@
 
