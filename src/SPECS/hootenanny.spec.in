@@ -110,7 +110,6 @@ export JAVA_HOME=/etc/alternatives/jre_1.7.0
 # https://github.com/ngageoint/hootenanny/issues/281
 HootTest --exclude=.*RubberSheetConflateTest.sh \
     --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh \
-    --exclude=.*ConflationStatsReportTest.sh \
     --exclude=.*Osm2OgrTranslation.sh \
     --slow
 cd hoot-services
