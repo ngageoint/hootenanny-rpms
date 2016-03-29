@@ -41,13 +41,13 @@ vagrant-plugins:
 	(vagrant plugin list | grep -q bindfs) || vagrant plugin install vagrant-bindfs
 
 vagrant-build-deps: copy-words1
-	vagrant ssh -c "cd hootenanny-rpms && make deps"
+	vagrant ssh -c "cd hootenanny-rpms && make -j$$((`nproc` + 2)) deps"
 
 vagrant-build: | vagrant-build-archive vagrant-build-rpms
 
 vagrant-build-rpms: ValidHootTarball vagrant-build-deps
 	vagrant up
-	vagrant ssh -c "cd hootenanny-rpms && make"
+	vagrant ssh -c "cd hootenanny-rpms && make -j$$((`nproc` + 2))"
 
 vagrant-build-archive: vagrant-build-deps
 	vagrant up
