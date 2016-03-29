@@ -28,7 +28,7 @@ tmp/not-hoot: \
 	$(FILEGDB_RPM) \
 	RPMS/x86_64/gdal-1.10.1-3.el6.x86_64.rpm \
 	RPMS/x86_64/gdal-esri-epsg-1.10.1-1.el6.x86_64.rpm \
-	RPMS/x86_64/geos-3.4.2-1.el6.x86_64.rpm \
+	RPMS/x86_64/geos-3.4.2-2.el6.x86_64.rpm \
 	RPMS/x86_64/gnuplot-4.6.1-1.el6.x86_64.rpm \
 	RPMS/x86_64/log4cxx-0.10.0-14.el6.x86_64.rpm \
 	RPMS/x86_64/stxxl-1.3.1-1.el6.x86_64.rpm

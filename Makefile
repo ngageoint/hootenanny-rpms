@@ -43,11 +43,12 @@ vagrant-plugins:
 vagrant-build-deps: copy-words1
 	vagrant ssh -c "cd hootenanny-rpms && make deps"
 
-vagrant-build: | vagrant-build-archive vagrant-build-rpms
+vagrant-build: vagrant-build-rpms
 
-vagrant-build-rpms: ValidHootTarball vagrant-build-deps
+vagrant-build-rpms: ValidHootTarball vagrant-build-archive
 	vagrant up
 	vagrant ssh -c "cd hootenanny-rpms && make"
+	false
 
 vagrant-build-archive: vagrant-build-deps
 	vagrant up
