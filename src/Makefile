@@ -79,7 +79,7 @@ RPMS/x86_64/gdal-1.10.1-3.el6.x86_64.rpm: SPECS/gdal.spec $(FILEGDB_RPM)
 	$(INSTALL_FILEGDB)
 	rpmbuild --define "_smp_mflags -j"`nproc` --define "_topdir `pwd`" -ba $<
 
-RPMS/x86_64/geos-3.4.2-1.el6.x86_64.rpm: SPECS/geos.spec
+RPMS/x86_64/geos-3.4.2-2.el6.x86_64.rpm: SPECS/geos.spec
 	rpmbuild --define "_smp_mflags -j"`nproc` --define "_topdir `pwd`" -ba $<
 
 RPMS/x86_64/gdal-esri-epsg-1.10.1-1.el6.x86_64.rpm: SPECS/gdal-esri-epsg.spec
