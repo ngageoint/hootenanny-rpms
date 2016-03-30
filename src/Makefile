@@ -67,6 +67,7 @@ SPECS/hootenanny.spec: SPECS/hootenanny.spec.in  $(HOOTBALL)
 
 RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm: SPECS/hootenanny.spec hoot-deps
 	rm -rf BUILD/hootenanny-* BUILDROOT/hootenanny-* RPMS/x86_64/hootenanny-* SRPMS/hootenanny-*
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 RPMS/noarch/autoconf-2.69-3.el6.noarch.rpm: SPECS/autoconf.spec
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
