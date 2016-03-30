@@ -48,7 +48,6 @@ vagrant-build: vagrant-build-rpms
 vagrant-build-rpms: ValidHootTarball vagrant-build-archive
 	vagrant up
 	vagrant ssh -c "cd hootenanny-rpms && make"
-	false
 
 vagrant-build-archive: vagrant-build-deps
 	vagrant up

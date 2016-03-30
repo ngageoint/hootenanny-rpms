@@ -32,24 +32,29 @@ tmp/not-hoot: \
 	RPMS/x86_64/gnuplot-4.6.1-1.el6.x86_64.rpm \
 	RPMS/x86_64/log4cxx-0.10.0-14.el6.x86_64.rpm \
 	RPMS/x86_64/stxxl-1.3.1-1.el6.x86_64.rpm
-	touch $@
+	# touch was sometimes cropping down to second resolution
+	echo > $@
 
 hoot: \
 	RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm \
 
 tmp/hoot-deps: tmp/not-hoot
-	sudo yum -y install RPMS/x86_64/* RPMS/noarch/*
-	touch $@
+	# Adding bash to the end avoids an error if all the RPMs were already installed.
+	sudo yum -y install RPMS/x86_64/* RPMS/noarch/* bash
+	# touch was sometimes cropping down to second resolution
+	echo > $@
 
 tmp/log4cxx-install: RPMS/x86_64/log4cxx-0.10.0-14.el6.x86_64.rpm
 	yum list installed log4cxx || sudo yum -y install RPMS/x86_64/log4cxx*
 	mkdir -p tmp
-	touch $@
+	# touch was sometimes cropping down to second resolution
+	echo > $@
 
 tmp/python-which-install: RPMS/noarch/python-which-1.1.0-12.el6.noarch.rpm
 	yum list installed python-which || sudo yum -y install $<
 	mkdir -p tmp
-	touch $@
+	# touch was sometimes cropping down to second resolution
+	echo > $@
 
 # Just run the install part.
 hoot-test-install: SPECS/hootenanny.spec
