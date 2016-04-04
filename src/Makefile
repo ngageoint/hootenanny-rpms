@@ -63,7 +63,7 @@ tmp/python-which-install: RPMS/noarch/python-which-1.1.0-12.el6.noarch.rpm
 
 # Just run the install part.
 hoot-test-install: SPECS/hootenanny.spec
-	rpmbuild --define "_topdir `pwd`" --short-circuit -bi SPECS/hootenanny.spec
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) --short-circuit -bi SPECS/hootenanny.spec
 
 SPECS/hootenanny.spec: SPECS/hootenanny.spec.in  $(HOOTBALL)
 	test $(words $(HOOTBALL)) == 0 && (echo "Did not find a hoot tarball in SOURCES. Do you need to download one? https://github.com/ngageoint/hootenanny/releases"; exit -1) || true
@@ -74,40 +74,39 @@ SPECS/hootenanny.spec: SPECS/hootenanny.spec.in  $(HOOTBALL)
 
 RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm: SPECS/hootenanny.spec tmp/hoot-deps
 	rm -rf BUILD/hootenanny-* BUILDROOT/hootenanny-* RPMS/x86_64/hootenanny-* SRPMS/hootenanny-*
-	rpmbuild --define "_topdir `pwd`" -ba $<
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 RPMS/noarch/autoconf-2.69-3.el6.noarch.rpm: SPECS/autoconf.spec
-	rpmbuild --define "_topdir `pwd`" -ba $<
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 RPMS/noarch/dblatex-0.3-5.el6.noarch.rpm: SPECS/dblatex.spec tmp/python-which-install
-	rpmbuild --define "_topdir `pwd`" -ba $<
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 $(FILEGDB_RPM): SPECS/FileGDB_API.spec
-	rpmbuild --define "_topdir `pwd`" -ba $<
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 RPMS/x86_64/gdal-1.10.1-3.el6.x86_64.rpm: SPECS/gdal.spec $(FILEGDB_RPM)
 	$(INSTALL_FILEGDB)
-	rpmbuild --define "_smp_mflags -j"`nproc` --define "_topdir `pwd`" -ba $<
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 RPMS/x86_64/geos-3.4.2-2.el6.x86_64.rpm: SPECS/geos.spec
-	rpmbuild --define "_smp_mflags -j"`nproc` --define "_topdir `pwd`" -ba $<
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 RPMS/x86_64/gdal-esri-epsg-1.10.1-1.el6.x86_64.rpm: SPECS/gdal-esri-epsg.spec
-	rpmbuild --define "_topdir `pwd`" -ba $<
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 RPMS/x86_64/gnuplot-4.6.1-1.el6.x86_64.rpm: SPECS/gnuplot.spec
-	rpmbuild --define "_topdir `pwd`" -ba $<
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 RPMS/noarch/python-which-1.1.0-12.el6.noarch.rpm: SPECS/python-which.spec
-	rpmbuild --define "_topdir `pwd`" -ba $<
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 RPMS/x86_64/log4cxx-0.10.0-14.el6.x86_64.rpm: SPECS/log4cxx.spec
-	rpmbuild --define "_topdir `pwd`" -ba $<
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 RPMS/x86_64/stxxl-1.3.1-1.el6.x86_64.rpm: SPECS/stxxl.spec
-	rpmbuild --define "_topdir `pwd`" -ba $<
-
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 RPMS/noarch/hootenanny-words-1.0.0-1.el6.noarch.rpm: SPECS/hootenanny-words.spec
-	rpmbuild -ba -vv --define "_topdir `pwd`" $<
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 

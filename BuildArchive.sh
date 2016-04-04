@@ -17,8 +17,6 @@ sudo yum install -y ccache
 cd /home/vagrant/hootenanny-rpms/src/
 
 # Builds and installs necessary RPMs for archiving hoot
-# -j seems to cause errors -- fix another time...
-#make -s -j `grep -c ^processor /proc/cpuinfo` hoot-deps
 rm -f RPMS/x86_64/hoot*.rpm
 make -j $((`nproc` + 2)) tmp/hoot-deps
 
