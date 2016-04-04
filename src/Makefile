@@ -4,6 +4,11 @@ HOOTBALL := $(filter-out $(DOCBALLS), $(TARBALLS))
 
 FILEGDB_RPM=RPMS/x86_64/FileGDB_API-1.3-1.el6.x86_64.rpm
 INSTALL_FILEGDB=yum list installed FileGDB_API || sudo yum -y install $(FILEGDB_RPM)
+# Synchronizing the make build with rpmbuild parallel flags causes problems. This way we
+# spawn at most nproc processes per sub-job and if the load is above nproc + 2 no more
+# jobs will be spawned. This is a poor man parallelism, but should avoid killing the
+# host.
+RPMBUILD_OPTS=--define "_topdir `pwd`" --define "_smp_mflags -j`nproc` -l$$((`nproc` + 2))"
 
 hoottarball=$(lastword $(sort $(HOOTBALL)))
 

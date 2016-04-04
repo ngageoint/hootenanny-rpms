@@ -19,18 +19,22 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 %description
 
 %prep
-cd %{_topdir}/SOURCES
-[ -e %{words_compress} ] && rm %{words_compress}
-wget -nv %{words_url}
-cd %{_topdir}/BUILD
-bzcat %{_topdir}/SOURCES/%{words_compress} > %{words_filename}
+pwd
+export BUILD_DIR=%{_builddir}/%{name}-%{version}-%{release}.%{_arch}
+# Only download if the remote file is newer or a different size
+wget -P %{_sourcedir} -N -nv %{words_url}
+# Is there a shortcut for this?
+mkdir -p $BUILD_DIR
+cd $BUILD_DIR
+bzcat %{_sourcedir}/%{words_compress} > %{words_filename}
 /bin/chmod -Rf a+rX,u+w,g-w,o-w .
 
 %build
 
 %install
+export BUILD_DIR=%{_builddir}/%{name}-%{version}-%{release}.%{_arch}
 install -m 755 -d $RPM_BUILD_ROOT%{deploy_dir}
-install -m 644 %{words_filename} $RPM_BUILD_ROOT%{deploy_dir}
+install -m 644 $BUILD_DIR/%{words_filename} $RPM_BUILD_ROOT%{deploy_dir}
 cd $RPM_BUILD_ROOT%{deploy_dir}; ln -s %{words_filename} words.sqlite
 
 %clean

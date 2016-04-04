@@ -20,7 +20,7 @@ cd /home/vagrant/hootenanny-rpms/src/
 # -j seems to cause errors -- fix another time...
 #make -s -j `grep -c ^processor /proc/cpuinfo` hoot-deps
 rm -f RPMS/x86_64/hoot*.rpm
-make tmp/hoot-deps
+make -j $((`nproc` + 2)) tmp/hoot-deps
 
 cd /home/vagrant/hootenanny-rpms
 mkdir -p tmp
@@ -82,8 +82,8 @@ rm -f /home/vagrant/hootenanny-rpms/src/SOURCES/hootenanny-*.tar.gz
 rm -f /home/vagrant/hootenanny-rpms/src/SOURCES/hootenanny-services*.war
 
 [ -e /tmp/words1.sqlite ] && cp /tmp/words1.sqlite conf/
-make -s -j `grep -c ^processor /proc/cpuinfo`
-make -s -j `grep -c ^processor /proc/cpuinfo` archive
+make -s -j `nproc`
+make -s -j `nproc` archive
 
 # Run the tests that are known to be good on CentOS with a generous timeout
 timeout 600s HootTest --exclude=.*RubberSheetConflateTest.sh --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh --slow
