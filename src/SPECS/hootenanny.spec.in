@@ -370,11 +370,6 @@ if [ "$1" = "0" ]; then
         sudo mv /etc/sysctl.conf.orig /etc/sysctl.conf
     fi
 
-    # Restore Tomcat environment
-    TOMCAT_ENV=/usr/sbin/tomcat6
-    if grep -i --quiet HOOT $TOMCAT_ENV; then
-        sudo mv $TOMCAT_ENV.orig $TOMCAT_ENV
-    fi
     # Restore original file
     TOMCAT_SRV=/etc/tomcat6/server.xml
     if grep -i --quiet 'ingest/processed' $TOMCAT_SRV; then
