@@ -80,7 +80,6 @@ rm -f /home/vagrant/hootenanny-rpms/src/SOURCES/hootenanny-*.tar.gz
 rm -f /home/vagrant/hootenanny-rpms/src/SOURCES/hootenanny-services*.war
 
 [ -e /tmp/words1.sqlite ] && cp /tmp/words1.sqlite conf/
-make -s -j `nproc`
 make -s -j `nproc` archive
 
 # Run the tests that are known to be good on CentOS with a generous timeout
