@@ -18,7 +18,7 @@ cd /home/vagrant/hootenanny-rpms/src/
 
 # Builds and installs necessary RPMs for archiving hoot
 rm -f RPMS/x86_64/hoot*.rpm
-make -j $((`nproc` + 2)) hoot-deps
+make -j $((`nproc` + 2)) tmp/hoot-deps
 
 cd /home/vagrant/hootenanny-rpms
 mkdir -p tmp
