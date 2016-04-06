@@ -242,25 +242,6 @@ EOT
     # create the osm api test db
     sudo -i /var/lib/hootenanny/scripts/SetupOsmApiDB.sh
 
-    # configure Tomcat environment
-    TOMCAT_ENV=/usr/sbin/tomcat6
-    if ! grep -i --quiet HOOT $TOMCAT_ENV; then
-        sudo cp $TOMCAT_ENV $TOMCAT_ENV.orig
-        echo "Configuring tomcat6 environment"
-        sudo bash -c "cat >> $TOMCAT_ENV" <<EOT
-#--------------
-# Hoot Settings
-#--------------
-HOOT_HOME=/var/lib/hootenanny
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:$HOOT_HOME/lib:$HOOT_HOME/pretty-pipes/lib
-GDAL_DATA=/usr/local/share/gdal
-GDAL_LIB_DIR=/usr/local/lib
-HOOT_WORKING_NAME=hoot
-QT_HOME=/usr/local/qt-everywhere-opensource-src-4.8.6
-PSQL_HOME=/usr/pgsql-$PG_VERSION
-PATH=$HOOT_HOME/bin:/usr/local/lib:/usr/local/bin:$PATH:$QT_HOME/bin:$PSQL_HOME/bin
-EOT
-    fi
     # Create Tomcat context path for tile images
     TOMCAT_SRV=/etc/tomcat6/server.xml
     if ! grep -i --quiet 'ingest/processed' $TOMCAT_SRV; then
@@ -337,11 +318,11 @@ EOT
 
     # Configuring firewall
     if ! sudo iptables --list-rules | grep -i --quiet 'dport 80'; then
-        sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
-        sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
-        sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 8000 -j ACCEPT
-        sudo iptables -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080
-        sudo iptables -A OUTPUT -t nat -s 0/0 -d 127/8 -p tcp --dport 80 -j REDIRECT --to-ports 8080
+        sudo iptables -I -A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+        sudo iptables -I -A INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
+        sudo iptables -I -A INPUT -p tcp -m state --state NEW -m tcp --dport 8000 -j ACCEPT
+        sudo iptables -I -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080
+        sudo iptables -I -A OUTPUT -t nat -s 0/0 -d 127/8 -p tcp --dport 80 -j REDIRECT --to-ports 8080
         sudo service iptables save
         sudo service iptables restart
     fi
@@ -356,7 +337,7 @@ elif [ "$1" = "2" ]; then
         --changeLogFile=classes/db/db.changelog-master.xml \
         --promptForNonLocalDatabase=false \
         --driver=org.postgresql.Driver \
-        --url=jdbc:postgresql:$DB_NAME \
+        --url=jdbc:postgresql://$DB_HOST:$DB_PORT/$DB_NAME \
         --username=$DB_USER \
         --password=$DB_PASSWORD \
         --logLevel=warning \
