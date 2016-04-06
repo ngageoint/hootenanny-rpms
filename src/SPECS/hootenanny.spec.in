@@ -210,17 +210,17 @@ if [ "$1" = "1" ]; then
         sudo -u postgres sed -i s/^max_connections/\#max_connections/ $POSTGRES_CONF
         sudo -u postgres sed -i s/^shared_buffers/\#shared_buffers/ $POSTGRES_CONF
         sudo -u postgres bash -c "cat >> $POSTGRES_CONF" <<EOT
-    #--------------
-    # Hoot Settings
-    #--------------
-    max_connections = 1000
-    shared_buffers = 1024MB
-    max_files_per_process = 1000
-    work_mem = 16MB
-    maintenance_work_mem = 256MB
-    checkpoint_segments = 20
-    autovacuum = off
-    EOT
+#--------------
+# Hoot Settings
+#--------------
+max_connections = 1000
+shared_buffers = 1024MB
+max_files_per_process = 1000
+work_mem = 16MB
+maintenance_work_mem = 256MB
+checkpoint_segments = 20
+autovacuum = off
+EOT
     fi
     # configure kernel parameters
     SYSCTL_CONF=/etc/sysctl.conf
@@ -248,18 +248,18 @@ if [ "$1" = "1" ]; then
         sudo cp $TOMCAT_ENV $TOMCAT_ENV.orig
         echo "Configuring tomcat6 environment"
         sudo bash -c "cat >> $TOMCAT_ENV" <<EOT
-    #--------------
-    # Hoot Settings
-    #--------------
-    HOOT_HOME=/var/lib/hootenanny
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:$HOOT_HOME/lib:$HOOT_HOME/pretty-pipes/lib
-    GDAL_DATA=/usr/local/share/gdal
-    GDAL_LIB_DIR=/usr/local/lib
-    HOOT_WORKING_NAME=hoot
-    QT_HOME=/usr/local/qt-everywhere-opensource-src-4.8.6
-    PSQL_HOME=/usr/pgsql-$PG_VERSION
-    PATH=$HOOT_HOME/bin:/usr/local/lib:/usr/local/bin:$PATH:$QT_HOME/bin:$PSQL_HOME/bin
-    EOT
+#--------------
+# Hoot Settings
+#--------------
+HOOT_HOME=/var/lib/hootenanny
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:$HOOT_HOME/lib:$HOOT_HOME/pretty-pipes/lib
+GDAL_DATA=/usr/local/share/gdal
+GDAL_LIB_DIR=/usr/local/lib
+HOOT_WORKING_NAME=hoot
+QT_HOME=/usr/local/qt-everywhere-opensource-src-4.8.6
+PSQL_HOME=/usr/pgsql-$PG_VERSION
+PATH=$HOOT_HOME/bin:/usr/local/lib:/usr/local/bin:$PATH:$QT_HOME/bin:$PSQL_HOME/bin
+EOT
     fi
     # Create Tomcat context path for tile images
     TOMCAT_SRV=/etc/tomcat6/server.xml
