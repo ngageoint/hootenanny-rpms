@@ -82,8 +82,5 @@ rm -f /home/vagrant/hootenanny-rpms/src/SOURCES/hootenanny-services*.war
 [ -e /tmp/words1.sqlite ] && cp /tmp/words1.sqlite conf/
 make -s -j `nproc` archive
 
-# Run the tests that are known to be good on CentOS with a generous timeout
-timeout 600s HootTest --exclude=.*RubberSheetConflateTest.sh --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh --slow
-
 cp -l hootenanny-[0-9]*.tar.gz /home/vagrant/hootenanny-rpms/src/SOURCES/
 cp -l hootenanny-services*.war /home/vagrant/hootenanny-rpms/src/SOURCES/
