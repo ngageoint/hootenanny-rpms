@@ -318,11 +318,11 @@ EOT
 
     # Configuring firewall
     if ! sudo iptables --list-rules | grep -i --quiet 'dport 80'; then
-        sudo iptables -I -A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
-        sudo iptables -I -A INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
-        sudo iptables -I -A INPUT -p tcp -m state --state NEW -m tcp --dport 8000 -j ACCEPT
-        sudo iptables -I -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080
-        sudo iptables -I -A OUTPUT -t nat -s 0/0 -d 127/8 -p tcp --dport 80 -j REDIRECT --to-ports 8080
+        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
+        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8000 -j ACCEPT
+        sudo iptables -I PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080
+        sudo iptables -I OUTPUT -t nat -s 0/0 -d 127/8 -p tcp --dport 80 -j REDIRECT --to-ports 8080
         sudo service iptables save
         sudo service iptables restart
     fi
