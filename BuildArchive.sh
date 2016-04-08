@@ -12,6 +12,8 @@ echo $GIT_COMMIT
 
 export JAVA_HOME=/etc/alternatives/jre_1.7.0
 
+echo "%__make /usr/bin/make -j 4" >> /home/vagrant/.rpmmacros
+
 sudo yum install -y ccache
 
 cd /home/vagrant/hootenanny-rpms/src/
