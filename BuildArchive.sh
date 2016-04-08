@@ -12,7 +12,7 @@ echo $GIT_COMMIT
 
 export JAVA_HOME=/etc/alternatives/jre_1.7.0
 
-echo "%__make /usr/bin/make -j 4" >> /home/vagrant/.rpmmacros
+echo "%__make /usr/bin/make -sj4" >> /home/vagrant/.rpmmacros
 
 sudo yum install -y ccache
 
