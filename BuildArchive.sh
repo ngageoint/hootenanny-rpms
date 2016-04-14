@@ -26,14 +26,10 @@ cd /home/vagrant/hootenanny-rpms
 mkdir -p tmp
 cd tmp
 
-[ -e hootenanny ] || git clone https://github.com/ngageoint/hootenanny.git
+rm -rf hootenanny
+git clone https://github.com/ngageoint/hootenanny.git
 cd hootenanny
-git fetch
-git reset
 git submodule update --init --recursive
-# Clean sometimes refuses to delete these directories. Odd.
-rm -rf docs/node_modules hoot-core/tmp/ hoot-core-test/tmp tgs/tmp
-git clean -d -f -f -x || echo "It is ok if this fails, it sometimes mysteriously doesn't clean"
 git checkout $GIT_COMMIT
 # Do a pull just in case a branch was specified.
 git pull || echo "Ignore the failure."
