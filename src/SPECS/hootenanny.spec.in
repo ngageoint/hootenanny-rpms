@@ -446,9 +446,32 @@ sudo /sbin/chkconfig --del tomcat6
 # set NodeJS node-mapnik-server to NOT autostart
 sudo /sbin/chkconfig --del node-mapnik-server
 
+%package services-devel-deps
+Summary:    Development dependencies for Hootenanny Services
+Group:      Development/Libraries
+Requires:   %{name}-core-devel-deps = %{version}-%{release}
+Requires:   apache-maven
+Requires:   java-1.7.0-openjdk-devel
+Requires:   nodejs
+Requires:   npm
+Requires:   postgresql-server >= 9.1
+Requires:   postgresql-contrib >= 9.1
+Requires:   postgis2_92 >= 2.1
+Requires:   liquibase
 
+%description services-devel-deps
+Hootenanny was developed to provide an open source, standards-based approach to
+geospatial vector data conflation. Hootenanny is designed to facilitate
+automated and semi-automated conflation of critical foundation GEOINT features
+in the topographic domain, namely roads (polylines), buildings (polygons), and
+points-of-interest (POI's) (points). Conflation happens at the dataset level,
+where the user's workflow determines the best reference dataset and source
+content, geometry and attributes, to transfer to the output map.
 
+This packages contains the dependencies to build and develop the Hootenanny
+services. Use this if you want to build and test from github.
 
+%files services-devel-deps
 
 %package core-devel-deps
 Summary:    Development dependencies for Hootenanny Core
