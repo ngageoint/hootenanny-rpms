@@ -397,6 +397,8 @@ if [ "$1" = "0" ]; then
         sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
         sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
         sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8000 -j ACCEPT
+        sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8094 -j ACCEPT
+        sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8096 -j ACCEPT
         sudo iptables -D PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080
         sudo iptables -D OUTPUT -t nat -s 0/0 -d 127/8 -p tcp --dport 80 -j REDIRECT --to-ports 8080
         sudo service iptables save
