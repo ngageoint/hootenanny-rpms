@@ -470,7 +470,7 @@ services. Use this if you want to build and test from github.
 
 %files services-devel-deps
 
-%post services-ui
+%post services-devel-deps
 if [ "$1" = "1" ]; then
     # Perform tasks to prepare for the initial installation
 
@@ -537,7 +537,7 @@ EOT
     sudo service postgresql-$PG_VERSION restart
 fi
 
-%postun services-ui
+%postun services-devel-deps
 if [ "$1" = "0" ]; then
     # Perform tasks to clean up after uninstallation
 
