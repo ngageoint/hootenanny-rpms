@@ -197,6 +197,11 @@ if [ "$1" = "1" ]; then
         sudo -u postgres psql -d wfsstoredb -c "GRANT ALL on spatial_ref_sys TO PUBLIC;"
     fi
 
+    # restore saved db config file if present
+    if [ -f /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave ]; then
+        sudo mv /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/DatabaseConfig.sh
+    fi
+
     # configure Postgres settings
     PG_HB_CONF=/var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
     if ! sudo grep -i --quiet hoot $PG_HB_CONF; then
