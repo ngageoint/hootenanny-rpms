@@ -78,7 +78,9 @@ RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm: SPECS/hootenanny.spec
 
 RPMS/noarch/autoconf-2.69-3.el6.noarch.rpm: SPECS/autoconf.spec
 	rm -f RPMS/noarch/autoconf* RPMS/x86_64/autoconf*
-	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
+	# autoconf fails intermittently with some odd test failures. See:
+	# https://github.com/ngageoint/hootenanny-rpms/issues/62
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $< || MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 RPMS/noarch/dblatex-0.3-5.el6.noarch.rpm: SPECS/dblatex.spec tmp/python-which-install
 	rm -f RPMS/noarch/dblatex* RPMS/x86_64/dblatex*
