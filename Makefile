@@ -64,6 +64,7 @@ vagrant-clean:
 vagrant-test:
 	cd test; vagrant up
 	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --diff \
+		--exclude=.*ConflateAverageTest.sh \
 		--exclude=.*RubberSheetConflateTest.sh \
 		--exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh \
 		--slow"
