@@ -187,7 +187,11 @@ if [ "$1" = "1" ]; then
         RAND_PW=$(pwgen -s 16 1)
         sudo -u postgres createuser --superuser hoot || true
         sudo -u postgres psql -c "alter user hoot with password '$RAND_PW';"
-        sudo sed -i s/DB_PASSWORD=.*/DB_PASSWORD=$RAND_PW/ /var/lib/hootenanny/conf/DatabaseConfig.sh
+        if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
+            sudo sed -i s/DB_PASSWORD=.*/DB_PASSWORD=$RAND_PW/ /var/lib/hootenanny/conf/DatabaseConfigDefault.sh
+        else
+            sudo sed -i s/DB_PASSWORD=.*/DB_PASSWORD=$RAND_PW/ /var/lib/hootenanny/conf/DatabaseConfig.sh
+        fi
         sudo -u postgres createdb hoot --owner=hoot
         sudo -u postgres createdb wfsstoredb --owner=hoot
         sudo -u postgres psql -d hoot -c 'create extension hstore;'
@@ -196,7 +200,10 @@ if [ "$1" = "1" ]; then
     fi
 
     # restore saved db config file if present
-    if [ -f /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave ]; then
+
+    if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh.rpmsave ]; then
+        sudo mv /var/lib/hootenanny/conf/DatabaseConfigDefault.sh.rpmsave /var/lib/hootenanny/conf/DatabaseConfigDefault.sh
+    elif [ -f /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave ]; then
         sudo mv /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/DatabaseConfig.sh
     fi
 
