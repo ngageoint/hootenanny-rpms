@@ -170,6 +170,17 @@ This package contains the UI and web services.
 #    5. Delete any old files not overwritten by the newer version. (This step deletes files that the new package does not require.)
 #    6. Run the %postun hook of the old package.
 
+%pre services-ui
+if [ "$1" = "2" ]; then
+    # Perform whatever maintenance must occur before the upgrade
+
+    # Remove exploded hoot-services war remnants
+    SERVICES_HOME=/var/lib/tomcat6/webapps/hoot-services
+    if [ -d $SERVICES_HOME ]; then
+        sudo rm -rf $SERVICES_HOME
+    fi
+fi
+
 %post services-ui
 if [ "$1" = "1" ]; then
     # Perform tasks to prepare for the initial installation
