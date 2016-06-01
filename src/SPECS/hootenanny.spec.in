@@ -178,7 +178,7 @@ if [ "$1" = "2" ]; then
 
     # If DatabaseConfig.sh still has passwords, write these to DatabaseConfigLocal.sh
     if grep -qw PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh; then
-        sudo grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave > /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
+        sudo grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh > /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
     else
 
 fi
