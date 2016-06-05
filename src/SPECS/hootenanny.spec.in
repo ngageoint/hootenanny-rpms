@@ -176,9 +176,9 @@ if [ "$1" = "2" ]; then
         sudo rm -rf $SERVICES_HOME
     fi
 
-    # If DatabaseConfig.sh still has passwords, write these to DatabaseConfigLocal.sh
-    if grep --quiet DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh; then
-        grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
+    # If DatabaseConfig.sh,rpmsave still has passwords, write these to DatabaseConfigLocal.sh and remove old file
+    if grep --quiet DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave; then
+        grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null && sudo rm /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave
         sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
     fi
 
