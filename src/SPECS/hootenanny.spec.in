@@ -177,8 +177,9 @@ if [ "$1" = "2" ]; then
     fi
 
     # If DatabaseConfig.sh still has passwords, write these to DatabaseConfigLocal.sh
-    if [ grep --quiet DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh ]; then
-        sudo grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh > /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
+    if grep --quiet DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh; then
+        grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
+        sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
     fi
 
 fi
@@ -186,6 +187,7 @@ fi
 %post services-ui
 if [ "$1" = "1" ]; then
     # Perform tasks to prepare for the initial installation
+    source /etc/profile.d/hootenanny.sh
 
     # init and start Postgres
     PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
@@ -201,7 +203,9 @@ if [ "$1" = "1" ]; then
         sudo -u postgres createuser --superuser hoot || true
         sudo -u postgres psql -c "alter user hoot with password '$RAND_PW';"
         if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
-            sudo echo "export DB_PASSWORD=$RAND_PW" > /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
+            echo "export DB_PASSWORD=$RAND_PW" | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
+            echo "export DB_PASSWORD_OSMAPI=$RAND_PW" | sudo tee --append /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
+            sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
         else
             sudo sed -i s/DB_PASSWORD=.*/DB_PASSWORD=$RAND_PW/ /var/lib/hootenanny/conf/DatabaseConfig.sh
         fi
@@ -215,7 +219,8 @@ if [ "$1" = "1" ]; then
     # restore saved db config file settings if present
     if [ -f /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave ]; then
         if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
-            sudo grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave > /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
+            grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
+            sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
         else
             sudo mv /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/DatabaseConfig.sh
         fi
@@ -264,7 +269,7 @@ EOT
     sudo service postgresql-$PG_VERSION restart
 
     # create the osm api test db
-    sudo -i /var/lib/hootenanny/scripts/SetupOsmApiDB.sh
+    /var/lib/hootenanny/scripts/SetupOsmApiDB.sh
 
     # Create Tomcat context path for tile images
     TOMCAT_SRV=/etc/tomcat6/server.xml
@@ -325,8 +330,9 @@ EOT
         sudo chown tomcat:tomcat $REPORT_HOME/..
     fi
 
-    # Update the db password in hoot-services war
     source /var/lib/hootenanny/conf/DatabaseConfig.sh
+
+    # Update the db password in hoot-services war
     while [ ! -f /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/db/spring-database.xml ]; do
         echo "Waiting for hoot-services.war to deploy"
         sleep 1
@@ -339,13 +345,18 @@ EOT
 
     sudo service tomcat6 restart
 
+    # Add hostname alias to 127.0.0.1 to avoid liquibase unknown hostname error
+    if ! grep --quiet $(hostname) /etc/hosts; then
+        sudo sed -i "1 s/$/ $(hostname)/" /etc/hosts
+    fi
+
     # Apply any database schema changes
     cd $TOMCAT_HOME/webapps/hoot-services/WEB-INF
     liquibase --contexts=default,production \
         --changeLogFile=classes/db/db.changelog-master.xml \
         --promptForNonLocalDatabase=false \
         --driver=org.postgresql.Driver \
-        --url=jdbc:postgresql:$DB_NAME \
+        --url=jdbc:postgresql://$DB_HOST:$DB_PORT/$DB_NAME \
         --username=$DB_USER \
         --password=$DB_PASSWORD \
         --logLevel=warning \
@@ -366,9 +377,10 @@ EOT
     fi
 elif [ "$1" = "2" ]; then
     # Perform whatever maintenance must occur after the upgrade
+    source /etc/profile.d/hootenanny.sh
+    source /var/lib/hootenanny/conf/DatabaseConfig.sh
 
     # Update the db password in hoot-services war
-    source /var/lib/hootenanny/conf/DatabaseConfig.sh
     while [ ! -f /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/db/spring-database.xml ]; do
         echo "Waiting for hoot-services.war to deploy"
         sleep 1
@@ -383,7 +395,6 @@ elif [ "$1" = "2" ]; then
 
     # Apply any database schema changes
     TOMCAT_HOME=/usr/share/tomcat6
-    source /var/lib/hootenanny/conf/DatabaseConfig.sh
     cd $TOMCAT_HOME/webapps/hoot-services/WEB-INF
     liquibase --contexts=default,production \
         --changeLogFile=classes/db/db.changelog-master.xml \
