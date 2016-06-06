@@ -175,13 +175,6 @@ if [ "$1" = "2" ]; then
     if [ -d $SERVICES_HOME ]; then
         sudo rm -rf $SERVICES_HOME
     fi
-
-    # If DatabaseConfig.sh,rpmsave still has passwords, write these to DatabaseConfigLocal.sh and remove old file
-    if grep --quiet DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave; then
-        grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null && sudo rm /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave
-        sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
-    fi
-
 fi
 
 %post services-ui
@@ -377,6 +370,17 @@ EOT
     fi
 elif [ "$1" = "2" ]; then
     # Perform whatever maintenance must occur after the upgrade
+
+    # copy values from saved db config file, if present
+    if [ -f /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave ]; then
+        if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
+            grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
+            sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
+        else
+            sudo mv /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/DatabaseConfig.sh
+        fi
+    fi
+
     source /etc/profile.d/hootenanny.sh
     source /var/lib/hootenanny/conf/DatabaseConfig.sh
 
