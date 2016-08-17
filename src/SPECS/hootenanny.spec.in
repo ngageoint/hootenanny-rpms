@@ -198,6 +198,12 @@ function updateConfigFiles () {
 }
 
 function updateLiquibase () {
+
+    # Add hostname alias to 127.0.0.1 to avoid liquibase unknown hostname error
+    if ! grep --quiet $(hostname) /etc/hosts; then
+        sudo sed -i "1 s/$/ $(hostname)/" /etc/hosts
+    fi
+
     # Apply any database schema changes
     source /var/lib/hootenanny/conf/DatabaseConfig.sh
     TOMCAT_HOME=/usr/share/tomcat6
@@ -211,7 +217,7 @@ function updateLiquibase () {
         --username=$DB_USER \
         --password=$DB_PASSWORD \
         --logLevel=warning \
-        --classpath=lib/postgresql-9.1-901-1.jdbc4.jar \
+        --classpath=lib/postgresql-9.4.1208.jre7.jar \
         update
 }
 if [ "$1" = "1" ]; then
@@ -360,12 +366,6 @@ EOT
     fi
 
     updateConfigFiles
-
-    # Add hostname alias to 127.0.0.1 to avoid liquibase unknown hostname error
-    if ! grep --quiet $(hostname) /etc/hosts; then
-        sudo sed -i "1 s/$/ $(hostname)/" /etc/hosts
-    fi
-
     updateLiquibase
 
     # Configuring firewall
