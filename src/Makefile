@@ -65,6 +65,10 @@ tmp/python-which-install: RPMS/noarch/python-which-1.1.0-12.el6.noarch.rpm
 hoot-test-install: SPECS/hootenanny.spec
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) --short-circuit -bi SPECS/hootenanny.spec
 
+# Just run the binary package part.
+hoot-test-package: SPECS/hootenanny.spec
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) --short-circuit -bb SPECS/hootenanny.spec
+
 SPECS/hootenanny.spec: SPECS/hootenanny.spec.in  $(HOOTBALL)
 	test $(words $(HOOTBALL)) == 0 && (echo "Did not find a hoot tarball in SOURCES. Do you need to download one? https://github.com/ngageoint/hootenanny/releases"; exit -1) || true
 	test $(words $(HOOTBALL)) == 1 || (echo "Found more than 1 hoot tarball please remove the extra tarballs. $(HOOTBALL)"; exit -1)

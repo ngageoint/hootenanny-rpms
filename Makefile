@@ -69,7 +69,6 @@ vagrant-test:
 		--exclude=.*ConflateAverageTest.sh \
 		--exclude=.*RubberSheetConflateTest.sh \
 		--exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh \
-		--exclude=.*OsmApiDb.* \
 		--slow"
 
 deps: force

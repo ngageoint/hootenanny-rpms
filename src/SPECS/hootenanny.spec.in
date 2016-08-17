@@ -126,7 +126,6 @@ rm -rf %{buildroot}
 %{_datarootdir}/doc/%{name}
 %{_bindir}/*
 %config %{_sharedstatedir}/%{name}/conf/hoot.json
-%config %{_sharedstatedir}/%{name}/conf/DatabaseConfig.sh
 %{_sharedstatedir}/%{name}
 %{_sysconfdir}/profile.d/hootenanny.sh
 %{_sysconfdir}/asciidoc/filters/
@@ -215,9 +214,9 @@ function updateLiquibase () {
         --classpath=lib/postgresql-9.1-901-1.jdbc4.jar \
         update
 }
-
 if [ "$1" = "1" ]; then
     # Perform tasks to prepare for the initial installation
+    source /etc/profile.d/hootenanny.sh
 
     # init and start Postgres
     PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
@@ -232,7 +231,13 @@ if [ "$1" = "1" ]; then
         RAND_PW=$(pwgen -s 16 1)
         sudo -u postgres createuser --superuser hoot || true
         sudo -u postgres psql -c "alter user hoot with password '$RAND_PW';"
+        if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
+            echo "export DB_PASSWORD=$RAND_PW" | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
+            echo "export DB_PASSWORD_OSMAPI=$RAND_PW" | sudo tee --append /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
+            sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
+        else
         sudo sed -i s/DB_PASSWORD=.*/DB_PASSWORD=$RAND_PW/ /var/lib/hootenanny/conf/DatabaseConfig.sh
+        fi
         sudo -u postgres createdb hoot --owner=hoot
         sudo -u postgres createdb wfsstoredb --owner=hoot
         sudo -u postgres psql -d hoot -c 'create extension hstore;'
@@ -240,9 +245,14 @@ if [ "$1" = "1" ]; then
         sudo -u postgres psql -d wfsstoredb -c 'create extension postgis;'
     fi
 
-    # restore saved db config file if present
+    # restore saved db config file settings if present
     if [ -f /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave ]; then
+        if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
+            grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
+            sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
+        else
         sudo mv /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/DatabaseConfig.sh
+    fi
     fi
 
     # configure Postgres settings
@@ -288,7 +298,7 @@ EOT
     sudo service postgresql-$PG_VERSION restart
 
     # create the osm api test db
-    sudo -i /var/lib/hootenanny/scripts/SetupOsmApiDB.sh
+    /var/lib/hootenanny/scripts/SetupOsmApiDB.sh
 
     # Create Tomcat context path for tile images
     TOMCAT_SRV=/etc/tomcat6/server.xml
@@ -350,6 +360,12 @@ EOT
     fi
 
     updateConfigFiles
+
+    # Add hostname alias to 127.0.0.1 to avoid liquibase unknown hostname error
+    if ! grep --quiet $(hostname) /etc/hosts; then
+        sudo sed -i "1 s/$/ $(hostname)/" /etc/hosts
+    fi
+
     updateLiquibase
 
     # Configuring firewall
@@ -366,6 +382,20 @@ EOT
     fi
 elif [ "$1" = "2" ]; then
     # Perform whatever maintenance must occur after the upgrade
+
+    # copy values from saved db config file, if present
+    if [ -f /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave ]; then
+        if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
+            grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
+            sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
+        else
+            sudo mv /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/DatabaseConfig.sh
+        fi
+    fi
+
+    source /etc/profile.d/hootenanny.sh
+    source /var/lib/hootenanny/conf/DatabaseConfig.sh
+
     updateConfigFiles
     updateLiquibase
 fi

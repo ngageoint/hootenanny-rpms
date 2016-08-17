@@ -68,8 +68,9 @@ fi
 # Configure makefiles, we aren't testing services with RPMs yet.
 aclocal && autoconf && autoheader && automake && ./configure -q --with-rnd --with-services
 
-# Use the default database
-cp conf/DatabaseConfig.sh.orig conf/DatabaseConfig.sh
+if [ ! -f conf/DatabaseConfigDefault.sh ]; then
+    cp conf/DatabaseConfig.sh.orig conf/DatabaseConfig.sh
+fi
 make -s clean
 
 # Remove any old archives
