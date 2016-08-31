@@ -101,6 +101,9 @@ mkdir -p $RPM_BUILD_ROOT/var/lib/hootenanny/hoot-core-test/src/test/
 ln -s /var/lib/hootenanny/test-files/ $RPM_BUILD_ROOT/var/lib/hootenanny/hoot-core-test/src/test/resources
 # This makes it so HootEnv.sh resolves hoot home properly.
 ln -s /var/lib/hootenanny/bin/HootEnv.sh $RPM_BUILD_ROOT/usr/bin/HootEnv.sh
+# Fix the docs for the UI
+ln -s /usr/share/doc/hootenanny  $RPM_BUILD_ROOT/var/lib/hootenanny/docs
+
 
 %check
 source ./SetupEnv.sh
@@ -122,7 +125,7 @@ rm -rf %{buildroot}
 %files core
 %{_includedir}/hoot
 %{_libdir}/*
-%docdir /usr/share/docs/%{name}
+%docdir /usr/share/doc/%{name}
 %{_datarootdir}/doc/%{name}
 %{_bindir}/*
 %config %{_sharedstatedir}/%{name}/conf/hoot.json
@@ -684,6 +687,9 @@ This packages contains the dependencies to run the Hootenanny core.
 %files core-deps
 
 %changelog
+* Tue Aug 30 2016 Matt Jackson <matthew.jackson@digitalglobe.com> - 0.2.23+
+- Added symlink for hootenanny docs so they are available in the UI
+
 * Thu Feb 25 2016 Brian Hatchl <brian.hatchl@digitalglobe.com> - 0.2.23+
 - Adding ui-services and autostart packages
 
