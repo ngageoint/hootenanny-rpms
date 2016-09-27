@@ -47,6 +47,7 @@ vagrant-build: vagrant-build-rpms
 
 vagrant-build-rpms: vagrant-build-archive
 	vagrant up
+	vagrant ssh -c "cd hootenanny-rpms && ./fix_postgres.sh"
 	vagrant ssh -c "cd hootenanny-rpms && make -j$$((`nproc` + 2))"
 
 vagrant-build-archive: vagrant-build-deps
