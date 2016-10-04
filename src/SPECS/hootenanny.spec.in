@@ -323,6 +323,19 @@ EOT
         echo "Set allowLinking to true in Tomcat context"
         sudo sed -i "s@^<Context>@<Context allowLinking=\"true\">@" $TOMCAT_CTX
     fi
+    # Increase the Tomcat java heap size
+    TOMCAT_CONF=/etc/tomcat6/tomcat6.conf
+    if ! grep -i --quiet 'Xmx2048m' $TOMCAT_CONF; then
+        sudo -u tomcat cp $TOMCAT_CONF $TOMCAT_CONF.orig
+        echo "Increase the Tomcat java heap size"
+        sudo -u tomcat bash -c "cat >> $TOMCAT_CONF" <<EOT
+#--------------
+# Hoot increase java heap size
+#--------------
+JAVA_OPTS="$JAVA_OPTS -Xms512m -Xmx2048m"
+
+EOT
+    fi
     # Create directories for webapp
     TOMCAT_HOME=/usr/share/tomcat6
     if [ ! -d $TOMCAT_HOME/.deegree ]; then
@@ -437,6 +450,11 @@ if [ "$1" = "0" ]; then
     TOMCAT_CTX=/etc/tomcat6/context.xml
     if grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
         sudo -u tomcat mv $TOMCAT_CTX.orig $TOMCAT_CTX
+    fi
+    # Restore original file
+    TOMCAT_CONF=/etc/tomcat6/tomcat6.conf
+    if grep -i --quiet 'Xmx2048m' $TOMCAT_CONF; then
+        sudo -u tomcat mv $TOMCAT_CONF.orig $TOMCAT_CONF
     fi
     # Remove .deegree directory
     TOMCAT_HOME=/usr/share/tomcat6
