@@ -93,7 +93,7 @@ cp node-mapnik-server/init.d/centos-rpm $RPM_BUILD_ROOT/etc/init.d/node-mapnik-s
 cp renderdb-export-server/init.d/centos-rpm $RPM_BUILD_ROOT/etc/init.d/renderdb-export-server
 mkdir -p $RPM_BUILD_ROOT/var/lib/hootenanny
 cp -R node-mapnik-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-mapnik-server
-cp -R renderdb-export-server/ $RPM_BUILD_ROOT/var/lib/hootenannyrenderdb-export-server
+cp -R renderdb-export-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/renderdb-export-server
 
 make install
 echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
