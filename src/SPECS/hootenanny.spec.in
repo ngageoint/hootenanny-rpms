@@ -79,16 +79,21 @@ make -s %{?_smp_mflags}
 #cd node-mapnik-server
 #npm install
 
+cd renderdb-export-server
+npm install
+
 %install
 
-# UI stuff
+# UI/Server stuff
 mkdir -p $RPM_BUILD_ROOT/var/lib/tomcat6/webapps
 cp hoot-services/target/hoot-services*.war $RPM_BUILD_ROOT/var/lib/tomcat6/webapps/hoot-services.war
 cp -R hoot-ui/ $RPM_BUILD_ROOT/var/lib/tomcat6/webapps/hootenanny-id
 mkdir -p $RPM_BUILD_ROOT/etc/init.d
 cp node-mapnik-server/init.d/centos-rpm $RPM_BUILD_ROOT/etc/init.d/node-mapnik-server
+cp renderdb-export-server/init.d/centos-rpm $RPM_BUILD_ROOT/etc/init.d/renderdb-export-server
 mkdir -p $RPM_BUILD_ROOT/var/lib/hootenanny
 cp -R node-mapnik-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-mapnik-server
+cp -R renderdb-export-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/renderdb-export-server
 
 make install
 echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
@@ -162,6 +167,7 @@ This package contains the UI and web services.
 %attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat6/webapps/hoot-services.war
 %attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat6/webapps/hootenanny-id
 /etc/init.d/node-mapnik-server
+/etc/init.d/renderdb-export-server
 
 #the order of operations during an upgrade is:
 #
@@ -514,6 +520,9 @@ sudo /sbin/chkconfig tomcat6 on
 # set NodeJS node-mapnik-server to autostart
 sudo /sbin/chkconfig --add node-mapnik-server
 sudo /sbin/chkconfig node-mapnik-server on
+# set NodeJS renderdb-export-server to autostart
+sudo /sbin/chkconfig --add renderdb-export-server
+sudo /sbin/chkconfig renderdb-export-server on
 
 %postun autostart
 # set Postgres to NOT autostart
@@ -523,6 +532,8 @@ sudo /sbin/chkconfig --del postgresql-$PG_VERSION
 sudo /sbin/chkconfig --del tomcat6
 # set NodeJS node-mapnik-server to NOT autostart
 sudo /sbin/chkconfig --del node-mapnik-server
+# set NodeJS renderdb-export-server to NOT autostart
+sudo /sbin/chkconfig --del renderdb-export-server
 
 %package services-devel-deps
 Summary:    Development dependencies for Hootenanny Services
