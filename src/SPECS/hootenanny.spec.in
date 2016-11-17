@@ -318,23 +318,23 @@ EOT
     # Create Tomcat context path for tile images
     TOMCAT_SRV=/etc/tomcat6/server.xml
     if ! grep -i --quiet 'ingest/processed' $TOMCAT_SRV; then
-        sudo -u tomcat cp $TOMCAT_SRV $TOMCAT_SRV.orig
+        sudo $TOMCAT_SRV $TOMCAT_SRV.orig
         echo "Adding Tomcat context path for tile images"
         sudo sed -i "s@<\/Host>@ <Context docBase=\"\/var\/lib\/hootenanny\/ingest\/processed\" path=\"\/static\" \/>\n &@" $TOMCAT_SRV
     fi
     # Allow linking in Tomcat context
     TOMCAT_CTX=/etc/tomcat6/context.xml
     if ! grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
-        sudo -u tomcat cp $TOMCAT_CTX $TOMCAT_CTX.orig
+        sudo -cp $TOMCAT_CTX $TOMCAT_CTX.orig
         echo "Set allowLinking to true in Tomcat context"
         sudo sed -i "s@^<Context>@<Context allowLinking=\"true\">@" $TOMCAT_CTX
     fi
     # Increase the Tomcat java heap size
     TOMCAT_CONF=/etc/tomcat6/tomcat6.conf
     if ! grep -i --quiet 'Xmx2048m' $TOMCAT_CONF; then
-        sudo -u tomcat cp $TOMCAT_CONF $TOMCAT_CONF.orig
+        sudo cp $TOMCAT_CONF $TOMCAT_CONF.orig
         echo "Increase the Tomcat java heap size"
-        sudo -u tomcat bash -c "cat >> $TOMCAT_CONF" <<EOT
+        sudo bash -c "cat >> $TOMCAT_CONF" <<EOT
 #--------------
 # Hoot increase java heap size
 #--------------
