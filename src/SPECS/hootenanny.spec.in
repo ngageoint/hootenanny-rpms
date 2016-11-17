@@ -321,14 +321,14 @@ EOT
     # Create Tomcat context path for tile images
     TOMCAT_SRV=/etc/tomcat6/server.xml
     if ! grep -i --quiet 'ingest/processed' $TOMCAT_SRV; then
-        sudo $TOMCAT_SRV $TOMCAT_SRV.orig
+        sudo cp $TOMCAT_SRV $TOMCAT_SRV.orig
         echo "Adding Tomcat context path for tile images"
         sudo sed -i "s@<\/Host>@ <Context docBase=\"\/var\/lib\/hootenanny\/ingest\/processed\" path=\"\/static\" \/>\n &@" $TOMCAT_SRV
     fi
     # Allow linking in Tomcat context
     TOMCAT_CTX=/etc/tomcat6/context.xml
     if ! grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
-        sudo -cp $TOMCAT_CTX $TOMCAT_CTX.orig
+        sudo cp $TOMCAT_CTX $TOMCAT_CTX.orig
         echo "Set allowLinking to true in Tomcat context"
         sudo sed -i "s@^<Context>@<Context allowLinking=\"true\">@" $TOMCAT_CTX
     fi
