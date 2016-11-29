@@ -83,6 +83,11 @@ make -s %{?_smp_mflags}
 
 %install
 
+alternatives --install /usr/bin/java java /usr/java/jdk1.8.0_111/bin/java 999999
+alternatives --install /usr/bin/javac javac /usr/java/jdk1.8.0_111/bin/javac 9999999
+alternatives --set java /usr/java/jdk1.8.0_111/bin/java
+alternatives --set java /usr/java/jdk1.8.0_111/bin/javac
+
 # UI stuff
 mkdir -p $RPM_BUILD_ROOT/var/lib/tomcat6/webapps
 cp hoot-services/target/hoot-services*.war $RPM_BUILD_ROOT/var/lib/tomcat6/webapps/hoot-services.war
