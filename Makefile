@@ -72,10 +72,13 @@ vagrant-test:
 		--exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh \
 		--slow"
 
-deps: force
+jdk_rpm = jdk-8u111-linux-x64.rpm
+
+install-java:
 	sudo wget --quiet --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u111-b14/jdk-8u111-linux-x64.rpm -P /tmp
-	sudo rpm -Uvh /tmp/jdk-8u111-linux-x64.rpm
-	sudo rm -f /tmp/jdk-8u111-linux-x64.rpm
+	sudo rpm -Uvh /tmp/$(jdk_rpm)
+
+deps: force install-java
 	sudo cp repos/HootBuild.repo /etc/yum.repos.d
 	sudo cp repos/RPM-GPG-KEY-EPEL-6 /etc/pki/rpm-gpg/
 	sudo yum clean metadata
@@ -183,6 +186,7 @@ copy-rpms: el6
 	rm -rf el6
 	mkdir -p el6
 	cp -l el6-src/* el6/
+	cp /tmp/$(jdk_rpm) el6/
 	cp src/RPMS/noarch/* el6/
 	cp src/RPMS/x86_64/* el6/
 	createrepo el6
