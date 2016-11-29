@@ -24,6 +24,7 @@ BuildRequires:  proj-devel protobuf-devel python-argparse python-devel qt-devel
 BuildRequires:  texlive libxslt
 BuildRequires:  gnuplot
 BuildRequires:  unzip v8-devel w3m wget words zip
+BuildRequires:  jdk1.8.0_111
 
 Source0:        %{name}-%{version}.tar.gz
 
@@ -56,8 +57,9 @@ This package contains the core algorithms and command line interface.
 %setup -q -n %{name}-%{version}
 
 %build
+
 source ./SetupEnv.sh
-export JAVA_HOME=/etc/alternatives/jre_1.7.0
+export JAVA_HOME=/usr/java/jdk1.8.0_111
 # The dir configurations set the install directory to work with EL's dir structure
 ./configure --with-rnd --with-services -q \
     --prefix=$RPM_BUILD_ROOT/usr/ \
@@ -107,7 +109,7 @@ ln -s /usr/share/doc/hootenanny  $RPM_BUILD_ROOT/var/lib/hootenanny/docs
 
 %check
 source ./SetupEnv.sh
-export JAVA_HOME=/etc/alternatives/jre_1.7.0
+export JAVA_HOME=/usr/java/jdk1.8.0_111
 # The excluded tests are failing on CentOS now and waiting on a fix
 # https://github.com/ngageoint/hootenanny/issues/279
 # https://github.com/ngageoint/hootenanny/issues/281
@@ -143,6 +145,7 @@ Requires:   postgresql-server >= 9.1
 Requires:   postgresql-contrib >= 9.1
 Requires:   postgis2_92 >= 2.1
 Requires:   tomcat6
+Requires:   jdk1.8.0_111
 Requires:   liquibase
 Requires:   pwgen
 Group:      Applications/Engineering
@@ -174,45 +177,45 @@ This package contains the UI and web services.
 
 %pre services-ui
 if [ "$1" = "2" ]; then
-    # Perform whatever maintenance must occur before the upgrade
+# Perform whatever maintenance must occur before the upgrade
 
-    # Remove exploded hoot-services war remnants
-    SERVICES_HOME=/var/lib/tomcat6/webapps/hoot-services
-    if [ -d $SERVICES_HOME ]; then
-        sudo rm -rf $SERVICES_HOME
-    fi
+# Remove exploded hoot-services war remnants
+SERVICES_HOME=/var/lib/tomcat6/webapps/hoot-services
+if [ -d $SERVICES_HOME ]; then
+sudo rm -rf $SERVICES_HOME
+fi
 fi
 
 %post services-ui
 function updateConfigFiles () {
-    # Update the db password in hoot-services war
-    source /var/lib/hootenanny/conf/DatabaseConfig.sh
-    while [ ! -f /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/db/spring-database.xml ]; do
-        echo "Waiting for hoot-services.war to deploy"
-        sleep 1
-    done
-    sudo sed -i s/password\:\ hoottest/password\:\ $DB_PASSWORD/ /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/db/liquibase.properties
-    sudo sed -i s/value=\"hoottest\"/value=\"$DB_PASSWORD\"/ /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/db/spring-database.xml
-    sudo sed -i s/dbPassword=hoottest/dbPassword=$DB_PASSWORD/g /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/conf/hoot-services.conf
-    sudo sed -i s/\<Password\>hoottest\<\\/Password\>/\<Password\>$DB_PASSWORD\<\\/Password\>/ /var/lib/tomcat6/webapps/hoot-services/WEB-INF/workspace/jdbc/WFS_Connection.xml
-    sudo sed -i s/\<jdbcPassword\>hoottest\<\\/jdbcPassword\>/\<jdbcPassword\>$DB_PASSWORD\<\\/jdbcPassword\>/ /var/lib/tomcat6/webapps/hoot-services/META-INF/maven/hoot/hoot-services/pom.xml
+# Update the db password in hoot-services war
+source /var/lib/hootenanny/conf/DatabaseConfig.sh
+while [ ! -f /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/db/spring-database.xml ]; do
+echo "Waiting for hoot-services.war to deploy"
+sleep 1
+done
+sudo sed -i s/password\:\ hoottest/password\:\ $DB_PASSWORD/ /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/db/liquibase.properties
+sudo sed -i s/value=\"hoottest\"/value=\"$DB_PASSWORD\"/ /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/db/spring-database.xml
+sudo sed -i s/dbPassword=hoottest/dbPassword=$DB_PASSWORD/g /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/conf/hoot-services.conf
+sudo sed -i s/\<Password\>hoottest\<\\/Password\>/\<Password\>$DB_PASSWORD\<\\/Password\>/ /var/lib/tomcat6/webapps/hoot-services/WEB-INF/workspace/jdbc/WFS_Connection.xml
+sudo sed -i s/\<jdbcPassword\>hoottest\<\\/jdbcPassword\>/\<jdbcPassword\>$DB_PASSWORD\<\\/jdbcPassword\>/ /var/lib/tomcat6/webapps/hoot-services/META-INF/maven/hoot/hoot-services/pom.xml
 
-    sudo service tomcat6 restart
+sudo service tomcat6 restart
 }
 
 function updateLiquibase () {
 
-    # Add hostname alias to 127.0.0.1 to avoid liquibase unknown hostname error
-    if ! grep --quiet $(hostname) /etc/hosts; then
-        sudo sed -i "1 s/$/ $(hostname)/" /etc/hosts
-    fi
+# Add hostname alias to 127.0.0.1 to avoid liquibase unknown hostname error
+if ! grep --quiet $(hostname) /etc/hosts; then
+sudo sed -i "1 s/$/ $(hostname)/" /etc/hosts
+fi
 
-    # Apply any database schema changes
-    source /var/lib/hootenanny/conf/DatabaseConfig.sh
-    TOMCAT_HOME=/usr/share/tomcat6
-    source /var/lib/hootenanny/conf/DatabaseConfig.sh
-    cd $TOMCAT_HOME/webapps/hoot-services/WEB-INF
-    liquibase --contexts=default,production \
+# Apply any database schema changes
+source /var/lib/hootenanny/conf/DatabaseConfig.sh
+TOMCAT_HOME=/usr/share/tomcat6
+source /var/lib/hootenanny/conf/DatabaseConfig.sh
+cd $TOMCAT_HOME/webapps/hoot-services/WEB-INF
+liquibase --contexts=default,production \
         --changeLogFile=classes/db/db.changelog-master.xml \
         --promptForNonLocalDatabase=false \
         --driver=org.postgresql.Driver \
@@ -224,59 +227,59 @@ function updateLiquibase () {
         update
 }
 if [ "$1" = "1" ]; then
-    # Perform tasks to prepare for the initial installation
-    source /etc/profile.d/hootenanny.sh
+# Perform tasks to prepare for the initial installation
+source /etc/profile.d/hootenanny.sh
 
-    # init and start Postgres
-    PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
-    sudo service $PG_SERVICE initdb
-    sudo service $PG_SERVICE start
-    PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
+# init and start Postgres
+PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
+sudo service $PG_SERVICE initdb
+sudo service $PG_SERVICE start
+PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
 
-    sudo service tomcat6 start
+sudo service tomcat6 start
 
-    # create Hoot services db
-    if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw hoot; then
-        RAND_PW=$(pwgen -s 16 1)
-        sudo -u postgres createuser --superuser hoot || true
-        sudo -u postgres psql -c "alter user hoot with password '$RAND_PW';"
-        if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
-            echo "export DB_PASSWORD=$RAND_PW" | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
-            echo "export DB_PASSWORD_OSMAPI=$RAND_PW" | sudo tee --append /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
-            sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
-        else
-        sudo sed -i s/DB_PASSWORD=.*/DB_PASSWORD=$RAND_PW/ /var/lib/hootenanny/conf/DatabaseConfig.sh
-        fi
-        sudo -u postgres createdb hoot --owner=hoot
-        sudo -u postgres createdb wfsstoredb --owner=hoot
-        sudo -u postgres psql -d hoot -c 'create extension hstore;'
-        sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='wfsstoredb'"
-        sudo -u postgres psql -d wfsstoredb -c 'create extension postgis;'
-    fi
+# create Hoot services db
+if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw hoot; then
+RAND_PW=$(pwgen -s 16 1)
+sudo -u postgres createuser --superuser hoot || true
+sudo -u postgres psql -c "alter user hoot with password '$RAND_PW';"
+if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
+echo "export DB_PASSWORD=$RAND_PW" | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
+echo "export DB_PASSWORD_OSMAPI=$RAND_PW" | sudo tee --append /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
+sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
+else
+sudo sed -i s/DB_PASSWORD=.*/DB_PASSWORD=$RAND_PW/ /var/lib/hootenanny/conf/DatabaseConfig.sh
+fi
+sudo -u postgres createdb hoot --owner=hoot
+sudo -u postgres createdb wfsstoredb --owner=hoot
+sudo -u postgres psql -d hoot -c 'create extension hstore;'
+sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='wfsstoredb'"
+sudo -u postgres psql -d wfsstoredb -c 'create extension postgis;'
+fi
 
-    # restore saved db config file settings if present
-    if [ -f /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave ]; then
-        if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
-            grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
-            sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
-        else
-        sudo mv /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/DatabaseConfig.sh
-    fi
-    fi
+# restore saved db config file settings if present
+if [ -f /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave ]; then
+if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
+grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
+sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
+else
+sudo mv /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/DatabaseConfig.sh
+fi
+fi
 
-    # configure Postgres settings
-    PG_HB_CONF=/var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
-    if ! sudo grep -i --quiet hoot $PG_HB_CONF; then
-        sudo -u postgres cp $PG_HB_CONF $PG_HB_CONF.orig
-        sudo -u postgres sed -i '1ihost    all            hoot            127.0.0.1/32            md5' $PG_HB_CONF
-        sudo -u postgres sed -i '1ihost    all            hoot            ::1/128                 md5' $PG_HB_CONF
-    fi
-    POSTGRES_CONF=/var/lib/pgsql/$PG_VERSION/data/postgresql.conf
-    if ! grep -i --quiet HOOT $POSTGRES_CONF; then
-        sudo -u postgres cp $POSTGRES_CONF $POSTGRES_CONF.orig
-        sudo -u postgres sed -i s/^max_connections/\#max_connections/ $POSTGRES_CONF
-        sudo -u postgres sed -i s/^shared_buffers/\#shared_buffers/ $POSTGRES_CONF
-        sudo -u postgres bash -c "cat >> $POSTGRES_CONF" <<EOT
+# configure Postgres settings
+PG_HB_CONF=/var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
+if ! sudo grep -i --quiet hoot $PG_HB_CONF; then
+sudo -u postgres cp $PG_HB_CONF $PG_HB_CONF.orig
+sudo -u postgres sed -i '1ihost    all            hoot            127.0.0.1/32            md5' $PG_HB_CONF
+sudo -u postgres sed -i '1ihost    all            hoot            ::1/128                 md5' $PG_HB_CONF
+fi
+POSTGRES_CONF=/var/lib/pgsql/$PG_VERSION/data/postgresql.conf
+if ! grep -i --quiet HOOT $POSTGRES_CONF; then
+sudo -u postgres cp $POSTGRES_CONF $POSTGRES_CONF.orig
+sudo -u postgres sed -i s/^max_connections/\#max_connections/ $POSTGRES_CONF
+sudo -u postgres sed -i s/^shared_buffers/\#shared_buffers/ $POSTGRES_CONF
+sudo -u postgres bash -c "cat >> $POSTGRES_CONF" <<EOT
 #--------------
 # Hoot Settings
 #--------------
@@ -288,180 +291,180 @@ maintenance_work_mem = 256MB
 checkpoint_segments = 20
 autovacuum = off
 EOT
-    fi
-    # configure kernel parameters
-    SYSCTL_CONF=/etc/sysctl.conf
-    if ! grep --quiet 1173741824 $SYSCTL_CONF; then
-        sudo cp $SYSCTL_CONF $SYSCTL_CONF.orig
-        echo "Setting kernel.shmmax"
-        sudo sysctl -w kernel.shmmax=1173741824
-        sudo sh -c "echo 'kernel.shmmax=1173741824' >> $SYSCTL_CONF"
-        #                 kernel.shmmax=68719476736
-    fi
-    if ! grep --quiet 2097152 $SYSCTL_CONF; then
-        echo "Setting kernel.shmall"
-        sudo sysctl -w kernel.shmall=2097152
-        sudo sh -c "echo 'kernel.shmall=2097152' >> $SYSCTL_CONF"
-        #                 kernel.shmall=4294967296
-    fi
-    sudo service postgresql-$PG_VERSION restart
+fi
+# configure kernel parameters
+SYSCTL_CONF=/etc/sysctl.conf
+if ! grep --quiet 1173741824 $SYSCTL_CONF; then
+sudo cp $SYSCTL_CONF $SYSCTL_CONF.orig
+echo "Setting kernel.shmmax"
+sudo sysctl -w kernel.shmmax=1173741824
+sudo sh -c "echo 'kernel.shmmax=1173741824' >> $SYSCTL_CONF"
+#                 kernel.shmmax=68719476736
+fi
+if ! grep --quiet 2097152 $SYSCTL_CONF; then
+echo "Setting kernel.shmall"
+sudo sysctl -w kernel.shmall=2097152
+sudo sh -c "echo 'kernel.shmall=2097152' >> $SYSCTL_CONF"
+#                 kernel.shmall=4294967296
+fi
+sudo service postgresql-$PG_VERSION restart
 
-    # create the osm api test db
-    /var/lib/hootenanny/scripts/SetupOsmApiDB.sh
+# create the osm api test db
+/var/lib/hootenanny/scripts/SetupOsmApiDB.sh
 
-    # Create Tomcat context path for tile images
-    TOMCAT_SRV=/etc/tomcat6/server.xml
-    if ! grep -i --quiet 'ingest/processed' $TOMCAT_SRV; then
-        sudo -u tomcat cp $TOMCAT_SRV $TOMCAT_SRV.orig
-        echo "Adding Tomcat context path for tile images"
-        sudo sed -i "s@<\/Host>@ <Context docBase=\"\/var\/lib\/hootenanny\/ingest\/processed\" path=\"\/static\" \/>\n &@" $TOMCAT_SRV
-    fi
-    # Allow linking in Tomcat context
-    TOMCAT_CTX=/etc/tomcat6/context.xml
-    if ! grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
-        sudo -u tomcat cp $TOMCAT_CTX $TOMCAT_CTX.orig
-        echo "Set allowLinking to true in Tomcat context"
-        sudo sed -i "s@^<Context>@<Context allowLinking=\"true\">@" $TOMCAT_CTX
-    fi
-    # Create directories for webapp
-    TOMCAT_HOME=/usr/share/tomcat6
-    if [ ! -d $TOMCAT_HOME/.deegree ]; then
-        echo "Creating .deegree directory for webapp"
-        sudo mkdir $TOMCAT_HOME/.deegree
-        sudo chown tomcat:tomcat $TOMCAT_HOME/.deegree
-    fi
-    BASEMAP_UPLOAD_HOME=/var/lib/hootenanny/ingest/upload
-    if [ ! -d $BASEMAP_UPLOAD_HOME ]; then
-        echo "Creating ingest/upload directory for webapp"
-        sudo mkdir -p $BASEMAP_UPLOAD_HOME
-        sudo chown tomcat:tomcat $BASEMAP_UPLOAD_HOME
-    fi
-    BASEMAP_PROCESSED_HOME=/var/lib/hootenanny/ingest/processed
-    if [ ! -d $BASEMAP_PROCESSED_HOME ]; then
-        echo "Creating ingest/processed directory for webapp"
-        sudo mkdir -p $BASEMAP_PROCESSED_HOME
-        sudo chown tomcat:tomcat $BASEMAP_PROCESSED_HOME
-    fi
-    UPLOAD_HOME=/var/lib/hootenanny/upload
-    if [ ! -d $UPLOAD_HOME ]; then
-        echo "Creating upload directory for webapp"
-        sudo mkdir -p $UPLOAD_HOME
-        sudo chown tomcat:tomcat $UPLOAD_HOME
-    fi
-    CUSTOMSCRIPT_HOME=/var/lib/hootenanny/customscript
-    if [ ! -d $CUSTOMSCRIPT_HOME ]; then
-        echo "Creating customscript directory for webapp"
-        sudo mkdir -p $CUSTOMSCRIPT_HOME
-        sudo chown tomcat:tomcat $CUSTOMSCRIPT_HOME
-    fi
-    TMP_HOME=/var/lib/hootenanny/tmp
-    if [ ! -d $TMP_HOME ]; then
-        echo "Creating tmp directory for webapp"
-        sudo mkdir -p $TMP_HOME
-        sudo chown tomcat:tomcat $TMP_HOME
-    fi
-    REPORT_HOME=/var/lib/hootenanny/data/reports
-    if [ ! -d $REPORT_HOME ]; then
-        echo "Creating data/reports directory for webapp"
-        sudo mkdir -p $REPORT_HOME
-        sudo chown tomcat:tomcat $REPORT_HOME
-        sudo chown tomcat:tomcat $REPORT_HOME/..
-    fi
+# Create Tomcat context path for tile images
+TOMCAT_SRV=/etc/tomcat6/server.xml
+if ! grep -i --quiet 'ingest/processed' $TOMCAT_SRV; then
+sudo -u tomcat cp $TOMCAT_SRV $TOMCAT_SRV.orig
+echo "Adding Tomcat context path for tile images"
+sudo sed -i "s@<\/Host>@ <Context docBase=\"\/var\/lib\/hootenanny\/ingest\/processed\" path=\"\/static\" \/>\n &@" $TOMCAT_SRV
+fi
+# Allow linking in Tomcat context
+TOMCAT_CTX=/etc/tomcat6/context.xml
+if ! grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
+sudo -u tomcat cp $TOMCAT_CTX $TOMCAT_CTX.orig
+echo "Set allowLinking to true in Tomcat context"
+sudo sed -i "s@^<Context>@<Context allowLinking=\"true\">@" $TOMCAT_CTX
+fi
+# Create directories for webapp
+TOMCAT_HOME=/usr/share/tomcat6
+if [ ! -d $TOMCAT_HOME/.deegree ]; then
+echo "Creating .deegree directory for webapp"
+sudo mkdir $TOMCAT_HOME/.deegree
+sudo chown tomcat:tomcat $TOMCAT_HOME/.deegree
+fi
+BASEMAP_UPLOAD_HOME=/var/lib/hootenanny/ingest/upload
+if [ ! -d $BASEMAP_UPLOAD_HOME ]; then
+echo "Creating ingest/upload directory for webapp"
+sudo mkdir -p $BASEMAP_UPLOAD_HOME
+sudo chown tomcat:tomcat $BASEMAP_UPLOAD_HOME
+fi
+BASEMAP_PROCESSED_HOME=/var/lib/hootenanny/ingest/processed
+if [ ! -d $BASEMAP_PROCESSED_HOME ]; then
+echo "Creating ingest/processed directory for webapp"
+sudo mkdir -p $BASEMAP_PROCESSED_HOME
+sudo chown tomcat:tomcat $BASEMAP_PROCESSED_HOME
+fi
+UPLOAD_HOME=/var/lib/hootenanny/upload
+if [ ! -d $UPLOAD_HOME ]; then
+echo "Creating upload directory for webapp"
+sudo mkdir -p $UPLOAD_HOME
+sudo chown tomcat:tomcat $UPLOAD_HOME
+fi
+CUSTOMSCRIPT_HOME=/var/lib/hootenanny/customscript
+if [ ! -d $CUSTOMSCRIPT_HOME ]; then
+echo "Creating customscript directory for webapp"
+sudo mkdir -p $CUSTOMSCRIPT_HOME
+sudo chown tomcat:tomcat $CUSTOMSCRIPT_HOME
+fi
+TMP_HOME=/var/lib/hootenanny/tmp
+if [ ! -d $TMP_HOME ]; then
+echo "Creating tmp directory for webapp"
+sudo mkdir -p $TMP_HOME
+sudo chown tomcat:tomcat $TMP_HOME
+fi
+REPORT_HOME=/var/lib/hootenanny/data/reports
+if [ ! -d $REPORT_HOME ]; then
+echo "Creating data/reports directory for webapp"
+sudo mkdir -p $REPORT_HOME
+sudo chown tomcat:tomcat $REPORT_HOME
+sudo chown tomcat:tomcat $REPORT_HOME/..
+fi
 
-    updateConfigFiles
-    updateLiquibase
+updateConfigFiles
+updateLiquibase
 
-    # Configuring firewall
-    if ! sudo iptables --list-rules | grep -i --quiet 'dport 80'; then
-        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
-        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
-        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8000 -j ACCEPT
-        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8094 -j ACCEPT
-        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8096 -j ACCEPT
-        sudo iptables -I PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080
-        sudo iptables -I OUTPUT -t nat -s 0/0 -d 127/8 -p tcp --dport 80 -j REDIRECT --to-ports 8080
-        sudo service iptables save
-        sudo service iptables restart
-    fi
+# Configuring firewall
+if ! sudo iptables --list-rules | grep -i --quiet 'dport 80'; then
+sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
+sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8000 -j ACCEPT
+sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8094 -j ACCEPT
+sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8096 -j ACCEPT
+sudo iptables -I PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080
+sudo iptables -I OUTPUT -t nat -s 0/0 -d 127/8 -p tcp --dport 80 -j REDIRECT --to-ports 8080
+sudo service iptables save
+sudo service iptables restart
+fi
 elif [ "$1" = "2" ]; then
-    # Perform whatever maintenance must occur after the upgrade
+# Perform whatever maintenance must occur after the upgrade
 
-    # copy values from saved db config file, if present
-    if [ -f /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave ]; then
-        if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
-            grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
-            sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
-        else
-            sudo mv /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/DatabaseConfig.sh
-        fi
-    fi
+# copy values from saved db config file, if present
+if [ -f /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave ]; then
+if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
+grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
+sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
+else
+sudo mv /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/DatabaseConfig.sh
+fi
+fi
 
-    source /etc/profile.d/hootenanny.sh
-    source /var/lib/hootenanny/conf/DatabaseConfig.sh
+source /etc/profile.d/hootenanny.sh
+source /var/lib/hootenanny/conf/DatabaseConfig.sh
 
-    updateConfigFiles
-    updateLiquibase
+updateConfigFiles
+updateLiquibase
 fi
 
 %postun services-ui
 if [ "$1" = "0" ]; then
-    # Perform tasks to clean up after uninstallation
+# Perform tasks to clean up after uninstallation
 
-    # Stop tomcat
-    sudo service tomcat6 stop
-    # Ensure Postgres is started
-    PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
-    sudo service $PG_SERVICE start
-    PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
+# Stop tomcat
+sudo service tomcat6 stop
+# Ensure Postgres is started
+PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
+sudo service $PG_SERVICE start
+PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
 
-    # Restore Postgres settings
-    PG_HB_CONF=/var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
-    if sudo grep -i --quiet hoot $PG_HB_CONF; then
-        sudo -u postgres mv $PG_HB_CONF.orig $PG_HB_CONF
-    fi
-    POSTGRES_CONF=/var/lib/pgsql/$PG_VERSION/data/postgresql.conf
-    if grep -i --quiet HOOT $POSTGRES_CONF; then
-        sudo -u postgres mv $POSTGRES_CONF.orig $POSTGRES_CONF
-    fi
-    # Restore kernal parameters
-    if sysctl -e kernel.shmmax | grep --quiet 1173741824; then
-        sudo mv /etc/sysctl.conf.orig /etc/sysctl.conf
-    fi
+# Restore Postgres settings
+PG_HB_CONF=/var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
+if sudo grep -i --quiet hoot $PG_HB_CONF; then
+sudo -u postgres mv $PG_HB_CONF.orig $PG_HB_CONF
+fi
+POSTGRES_CONF=/var/lib/pgsql/$PG_VERSION/data/postgresql.conf
+if grep -i --quiet HOOT $POSTGRES_CONF; then
+sudo -u postgres mv $POSTGRES_CONF.orig $POSTGRES_CONF
+fi
+# Restore kernal parameters
+if sysctl -e kernel.shmmax | grep --quiet 1173741824; then
+sudo mv /etc/sysctl.conf.orig /etc/sysctl.conf
+fi
 
-    # Restore original file
-    TOMCAT_SRV=/etc/tomcat6/server.xml
-    if grep -i --quiet 'ingest/processed' $TOMCAT_SRV; then
-        sudo -u tomcat mv $TOMCAT_SRV.orig $TOMCAT_SRV
-    fi
-    # Restore original file
-    TOMCAT_CTX=/etc/tomcat6/context.xml
-    if grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
-        sudo -u tomcat mv $TOMCAT_CTX.orig $TOMCAT_CTX
-    fi
-    # Remove .deegree directory
-    TOMCAT_HOME=/usr/share/tomcat6
-    if [ -d $TOMCAT_HOME/.deegree ]; then
-        sudo rm -rf $TOMCAT_HOME/.deegree
-    fi
-    # Remove exploded hoot-services war remnants
-    SERVICES_HOME=/var/lib/tomcat6/webapps/hoot-services
-    if [ -d $SERVICES_HOME ]; then
-        sudo rm -rf $SERVICES_HOME
-    fi
-    sudo service tomcat6 start
+# Restore original file
+TOMCAT_SRV=/etc/tomcat6/server.xml
+if grep -i --quiet 'ingest/processed' $TOMCAT_SRV; then
+sudo -u tomcat mv $TOMCAT_SRV.orig $TOMCAT_SRV
+fi
+# Restore original file
+TOMCAT_CTX=/etc/tomcat6/context.xml
+if grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
+sudo -u tomcat mv $TOMCAT_CTX.orig $TOMCAT_CTX
+fi
+# Remove .deegree directory
+TOMCAT_HOME=/usr/share/tomcat6
+if [ -d $TOMCAT_HOME/.deegree ]; then
+sudo rm -rf $TOMCAT_HOME/.deegree
+fi
+# Remove exploded hoot-services war remnants
+SERVICES_HOME=/var/lib/tomcat6/webapps/hoot-services
+if [ -d $SERVICES_HOME ]; then
+sudo rm -rf $SERVICES_HOME
+fi
+sudo service tomcat6 start
 
-    # Configuring firewall
-    if sudo iptables --list-rules | grep -i --quiet 'dport 80'; then
-        sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
-        sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
-        sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8000 -j ACCEPT
-        sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8094 -j ACCEPT
-        sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8096 -j ACCEPT
-        sudo iptables -D PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080
-        sudo iptables -D OUTPUT -t nat -s 0/0 -d 127/8 -p tcp --dport 80 -j REDIRECT --to-ports 8080
-        sudo service iptables save
-        sudo service iptables restart
-    fi
+# Configuring firewall
+if sudo iptables --list-rules | grep -i --quiet 'dport 80'; then
+sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
+sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8000 -j ACCEPT
+sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8094 -j ACCEPT
+sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8096 -j ACCEPT
+sudo iptables -D PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080
+sudo iptables -D OUTPUT -t nat -s 0/0 -d 127/8 -p tcp --dport 80 -j REDIRECT --to-ports 8080
+sudo service iptables save
+sudo service iptables restart
+fi
 fi
 
 
@@ -511,7 +514,6 @@ Summary:    Development dependencies for Hootenanny Services
 Group:      Development/Libraries
 Requires:   %{name}-core-devel-deps = %{version}-%{release}
 Requires:   apache-maven
-Requires:   java-1.7.0-openjdk-devel
 Requires:   nodejs
 Requires:   npm
 Requires:   postgresql-server >= 9.1
@@ -527,7 +529,7 @@ in the topographic domain, namely roads (polylines), buildings (polygons), and
 points-of-interest (POI's) (points). Conflation happens at the dataset level,
 where the user's workflow determines the best reference dataset and source
 content, geometry and attributes, to transfer to the output map.
-
+3
 This packages contains the dependencies to build and develop the Hootenanny
 services. Use this if you want to build and test from github.
 
@@ -535,40 +537,40 @@ services. Use this if you want to build and test from github.
 
 %post services-devel-deps
 if [ "$1" = "1" ]; then
-    # Perform tasks to prepare for the initial installation
+# Perform tasks to prepare for the initial installation
 
-    # init and start Postgres
-    PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
-    sudo service $PG_SERVICE initdb
-    sudo service $PG_SERVICE start
-    PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
+# init and start Postgres
+PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
+sudo service $PG_SERVICE initdb
+sudo service $PG_SERVICE start
+PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
 
-    sudo service tomcat6 start
+sudo service tomcat6 start
 
-    # create Hoot services db
-    if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw hoot; then
-        sudo -u postgres createuser --superuser hoot || true
-        sudo -u postgres psql -c "alter user hoot with password 'hoottest';"
-        sudo -u postgres createdb hoot --owner=hoot
-        sudo -u postgres createdb wfsstoredb --owner=hoot
-        sudo -u postgres psql -d hoot -c 'create extension hstore;'
-        sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='wfsstoredb'"
-        sudo -u postgres psql -d wfsstoredb -c 'create extension postgis;'
-    fi
+# create Hoot services db
+if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw hoot; then
+sudo -u postgres createuser --superuser hoot || true
+sudo -u postgres psql -c "alter user hoot with password 'hoottest';"
+sudo -u postgres createdb hoot --owner=hoot
+sudo -u postgres createdb wfsstoredb --owner=hoot
+sudo -u postgres psql -d hoot -c 'create extension hstore;'
+sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='wfsstoredb'"
+sudo -u postgres psql -d wfsstoredb -c 'create extension postgis;'
+fi
 
-    # configure Postgres settings
-    PG_HB_CONF=/var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
-    if ! sudo grep -i --quiet hoot $PG_HB_CONF; then
-        sudo -u postgres cp $PG_HB_CONF $PG_HB_CONF.orig
-        sudo -u postgres sed -i '1ihost    all            hoot            127.0.0.1/32            md5' $PG_HB_CONF
-        sudo -u postgres sed -i '1ihost    all            hoot            ::1/128                 md5' $PG_HB_CONF
-    fi
-    POSTGRES_CONF=/var/lib/pgsql/$PG_VERSION/data/postgresql.conf
-    if ! grep -i --quiet HOOT $POSTGRES_CONF; then
-        sudo -u postgres cp $POSTGRES_CONF $POSTGRES_CONF.orig
-        sudo -u postgres sed -i s/^max_connections/\#max_connections/ $POSTGRES_CONF
-        sudo -u postgres sed -i s/^shared_buffers/\#shared_buffers/ $POSTGRES_CONF
-        sudo -u postgres bash -c "cat >> $POSTGRES_CONF" <<EOT
+# configure Postgres settings
+PG_HB_CONF=/var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
+if ! sudo grep -i --quiet hoot $PG_HB_CONF; then
+sudo -u postgres cp $PG_HB_CONF $PG_HB_CONF.orig
+sudo -u postgres sed -i '1ihost    all            hoot            127.0.0.1/32            md5' $PG_HB_CONF
+sudo -u postgres sed -i '1ihost    all            hoot            ::1/128                 md5' $PG_HB_CONF
+fi
+POSTGRES_CONF=/var/lib/pgsql/$PG_VERSION/data/postgresql.conf
+if ! grep -i --quiet HOOT $POSTGRES_CONF; then
+sudo -u postgres cp $POSTGRES_CONF $POSTGRES_CONF.orig
+sudo -u postgres sed -i s/^max_connections/\#max_connections/ $POSTGRES_CONF
+sudo -u postgres sed -i s/^shared_buffers/\#shared_buffers/ $POSTGRES_CONF
+sudo -u postgres bash -c "cat >> $POSTGRES_CONF" <<EOT
 #--------------
 # Hoot Settings
 #--------------
@@ -580,47 +582,47 @@ maintenance_work_mem = 256MB
 checkpoint_segments = 20
 autovacuum = off
 EOT
-    fi
-    # configure kernel parameters
-    SYSCTL_CONF=/etc/sysctl.conf
-    if ! grep --quiet 1173741824 $SYSCTL_CONF; then
-        sudo cp $SYSCTL_CONF $SYSCTL_CONF.orig
-        echo "Setting kernel.shmmax"
-        sudo sysctl -w kernel.shmmax=1173741824
-        sudo sh -c "echo 'kernel.shmmax=1173741824' >> $SYSCTL_CONF"
-        #                 kernel.shmmax=68719476736
-    fi
-    if ! grep --quiet 2097152 $SYSCTL_CONF; then
-        echo "Setting kernel.shmall"
-        sudo sysctl -w kernel.shmall=2097152
-        sudo sh -c "echo 'kernel.shmall=2097152' >> $SYSCTL_CONF"
-        #                 kernel.shmall=4294967296
-    fi
-    sudo service postgresql-$PG_VERSION restart
+fi
+# configure kernel parameters
+SYSCTL_CONF=/etc/sysctl.conf
+if ! grep --quiet 1173741824 $SYSCTL_CONF; then
+sudo cp $SYSCTL_CONF $SYSCTL_CONF.orig
+echo "Setting kernel.shmmax"
+sudo sysctl -w kernel.shmmax=1173741824
+sudo sh -c "echo 'kernel.shmmax=1173741824' >> $SYSCTL_CONF"
+#                 kernel.shmmax=68719476736
+fi
+if ! grep --quiet 2097152 $SYSCTL_CONF; then
+echo "Setting kernel.shmall"
+sudo sysctl -w kernel.shmall=2097152
+sudo sh -c "echo 'kernel.shmall=2097152' >> $SYSCTL_CONF"
+#                 kernel.shmall=4294967296
+fi
+sudo service postgresql-$PG_VERSION restart
 fi
 
 %postun services-devel-deps
 if [ "$1" = "0" ]; then
-    # Perform tasks to clean up after uninstallation
+# Perform tasks to clean up after uninstallation
 
-    # Ensure Postgres is started
-    PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
-    sudo service $PG_SERVICE start
-    PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
+# Ensure Postgres is started
+PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
+sudo service $PG_SERVICE start
+PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
 
-    # Restore Postgres settings
-    PG_HB_CONF=/var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
-    if sudo grep -i --quiet hoot $PG_HB_CONF; then
-        sudo -u postgres mv $PG_HB_CONF.orig $PG_HB_CONF
-    fi
-    POSTGRES_CONF=/var/lib/pgsql/$PG_VERSION/data/postgresql.conf
-    if grep -i --quiet HOOT $POSTGRES_CONF; then
-        sudo -u postgres mv $POSTGRES_CONF.orig $POSTGRES_CONF
-    fi
-    # Restore kernal parameters
-    if sysctl -e kernel.shmmax | grep --quiet 1173741824; then
-        sudo mv /etc/sysctl.conf.orig /etc/sysctl.conf
-    fi
+# Restore Postgres settings
+PG_HB_CONF=/var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
+if sudo grep -i --quiet hoot $PG_HB_CONF; then
+sudo -u postgres mv $PG_HB_CONF.orig $PG_HB_CONF
+fi
+POSTGRES_CONF=/var/lib/pgsql/$PG_VERSION/data/postgresql.conf
+if grep -i --quiet HOOT $POSTGRES_CONF; then
+sudo -u postgres mv $POSTGRES_CONF.orig $POSTGRES_CONF
+fi
+# Restore kernal parameters
+if sysctl -e kernel.shmmax | grep --quiet 1173741824; then
+sudo mv /etc/sysctl.conf.orig /etc/sysctl.conf
+fi
 fi
 
 %package core-devel-deps

@@ -73,6 +73,9 @@ vagrant-test:
 		--slow"
 
 deps: force
+	sudo wget --quiet --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u111-b14/jdk-8u111-linux-x64.rpm -P /tmp
+	sudo rpm -Uvh /tmp/jdk-8u111-linux-x64.rpm
+	sudo rm -f /tmp/jdk-8u111-linux-x64.rpm
 	sudo cp repos/HootBuild.repo /etc/yum.repos.d
 	sudo cp repos/RPM-GPG-KEY-EPEL-6 /etc/pki/rpm-gpg/
 	sudo yum clean metadata
@@ -115,8 +118,6 @@ deps: force
 	  hdf-static \
 	  help2man \
 	  info \
-	  java-1.7.0-openjdk-devel \
-	  java-devel \
 	  libdap-devel \
 	  libgta-devel \
 	  libjpeg-turbo-devel \
