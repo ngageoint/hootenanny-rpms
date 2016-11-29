@@ -72,10 +72,14 @@ vagrant-test:
 		--exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh \
 		--slow"
 
+# As of 11/29/2016, hootenanny-rpms project in Github supports files <= 100MB in size.  Everything over this size limit,
+# will is currently rejected by Github.  In order to workaround this limitation, we will download a desired JDK RPM
+# every time we build.
 jdk_rpm = jdk-8u111-linux-x64.rpm
+jdk_download_url = http://download.oracle.com/otn-pub/java/jdk/8u111-b14/jdk-8u111-linux-x64.rpm
 
 install-java:
-	sudo wget --quiet --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u111-b14/jdk-8u111-linux-x64.rpm -P /tmp
+	sudo wget --quiet --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" $(jdk_download_url) -P /tmp
 	sudo rpm -Uvh /tmp/$(jdk_rpm)
 
 deps: force install-java
