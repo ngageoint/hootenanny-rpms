@@ -266,7 +266,7 @@ if [ "$1" = "1" ]; then
             echo "export DB_PASSWORD_OSMAPI=$RAND_PW" | sudo tee --append /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
             sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
         else
-            sudo sed -i s/DB_PASSWORD=.*/DB_PASSWORD=$RAND_PW/ /var/lib/hootenanny/conf/DatabaseConfig.sh
+        sudo sed -i s/DB_PASSWORD=.*/DB_PASSWORD=$RAND_PW/ /var/lib/hootenanny/conf/DatabaseConfig.sh
         fi
         sudo -u postgres createdb hoot --owner=hoot
         sudo -u postgres createdb wfsstoredb --owner=hoot
@@ -281,8 +281,8 @@ if [ "$1" = "1" ]; then
             grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
             sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
         else
-            sudo mv /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/DatabaseConfig.sh
-        fi
+        sudo mv /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/DatabaseConfig.sh
+    fi
     fi
 
     # configure Postgres settings
@@ -323,7 +323,7 @@ EOT
         echo "Setting kernel.shmall"
         sudo sysctl -w kernel.shmall=2097152
         sudo sh -c "echo 'kernel.shmall=2097152' >> $SYSCTL_CONF"
-    #                 kernel.shmall=4294967296
+        #                 kernel.shmall=4294967296
     fi
     sudo service postgresql-$PG_VERSION restart
 
@@ -404,25 +404,25 @@ EOT
         sudo service iptables save
         sudo service iptables restart
     fi
-    elif [ "$1" = "2" ]; then
-        # Perform whatever maintenance must occur after the upgrade
+elif [ "$1" = "2" ]; then
+    # Perform whatever maintenance must occur after the upgrade
 
-        # copy values from saved db config file, if present
-        if [ -f /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave ]; then
-            if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
-                grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
-                sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
-            else
-                sudo mv /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/DatabaseConfig.sh
-            fi
+    # copy values from saved db config file, if present
+    if [ -f /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave ]; then
+        if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
+            grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
+            sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
+        else
+            sudo mv /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/DatabaseConfig.sh
         fi
-
-        source /etc/profile.d/hootenanny.sh
-        source /var/lib/hootenanny/conf/DatabaseConfig.sh
-
-        updateConfigFiles
-        updateLiquibase
     fi
+
+    source /etc/profile.d/hootenanny.sh
+    source /var/lib/hootenanny/conf/DatabaseConfig.sh
+
+    updateConfigFiles
+    updateLiquibase
+fi
 
 %postun services-ui
 if [ "$1" = "0" ]; then
