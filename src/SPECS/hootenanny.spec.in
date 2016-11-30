@@ -24,6 +24,7 @@ BuildRequires:  proj-devel protobuf-devel python-argparse python-devel qt-devel
 BuildRequires:  texlive libxslt
 BuildRequires:  gnuplot
 BuildRequires:  unzip v8-devel w3m wget words zip
+BuildRequires:  jdk1.8.0_111
 
 Source0:        %{name}-%{version}.tar.gz
 
@@ -57,7 +58,7 @@ This package contains the core algorithms and command line interface.
 
 %build
 source ./SetupEnv.sh
-export JAVA_HOME=/etc/alternatives/jre_1.7.0
+export JAVA_HOME=/usr/java/jdk1.8.0_111
 # The dir configurations set the install directory to work with EL's dir structure
 ./configure --with-rnd --with-services -q \
     --prefix=$RPM_BUILD_ROOT/usr/ \
@@ -81,6 +82,20 @@ make -s %{?_smp_mflags}
 
 %install
 
+# Setting /usr/java/jdk1.8.0_111/bin/java's priority to something really atrocious to guarantee that it will be
+# the one used when alternatives' auto mode is used.
+sudo alternatives --install /usr/bin/java java /usr/java/jdk1.8.0_111/bin/java 999999
+
+# Setting /usr/java/jdk1.8.0_111/bin/javac's priority to something really atrocious to guarantee that it will be
+# the one used when alternatives' auto mode is enabled.
+sudo alternatives --install /usr/bin/javac javac /usr/java/jdk1.8.0_111/bin/javac 9999999
+
+# switching to manual and forcing the desired version of java be used
+sudo alternatives --set java /usr/java/jdk1.8.0_111/bin/java
+
+# switching to manual and forcing the desired version of javac be used
+sudo alternatives --set java /usr/java/jdk1.8.0_111/bin/javac
+
 # UI stuff
 mkdir -p $RPM_BUILD_ROOT/var/lib/tomcat6/webapps
 cp hoot-services/target/hoot-services*.war $RPM_BUILD_ROOT/var/lib/tomcat6/webapps/hoot-services.war
@@ -92,6 +107,8 @@ cp -R node-mapnik-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-mapnik-server
 
 make install
 echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
+echo "export JAVA_HOME=/usr/java/jdk1.8.0_111" >> $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
+
 chmod 755 $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
 cp -R test-files/ $RPM_BUILD_ROOT/var/lib/hootenanny/
 ln -s /usr/lib64 $RPM_BUILD_ROOT/var/lib/hootenanny/lib
@@ -107,7 +124,7 @@ ln -s /usr/share/doc/hootenanny  $RPM_BUILD_ROOT/var/lib/hootenanny/docs
 
 %check
 source ./SetupEnv.sh
-export JAVA_HOME=/etc/alternatives/jre_1.7.0
+export JAVA_HOME=/usr/java/jdk1.8.0_111
 # The excluded tests are failing on CentOS now and waiting on a fix
 # https://github.com/ngageoint/hootenanny/issues/279
 # https://github.com/ngageoint/hootenanny/issues/281
@@ -143,6 +160,7 @@ Requires:   postgresql-server >= 9.1
 Requires:   postgresql-contrib >= 9.1
 Requires:   postgis2_92 >= 2.1
 Requires:   tomcat6
+Requires:   jdk1.8.0_111
 Requires:   liquibase
 Requires:   pwgen
 Group:      Applications/Engineering
@@ -196,6 +214,9 @@ function updateConfigFiles () {
     sudo sed -i s/dbPassword=hoottest/dbPassword=$DB_PASSWORD/g /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/conf/hoot-services.conf
     sudo sed -i s/\<Password\>hoottest\<\\/Password\>/\<Password\>$DB_PASSWORD\<\\/Password\>/ /var/lib/tomcat6/webapps/hoot-services/WEB-INF/workspace/jdbc/WFS_Connection.xml
     sudo sed -i s/\<jdbcPassword\>hoottest\<\\/jdbcPassword\>/\<jdbcPassword\>$DB_PASSWORD\<\\/jdbcPassword\>/ /var/lib/tomcat6/webapps/hoot-services/META-INF/maven/hoot/hoot-services/pom.xml
+
+    # make sure tomcat is using correct Java
+    sudo sed -i '/.*JAVA_HOME=.*/c\JAVA_HOME=\/usr\/java\/jdk1.8.0_111' /etc/default/tomcat6
 
     sudo service tomcat6 restart
 }
@@ -511,7 +532,6 @@ Summary:    Development dependencies for Hootenanny Services
 Group:      Development/Libraries
 Requires:   %{name}-core-devel-deps = %{version}-%{release}
 Requires:   apache-maven
-Requires:   java-1.7.0-openjdk-devel
 Requires:   nodejs
 Requires:   npm
 Requires:   postgresql-server >= 9.1
