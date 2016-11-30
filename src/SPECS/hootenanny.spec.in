@@ -83,9 +83,18 @@ make -s %{?_smp_mflags}
 
 %install
 
+# Setting /usr/java/jdk1.8.0_111/bin/java's priority to something really atrocious to guarantee that it will be
+# the one used when alternatives' auto mode is used.
 alternatives --install /usr/bin/java java /usr/java/jdk1.8.0_111/bin/java 999999
+
+# Setting /usr/java/jdk1.8.0_111/bin/javac's priority to something really atrocious to guarantee that it will be
+# the one used when alternatives' auto mode is enabled.
 alternatives --install /usr/bin/javac javac /usr/java/jdk1.8.0_111/bin/javac 9999999
+
+# switching to manual and forcing the desired version of java be used
 alternatives --set java /usr/java/jdk1.8.0_111/bin/java
+
+# switching to manual and forcing the desired version of javac be used
 alternatives --set java /usr/java/jdk1.8.0_111/bin/javac
 
 # UI stuff
@@ -99,6 +108,8 @@ cp -R node-mapnik-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-mapnik-server
 
 make install
 echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
+echo "export JAVA_HOME=/usr/java/jdk1.8.0_111" >> $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
+
 chmod 755 $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
 cp -R test-files/ $RPM_BUILD_ROOT/var/lib/hootenanny/
 ln -s /usr/lib64 $RPM_BUILD_ROOT/var/lib/hootenanny/lib
@@ -204,6 +215,9 @@ sudo sed -i s/value=\"hoottest\"/value=\"$DB_PASSWORD\"/ /var/lib/tomcat6/webapp
 sudo sed -i s/dbPassword=hoottest/dbPassword=$DB_PASSWORD/g /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/conf/hoot-services.conf
 sudo sed -i s/\<Password\>hoottest\<\\/Password\>/\<Password\>$DB_PASSWORD\<\\/Password\>/ /var/lib/tomcat6/webapps/hoot-services/WEB-INF/workspace/jdbc/WFS_Connection.xml
 sudo sed -i s/\<jdbcPassword\>hoottest\<\\/jdbcPassword\>/\<jdbcPassword\>$DB_PASSWORD\<\\/jdbcPassword\>/ /var/lib/tomcat6/webapps/hoot-services/META-INF/maven/hoot/hoot-services/pom.xml
+
+# make sure tomcat is using correct Java
+sudo sed -i '/.*JAVA_HOME=.*/c\JAVA_HOME=\/usr\/java\/jdk1.8.0_111' /etc/default/tomcat6
 
 sudo service tomcat6 restart
 }
