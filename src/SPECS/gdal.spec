@@ -551,7 +551,7 @@ export CPPFLAGS="$CPPFLAGS -I%{_includedir}/libgeotiff"
         --without-msg             \
         --without-openjpeg        \
         --with-pcraster           \
-        --with-pg                 \
+        --with-pg=/usr/pgsql-9.2/bin/pg_config                 \
         --with-png                \
         --with-poppler            \
         %{spatialite}             \

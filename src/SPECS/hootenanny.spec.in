@@ -57,7 +57,8 @@ This package contains the core algorithms and command line interface.
 
 %build
 source ./SetupEnv.sh
-export JAVA_HOME=/etc/alternatives/jre_1.7.0
+#export JAVA_HOME=/etc/alternatives/jre_1.7.0
+export JAVA_HOME=/etc/alternatives/java_sdk
 # The dir configurations set the install directory to work with EL's dir structure
 ./configure --with-rnd --with-services -q \
     --prefix=$RPM_BUILD_ROOT/usr/ \
@@ -112,7 +113,8 @@ ln -s /usr/share/doc/hootenanny  $RPM_BUILD_ROOT/var/lib/hootenanny/docs
 
 %check
 source ./SetupEnv.sh
-export JAVA_HOME=/etc/alternatives/jre_1.7.0
+#export JAVA_HOME=/etc/alternatives/jre_1.7.0
+export JAVA_HOME=/etc/alternatives/java_sdk
 # The excluded tests are failing on CentOS now and waiting on a fix
 # https://github.com/ngageoint/hootenanny/issues/279
 # https://github.com/ngageoint/hootenanny/issues/281

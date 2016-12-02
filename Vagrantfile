@@ -3,6 +3,10 @@
 
 $provisionSh = <<-SHELL
     ln -s hootenanny-rpms/src/ rpmbuild
+
+    wget http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+    rpm -ivh epel-release-6-8.noarch.rpm
+
     # Try the update a few times. Sometimes the epel repo gives an error.
     sudo yum -y update || true
     sudo yum -y update || true

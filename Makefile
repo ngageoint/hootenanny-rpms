@@ -41,6 +41,8 @@ vagrant-plugins:
 	(vagrant plugin list | grep -q bindfs) || vagrant plugin install vagrant-bindfs
 
 vagrant-build-deps: copy-words1
+	# Get a copy of the Oracle 8 JDK
+	./get_jdk.sh
 	vagrant ssh -c "cd hootenanny-rpms && make -j$$((`nproc` + 2)) deps"
 
 vagrant-build: vagrant-build-rpms
@@ -115,8 +117,6 @@ deps: force
 	  hdf-static \
 	  help2man \
 	  info \
-	  java-1.7.0-openjdk-devel \
-	  java-devel \
 	  libdap-devel \
 	  libgta-devel \
 	  libjpeg-turbo-devel \
@@ -174,7 +174,11 @@ deps: force
 	  libicu-devel \
 	  cppunit-devel \
 	  python-argparse \
+	  libXrandr-devel \
+	  libXrender-devel \
+	  libdrm-devel \
 	  el6-src/* \
+
 
 el6: el6-src/* custom-rpms
 
