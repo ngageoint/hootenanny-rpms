@@ -79,8 +79,8 @@ jdk_rpm = jdk-8u111-linux-x64.rpm
 jdk_download_url = http://download.oracle.com/otn-pub/java/jdk/8u111-b14/jdk-8u111-linux-x64.rpm
 
 install-java:
-	sudo wget --quiet --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" $(jdk_download_url) -P /tmp
-	sudo rpm -Uvh /tmp/$(jdk_rpm)
+	(sudo yum list installed jdk1.8.0_111 > /dev/null 2>&1) || sudo wget --quiet --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" $(jdk_download_url) -P /tmp
+	(sudo yum list installed jdk1.8.0_111 > /dev/null 2>&1) || sudo rpm -Uvh --force /tmp/$(jdk_rpm)
 
 deps: force install-java
 	sudo cp repos/HootBuild.repo /etc/yum.repos.d
@@ -88,9 +88,9 @@ deps: force install-java
 	sudo yum clean metadata
 	# Sometimes the yum update fails getting the metadata. Try several times and ignore
 	# the first two if they error
-	sudo yum update -y || sleep 30
-	sudo yum update -y || sleep 30
-	sudo yum update -y
+	sudo yum update -y --exclude=puppet* || sleep 30
+	sudo yum update -y --exclude=puppet* || sleep 30
+	sudo yum update -y --exclude=puppet*
 	sudo true || true
 	sudo yum install -y \
 	  ant \
@@ -182,6 +182,9 @@ deps: force install-java
 	  libicu-devel \
 	  cppunit-devel \
 	  python-argparse \
+	  libXrandr-devel \
+	  libXrender-devel \
+	  libdrm-devel \
 	  el6-src/* \
 
 el6: el6-src/* custom-rpms
