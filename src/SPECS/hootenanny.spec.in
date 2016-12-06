@@ -82,20 +82,6 @@ make -s %{?_smp_mflags}
 
 %install
 
-# Setting /usr/java/jdk1.8.0_111/bin/java's priority to something really atrocious to guarantee that it will be
-# the one used when alternatives' auto mode is used.
-sudo alternatives --install /usr/bin/java java /usr/java/jdk1.8.0_111/bin/java 999999
-
-# Setting /usr/java/jdk1.8.0_111/bin/javac's priority to something really atrocious to guarantee that it will be
-# the one used when alternatives' auto mode is enabled.
-sudo alternatives --install /usr/bin/javac javac /usr/java/jdk1.8.0_111/bin/javac 9999999
-
-# switching to manual and forcing the desired version of java be used
-sudo alternatives --set java /usr/java/jdk1.8.0_111/bin/java
-
-# switching to manual and forcing the desired version of javac be used
-sudo alternatives --set java /usr/java/jdk1.8.0_111/bin/javac
-
 # UI stuff
 mkdir -p $RPM_BUILD_ROOT/var/lib/tomcat6/webapps
 cp hoot-services/target/hoot-services*.war $RPM_BUILD_ROOT/var/lib/tomcat6/webapps/hoot-services.war
@@ -201,22 +187,39 @@ if [ "$1" = "2" ]; then
     fi
 fi
 
+# Setting /usr/java/jdk1.8.0_111/bin/java's priority to something really atrocious to guarantee that it will be
+# the one used when alternatives' auto mode is used.
+sudo alternatives --install /usr/bin/java java /usr/java/jdk1.8.0_111/bin/java 999999
+
+# Setting /usr/java/jdk1.8.0_111/bin/javac's priority to something really atrocious to guarantee that it will be
+# the one used when alternatives' auto mode is enabled.
+sudo alternatives --install /usr/bin/javac javac /usr/java/jdk1.8.0_111/bin/javac 9999999
+
+# switching to manual and forcing the desired version of java be configured
+sudo alternatives --set java /usr/java/jdk1.8.0_111/bin/java
+
+# switching to manual and forcing the desired version of javac be configured
+sudo alternatives --set javac /usr/java/jdk1.8.0_111/bin/javac
+
+
 %post services-ui
 function updateConfigFiles () {
     # Update the db password in hoot-services war
     source /var/lib/hootenanny/conf/DatabaseConfig.sh
-    while [ ! -f /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/db/spring-database.xml ]; do
+
+    while [ ! -f /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/db/db.properties ]; do
         echo "Waiting for hoot-services.war to deploy"
         sleep 1
     done
+
     sudo sed -i s/password\:\ hoottest/password\:\ $DB_PASSWORD/ /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/db/liquibase.properties
-    sudo sed -i s/value=\"hoottest\"/value=\"$DB_PASSWORD\"/ /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/db/spring-database.xml
+    sudo sed -i s/value=\"hoottest\"/value=\"$DB_PASSWORD\"/ /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/db/db.properties
     sudo sed -i s/dbPassword=hoottest/dbPassword=$DB_PASSWORD/g /var/lib/tomcat6/webapps/hoot-services/WEB-INF/classes/conf/hoot-services.conf
     sudo sed -i s/\<Password\>hoottest\<\\/Password\>/\<Password\>$DB_PASSWORD\<\\/Password\>/ /var/lib/tomcat6/webapps/hoot-services/WEB-INF/workspace/jdbc/WFS_Connection.xml
     sudo sed -i s/\<jdbcPassword\>hoottest\<\\/jdbcPassword\>/\<jdbcPassword\>$DB_PASSWORD\<\\/jdbcPassword\>/ /var/lib/tomcat6/webapps/hoot-services/META-INF/maven/hoot/hoot-services/pom.xml
 
     # make sure tomcat is using correct Java
-    sudo sed -i '/.*JAVA_HOME=.*/c\JAVA_HOME=\/usr\/java\/jdk1.8.0_111' /etc/default/tomcat6
+    sudo sed -i '/.*JAVA_HOME=.*/c\JAVA_HOME=\/usr\/java\/jdk1.8.0_111' /etc/tomcat6/tomcat6.conf
 
     sudo service tomcat6 restart
 }
