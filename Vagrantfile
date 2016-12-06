@@ -4,9 +4,9 @@
 $provisionSh = <<-SHELL
     ln -s hootenanny-rpms/src/ rpmbuild
     # Try the update a few times. Sometimes the epel repo gives an error.
-    sudo yum -y update || true
-    sudo yum -y update || true
-    sudo yum -y update
+    sudo yum -y update --exclude=puppet* || true
+    sudo yum -y update --exclude=puppet* || true
+    sudo yum -y update --exclude=puppet*
 
     # Enable NTP to synchronize clock
     sudo yum -y install ntp
