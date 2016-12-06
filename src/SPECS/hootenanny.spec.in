@@ -121,7 +121,6 @@ export JAVA_HOME=/etc/alternatives/java_sdk
 HootTest --exclude=.*RubberSheetConflateTest.sh \
     --exclude=.*ConflateAverageTest.sh \
     --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh \
-    --exclude=.*Osm2OgrTranslation.sh \
     --slow --diff
 cd hoot-services
 make test -s

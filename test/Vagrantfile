@@ -4,9 +4,8 @@
 $provisionSh = <<-SHELL
     set -e
     set -x
-
-    wget http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-    rpm -ivh --replacepkgs epel-release-6-8.noarch.rpm
+  
+    sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm || true
 
     # Enable NTP to synchronize clock
     sudo yum -y install ntp
@@ -15,6 +14,12 @@ $provisionSh = <<-SHELL
     sudo /etc/init.d/ntpd stop
     sudo ntpdate pool.ntp.org
     sudo /etc/init.d/ntpd start
+
+    # Remove Postgres 8.4
+    if yum list installed | grep --quiet postgresql.x86_64 ; then
+        echo "Removing Postgres 8.4"
+        sudo yum remove -y postgresql.x86_64 postgresql-devel.x86_64 postgresql-libs.x86_64
+    fi
 
     echo "[hoot]" | sudo tee /etc/yum.repos.d/hoot.repo
     echo "name=hoot" | sudo tee -a /etc/yum.repos.d/hoot.repo

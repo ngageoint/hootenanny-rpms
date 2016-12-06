@@ -4,8 +4,7 @@
 $provisionSh = <<-SHELL
     ln -s hootenanny-rpms/src/ rpmbuild
 
-    wget http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-    rpm -ivh --replacepkgs epel-release-6-8.noarch.rpm
+    sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm || true
 
     # Try the update a few times. Sometimes the epel repo gives an error.
     sudo yum -y update || true
@@ -18,6 +17,12 @@ $provisionSh = <<-SHELL
     sudo /etc/init.d/ntpd stop
     sudo ntpdate pool.ntp.org
     sudo /etc/init.d/ntpd start
+
+    # Remove Postgres 8.4
+    if yum list installed | grep --quiet postgresql.x86_64 ; then
+        echo "Removing Postgres 8.4"
+        sudo yum remove -y postgresql.x86_64 postgresql-devel.x86_64 postgresql-libs.x86_64
+    fi
 
 SHELL
 
