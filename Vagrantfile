@@ -4,7 +4,7 @@
 $provisionSh = <<-SHELL
     ln -s hootenanny-rpms/src/ rpmbuild
 
-    sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm || true
+    sudo yum -y reinstall https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm || true
 
     # Try the update a few times. Sometimes the epel repo gives an error.
     sudo yum -y update || true

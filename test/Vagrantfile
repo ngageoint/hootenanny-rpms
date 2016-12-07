@@ -5,7 +5,7 @@ $provisionSh = <<-SHELL
     set -e
     set -x
   
-    sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm || true
+    sudo yum -y reinstall https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm || true
 
     # Enable NTP to synchronize clock
     sudo yum -y install ntp
