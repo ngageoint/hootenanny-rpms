@@ -24,6 +24,7 @@ BuildRequires:  proj-devel protobuf-devel python-argparse python-devel qt-devel
 BuildRequires:  texlive libxslt
 BuildRequires:  gnuplot
 BuildRequires:  unzip v8-devel w3m wget words zip
+BuildRequires:  jdk1.8.0_111
 
 Source0:        %{name}-%{version}.tar.gz
 
