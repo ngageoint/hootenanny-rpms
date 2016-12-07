@@ -3,6 +3,9 @@
 
 $provisionSh = <<-SHELL
     ln -s hootenanny-rpms/src/ rpmbuild
+
+    sudo yum -y reinstall https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm || true
+
     # Try the update a few times. Sometimes the epel repo gives an error.
     sudo yum -y update || true
     sudo yum -y update || true
@@ -11,8 +14,15 @@ $provisionSh = <<-SHELL
     # Enable NTP to synchronize clock
     sudo yum -y install ntp
     sudo chkconfig ntpd on
+    sudo /etc/init.d/ntpd stop
     sudo ntpdate pool.ntp.org
     sudo /etc/init.d/ntpd start
+
+    # Remove Postgres 8.4
+    if yum list installed | grep --quiet postgresql.x86_64 ; then
+        echo "Removing Postgres 8.4"
+        sudo yum remove -y postgresql.x86_64 postgresql-devel.x86_64 postgresql-libs.x86_64
+    fi
 
 SHELL
 
@@ -76,19 +86,6 @@ Vagrant.configure(2) do |config|
   #   push.app = "YOUR_ATLAS_USERNAME/YOUR_APPLICATION_NAME"
   # end
 
-  # This makes caching more efficient if you're using squid or similar.
-  if "#{ENV['http_proxy']}" != ""
-    config.vm.provision "proxy", type: "shell", inline: <<-SHELL
-      cat /etc/yum.repos.d/CentOS-Base.repo | sed -e s/mirrorlist=/#mirrorlist=/g | sed -e s/#baseurl=/baseurl=/g  sudo tee /etc/yum.repos.d/CentOS-Base.repo
-      cat /etc/yum.repos.d/epel.repo | sed -e s/mirrorlist=/#mirrorlist=/g | sed -e s/#baseurl=/baseurl=/g  sudo tee /etc/yum.repos.d/epel.repo
-
-      echo "proxy=#{ENV['http_proxy']}" | sudo tee -a /etc/yum.conf
-
-      # wget (maybe others?) will use the proxy
-      echo "export http_proxy=#{ENV['http_proxy']}" >> .bashrc
-    SHELL
-  end
-
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
@@ -102,4 +99,3 @@ if File.exists?('VagrantfileLocal')
 else
   load 'VagrantfileLocal.vbox'
 end
-
