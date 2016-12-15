@@ -124,13 +124,13 @@ getent passwd %{tomcat_user} >/dev/null || /usr/sbin/useradd --comment "Tomcat 8
 %{tomcat_home}
 %{_initrddir}/%{name}
 %{_sbindir}/%{name}
-%{_sysconfdir}/logrotate.d/%{name}
+#%{_sysconfdir}/logrotate.d/%{name}
 %defattr(-,root,%{tomcat_group})
 %{tomcat_cache_home}
 %{tomcat_cache_home}/temp
 %{tomcat_cache_home}/work
 %{tomcat_user_home}/webapps
-%config(noreplace) %{_sysconfdir}/sysconfig/%{name}
+#%config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %config(noreplace) %{_sysconfdir}/%{name}/*
 
 %post
