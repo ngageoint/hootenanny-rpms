@@ -94,7 +94,6 @@ cp -R node-mapnik-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-mapnik-server
 make install
 echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
 echo "export JAVA_HOME=/usr/java/jdk1.8.0_111" >> $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
-echo "export JAVA_HOME=/usr/java/jdk1.8.0_111" >> $RPM_BUILD_ROOT/etc/profile.d/java.sh
 
 chmod 755 $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
 cp -R test-files/ $RPM_BUILD_ROOT/var/lib/hootenanny/
@@ -147,6 +146,7 @@ Requires:   postgresql-server >= 9.1
 Requires:   postgresql-contrib >= 9.1
 Requires:   postgis2_92 >= 2.1
 Requires:   jdk1.8.0_111
+Requires:   tomcat8
 Requires:   liquibase
 Requires:   pwgen
 Group:      Applications/Engineering
@@ -200,6 +200,15 @@ sudo alternatives --set java /usr/java/jdk1.8.0_111/bin/java
 
 # switching to manual and forcing the desired version of javac be configured
 sudo alternatives --set javac /usr/java/jdk1.8.0_111/bin/javac
+
+#Uninstall Tomcat6
+sudo service tomcat6 stop
+sudo yum remove -y tomcat6
+sudo rm -rf /usr/share/tomcat6
+sudo rm -rf /var/lib/tomcat6
+sudo rm -rf /var/cache/tomcat6
+sudo rm -rf /var/log/tomcat6
+sudo rm -rf /etc/tomcat6
 
 
 %post services-ui
