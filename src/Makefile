@@ -30,6 +30,7 @@ tmp/not-hoot: \
 	RPMS/noarch/autoconf-2.69-3.el6.noarch.rpm \
 	RPMS/noarch/dblatex-0.3-5.el6.noarch.rpm \
 	RPMS/noarch/python-which-1.1.0-12.el6.noarch.rpm \
+	RPMS/noarch/tomcat-8.5.8-1.el6.noarch.rpm \
 	$(FILEGDB_RPM) \
 	RPMS/x86_64/gdal-1.10.1-3.el6.x86_64.rpm \
 	RPMS/x86_64/gdal-esri-epsg-1.10.1-1.el6.x86_64.rpm \
@@ -128,3 +129,6 @@ RPMS/noarch/hootenanny-words-1.0.0-1.el6.noarch.rpm: SPECS/hootenanny-words.spec
 	rm -f RPMS/noarch/hootenanny-words* RPMS/x86_64/hootenanny-words*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
+RPMS/noarch/tomcat-8.5.8-1.el6.noarch.rpm: SPECS/tomcat8.spec
+	rm -f RPMS/noarch/tomcat* tomcat*
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
