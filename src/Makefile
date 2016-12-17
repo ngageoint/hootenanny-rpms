@@ -129,6 +129,7 @@ RPMS/noarch/hootenanny-words-1.0.0-1.el6.noarch.rpm: SPECS/hootenanny-words.spec
 	rm -f RPMS/noarch/hootenanny-words* RPMS/x86_64/hootenanny-words*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
+#As for 12/16/2016, there doesn't exist an official RPM for tomcat-8.5.8 release.  Build our own then.
 RPMS/noarch/tomcat-8.5.8-1.el6.noarch.rpm: SPECS/tomcat8.spec
 	rm -f RPMS/noarch/tomcat* tomcat*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<

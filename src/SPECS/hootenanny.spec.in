@@ -141,12 +141,13 @@ rm -rf %{buildroot}
 
 %package services-ui
 Summary:    Hootenanny UI and Services
+Obsoletes:  tomcat6
+Requires:   tomcat8
 Requires:   %{name}-core = %{version}-%{release}
 Requires:   postgresql-server >= 9.1
 Requires:   postgresql-contrib >= 9.1
 Requires:   postgis2_92 >= 2.1
 Requires:   jdk1.8.0_111
-Requires:   tomcat8
 Requires:   liquibase
 Requires:   pwgen
 Group:      Applications/Engineering
@@ -201,25 +202,16 @@ sudo alternatives --set java /usr/java/jdk1.8.0_111/bin/java
 # switching to manual and forcing the desired version of javac be configured
 sudo alternatives --set javac /usr/java/jdk1.8.0_111/bin/javac
 
-#Uninstall Tomcat6
-sudo service tomcat6 stop
-sudo yum remove -y tomcat6
-sudo rm -rf /usr/share/tomcat6
-sudo rm -rf /var/lib/tomcat6
-sudo rm -rf /var/cache/tomcat6
-sudo rm -rf /var/log/tomcat6
-sudo rm -rf /etc/tomcat6
-
 
 %post services-ui
 function updateConfigFiles () {
     # Update the db password in hoot-services war
     source /var/lib/hootenanny/conf/DatabaseConfig.sh
 
-    while [ ! -f /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/db/db.properties ]; do
-        echo "Waiting for hoot-services.war to deploy"
-        sleep 1
-    done
+#    while [ ! -f /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/db/db.properties ]; do
+#        echo "Waiting for hoot-services.war to deploy"
+#        sleep 1
+#    done
 
     sudo sed -i s/password\:\ hoottest/password\:\ $DB_PASSWORD/ /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/db/liquibase.properties
     sudo sed -i s/value=\"hoottest\"/value=\"$DB_PASSWORD\"/ /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/db/db.properties
