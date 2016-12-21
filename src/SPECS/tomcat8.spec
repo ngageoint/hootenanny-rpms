@@ -4,8 +4,8 @@
 # rpmbuild -bb ./src/SPECS/tomcat8.spec
 
 %define __jar_repack %{nil}
-%define tomcat_group tomcat8
-%define tomcat_user tomcat8
+%define tomcat_group tomcat
+%define tomcat_user tomcat
 %define tomcat_home /usr/share/tomcat8
 %define tomcat_user_home /var/lib/tomcat8
 %define tomcat_cache_home /var/cache/tomcat8

@@ -61,7 +61,7 @@ TOMCAT_SCRIPT="/usr/sbin/tomcat8"
 TOMCAT_PROG="${NAME}"
         
 # Define the tomcat username
-TOMCAT_USER="${TOMCAT_USER:-tomcat8}"
+TOMCAT_USER="${TOMCAT_USER:-tomcat}"
 
 # Define the tomcat group
 TOMCAT_GROUP="${TOMCAT_GROUP:-`id -gn $TOMCAT_USER`}"

@@ -208,10 +208,12 @@ function updateConfigFiles () {
     # Update the db password in hoot-services war
     source /var/lib/hootenanny/conf/DatabaseConfig.sh
 
-#    while [ ! -f /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/db/db.properties ]; do
-#        echo "Waiting for hoot-services.war to deploy"
-#        sleep 1
-#    done
+    sudo service tomcat8 restart
+
+    while [ ! -f /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/db/db.properties ]; do
+        echo "Waiting for hoot-services.war to deploy"
+        sleep 1
+    done
 
     sudo sed -i s/password\:\ hoottest/password\:\ $DB_PASSWORD/ /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/db/liquibase.properties
     sudo sed -i s/value=\"hoottest\"/value=\"$DB_PASSWORD\"/ /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/db/db.properties
@@ -337,14 +339,14 @@ EOT
     # Create Tomcat context path for tile images
     TOMCAT_SRV=/etc/tomcat8/server.xml
     if ! grep -i --quiet 'ingest/processed' $TOMCAT_SRV; then
-        sudo -u tomcat cp $TOMCAT_SRV $TOMCAT_SRV.orig
+        sudo cp $TOMCAT_SRV $TOMCAT_SRV.orig
         echo "Adding Tomcat context path for tile images"
         sudo sed -i "s@<\/Host>@ <Context docBase=\"\/var\/lib\/hootenanny\/ingest\/processed\" path=\"\/static\" \/>\n &@" $TOMCAT_SRV
     fi
     # Allow linking in Tomcat context
     TOMCAT_CTX=/etc/tomcat8/context.xml
     if ! grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
-        sudo -u tomcat cp $TOMCAT_CTX $TOMCAT_CTX.orig
+        sudo cp $TOMCAT_CTX $TOMCAT_CTX.orig
         echo "Set allowLinking to true in Tomcat context"
         sudo sed -i "s@^<Context>@<Context allowLinking=\"true\">@" $TOMCAT_CTX
     fi

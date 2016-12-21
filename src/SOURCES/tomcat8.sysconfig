@@ -25,12 +25,12 @@
 #JAVA_OPTS="-Djava.library.path=/usr/lib64"
 
 # What user should run tomcat
-#TOMCAT_USER="tomcat8"
+#TOMCAT_USER="tomcat"
 #TOMCAT_GROUP="${TOMCAT_GROUP:-`id -gn $TOMCAT_USER`}"
 
 # The un-privileged user that runs tomcat.
-# Default is tomcat8
-#RUNAS_USER="tomcat8"
+# Default is tomcat
+#RUNAS_USER="tomcat"
 
 # You can change your tomcat locale here
 #LANG="en_US"
@@ -47,7 +47,7 @@
 # Set the TOMCAT_PID location
 #CATALINA_PID="/var/run/tomcat8.pid"
 
-# Connector port is 8080 for this tomcat6 instance
+# Connector port is 8080 for this tomcat8 instance
 #CONNECTOR_PORT="8080"
 
 # If you wish to further customize your tomcat environment,
