@@ -713,6 +713,9 @@ This packages contains the dependencies to run the Hootenanny core.
 %files core-deps
 
 %changelog
+* Wed Dec 21 2016 Dmitriy Mylov <dmitriy.mylov@digitalglobe.com>
+- Oracle Java 8 and Tomcat 8.5.8 upgrades
+
 * Tue Aug 30 2016 Matt Jackson <matthew.jackson@digitalglobe.com> - 0.2.23+
 - Added symlink for hootenanny docs so they are available in the UI
 
