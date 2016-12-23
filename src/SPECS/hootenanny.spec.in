@@ -121,7 +121,7 @@ export JAVA_HOME=/etc/alternatives/java_sdk
 # https://github.com/ngageoint/hootenanny/issues/281
 HootTest --exclude=.*RubberSheetConflateTest.sh \
     --exclude=.*ConflateAverageTest.sh \
-    --exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh \
+    --exclude=.*ExactMatchInputsTest.sh \
     --exclude=.*Osm2OgrTranslation.sh \
     --slow --diff
 cd hoot-services
