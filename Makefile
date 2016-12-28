@@ -69,7 +69,7 @@ vagrant-test:
 	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --diff \
 		--exclude=.*ConflateAverageTest.sh \
 		--exclude=.*RubberSheetConflateTest.sh \
-		--exclude=.*ConflateCmdHighwayExactMatchInputsTest.sh \
+		--exclude=.*ExactMatchInputsTest.sh \
 		--slow"
 
 deps: force
