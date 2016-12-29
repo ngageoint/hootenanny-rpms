@@ -14,17 +14,6 @@
 ### END INIT INFO
 #
 
-## Source function library.
-#. /etc/rc.d/init.d/functions
-# Source LSB function library.
-if [ -r /lib/lsb/init-functions ]; then
-    . /lib/lsb/init-functions
-else
-    exit 1
-fi
-
-DISTRIB_ID=`lsb_release -i -s 2>/dev/null`
-
 NAME="$(basename $0)"
 
 unset ISBOOT
@@ -111,9 +100,6 @@ function start() {
 #           if checkpid $kpid 2>&1; then
             if [ -d "/proc/${kpid}" ]; then
                 log_success_msg
-                if [ "$DISTRIB_ID" = "MandrivaLinux" ]; then
-                    echo
-                fi
                 RETVAL="0"
                 return
             fi
@@ -140,9 +126,6 @@ function start() {
         touch /var/lock/subsys/${NAME}
     else
         log_failure_msg "Error code ${RETVAL}"
-    fi
-    if [ "$DISTRIB_ID" = "MandrivaLinux" ]; then
-        echo
     fi
 }
 
@@ -183,9 +166,6 @@ function stop() {
     else
         log_success_msg
         RETVAL="0"
-    fi
-    if [ "$DISTRIB_ID" = "MandrivaLinux" ]; then
-        echo
     fi
 }
 
