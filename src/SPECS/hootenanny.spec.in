@@ -119,6 +119,7 @@ export JAVA_HOME=/usr/java/jdk1.8.0_111
 HootTest \
     --exclude=.*ConflateAverageTest.sh \
     --exclude=.*ExactMatchInputsTest.sh \
+    --exclude=.*Osm2OgrTranslation.sh \
     --slow --diff
 cd hoot-services
 make test -s
