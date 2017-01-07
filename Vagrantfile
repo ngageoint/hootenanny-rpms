@@ -3,10 +3,14 @@
 
 $provisionSh = <<-SHELL
     ln -s hootenanny-rpms/src/ rpmbuild
+
+    # Trying this to get rid of errors
+    sudo yum -y remove postgresql postgresql-devel postgresql-libs
+
     # Try the update a few times. Sometimes the epel repo gives an error.
-    sudo yum -y update || true
-    sudo yum -y update || true
-    sudo yum -y update
+    sudo yum -y update --exclude=puppet* || true
+    sudo yum -y update --exclude=puppet* || true
+    sudo yum -y update --exclude=puppet*
 
     # Enable NTP to synchronize clock
     sudo yum -y install ntp

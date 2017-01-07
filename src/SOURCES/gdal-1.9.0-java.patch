@@ -7,7 +7,7 @@ diff -ru gdal-1.10.1-fedora/swig/java/java.opt gdal-1.10.1-fedora-java/swig/java
  #JAVA_HOME = "C:\Program Files\Java\jdk1.6.0_16"
 -JAVA_HOME = /usr/lib/jvm/java-6-openjdk/
 +# Use the default java 1.6 -JRS
-+JAVA_HOME=/usr/lib/jvm/java-1.6.0
++JAVA_HOME=/usr/java/jdk1.8.0_111
  JAVADOC=$(JAVA_HOME)/bin/javadoc
  JAVAC=$(JAVA_HOME)/bin/javac
  JAVA=$(JAVA_HOME)/bin/java
