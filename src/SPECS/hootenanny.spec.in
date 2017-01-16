@@ -59,6 +59,8 @@ This package contains the core algorithms and command line interface.
 %build
 source ./SetupEnv.sh
 export JAVA_HOME=/usr/java/jdk1.8.0_111
+#export JAVA_HOME=/etc/alternatives/java_sdk
+
 # The dir configurations set the install directory to work with EL's dir structure
 ./configure --with-rnd --with-services -q \
     --prefix=$RPM_BUILD_ROOT/usr/ \
@@ -80,6 +82,9 @@ make -s %{?_smp_mflags}
 #cd node-mapnik-server
 #npm install
 
+cd node-export-server
+npm install
+
 %install
 
 # UI stuff
@@ -88,8 +93,10 @@ cp hoot-services/target/hoot-services*.war $RPM_BUILD_ROOT/var/lib/tomcat8/webap
 cp -R hoot-ui/ $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hootenanny-id
 mkdir -p $RPM_BUILD_ROOT/etc/init.d
 cp node-mapnik-server/init.d/centos-rpm $RPM_BUILD_ROOT/etc/init.d/node-mapnik-server
+cp node-export-server/init.d/centos-rpm $RPM_BUILD_ROOT/etc/init.d/node-export-server
 mkdir -p $RPM_BUILD_ROOT/var/lib/hootenanny
 cp -R node-mapnik-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-mapnik-server
+cp -R node-export-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-export-server
 
 make install
 echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
@@ -111,6 +118,7 @@ ln -s /usr/share/doc/hootenanny  $RPM_BUILD_ROOT/var/lib/hootenanny/docs
 %check
 source ./SetupEnv.sh
 export JAVA_HOME=/usr/java/jdk1.8.0_111
+#export JAVA_HOME=/etc/alternatives/java_sdk
 # The excluded tests are failing on CentOS now and waiting on a fix
 # https://github.com/ngageoint/hootenanny/issues/279
 # https://github.com/ngageoint/hootenanny/issues/281
@@ -172,6 +180,7 @@ This package contains the UI and web services.
 %attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hoot-services.war
 %attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hootenanny-id
 /etc/init.d/node-mapnik-server
+/etc/init.d/node-export-server
 
 #the order of operations during an upgrade is:
 #
@@ -263,7 +272,10 @@ if [ "$1" = "1" ]; then
     PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
     sudo service $PG_SERVICE initdb
     sudo service $PG_SERVICE start
-    PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
+    while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
+        echo "Waiting for postgres to start"
+        sleep 1
+    done
 
     sudo service tomcat8 start
 
@@ -355,6 +367,19 @@ EOT
         echo "Set allowLinking to true in Tomcat context"
         sudo sed -i "s@^<Context>@<Context allowLinking=\"true\">@" $TOMCAT_CTX
     fi
+    # Increase the Tomcat java heap size
+    TOMCAT_CONF=/etc/tomcat6/tomcat6.conf
+    if ! grep -i --quiet 'Xmx2048m' $TOMCAT_CONF; then
+        sudo cp $TOMCAT_CONF $TOMCAT_CONF.orig
+        echo "Increase the Tomcat java heap size"
+        sudo bash -c "cat >> $TOMCAT_CONF" <<EOT
+#--------------
+# Hoot increase java heap size
+#--------------
+JAVA_OPTS="$JAVA_OPTS -Xms512m -Xmx2048m"
+
+EOT
+    fi
     # Create directories for webapp
     TOMCAT_HOME=/usr/share/tomcat8
     if [ ! -d $TOMCAT_HOME/.deegree ]; then
@@ -444,7 +469,10 @@ if [ "$1" = "0" ]; then
     # Ensure Postgres is started
     PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
     sudo service $PG_SERVICE start
-    PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
+    while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
+        echo "Waiting for postgres to start"
+        sleep 1
+    done
 
     # Restore Postgres settings
     PG_HB_CONF=/var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
@@ -469,6 +497,11 @@ if [ "$1" = "0" ]; then
     TOMCAT_CTX=/etc/tomcat8/context.xml
     if grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
         sudo -u tomcat mv $TOMCAT_CTX.orig $TOMCAT_CTX
+    fi
+    # Restore original file
+    TOMCAT_CONF=/etc/tomcat6/tomcat6.conf
+    if grep -i --quiet 'Xmx2048m' $TOMCAT_CONF; then
+        sudo -u tomcat mv $TOMCAT_CONF.orig $TOMCAT_CONF
     fi
     # Remove .deegree directory
     TOMCAT_HOME=/usr/share/tomcat8
@@ -528,6 +561,9 @@ sudo /sbin/chkconfig tomcat8 on
 # set NodeJS node-mapnik-server to autostart
 sudo /sbin/chkconfig --add node-mapnik-server
 sudo /sbin/chkconfig node-mapnik-server on
+# set NodeJS node-export-server to autostart
+sudo /sbin/chkconfig --add node-export-server
+sudo /sbin/chkconfig node-export-server on
 
 %postun autostart
 # set Postgres to NOT autostart
@@ -537,6 +573,8 @@ sudo /sbin/chkconfig --del postgresql-$PG_VERSION
 sudo /sbin/chkconfig --del tomcat8
 # set NodeJS node-mapnik-server to NOT autostart
 sudo /sbin/chkconfig --del node-mapnik-server
+# set NodeJS node-export-server to NOT autostart
+sudo /sbin/chkconfig --del node-export-server
 
 %package services-devel-deps
 Summary:    Development dependencies for Hootenanny Services
@@ -572,7 +610,10 @@ if [ "$1" = "1" ]; then
     PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
     sudo service $PG_SERVICE initdb
     sudo service $PG_SERVICE start
-    PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
+    while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
+        echo "Waiting for postgres to start"
+        sleep 1
+    done
 
     sudo service tomcat8 start
 
@@ -637,7 +678,10 @@ if [ "$1" = "0" ]; then
     # Ensure Postgres is started
     PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
     sudo service $PG_SERVICE start
-    PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
+    while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
+        echo "Waiting for postgres to start"
+        sleep 1
+    done
 
     # Restore Postgres settings
     PG_HB_CONF=/var/lib/pgsql/$PG_VERSION/data/pg_hba.conf

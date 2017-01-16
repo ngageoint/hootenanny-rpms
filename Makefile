@@ -5,6 +5,9 @@ TARBALLS := $(wildcard src/SOURCES/hootenanny*.tar.gz)
 DOCBALLS := $(wildcard src/SOURCES/hootenanny*-documentation.tar.gz)
 HOOTBALL := $(filter-out $(DOCBALLS), $(TARBALLS))
 
+# URL for downloading the Java8 JDK 
+JDKURL=http://download.oracle.com/otn-pub/java/jdk/8u111-b14/jdk-8u111-linux-x64.rpm
+
 all: copy-rpms
 
 # a convenience target for building hoot RPMs and no others.
@@ -40,7 +43,9 @@ vagrant-plugins:
 	# Install the bindfs plugin if it doesn't exist
 	(vagrant plugin list | grep -q bindfs) || vagrant plugin install vagrant-bindfs
 
-vagrant-build-deps: copy-words1
+
+# NOTE: We grab a copy of the Oracle 8 JDK before installing the deps
+vagrant-build-deps: copy-words1 el6-src/jdk-8u111-linux-x64.rpm
 	vagrant ssh -c "cd hootenanny-rpms && make -j$$((`nproc` + 2)) deps"
 
 vagrant-build: vagrant-build-rpms
@@ -64,8 +69,6 @@ vagrant-clean:
 
 vagrant-test:
 	cd test; vagrant up
-	# OsmApiDb is being excluded b/c the RPM test environment doesn't include
-	# a OSM API DB.
 	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --diff \
 		--exclude=.*ConflateAverageTest.sh \
 		--exclude=.*RubberSheetConflateTest.sh \
@@ -187,7 +190,18 @@ deps: force install-java
 	  libdrm-devel \
 	  el6-src/* \
 
+
 el6: el6-src/* custom-rpms
+
+
+# Get a copy of the Oracle 8 JDK
+# As of 11/29/2016, the hootenanny-rpms project in Github supports files <= 100MB in size.  
+# Everything over this size gets rejected by Github.  In order to workaround this limitation, 
+# we download a copy of the 159Mb JDK and store it in the el6 directory. This ensures that it
+# is installed and is copied to the S3 repo.
+el6-src/jdk-8u111-linux-x64.rpm:
+	wget --quiet --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" $(JDKURL) -P el6-src
+
 
 copy-rpms: el6
 	rm -rf el6

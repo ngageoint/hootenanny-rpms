@@ -10,7 +10,9 @@ if [ -z "$GIT_COMMIT" ]; then
 fi
 echo $GIT_COMMIT
 
-export JAVA_HOME=/usr/java/jdk1.8.0_111
+#export JAVA_HOME=/etc/alternatives/jre_1.7.0
+#export JAVA_HOME=/usr/java/jdk1.8.0_111
+export JAVA_HOME=/etc/alternatives/java_sdk
 
 echo "%__make /usr/bin/make -sj4" >> /home/vagrant/.rpmmacros
 
