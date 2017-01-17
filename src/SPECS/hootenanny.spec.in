@@ -152,9 +152,9 @@ rm -rf %{buildroot}
 %package services-ui
 Summary:    Hootenanny UI and Services
 Obsoletes:  tomcat6
-Obsoletes:  tomcat6-lib
-Obsoletes:  tomcat6-servlet-2.5-api
-Obsoletes:  tomcat6-el-2.1-api
+#Obsoletes:  tomcat6-lib
+#Obsoletes:  tomcat6-servlet-2.5-api
+#Obsoletes:  tomcat6-el-2.1-api
 Requires:   tomcat8
 Requires:   %{name}-core = %{version}-%{release}
 Requires:   postgresql-server >= 9.1
