@@ -5,9 +5,10 @@ $provisionSh = <<-SHELL
     ln -s hootenanny-rpms/src/ rpmbuild
 
     # Trying this to get rid of errors
-    sudo yum -y remove postgresql postgresql-devel postgresql-libs
-
-    sudo yum -y reinstall https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm || true
+    if ! yum list installed | grep --quiet epel-release.noarch ; then
+        echo "Installing epel repo"
+        sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm || true
+    fi
 
     # Try the update a few times. Sometimes the epel repo gives an error.
     sudo yum -y update --exclude=puppet* || true
