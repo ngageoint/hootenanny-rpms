@@ -2,7 +2,7 @@ TARBALLS := $(wildcard SOURCES/hootenanny*.tar.gz)
 DOCBALLS := $(wildcard SOURCES/hootenanny*-documentation.tar.gz)
 HOOTBALL := $(filter-out $(DOCBALLS), $(TARBALLS))
 
-FILEGDB_RPM=RPMS/x86_64/FileGDB_API-1.3-1.el6.x86_64.rpm
+FILEGDB_RPM=RPMS/x86_64/FileGDB_API-1.4-1.el6.x86_64.rpm
 INSTALL_FILEGDB=yum list installed FileGDB_API || sudo yum -y install $(FILEGDB_RPM)
 # Synchronizing the make build with rpmbuild parallel flags causes problems. This way we
 # spawn at most nproc processes per sub-job and if the load is above nproc + 2 no more
