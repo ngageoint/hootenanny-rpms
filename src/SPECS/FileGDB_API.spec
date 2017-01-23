@@ -71,7 +71,6 @@ install -d $INSTALL_DIR/include
 
 cp -R $BUILD_DIR/doc/ $SHARE_DIR/
 install -D $BUILD_DIR/license/* $SHARE_DIR/
-install -D $BUILD_DIR/xmlResources/* $SHARE_DIR/
 install -D $BUILD_DIR/lib/* $LIB_DIR
 install -D $BUILD_DIR/include/* $INSTALL_DIR/include/
 
