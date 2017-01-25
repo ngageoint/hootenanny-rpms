@@ -2,7 +2,7 @@
 ### This is far from complete. Just playing.
 ####
 Name:		gdal-esri-epsg
-Version:	1.10.1
+Version:	2.1.2
 Release:	1%{?dist}
 Summary:	GIS file format support files
 
@@ -54,5 +54,6 @@ install $DATA_DIR/ecw_cs.wkt $INSTALL_DIR
 #rm -rf %{buildroot}
 
 %changelog
+* Wed Jan 25 2016 Benjamin Marchant <benjamin.marchant@digitalglobe.com> - 0.2.33+
 * Thu Jan 25 2016 Jason R. Surratt <jason.surratt@digitalglobe.com> - 0.2.21+
 - Initial attempt
