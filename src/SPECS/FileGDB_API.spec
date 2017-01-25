@@ -2,17 +2,16 @@
 ### This is far from complete. Just playing.
 ####
 Name:		FileGDB_API
-Version:	1.3
+Version:	1.4
 Release:	1%{?dist}
 Summary:	ESRI FileGDB libraries
 
 Group:		System Environment/Libraries
 License:	Copyright © 2012 ESRI
-URL:		http://www.esri.com/apps/products/download/#File_Geodatabase_API_1.3
+URL:		http://www.esri.com/apps/products/download/#File_Geodatabase_API_1.4
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-#Source0:        http://www.esri.com/apps/products/download/index.cfm?fuseaction=download.main&downloadid=841
-Source1:        FileGDB_API_1_3-64.tar.gz
+Source1:        FileGDB_API_1_4-64.tar.gz
 
 %description
 
@@ -52,10 +51,9 @@ email: contracts@esri.com
 /usr/share/*
 
 %prep
-mkdir -p %{name}-%{version}
-cd %{name}-%{version}
-tar xf %{_sourcedir}/FileGDB_API_1_3-64.tar.gz
-cd FileGDB_API
+mkdir -p %{name}-%{version}/FileGDB_API
+cd %{name}-%{version}/FileGDB_API
+tar xf %{_sourcedir}/FileGDB_API_1_4-64.tar.gz --strip-components 1
 
 %build
 true
@@ -73,7 +71,6 @@ install -d $INSTALL_DIR/include
 
 cp -R $BUILD_DIR/doc/ $SHARE_DIR/
 install -D $BUILD_DIR/license/* $SHARE_DIR/
-install -D $BUILD_DIR/xmlResources/* $SHARE_DIR/
 install -D $BUILD_DIR/lib/* $LIB_DIR
 install -D $BUILD_DIR/include/* $INSTALL_DIR/include/
 
@@ -82,5 +79,6 @@ install -D $BUILD_DIR/include/* $INSTALL_DIR/include/
 %clean
 
 %changelog
+* Thu Jan 19 2017 Benjamin Marchant <benjamin.marchant@digitalglobe.com>
 * Thu Jan 26 2016 Jason R. Surratt <jason.surratt@digitalglobe.com>
 - Initial attempt
