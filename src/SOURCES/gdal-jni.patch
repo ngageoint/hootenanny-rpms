@@ -20,7 +20,7 @@ diff -up ./swig/include/java/gdal_java.i.jni~ ./swig/include/java/gdal_java.i
 -      System.loadLibrary("gdaljni");
 +      System.load("/usr/lib/java/gdal/libgdaljni.so");
        available = true;
-       
+ 
        if (gdal.HasThreadSupport() == 0)
 diff -up ./swig/include/java/ogr_java.i.jni~ ./swig/include/java/ogr_java.i
 --- ./swig/include/java/ogr_java.i.jni~	2016-04-25 19:35:57.000000000 +0200
@@ -32,7 +32,7 @@ diff -up ./swig/include/java/ogr_java.i.jni~ ./swig/include/java/ogr_java.i
 -      System.loadLibrary("ogrjni");
 +      System.load("/usr/lib/java/gdal/libogrjni.so");
        available = true;
-       
+ 
        if (org.gdal.gdal.gdal.HasThreadSupport() == 0)
 diff -up ./swig/include/java/osr_java.i.jni~ ./swig/include/java/osr_java.i
 --- ./swig/include/java/osr_java.i.jni~	2016-04-25 19:35:57.000000000 +0200

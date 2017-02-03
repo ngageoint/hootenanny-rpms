@@ -24,8 +24,8 @@
 %global proj_somaj 12
 
 # Tests can be of a different version
-%global testversion 2.1.1
-%global run_tests 1
+%global testversion 2.1.3
+%global run_tests 0
 
 %global with_spatialite 1
 %global spatialite "--with-spatialite"
@@ -43,8 +43,8 @@
 
 
 Name:		gdal
-Version:	2.1.2
-Release:	6%{?dist}
+Version:	2.1.3
+Release:	2%{?dist}
 Summary:	GIS file format library
 Group:		System Environment/Libraries
 License:	MIT
@@ -828,6 +828,13 @@ popd
 #Or as before, using ldconfig
 
 %changelog
+* Wed Feb 01 2017 Sandro Mani <manisandro@gmail.com> - 2.1.3-2
+- Rebuild (libwebp)
+
+* Fri Jan 27 2017 Volker Froehlich <volker27@gmx.at> - 2.1.3-1
+- New upstream release
+- Don't run tests by default (BZ #1260151)
+
 * Tue Jan 24 2017 Devrim Gündüz <devrim@gunduz.org> - 2.1.2-6
 - Rebuilt for proj 4.9.3
 - Fix many rpmlint warnings/errors.

@@ -2,8 +2,8 @@
 ### This is far from complete. Just playing.
 ####
 Name:		gdal-esri-epsg
-Version:	2.1.2
-Release:	1%{?dist}
+Version:	2.1.3
+Release:	2%{?dist}
 Summary:	GIS file format support files
 
 Group:		System Environment/Libraries
