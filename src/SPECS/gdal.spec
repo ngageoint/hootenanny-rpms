@@ -76,6 +76,9 @@ Patch9:		%{name}-2.1.0-zlib.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
+# Adding FileGDB API for Hootenanny
+BuildRequires:	FileGDB_API
+
 BuildRequires:	ant
 # No armadillo in EL5
 BuildRequires:	armadillo-devel
@@ -124,7 +127,6 @@ BuildRequires:	librx-devel
 BuildRequires:	mysql-devel
 BuildRequires:	numpy
 BuildRequires:	pcre-devel
-BuildRequires:	ogdi-devel
 BuildRequires:	perl-devel
 BuildRequires:	perl-generators
 BuildRequires:	openjpeg2-devel
@@ -323,7 +325,6 @@ sed -i 's|-L\$with_cfitsio -L\$with_cfitsio/lib -lcfitsio|-lcfitsio|g' configure
 sed -i 's|-I\$with_cfitsio -I\$with_cfitsio/include|-I\$with_cfitsio/include/cfitsio|g' configure
 sed -i 's|-L\$with_netcdf -L\$with_netcdf/lib -lnetcdf|-lnetcdf|g' configure
 sed -i 's|-L\$DODS_LIB -ldap++|-ldap++|g' configure
-sed -i 's|-L\$with_ogdi -L\$with_ogdi/lib -logdi|-logdi|g' configure
 sed -i 's|-L\$with_jpeg -L\$with_jpeg/lib -ljpeg|-ljpeg|g' configure
 sed -i 's|-L\$with_libtiff\/lib -ltiff|-ltiff|g' configure
 sed -i 's|-lgeotiff -L$with_geotiff $LIBS|-lgeotiff $LIBS|g' configure
@@ -375,6 +376,7 @@ export CPPFLAGS="$CPPFLAGS -I%{_includedir}/libgeotiff"
 	--with-cfitsio=%{_prefix}	\
 	--with-dods-root=%{_prefix}	\
 	--with-expat		\
+	--with-fgdb		\
 	--with-freexl		\
 	--with-geos		\
 	--with-geotiff=external	\
@@ -394,7 +396,6 @@ export CPPFLAGS="$CPPFLAGS -I%{_includedir}/libgeotiff"
 	--with-mysql		\
 	--with-netcdf		\
 	--with-odbc		\
-	--with-ogdi		\
 	--without-msg		\
 	--with-openjpeg		\
 	--with-pcraster		\

@@ -103,6 +103,7 @@ deps: force install-java
 	  armadillo-devel \
 	  automake \
 	  bison \
+	  bash-completion \
 	  boost-devel \
 	  cairo-devel \
 	  cfitsio-devel \
@@ -128,13 +129,17 @@ deps: force install-java
 	  hdf-static \
 	  help2man \
 	  info \
+	  json-c-devel \
 	  libdap-devel \
+	  libgeotiff-devel \
 	  libgta-devel \
 	  libjpeg-turbo-devel \
 	  libotf \
 	  libpng-devel \
 	  librx-devel \
 	  libspatialite-devel \
+	  libtiff-devel \
+	  libwebp-devel \
 	  libX11-devel \
 	  libXt-devel \
 	  libxslt \
@@ -144,8 +149,10 @@ deps: force install-java
 	  netcdf-devel \
 	  nodejs \
 	  npm \
+	  openjpeg2-devel \
 	  pango-devel \
 	  pcre-devel \
+	  perl-generators \
 	  proj-devel \
 	  pygtk2 \
 	  python-devel \
