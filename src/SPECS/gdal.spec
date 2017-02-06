@@ -220,26 +220,6 @@ Obsoletes:	%{name}-ruby < 1.11.0-1
 This package contains the GDAL file format library.
 
 
-%package java
-Summary:	Java modules for the GDAL file format library
-Group:		Development/Libraries
-Requires:	jpackage-utils
-Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
-
-%description java
-The GDAL Java modules provide support to handle multiple GIS file formats.
-
-
-%package javadoc
-Summary:	Javadocs for %{name}
-Group:		Documentation
-Requires:	jpackage-utils
-BuildArch:	noarch
-
-%description javadoc
-This package contains the API documentation for %{name}.
-
-
 %package perl
 Summary:	Perl modules for the GDAL file format library
 Group:		Development/Libraries
@@ -385,7 +365,6 @@ export CPPFLAGS="$CPPFLAGS -I%{_includedir}/libgeotiff"
 	--with-hdf4		\
 	--with-hdf5		\
 	--with-jasper		\
-	--with-java		\
 	--with-jpeg		\
 	--with-libjson-c	\
 	--without-jpeg12	\
@@ -437,12 +416,6 @@ sed -i 's|INSTALLDIRS = site|INSTALLDIRS = vendor|' swig/perl/Makefile_*
 # Don't append installation info to pod
 #TODO: What about the pod?
 sed -i 's|>> $(DESTINSTALLARCHLIB)\/perllocal.pod|> \/dev\/null|g' swig/perl/Makefile_*
-
-# Make Java module and documentation
-pushd swig/java
-  make
-  ./make_doc.sh
-popd
 
 # Make Python 3 module
 pushd swig/python
@@ -516,30 +489,32 @@ find %{buildroot}%{perl_vendorarch} -name "*.pm" -exec chmod 644 '{}' \;
 #TODO: JAR files that require JNI shared objects MUST be installed in %%{_libdir}/%%{name}. The JNI shared objects themselves must also be installed in %%{_libdir}/%%{name}.
 #Java programs that wish to make calls into native libraries do so via the Java Native Interface (JNI). A Java package uses JNI if it contains a .so
 #If the JNI-using code calls System.loadLibrary you'll have to patch it to use System.load, passing it the full path to the dynamic shared object. If the package installs a wrapper script you'll need to manually add %%{_libdir}/%%{name}/<jar filename> to CLASSPATH. If you are depending on a JNI-using JAR file, you'll need to add it manually -- build-classpath will not find it.
-touch -r NEWS swig/java/gdal.jar
-mkdir -p %{buildroot}%{_javadir}
-cp -p swig/java/gdal.jar  \
-    %{buildroot}%{_javadir}/%{name}.jar
-
-# Install Maven pom and update version number
-install -dm 755 %{buildroot}%{_mavenpomdir}
-install -pm 644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
-sed -i 's|<version></version>|<version>%{version}</version>|' %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
-
-# Create depmap fragment
-%add_maven_depmap JPP-%{name}.pom %{name}.jar
-
-# 775 on the .so?
-# copy JNI libraries and links, non versioned link needed by JNI
-# What is linked here?
-mkdir -p %{buildroot}%{_jnidir}/%{name}
-cp -pl swig/java/.libs/*.so*  \
-    %{buildroot}%{_jnidir}/%{name}/
-chrpath --delete %{buildroot}%{_jnidir}/%{name}/*jni.so*
-
-# Install Java API documentation in the designated place
-mkdir -p %{buildroot}%{_javadocdir}/%{name}
-cp -pr swig/java/java/org %{buildroot}%{_javadocdir}/%{name}
+#%if 0%{?build_java})
+#	touch -r NEWS swig/java/gdal.jar
+#	mkdir -p %{buildroot}%{_javadir}
+#	cp -p swig/java/gdal.jar  \
+#	    %{buildroot}%{_javadir}/%{name}.jar
+#
+#	# Install Maven pom and update version number
+#	install -dm 755 %{buildroot}%{_mavenpomdir}
+#	install -pm 644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
+#	sed -i 's|<version></version>|<version>%{version}</version>|' %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
+#
+#	# Create depmap fragment
+#	%add_maven_depmap JPP-%{name}.pom %{name}.jar
+#
+#	# 775 on the .so?
+#	# copy JNI libraries and links, non versioned link needed by JNI
+#	# What is linked here?
+#	mkdir -p %{buildroot}%{_jnidir}/%{name}
+#	cp -pl swig/java/.libs/*.so*  \
+#	    %{buildroot}%{_jnidir}/%{name}/
+#	chrpath --delete %{buildroot}%{_jnidir}/%{name}/*jni.so*
+#
+#	# Install Java API documentation in the designated place
+#	mkdir -p %{buildroot}%{_javadocdir}/%{name}
+#	cp -pr swig/java/java/org %{buildroot}%{_javadocdir}/%{name}
+#%endif
 
 # Install refmans
 for docdir in %{docdirs}; do
@@ -748,14 +723,6 @@ popd
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/%{name}.pc
 
-# Can I even have a separate Java package anymore?
-%files java -f .mfiles
-%doc swig/java/apps
-%{_jnidir}/%{name}/
-
-%files javadoc
-%{_javadocdir}/%{name}
-
 %files perl
 %doc swig/perl/README
 %{perl_vendorarch}/*
@@ -773,11 +740,11 @@ popd
 %{_mandir}/man1/gdal_merge.1*
 %{_mandir}/man1/gdal_retile.1*
 %{_mandir}/man1/gdal_sieve.1*
-%{python2_sitearch}/osgeo
-%{python2_sitearch}/GDAL-%{version}-py*.egg-info
-%{python2_sitearch}/osr.py*
-%{python2_sitearch}/ogr.py*
-%{python2_sitearch}/gdal*.py*
+%{python_sitearch}/osgeo
+%{python_sitearch}/GDAL-%{version}-py*.egg-info
+%{python_sitearch}/osr.py*
+%{python_sitearch}/ogr.py*
+%{python_sitearch}/gdal*.py*
 
 %files doc
 %doc gdal_frmts ogrsf_frmts refman
