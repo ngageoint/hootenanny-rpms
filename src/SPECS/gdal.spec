@@ -20,9 +20,6 @@
 
 # He also suggest to use --with-static-proj4 to actually link to proj, instead of dlopen()ing it.
 
-# Major digit of the proj so version
-%global proj_somaj 12
-
 # Tests can be of a different version
 %global testversion 2.1.3
 %global run_tests 0
@@ -158,12 +155,7 @@ BuildRequires:	zlib-devel
 # Run time dependency for gpsbabel driver
 Requires:	gpsbabel
 
-# proj DL-opened in ogrct.cpp, see also fix in %%prep
-%if 0%{?__isa_bits} == 64
-Requires:	libproj.so.%{proj_somaj}()(64bit)
-%else
-Requires:	libproj.so.%{proj_somaj}
-%endif
+Requires:	libproj.so
 
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 
@@ -309,10 +301,6 @@ sed -i 's|-L\$with_jpeg -L\$with_jpeg/lib -ljpeg|-ljpeg|g' configure
 sed -i 's|-L\$with_libtiff\/lib -ltiff|-ltiff|g' configure
 sed -i 's|-lgeotiff -L$with_geotiff $LIBS|-lgeotiff $LIBS|g' configure
 sed -i 's|-L\$with_geotiff\/lib -lgeotiff $LIBS|-lgeotiff $LIBS|g' configure
-
-# libproj is dlopened; upstream sources point to .so, which is usually not present
-# http://trac.osgeo.org/gdal/ticket/3602
-sed -i 's|libproj.so|libproj.so.%{proj_somaj}|g' ogr/ogrct.cpp
 
 # Fix Python installation path
 sed -i 's|setup.py install|setup.py install --root=%{buildroot}|' swig/python/GNUmakefile
