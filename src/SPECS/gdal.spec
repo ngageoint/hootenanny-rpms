@@ -334,7 +334,6 @@ export CPPFLAGS="$CPPFLAGS -I%{_includedir}/libgeotiff"
 
 %configure \
 	LIBS=-lgrib2c \
-	--with-autoload=%{_libdir}/%{name}plugins \
 	--datadir=%{_datadir}/%{name}/ \
 	--includedir=%{_includedir}/%{name}/ \
 	--prefix=%{_prefix}	\
@@ -366,7 +365,7 @@ export CPPFLAGS="$CPPFLAGS -I%{_includedir}/libgeotiff"
 	--without-msg		\
 	--with-openjpeg		\
 	--with-pcraster		\
-	--with-pg		\
+	--with-pg=/usr/pgsql-9.2/bin/pg_config		\
 	--with-png		\
 	--with-poppler		\
 	%{spatialite}		\
