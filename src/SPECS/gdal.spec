@@ -155,8 +155,6 @@ BuildRequires:	zlib-devel
 # Run time dependency for gpsbabel driver
 Requires:	gpsbabel
 
-Requires:	libproj.so
-
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 
 # Enable/disable generating refmans
