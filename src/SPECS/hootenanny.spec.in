@@ -9,9 +9,9 @@ URL:        https://github.com/ngageoint/hootenanny
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  autoconf automake boost-devel cppunit-devel doxygen gcc-c++
-BuildRequires:  gdal-devel >= 1.10.1
-BuildRequires:  gdal-python >= 1.10.1
-BuildRequires:  gdal-esri-epsg >= 1.10.1
+BuildRequires:  gdal-devel >= 2.1.3
+BuildRequires:  gdal-python >= 2.1.3
+BuildRequires:  gdal-esri-epsg >= 2.1.3
 BuildRequires:  gdb
 BuildRequires:  geos-devel = 3.4.2
 BuildRequires:  git glpk-devel graphviz libicu-devel
@@ -683,9 +683,9 @@ core. Use this if you want to build from github.
 Summary:    Dependencies for Hootenanny Core
 Group:      Development/Libraries
 Requires:   asciidoc cppunit dblatex doxygen FileGDB_API
-Requires:       gdal-devel >= 1.10.1
-Requires:       gdal-python >= 1.10.1
-Requires:       gdal-esri-epsg >= 1.10.1
+Requires:       gdal-devel >= 2.1.3
+Requires:       gdal-python >= 2.1.3
+Requires:       gdal-esri-epsg >= 2.1.3
 Requires:       geos = 3.4.2, gnuplot, graphviz
 Requires:   hootenanny-words = 1.0.0
 # Needed by gnuplot for report generation
@@ -712,6 +712,9 @@ This packages contains the dependencies to run the Hootenanny core.
 %files core-deps
 
 %changelog
+* Thu Feb 09 2017 Ben Marchant <benjamin.marchant@digitalglobe.com> - 0.2.32+
+- GDAL 2.1.3 upgrade
+
 * Wed Dec 21 2016 Dmitriy Mylov <dmitriy.mylov@digitalglobe.com>
 - Oracle Java 8 and Tomcat 8.5.8 upgrades
 

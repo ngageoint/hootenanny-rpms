@@ -106,8 +106,6 @@ BuildRequires:	libgta-devel
 
 BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel
-# No libkml in EL
-#BuildRequires:	libkml-devel
 
 %if %{with_spatialite}
 BuildRequires:	libspatialite-devel
@@ -239,6 +237,9 @@ BuildArch:	noarch
 %description doc
 This package contains HTML and PDF documentation for GDAL.
 
+# We don't want to provide private Python extension libs
+%global __provides_exclude_from ^(%{python2_sitearch})/.*\.so$
+
 %prep
 %setup -q -n %{name}-%{version}-fedora -a 1
 
@@ -302,6 +303,13 @@ sed -i 's|-L\$with_geotiff\/lib -lgeotiff $LIBS|-lgeotiff $LIBS|g' configure
 
 # Fix Python installation path
 sed -i 's|setup.py install|setup.py install --root=%{buildroot}|' swig/python/GNUmakefile
+
+# Fix Python samples to depend on correct interpreter
+pushd swig/python/samples
+for f in `find . -name '*.py'`; do
+  sed -i 's|^#!.\+python$|#!/usr/bin/python2|' $f
+done
+popd
 
 # Adjust check for LibDAP version
 # http://trac.osgeo.org/gdal/ticket/4545
@@ -402,9 +410,9 @@ sed -i 's|INSTALLDIRS = site|INSTALLDIRS = vendor|' swig/perl/Makefile_*
 #TODO: What about the pod?
 sed -i 's|>> $(DESTINSTALLARCHLIB)\/perllocal.pod|> \/dev\/null|g' swig/perl/Makefile_*
 
-# Make Python 3 module
+# Make Python 2 module
 pushd swig/python
-  %{__python} setup.py build
+  %{__python2} setup.py build
 popd
 
 # --------- Documentation ----------
@@ -444,10 +452,9 @@ done
 %install
 rm -rf %{buildroot}
 
-# Install Python 3 module
-# Must be done first so executables are Python 2.
+# Install Python 2 module
 pushd swig/python
-  %{__python} setup.py install --skip-build --root %{buildroot}
+  %{__python2} setup.py install --skip-build --root %{buildroot}
 popd
 
 make	DESTDIR=%{buildroot}	\
@@ -470,36 +477,6 @@ rm -f %{buildroot}%{perl_archlib}/perllocal.pod
 #TODO and potential ticket: Why are the permissions not correct?
 find %{buildroot}%{perl_vendorarch} -name "*.so" -exec chmod 755 '{}' \;
 find %{buildroot}%{perl_vendorarch} -name "*.pm" -exec chmod 644 '{}' \;
-
-#TODO: JAR files that require JNI shared objects MUST be installed in %%{_libdir}/%%{name}. The JNI shared objects themselves must also be installed in %%{_libdir}/%%{name}.
-#Java programs that wish to make calls into native libraries do so via the Java Native Interface (JNI). A Java package uses JNI if it contains a .so
-#If the JNI-using code calls System.loadLibrary you'll have to patch it to use System.load, passing it the full path to the dynamic shared object. If the package installs a wrapper script you'll need to manually add %%{_libdir}/%%{name}/<jar filename> to CLASSPATH. If you are depending on a JNI-using JAR file, you'll need to add it manually -- build-classpath will not find it.
-#%if 0%{?build_java})
-#	touch -r NEWS swig/java/gdal.jar
-#	mkdir -p %{buildroot}%{_javadir}
-#	cp -p swig/java/gdal.jar  \
-#	    %{buildroot}%{_javadir}/%{name}.jar
-#
-#	# Install Maven pom and update version number
-#	install -dm 755 %{buildroot}%{_mavenpomdir}
-#	install -pm 644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
-#	sed -i 's|<version></version>|<version>%{version}</version>|' %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
-#
-#	# Create depmap fragment
-#	%add_maven_depmap JPP-%{name}.pom %{name}.jar
-#
-#	# 775 on the .so?
-#	# copy JNI libraries and links, non versioned link needed by JNI
-#	# What is linked here?
-#	mkdir -p %{buildroot}%{_jnidir}/%{name}
-#	cp -pl swig/java/.libs/*.so*  \
-#	    %{buildroot}%{_jnidir}/%{name}/
-#	chrpath --delete %{buildroot}%{_jnidir}/%{name}/*jni.so*
-#
-#	# Install Java API documentation in the designated place
-#	mkdir -p %{buildroot}%{_javadocdir}/%{name}
-#	cp -pr swig/java/java/org %{buildroot}%{_javadocdir}/%{name}
-#%endif
 
 # Install refmans
 for docdir in %{docdirs}; do
@@ -725,11 +702,11 @@ popd
 %{_mandir}/man1/gdal_merge.1*
 %{_mandir}/man1/gdal_retile.1*
 %{_mandir}/man1/gdal_sieve.1*
-%{python_sitearch}/osgeo
-%{python_sitearch}/GDAL-%{version}-py*.egg-info
-%{python_sitearch}/osr.py*
-%{python_sitearch}/ogr.py*
-%{python_sitearch}/gdal*.py*
+%{python2_sitearch}/osgeo
+%{python2_sitearch}/GDAL-%{version}-py*.egg-info
+%{python2_sitearch}/osr.py*
+%{python2_sitearch}/ogr.py*
+%{python2_sitearch}/gdal*.py*
 
 %files doc
 %doc gdal_frmts ogrsf_frmts refman
