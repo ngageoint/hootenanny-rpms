@@ -238,7 +238,7 @@ BuildArch:	noarch
 This package contains HTML and PDF documentation for GDAL.
 
 # We don't want to provide private Python extension libs
-%global __provides_exclude_from ^(%{python2_sitearch})/.*\.so$
+%global __provides_exclude_from ^(%{python_sitearch})/.*\.so$
 
 %prep
 %setup -q -n %{name}-%{version}-fedora -a 1
@@ -307,7 +307,7 @@ sed -i 's|setup.py install|setup.py install --root=%{buildroot}|' swig/python/GN
 # Fix Python samples to depend on correct interpreter
 pushd swig/python/samples
 for f in `find . -name '*.py'`; do
-  sed -i 's|^#!.\+python$|#!/usr/bin/python2|' $f
+  sed -i 's|^#!.\+python$|#!/usr/bin/python|' $f
 done
 popd
 
@@ -412,7 +412,7 @@ sed -i 's|>> $(DESTINSTALLARCHLIB)\/perllocal.pod|> \/dev\/null|g' swig/perl/Mak
 
 # Make Python 2 module
 pushd swig/python
-  %{__python2} setup.py build
+  %{__python} setup.py build
 popd
 
 # --------- Documentation ----------
@@ -454,7 +454,7 @@ rm -rf %{buildroot}
 
 # Install Python 2 module
 pushd swig/python
-  %{__python2} setup.py install --skip-build --root %{buildroot}
+  %{__python} setup.py install --skip-build --root %{buildroot}
 popd
 
 make	DESTDIR=%{buildroot}	\
@@ -588,7 +588,7 @@ for f in 'GDAL*' BandProperty ColorAssociation CutlineTransformer DatasetPropert
 done
 
 # Fix python interpreter
-sed -i '1s|^#!/usr/bin/env python$|#!%{__python2}|' %{buildroot}%{_bindir}/*.py
+sed -i '1s|^#!/usr/bin/env python$|#!%{__python}|' %{buildroot}%{_bindir}/*.py
 
 # Cleanup .pyc for now
 rm -f %{buildroot}%{_bindir}/*.pyc
@@ -702,11 +702,11 @@ popd
 %{_mandir}/man1/gdal_merge.1*
 %{_mandir}/man1/gdal_retile.1*
 %{_mandir}/man1/gdal_sieve.1*
-%{python2_sitearch}/osgeo
-%{python2_sitearch}/GDAL-%{version}-py*.egg-info
-%{python2_sitearch}/osr.py*
-%{python2_sitearch}/ogr.py*
-%{python2_sitearch}/gdal*.py*
+%{python_sitearch}/osgeo
+%{python_sitearch}/GDAL-%{version}-py*.egg-info
+%{python_sitearch}/osr.py*
+%{python_sitearch}/ogr.py*
+%{python_sitearch}/gdal*.py*
 
 %files doc
 %doc gdal_frmts ogrsf_frmts refman
