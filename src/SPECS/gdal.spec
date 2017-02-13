@@ -150,6 +150,7 @@ BuildRequires:	xerces-c-devel
 BuildRequires:	xz-devel
 BuildRequires:	zlib-devel
 
+Requires:	proj
 # Run time dependency for gpsbabel driver
 Requires:	gpsbabel
 
