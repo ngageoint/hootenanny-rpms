@@ -692,6 +692,7 @@ Requires:   hootenanny-words = 1.0.0
 Requires:       liberation-fonts-common liberation-sans-fonts
 Requires:       libxslt log4cxx nodejs opencv  protobuf qt
 Requires:       postgresql-libs >= 9.1
+Requires:       proj, proj-devel
 Requires:       qt-postgresql
 Requires:       stxxl
 Requires:       texlive
