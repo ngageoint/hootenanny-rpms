@@ -32,8 +32,8 @@ tmp/not-hoot: \
 	RPMS/noarch/python-which-1.1.0-12.el6.noarch.rpm \
 	RPMS/noarch/tomcat-8.5.8-1.el6.noarch.rpm \
 	$(FILEGDB_RPM) \
-	RPMS/x86_64/gdal-1.10.1-3.el6.x86_64.rpm \
-	RPMS/x86_64/gdal-esri-epsg-1.10.1-1.el6.x86_64.rpm \
+	RPMS/x86_64/gdal-2.1.3-2.el6.x86_64.rpm \
+	RPMS/x86_64/gdal-esri-epsg-2.1.3-2.el6.x86_64.rpm \
 	RPMS/x86_64/geos-3.4.2-2.el6.x86_64.rpm \
 	RPMS/x86_64/gnuplot-4.6.1-1.el6.x86_64.rpm \
 	RPMS/x86_64/log4cxx-0.10.0-14.el6.x86_64.rpm \
@@ -95,9 +95,9 @@ $(FILEGDB_RPM): SPECS/FileGDB_API.spec
 	rm -f RPMS/noarch/FileGDB_API* RPMS/x86_64/FileGDB_API*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
-RPMS/x86_64/gdal-1.10.1-3.el6.x86_64.rpm: SPECS/gdal.spec $(FILEGDB_RPM)
-	# The gdal-1* prevents deleting the gdal-esri-epsg RPM
-	rm -f RPMS/noarch/gdal-1* RPMS/x86_64/gdal-1*
+RPMS/x86_64/gdal-2.1.3-2.el6.x86_64.rpm: SPECS/gdal.spec $(FILEGDB_RPM)
+	# The gdal-2* prevents deleting the gdal-esri-epsg RPM
+	rm -f RPMS/noarch/gdal-2* RPMS/x86_64/gdal-2*
 	$(INSTALL_FILEGDB)
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
@@ -105,7 +105,7 @@ RPMS/x86_64/geos-3.4.2-2.el6.x86_64.rpm: SPECS/geos.spec
 	rm -f RPMS/noarch/geos* RPMS/x86_64/geos*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
-RPMS/x86_64/gdal-esri-epsg-1.10.1-1.el6.x86_64.rpm: SPECS/gdal-esri-epsg.spec
+RPMS/x86_64/gdal-esri-epsg-2.1.3-2.el6.x86_64.rpm: SPECS/gdal-esri-epsg.spec
 	rm -f RPMS/noarch/gdal-esri-epsg* RPMS/x86_64/gdal-esri-epsg*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 

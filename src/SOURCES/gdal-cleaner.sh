@@ -1,8 +1,8 @@
 #!/bin/bash
 # Volker Fröhlich
-VERSION="1.10.1"
+VERSION="2.1.3"
 
-tar xvfz gdal-"${VERSION}".tar.xz
+tar xvf gdal-"${VERSION}".tar.xz
 
 mv gdal-"${VERSION}"{,-fedora} && pushd gdal-"${VERSION}"-fedora
 
@@ -15,8 +15,7 @@ rm data/ecw_cs.wkt
 rm -r frmts/bsb
 
 #Really necessary?
-# I need it: <pali@fedoraproject.org>
-# rm -r swig/php
+rm -r swig/php
 
 popd
 
