@@ -209,7 +209,8 @@ Summary:	GDAL file format library
 Group:		System Environment/Libraries
 Provides: %{name}-libs-fgdb
 # https://trac.osgeo.org/gdal/ticket/3978#comment:5
-Obsoletes:	%{name}-ruby < 1.11.0-1
+Obsoletes:  %{name}-ruby < 1.11.0-1
+Obsoletes:  %{name}-java
 
 %description libs
 This package contains the GDAL file format library.
