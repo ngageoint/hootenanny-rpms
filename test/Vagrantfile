@@ -28,7 +28,7 @@ $provisionSh = <<-SHELL
     echo "name=hoot" | sudo tee -a /etc/yum.repos.d/hoot.repo
     echo "baseurl=file:///home/vagrant/el6/" | sudo tee -a /etc/yum.repos.d/hoot.repo
     echo "gpgcheck=0" | sudo tee -a /etc/yum.repos.d/hoot.repo
-    sudo yum -y update --exclude=puppet*
+    sudo yum -y -q update --exclude=puppet*
     sudo yum -y install hootenanny-autostart
 
     if yum list installed | grep --quiet postgresql92 ; then
@@ -55,7 +55,7 @@ EOT
 fi
         echo
         echo "About to restart Postgres"
-        sudo /etc/init.d/postgresql-9.2 restart
+        sudo service postgresql-9.2 restart
     fi
 
  SHELL

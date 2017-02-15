@@ -40,6 +40,7 @@
 
 
 Name:		gdal
+Epoch:     1
 Version:	2.1.3
 Release:	2%{?dist}
 Summary:	GIS file format library
@@ -154,7 +155,7 @@ Requires:	proj
 # Run time dependency for gpsbabel driver
 Requires:	gpsbabel
 
-Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
+Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 
 # Enable/disable generating refmans
 %global build_refman 1
@@ -192,7 +193,7 @@ Group:	Development/Libraries
 Requires: pkgconfig
 %endif
 
-Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
+Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 Obsoletes:	%{name}-static < 1.9.0-1
 
 %description devel
@@ -212,7 +213,7 @@ This package contains the GDAL file format library.
 %package perl
 Summary:	Perl modules for the GDAL file format library
 Group:		Development/Libraries
-Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
+Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 Requires:	perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description perl
@@ -223,7 +224,7 @@ The GDAL Perl modules provide support to handle multiple GIS file formats.
 Summary:	Python modules for the GDAL file format library
 Group:		Development/Libraries
 Requires:	numpy
-Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
+Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description python
 The GDAL Python modules provide support to handle multiple GIS file formats.
