@@ -433,11 +433,11 @@ popd
 
 # Build some utilities, as requested in BZ #1271906
 pushd ogr/ogrsf_frmts/s57/
-  make all
+  make -s all
 popd
 
 pushd frmts/iso8211/
-  make all
+  make -s all
 popd
 
 # Install the Perl modules in the right place
