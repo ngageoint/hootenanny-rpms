@@ -40,7 +40,7 @@
 
 
 Name:		gdal
-Epoch:     1
+Epoch:		1
 Version:	2.1.3
 Release:	2%{?dist}
 Summary:	GIS file format library
@@ -156,7 +156,7 @@ Requires:	proj
 Requires:	gpsbabel
 
 # Nameing from the older 1.10.1 builds sscript
-Provides: %{name}-fgdb
+Provides:	%{name}-fgdb
 Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 
 # Enable/disable generating refmans
@@ -188,16 +188,16 @@ GDAL/OGR is the most widely used geospatial data access library.
 
 %package devel
 Summary:	Development files for the GDAL file format library
-Group:	Development/Libraries
-Provides: %{name}-devel-fgdb
+Group:		Development/Libraries
+Provides:	%{name}-devel-fgdb
 
 # Old rpm didn't figure out
 %if 0%{?rhel} < 6
-Requires: pkgconfig
+Requires:	pkgconfig
 %endif
 
 Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
-Requires: %{name}-libs-fgdb
+Requires:	%{name}-libs-fgdb
 Obsoletes:	%{name}-static < 1.9.0-1
 
 %description devel
@@ -207,10 +207,9 @@ This package contains development files for GDAL.
 %package libs
 Summary:	GDAL file format library
 Group:		System Environment/Libraries
-Provides: %{name}-libs-fgdb
+Provides:	%{name}-libs-fgdb
 # https://trac.osgeo.org/gdal/ticket/3978#comment:5
-Obsoletes:  %{name}-ruby < 1.11.0-1
-Obsoletes:  %{name}-java
+Obsoletes:	%{name}-ruby < 1.11.0-1
 
 %description libs
 This package contains the GDAL file format library.
@@ -219,7 +218,7 @@ This package contains the GDAL file format library.
 %package java
 Summary:	Java modules for the GDAL file format library
 Group:		Development/Libraries
-Requires:   java >= 1:1.8.0
+Requires:	java >= 1:1.8.0
 Requires:	jpackage-utils
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 
@@ -241,9 +240,9 @@ This package contains the API documentation for %{name}.
 Summary:	Perl modules for the GDAL file format library
 Group:		Development/Libraries
 Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
-Requires: %{name}-libs-fgdb
+Requires:	%{name}-libs-fgdb
 Requires:	perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
-Provides: %{name}-perl-fgdb
+Provides:	%{name}-perl-fgdb
 
 %description perl
 The GDAL Perl modules provide support to handle multiple GIS file formats.
@@ -254,8 +253,8 @@ Summary:	Python modules for the GDAL file format library
 Group:		Development/Libraries
 Requires:	numpy
 Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
-Requires: %{name}-libs-fgdb
-Provides: %{name}-python-fgdb
+Requires:	%{name}-libs-fgdb
+Provides:	%{name}-python-fgdb
 
 %description python
 The GDAL Python modules provide support to handle multiple GIS file formats.
