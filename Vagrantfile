@@ -7,13 +7,13 @@ $provisionSh = <<-SHELL
     # Trying this to get rid of errors
     if ! yum list installed | grep --quiet epel-release.noarch ; then
         echo "Installing epel repo"
-        sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm || true
+        sudo yum -y -q install https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm || true
     fi
 
     # Try the update a few times. Sometimes the epel repo gives an error.
-    sudo yum -y update --exclude=puppet* || true
-    sudo yum -y update --exclude=puppet* || true
-    sudo yum -y update --exclude=puppet*
+    sudo yum -y -q update --exclude=puppet* || true
+    sudo yum -y -q update --exclude=puppet* || true
+    sudo yum -y -q update --exclude=puppet*
 
     # Enable NTP to synchronize clock
     sudo yum -y install ntp
