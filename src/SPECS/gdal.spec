@@ -220,7 +220,7 @@ Summary:	Java modules for the GDAL file format library
 Group:		Development/Libraries
 Requires:	java >= 1:1.8.0
 Requires:	jpackage-utils
-Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
+Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description java
 The GDAL Java modules provide support to handle multiple GIS file formats.
