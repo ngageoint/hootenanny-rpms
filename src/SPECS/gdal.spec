@@ -218,6 +218,7 @@ This package contains the GDAL file format library.
 %package java
 Summary:	Java modules for the GDAL file format library
 Group:		Development/Libraries
+Provides:	%{name}-java-fgdb
 Requires:	java >= 1:1.8.0
 Requires:	jpackage-utils
 Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
@@ -229,6 +230,7 @@ The GDAL Java modules provide support to handle multiple GIS file formats.
 %package javadoc
 Summary:	Javadocs for %{name}
 Group:		Documentation
+Provides:	%{name}-javadoc-fgdb
 Requires:	jpackage-utils
 BuildArch:	noarch
 
