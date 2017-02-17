@@ -40,7 +40,7 @@
 
 
 Name:		gdal
-Epoch:     1
+Epoch:		1
 Version:	2.1.3
 Release:	2%{?dist}
 Summary:	GIS file format library
@@ -156,7 +156,7 @@ Requires:	proj
 Requires:	gpsbabel
 
 # Nameing from the older 1.10.1 builds sscript
-Provides: %{name}-fgdb
+Provides:	%{name}-fgdb
 Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 
 # Enable/disable generating refmans
@@ -188,16 +188,16 @@ GDAL/OGR is the most widely used geospatial data access library.
 
 %package devel
 Summary:	Development files for the GDAL file format library
-Group:	Development/Libraries
-Provides: %{name}-devel-fgdb
+Group:		Development/Libraries
+Provides:	%{name}-devel-fgdb
 
 # Old rpm didn't figure out
 %if 0%{?rhel} < 6
-Requires: pkgconfig
+Requires:	pkgconfig
 %endif
 
 Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
-Requires: %{name}-libs-fgdb
+Requires:	%{name}-libs-fgdb
 Obsoletes:	%{name}-static < 1.9.0-1
 
 %description devel
@@ -207,22 +207,44 @@ This package contains development files for GDAL.
 %package libs
 Summary:	GDAL file format library
 Group:		System Environment/Libraries
-Provides: %{name}-libs-fgdb
+Provides:	%{name}-libs-fgdb
 # https://trac.osgeo.org/gdal/ticket/3978#comment:5
-Obsoletes:  %{name}-ruby < 1.11.0-1
-Obsoletes:  %{name}-java
+Obsoletes:	%{name}-ruby < 1.11.0-1
 
 %description libs
 This package contains the GDAL file format library.
+
+
+%package java
+Summary:	Java modules for the GDAL file format library
+Group:		Development/Libraries
+Provides:	%{name}-java-fgdb
+Requires:	java >= 1:1.8.0
+Requires:	jpackage-utils
+Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+
+%description java
+The GDAL Java modules provide support to handle multiple GIS file formats.
+
+
+%package javadoc
+Summary:	Javadocs for %{name}
+Group:		Documentation
+Provides:	%{name}-javadoc-fgdb
+Requires:	jpackage-utils
+BuildArch:	noarch
+
+%description javadoc
+This package contains the API documentation for %{name}.
 
 
 %package perl
 Summary:	Perl modules for the GDAL file format library
 Group:		Development/Libraries
 Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
-Requires: %{name}-libs-fgdb
+Requires:	%{name}-libs-fgdb
 Requires:	perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
-Provides: %{name}-perl-fgdb
+Provides:	%{name}-perl-fgdb
 
 %description perl
 The GDAL Perl modules provide support to handle multiple GIS file formats.
@@ -233,8 +255,8 @@ Summary:	Python modules for the GDAL file format library
 Group:		Development/Libraries
 Requires:	numpy
 Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
-Requires: %{name}-libs-fgdb
-Provides: %{name}-python-fgdb
+Requires:	%{name}-libs-fgdb
+Provides:	%{name}-python-fgdb
 
 %description python
 The GDAL Python modules provide support to handle multiple GIS file formats.
@@ -370,6 +392,7 @@ export CPPFLAGS="$CPPFLAGS -I%{_includedir}/libgeotiff"
 	--with-hdf4		\
 	--with-hdf5		\
 	--with-jasper		\
+	--with-java		\
 	--with-jpeg		\
 	--with-libjson-c	\
 	--without-jpeg12	\
@@ -380,6 +403,7 @@ export CPPFLAGS="$CPPFLAGS -I%{_includedir}/libgeotiff"
 	--with-mysql		\
 	--with-netcdf		\
 	--with-odbc		\
+	--without-ogdi		\
 	--without-msg		\
 	--with-openjpeg		\
 	--with-pcraster		\
@@ -409,11 +433,11 @@ popd
 
 # Build some utilities, as requested in BZ #1271906
 pushd ogr/ogrsf_frmts/s57/
-  make all
+  make -s all
 popd
 
 pushd frmts/iso8211/
-  make all
+  make -s all
 popd
 
 # Install the Perl modules in the right place
@@ -423,7 +447,13 @@ sed -i 's|INSTALLDIRS = site|INSTALLDIRS = vendor|' swig/perl/Makefile_*
 #TODO: What about the pod?
 sed -i 's|>> $(DESTINSTALLARCHLIB)\/perllocal.pod|> \/dev\/null|g' swig/perl/Makefile_*
 
-# Make Python 2 module
+# Make Java module and documentation
+pushd swig/java
+  make
+  ./make_doc.sh
+popd
+
+# Make Python module
 pushd swig/python
   %{__python} setup.py build
 popd
@@ -490,6 +520,34 @@ rm -f %{buildroot}%{perl_archlib}/perllocal.pod
 #TODO and potential ticket: Why are the permissions not correct?
 find %{buildroot}%{perl_vendorarch} -name "*.so" -exec chmod 755 '{}' \;
 find %{buildroot}%{perl_vendorarch} -name "*.pm" -exec chmod 644 '{}' \;
+
+#TODO: JAR files that require JNI shared objects MUST be installed in %%{_libdir}/%%{name}. The JNI shared objects themselves must also be installed in %%{_libdir}/%%{name}.
+#Java programs that wish to make calls into native libraries do so via the Java Native Interface (JNI). A Java package uses JNI if it contains a .so
+#If the JNI-using code calls System.loadLibrary you'll have to patch it to use System.load, passing it the full path to the dynamic shared object. If the package installs a wrapper script you'll need to manually add %%{_libdir}/%%{name}/<jar filename> to CLASSPATH. If you are depending on a JNI-using JAR file, you'll need to add it manually -- build-classpath will not find it.
+touch -r NEWS swig/java/gdal.jar
+mkdir -p %{buildroot}%{_javadir}
+cp -p swig/java/gdal.jar  \
+    %{buildroot}%{_javadir}/%{name}.jar
+
+# Install Maven pom and update version number
+install -dm 755 %{buildroot}%{_mavenpomdir}
+install -pm 644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
+sed -i 's|<version></version>|<version>%{version}</version>|' %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
+
+# Create depmap fragment
+%add_to_maven_depmap JPP-%{name}.pom %{name}.jar
+
+# 775 on the .so?
+# copy JNI libraries and links, non versioned link needed by JNI
+# What is linked here?
+mkdir -p %{buildroot}%{_jnidir}/%{name}
+cp -pl swig/java/.libs/*.so*  \
+    %{buildroot}%{_jnidir}/%{name}/
+chrpath --delete %{buildroot}%{_jnidir}/%{name}/*jni.so*
+
+# Install Java API documentation in the designated place
+mkdir -p %{buildroot}%{_javadocdir}/%{name}
+cp -pr swig/java/java/org %{buildroot}%{_javadocdir}/%{name}
 
 # Install refmans
 for docdir in %{docdirs}; do
@@ -697,6 +755,14 @@ popd
 %{_includedir}/%{name}/*.h
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/%{name}.pc
+
+# Can I even have a separate Java package anymore?
+%files java
+%doc swig/java/apps
+%{_jnidir}/%{name}/
+
+%files javadoc
+%{_javadocdir}/%{name}
 
 %files perl
 %doc swig/perl/README
