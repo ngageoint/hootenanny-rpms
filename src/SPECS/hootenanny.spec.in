@@ -216,7 +216,7 @@ sudo alternatives --set javac /usr/java/jdk1.8.0_111/bin/javac
 %post services-ui
 function updateConfigFiles () {
     # Update the db password in hoot-services war
-    source /var/lib/hootenanny/conf/DatabaseConfig.sh
+    source /var/lib/hootenanny/conf/database/DatabaseConfig.sh
 
     sudo service tomcat8 restart
 
@@ -245,9 +245,9 @@ function updateLiquibase () {
     fi
 
     # Apply any database schema changes
-    source /var/lib/hootenanny/conf/DatabaseConfig.sh
+    source /var/lib/hootenanny/conf/database/DatabaseConfig.sh
     TOMCAT_HOME=/usr/share/tomcat8
-    source /var/lib/hootenanny/conf/DatabaseConfig.sh
+    source /var/lib/hootenanny/conf/database/DatabaseConfig.sh
     cd $TOMCAT_HOME/webapps/hoot-services/WEB-INF
     liquibase --contexts=default,production \
         --changeLogFile=classes/db/db.changelog-master.xml \
@@ -280,12 +280,12 @@ if [ "$1" = "1" ]; then
         RAND_PW=$(pwgen -s 16 1)
         sudo -u postgres createuser --superuser hoot || true
         sudo -u postgres psql -c "alter user hoot with password '$RAND_PW';"
-        if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
-            echo "export DB_PASSWORD=$RAND_PW" | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
-            echo "export DB_PASSWORD_OSMAPI=$RAND_PW" | sudo tee --append /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
-            sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
+        if [ -f /var/lib/hootenanny/conf/database/DatabaseConfigDefault.sh ]; then
+            echo "export DB_PASSWORD=$RAND_PW" | sudo tee /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh > /dev/null
+            echo "export DB_PASSWORD_OSMAPI=$RAND_PW" | sudo tee --append /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh > /dev/null
+            sudo chmod a+x /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh
         else
-        sudo sed -i s/DB_PASSWORD=.*/DB_PASSWORD=$RAND_PW/ /var/lib/hootenanny/conf/DatabaseConfig.sh
+        sudo sed -i s/DB_PASSWORD=.*/DB_PASSWORD=$RAND_PW/ /var/lib/hootenanny/conf/database/DatabaseConfig.sh
         fi
         sudo -u postgres createdb hoot --owner=hoot
         sudo -u postgres createdb wfsstoredb --owner=hoot
@@ -295,12 +295,12 @@ if [ "$1" = "1" ]; then
     fi
 
     # restore saved db config file settings if present
-    if [ -f /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave ]; then
-        if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
-            grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
-            sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
+    if [ -f /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave ]; then
+        if [ -f /var/lib/hootenanny/conf/database/DatabaseConfigDefault.sh ]; then
+            grep DB_PASSWORD /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh > /dev/null
+            sudo chmod a+x /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh
         else
-        sudo mv /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/DatabaseConfig.sh
+        sudo mv /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/database/DatabaseConfig.sh
     fi
     fi
 
@@ -434,17 +434,17 @@ elif [ "$1" = "2" ]; then
     # Perform whatever maintenance must occur after the upgrade
 
     # copy values from saved db config file, if present
-    if [ -f /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave ]; then
-        if [ -f /var/lib/hootenanny/conf/DatabaseConfigDefault.sh ]; then
-            grep DB_PASSWORD /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/DatabaseConfigLocal.sh > /dev/null
-            sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
+    if [ -f /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave ]; then
+        if [ -f /var/lib/hootenanny/conf/database/DatabaseConfigDefault.sh ]; then
+            grep DB_PASSWORD /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh > /dev/null
+            sudo chmod a+x /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh
         else
-            sudo mv /var/lib/hootenanny/conf/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/DatabaseConfig.sh
+            sudo mv /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/database/DatabaseConfig.sh
         fi
     fi
 
     source /etc/profile.d/hootenanny.sh
-    source /var/lib/hootenanny/conf/DatabaseConfig.sh
+    source /var/lib/hootenanny/conf/database/DatabaseConfig.sh
 
     updateConfigFiles
     updateLiquibase
