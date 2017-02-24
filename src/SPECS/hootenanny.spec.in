@@ -298,7 +298,7 @@ if [ "$1" = "1" ]; then
     if [ -f /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave ]; then
         if [ -f /var/lib/hootenanny/conf/database/DatabaseConfigDefault.sh ]; then
             grep DB_PASSWORD /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh > /dev/null
-            sudo chmod a+x /var/lib/hootenanny/conf/DatabaseConfigLocal.sh
+            sudo chmod a+x /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh
         else
         sudo mv /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/database/DatabaseConfig.sh
     fi
