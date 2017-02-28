@@ -75,15 +75,25 @@ vagrant-test:
 		--exclude=.*ExactMatchInputsTest.sh \
 		--slow"
 
-deps: force
+# As of 11/29/2016, hootenanny-rpms project in Github supports files <= 100MB in size.  Everything over this size limit,
+# will is currently rejected by Github.  In order to workaround this limitation, we will download a desired JDK RPM
+# every time we build.
+jdk_rpm = jdk-8u111-linux-x64.rpm
+jdk_download_url = http://download.oracle.com/otn-pub/java/jdk/8u111-b14/jdk-8u111-linux-x64.rpm
+
+install-java:
+	(sudo yum list installed jdk1.8.0_111 > /dev/null 2>&1) || sudo wget --quiet --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" $(jdk_download_url) -P /tmp
+	(sudo yum list installed jdk1.8.0_111 > /dev/null 2>&1) || sudo rpm -Uvh --force /tmp/$(jdk_rpm)
+
+deps: force install-java
 	sudo cp repos/HootBuild.repo /etc/yum.repos.d
 	sudo cp repos/RPM-GPG-KEY-EPEL-6 /etc/pki/rpm-gpg/
 	sudo yum clean metadata
 	# Sometimes the yum update fails getting the metadata. Try several times and ignore
 	# the first two if they error
-	sudo yum update -y || sleep 30
-	sudo yum update -y || sleep 30
-	sudo yum update -y
+	sudo yum update -y --exclude=puppet* || sleep 30
+	sudo yum update -y --exclude=puppet* || sleep 30
+	sudo yum update -y --exclude=puppet*
 	sudo true || true
 	sudo yum install -y \
 	  ant \
@@ -93,6 +103,7 @@ deps: force
 	  armadillo-devel \
 	  automake \
 	  bison \
+	  bash-completion \
 	  boost-devel \
 	  cairo-devel \
 	  cfitsio-devel \
@@ -118,13 +129,17 @@ deps: force
 	  hdf-static \
 	  help2man \
 	  info \
+	  json-c-devel \
 	  libdap-devel \
+	  libgeotiff-devel \
 	  libgta-devel \
 	  libjpeg-turbo-devel \
 	  libotf \
 	  libpng-devel \
 	  librx-devel \
 	  libspatialite-devel \
+	  libtiff-devel \
+	  libwebp-devel \
 	  libX11-devel \
 	  libXt-devel \
 	  libxslt \
@@ -134,8 +149,10 @@ deps: force
 	  netcdf-devel \
 	  nodejs \
 	  npm \
+	  openjpeg2-devel \
 	  pango-devel \
 	  pcre-devel \
+	  perl-generators \
 	  proj-devel \
 	  pygtk2 \
 	  python-devel \
@@ -197,6 +214,7 @@ copy-rpms: el6
 	rm -rf el6
 	mkdir -p el6
 	cp -l el6-src/* el6/
+	cp /tmp/$(jdk_rpm) el6/
 	cp src/RPMS/noarch/* el6/
 	cp src/RPMS/x86_64/* el6/
 	createrepo el6

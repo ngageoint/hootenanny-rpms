@@ -11,6 +11,7 @@ fi
 echo $GIT_COMMIT
 
 #export JAVA_HOME=/etc/alternatives/jre_1.7.0
+#export JAVA_HOME=/usr/java/jdk1.8.0_111
 export JAVA_HOME=/etc/alternatives/java_sdk
 
 echo "%__make /usr/bin/make -sj4" >> /home/vagrant/.rpmmacros
@@ -69,8 +70,8 @@ fi
 # Configure makefiles, we aren't testing services with RPMs yet.
 aclocal && autoconf && autoheader && automake && ./configure -q --with-rnd --with-services
 
-if [ ! -f conf/DatabaseConfigDefault.sh ]; then
-    cp conf/DatabaseConfig.sh.orig conf/DatabaseConfig.sh
+if [ ! -f conf/database/DatabaseConfigDefault.sh ]; then
+    cp conf/database/DatabaseConfig.sh.orig conf/database/DatabaseConfig.sh
 fi
 make -s clean
 
