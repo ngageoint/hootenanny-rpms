@@ -356,7 +356,7 @@ EOT
     TOMCAT_CTX=/etc/tomcat8/context.xml
     if ! grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
         echo "Set allowLinking to true in Tomcat context"
-        sudo sed -i "s@^<Context>@<Context allowLinking=\"true\">@" $TOMCAT_CTX
+        sudo sed -i "/<Context>/a \    <Resources allowLinking=\"true\" />" $TOMCAT_CTX
     fi
     # Increase the Tomcat java heap size
     TOMCAT_CONF=/etc/tomcat8/tomcat8.conf
