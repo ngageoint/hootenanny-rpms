@@ -215,8 +215,15 @@ sudo alternatives --set javac /usr/java/jdk1.8.0_111/bin/javac
 
 %post services-ui
 function updateConfigFiles () {
+    # Check for existing db config from previous install and move to right location
+    if [ -f /var/lib/hootenanny/conf/DatabaseConfigLocal.sh ]; then
+        mv /var/lib/hootenanny/conf/DatabaseConfigLocal.sh /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh
+    fi
     # Update the db password in hoot-services war
     source /var/lib/hootenanny/conf/database/DatabaseConfig.sh
+
+    # Fix gdal2tiles path (can be removed once reference fixed in hoot code)
+    ln -s /usr/bin/gdal2tiles.py /usr/local/bin/gdal2tiles.py
 
     sudo service tomcat8 restart
 
@@ -356,7 +363,7 @@ EOT
     TOMCAT_CTX=/etc/tomcat8/context.xml
     if ! grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
         echo "Set allowLinking to true in Tomcat context"
-        sudo sed -i "s@^<Context>@<Context allowLinking=\"true\">@" $TOMCAT_CTX
+        sudo sed -i "/<Context>/a \    <Resources allowLinking=\"true\" />" $TOMCAT_CTX
     fi
     # Increase the Tomcat java heap size
     TOMCAT_CONF=/etc/tomcat8/tomcat8.conf

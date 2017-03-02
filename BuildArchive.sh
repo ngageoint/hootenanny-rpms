@@ -68,7 +68,7 @@ if ! sudo grep -i --quiet hoot /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf; then
 fi
 
 # Configure makefiles, we aren't testing services with RPMs yet.
-aclocal && autoconf && autoheader && automake && ./configure -q --with-rnd --with-services
+aclocal && autoconf && autoheader && automake --add-missing --copy && ./configure -q --with-rnd --with-services
 
 if [ ! -f conf/database/DatabaseConfigDefault.sh ]; then
     cp conf/database/DatabaseConfig.sh.orig conf/database/DatabaseConfig.sh
