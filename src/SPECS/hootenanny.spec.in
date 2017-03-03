@@ -361,6 +361,9 @@ EOT
     fi
     # Allow linking in Tomcat context
     TOMCAT_CTX=/etc/tomcat8/context.xml
+    # First, fix potential pre-existing setting of 'allowLinking' that doesn't work on tomcat8
+    sudo sed -i "s@^<Context allowLinking=\"true\">@<Context>@" $TOMCAT_CTX
+    # Now, set allowLinking if needed
     if ! grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
         echo "Set allowLinking to true in Tomcat context"
         sudo sed -i "/<Context>/a \    <Resources allowLinking=\"true\" />" $TOMCAT_CTX
