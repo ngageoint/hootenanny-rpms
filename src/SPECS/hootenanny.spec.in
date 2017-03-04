@@ -223,7 +223,85 @@ function updateConfigFiles () {
     source /var/lib/hootenanny/conf/database/DatabaseConfig.sh
 
     # Fix gdal2tiles path (can be removed once reference fixed in hoot code)
-    ln -s /usr/bin/gdal2tiles.py /usr/local/bin/gdal2tiles.py
+    if [ ! -h /usr/local/bin/gdal2tiles.py ]; then
+        ln -s /usr/bin/gdal2tiles.py /usr/local/bin/gdal2tiles.py
+    fi
+
+    # Configure tomcat for hoot
+    # We move this here to run on install and upgrade since these commands
+    # are wrapped in conditionals that allow them to skip already completed steps
+
+    # Create Tomcat context path for tile images
+    TOMCAT_SRV=/etc/tomcat8/server.xml
+    if ! grep -i --quiet 'ingest/processed' $TOMCAT_SRV; then
+        echo "Adding Tomcat context path for tile images"
+        sudo sed -i "s@<\/Host>@ <Context docBase=\"\/var\/lib\/hootenanny\/ingest\/processed\" path=\"\/static\" \/>\n &@" $TOMCAT_SRV
+    fi
+    # Allow linking in Tomcat context
+    TOMCAT_CTX=/etc/tomcat8/context.xml
+    # First, fix potential pre-existing setting of 'allowLinking' that doesn't work on tomcat8
+    sudo sed -i "s@^<Context allowLinking=\"true\">@<Context>@" $TOMCAT_CTX
+    # Now, set allowLinking if needed
+    if ! grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
+        echo "Set allowLinking to true in Tomcat context"
+        sudo sed -i "/<Context>/a \    <Resources allowLinking=\"true\" />" $TOMCAT_CTX
+    fi
+    # Increase the Tomcat java heap size
+    TOMCAT_CONF=/etc/tomcat8/tomcat8.conf
+    if ! grep -i --quiet 'Xmx2048m' $TOMCAT_CONF; then
+        echo "Increase the Tomcat java heap size"
+        sudo bash -c "cat >> $TOMCAT_CONF" <<EOT
+#--------------
+# Hoot increase java heap size
+#--------------
+JAVA_OPTS="$JAVA_OPTS -Xms512m -Xmx2048m"
+
+EOT
+    fi
+    # Create directories for webapp
+    TOMCAT_HOME=/usr/share/tomcat8
+    if [ ! -d $TOMCAT_HOME/.deegree ]; then
+        echo "Creating .deegree directory for webapp"
+        sudo mkdir $TOMCAT_HOME/.deegree
+        sudo chown tomcat:tomcat $TOMCAT_HOME/.deegree
+    fi
+    BASEMAP_UPLOAD_HOME=/var/lib/hootenanny/ingest/upload
+    if [ ! -d $BASEMAP_UPLOAD_HOME ]; then
+        echo "Creating ingest/upload directory for webapp"
+        sudo mkdir -p $BASEMAP_UPLOAD_HOME
+        sudo chown tomcat:tomcat $BASEMAP_UPLOAD_HOME
+    fi
+    BASEMAP_PROCESSED_HOME=/var/lib/hootenanny/ingest/processed
+    if [ ! -d $BASEMAP_PROCESSED_HOME ]; then
+        echo "Creating ingest/processed directory for webapp"
+        sudo mkdir -p $BASEMAP_PROCESSED_HOME
+        sudo chown tomcat:tomcat $BASEMAP_PROCESSED_HOME
+    fi
+    UPLOAD_HOME=/var/lib/hootenanny/upload
+    if [ ! -d $UPLOAD_HOME ]; then
+        echo "Creating upload directory for webapp"
+        sudo mkdir -p $UPLOAD_HOME
+        sudo chown tomcat:tomcat $UPLOAD_HOME
+    fi
+    CUSTOMSCRIPT_HOME=/var/lib/hootenanny/customscript
+    if [ ! -d $CUSTOMSCRIPT_HOME ]; then
+        echo "Creating customscript directory for webapp"
+        sudo mkdir -p $CUSTOMSCRIPT_HOME
+        sudo chown tomcat:tomcat $CUSTOMSCRIPT_HOME
+    fi
+    TMP_HOME=/var/lib/hootenanny/tmp
+    if [ ! -d $TMP_HOME ]; then
+        echo "Creating tmp directory for webapp"
+        sudo mkdir -p $TMP_HOME
+        sudo chown tomcat:tomcat $TMP_HOME
+    fi
+    REPORT_HOME=/var/lib/hootenanny/data/reports
+    if [ ! -d $REPORT_HOME ]; then
+        echo "Creating data/reports directory for webapp"
+        sudo mkdir -p $REPORT_HOME
+        sudo chown tomcat:tomcat $REPORT_HOME
+        sudo chown tomcat:tomcat $REPORT_HOME/..
+    fi
 
     sudo service tomcat8 restart
 
@@ -267,6 +345,7 @@ function updateLiquibase () {
         --classpath=lib/postgresql-9.4.1208.jre7.jar \
         update
 }
+
 if [ "$1" = "1" ]; then
     # Perform tasks to prepare for the initial installation
     source /etc/profile.d/hootenanny.sh
@@ -352,78 +431,6 @@ EOT
 
     # create the osm api test db
     /var/lib/hootenanny/scripts/database/SetupOsmApiDB.sh
-
-    # Create Tomcat context path for tile images
-    TOMCAT_SRV=/etc/tomcat8/server.xml
-    if ! grep -i --quiet 'ingest/processed' $TOMCAT_SRV; then
-        echo "Adding Tomcat context path for tile images"
-        sudo sed -i "s@<\/Host>@ <Context docBase=\"\/var\/lib\/hootenanny\/ingest\/processed\" path=\"\/static\" \/>\n &@" $TOMCAT_SRV
-    fi
-    # Allow linking in Tomcat context
-    TOMCAT_CTX=/etc/tomcat8/context.xml
-    # First, fix potential pre-existing setting of 'allowLinking' that doesn't work on tomcat8
-    sudo sed -i "s@^<Context allowLinking=\"true\">@<Context>@" $TOMCAT_CTX
-    # Now, set allowLinking if needed
-    if ! grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
-        echo "Set allowLinking to true in Tomcat context"
-        sudo sed -i "/<Context>/a \    <Resources allowLinking=\"true\" />" $TOMCAT_CTX
-    fi
-    # Increase the Tomcat java heap size
-    TOMCAT_CONF=/etc/tomcat8/tomcat8.conf
-    if ! grep -i --quiet 'Xmx2048m' $TOMCAT_CONF; then
-        echo "Increase the Tomcat java heap size"
-        sudo bash -c "cat >> $TOMCAT_CONF" <<EOT
-#--------------
-# Hoot increase java heap size
-#--------------
-JAVA_OPTS="$JAVA_OPTS -Xms512m -Xmx2048m"
-
-EOT
-    fi
-    # Create directories for webapp
-    TOMCAT_HOME=/usr/share/tomcat8
-    if [ ! -d $TOMCAT_HOME/.deegree ]; then
-        echo "Creating .deegree directory for webapp"
-        sudo mkdir $TOMCAT_HOME/.deegree
-        sudo chown tomcat:tomcat $TOMCAT_HOME/.deegree
-    fi
-    BASEMAP_UPLOAD_HOME=/var/lib/hootenanny/ingest/upload
-    if [ ! -d $BASEMAP_UPLOAD_HOME ]; then
-        echo "Creating ingest/upload directory for webapp"
-        sudo mkdir -p $BASEMAP_UPLOAD_HOME
-        sudo chown tomcat:tomcat $BASEMAP_UPLOAD_HOME
-    fi
-    BASEMAP_PROCESSED_HOME=/var/lib/hootenanny/ingest/processed
-    if [ ! -d $BASEMAP_PROCESSED_HOME ]; then
-        echo "Creating ingest/processed directory for webapp"
-        sudo mkdir -p $BASEMAP_PROCESSED_HOME
-        sudo chown tomcat:tomcat $BASEMAP_PROCESSED_HOME
-    fi
-    UPLOAD_HOME=/var/lib/hootenanny/upload
-    if [ ! -d $UPLOAD_HOME ]; then
-        echo "Creating upload directory for webapp"
-        sudo mkdir -p $UPLOAD_HOME
-        sudo chown tomcat:tomcat $UPLOAD_HOME
-    fi
-    CUSTOMSCRIPT_HOME=/var/lib/hootenanny/customscript
-    if [ ! -d $CUSTOMSCRIPT_HOME ]; then
-        echo "Creating customscript directory for webapp"
-        sudo mkdir -p $CUSTOMSCRIPT_HOME
-        sudo chown tomcat:tomcat $CUSTOMSCRIPT_HOME
-    fi
-    TMP_HOME=/var/lib/hootenanny/tmp
-    if [ ! -d $TMP_HOME ]; then
-        echo "Creating tmp directory for webapp"
-        sudo mkdir -p $TMP_HOME
-        sudo chown tomcat:tomcat $TMP_HOME
-    fi
-    REPORT_HOME=/var/lib/hootenanny/data/reports
-    if [ ! -d $REPORT_HOME ]; then
-        echo "Creating data/reports directory for webapp"
-        sudo mkdir -p $REPORT_HOME
-        sudo chown tomcat:tomcat $REPORT_HOME
-        sudo chown tomcat:tomcat $REPORT_HOME/..
-    fi
 
     updateConfigFiles
     updateLiquibase
