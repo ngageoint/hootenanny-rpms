@@ -167,7 +167,6 @@ deps: force install-java
 	  xz-devel \
 	  zlib-devel \
 	  wget \
-	  w3m \
 	  words \
 	  rpm-build \
 	  m4 \

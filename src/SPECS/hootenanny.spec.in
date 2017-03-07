@@ -23,7 +23,7 @@ BuildRequires:  proj-devel protobuf-devel python-argparse python-devel qt-devel
 # Needed to build the documentation
 BuildRequires:  texlive libxslt
 BuildRequires:  gnuplot
-BuildRequires:  unzip v8-devel w3m wget words zip
+BuildRequires:  unzip v8-devel wget words zip
 BuildRequires:  jdk1.8.0_111
 
 Source0:        %{name}-%{version}.tar.gz
@@ -713,7 +713,7 @@ Requires:       proj, proj-devel
 Requires:       qt-postgresql
 Requires:       stxxl
 Requires:       texlive
-Requires:       unzip w3m wget words
+Requires:       unzip wget words
 Requires:       zip
 
 %description core-deps
