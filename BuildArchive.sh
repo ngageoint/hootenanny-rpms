@@ -24,24 +24,8 @@ cd /home/vagrant/hootenanny-rpms/src/
 rm -f RPMS/x86_64/hoot*.rpm
 make -j $((`nproc` + 2)) tmp/hoot-deps
 
-cd /home/vagrant/hootenanny-rpms
-mkdir -p tmp
-cd tmp
-
-rm -rf hootenanny
-git clone https://github.com/ngageoint/hootenanny.git
-cd hootenanny
-git submodule update --init --recursive
-git checkout $GIT_COMMIT
-# Do a pull just in case a branch was specified.
-git pull || echo "Ignore the failure."
-git submodule update --init --recursive
-cp LocalConfig.pri.orig LocalConfig.pri
-echo "QMAKE_CXX=ccache g++" >> LocalConfig.pri
-
-source SetupEnv.sh
-
 # init and start Postgres
+cd /tmp
 PG_VERSION=9.2
 sudo service postgresql-$PG_VERSION initdb
 sudo service postgresql-$PG_VERSION start
@@ -66,6 +50,24 @@ if ! sudo grep -i --quiet hoot /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf; then
     sudo sed -i '1ihost    all            hoot            ::1/128                 md5' /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
     sudo /etc/init.d/postgresql-$PG_VERSION restart
 fi
+
+# Build the Hootenanny archive
+cd /home/vagrant/hootenanny-rpms
+mkdir -p tmp
+cd tmp
+
+rm -rf hootenanny
+git clone https://github.com/ngageoint/hootenanny.git
+cd hootenanny
+git submodule update --init --recursive
+git checkout $GIT_COMMIT
+# Do a pull just in case a branch was specified.
+git pull || echo "Ignore the failure."
+git submodule update --init --recursive
+cp LocalConfig.pri.orig LocalConfig.pri
+echo "QMAKE_CXX=ccache g++" >> LocalConfig.pri
+
+source SetupEnv.sh
 
 # Configure makefiles, we aren't testing services with RPMs yet.
 aclocal && autoconf && autoheader && automake --add-missing --copy && ./configure -q --with-rnd --with-services

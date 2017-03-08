@@ -159,6 +159,7 @@ deps: force install-java
 	  readline-devel \
 	  rpm-build \
 	  ruby-devel \
+	  source-highlight \
 	  sqlite-devel \
 	  tetex-tex4ht \
 	  tex* \
