@@ -233,10 +233,15 @@ function updateConfigFiles () {
 
     # Create Tomcat context path for tile images
     TOMCAT_SRV=/etc/tomcat8/server.xml
-    if ! grep -i --quiet 'ingest/processed' $TOMCAT_SRV; then
+
+    # Make sure to remove the old entry
+    sudo sed -i.bak '/<Context docBase=\"\/var\/lib\/hootenanny\/ingest\/processed\" path=\"\/static\" \/>/d' server.xml
+
+    if ! grep -i --quiet 'userfiles/ingest/processed' $TOMCAT_SRV; then
         echo "Adding Tomcat context path for tile images"
-        sudo sed -i "s@<\/Host>@ <Context docBase=\"\/var\/lib\/hootenanny\/ingest\/processed\" path=\"\/static\" \/>\n &@" $TOMCAT_SRV
+        sudo sed -i "s@<\/Host>@ <Context docBase=\"\/var\/lib\/hootenanny\/userfiles\/ingest\/processed\" path=\"\/static\" \/>\n &@" $TOMCAT_SRV
     fi
+
     # Allow linking in Tomcat context
     TOMCAT_CTX=/etc/tomcat8/context.xml
     # First, fix potential pre-existing setting of 'allowLinking' that doesn't work on tomcat8
@@ -258,6 +263,7 @@ JAVA_OPTS="$JAVA_OPTS -Xms512m -Xmx2048m"
 
 EOT
     fi
+
     # Create directories for webapp
     TOMCAT_HOME=/usr/share/tomcat8
     if [ ! -d $TOMCAT_HOME/.deegree ]; then
@@ -265,43 +271,25 @@ EOT
         sudo mkdir $TOMCAT_HOME/.deegree
         sudo chown tomcat:tomcat $TOMCAT_HOME/.deegree
     fi
-    BASEMAP_UPLOAD_HOME=/var/lib/hootenanny/ingest/upload
+
+    # Directory that now consolidates several folders used by the Services code.
+    USER_FILES_HOME=/var/lib/hootenanny/userfiles
+    if [ ! -d $USER_FILES_HOME ]; then
+        echo "Creating userfiles directory"
+        sudo mkdir -p $USER_FILES_HOME
+        sudo chown tomcat:tomcat $USER_FILES_HOME
+    fi
+
+    # Tomcat needs this directory to exist for the server to start.
+    # Tomcat's server.xml has a docBase reference to this folder.
+    BASEMAP_UPLOAD_HOME=$USER_FILES_HOME/ingest/upload
     if [ ! -d $BASEMAP_UPLOAD_HOME ]; then
-        echo "Creating ingest/upload directory for webapp"
+        echo "Creating $BASEMAP_UPLOAD_HOME directory"
         sudo mkdir -p $BASEMAP_UPLOAD_HOME
         sudo chown tomcat:tomcat $BASEMAP_UPLOAD_HOME
     fi
-    BASEMAP_PROCESSED_HOME=/var/lib/hootenanny/ingest/processed
-    if [ ! -d $BASEMAP_PROCESSED_HOME ]; then
-        echo "Creating ingest/processed directory for webapp"
-        sudo mkdir -p $BASEMAP_PROCESSED_HOME
-        sudo chown tomcat:tomcat $BASEMAP_PROCESSED_HOME
-    fi
-    UPLOAD_HOME=/var/lib/hootenanny/upload
-    if [ ! -d $UPLOAD_HOME ]; then
-        echo "Creating upload directory for webapp"
-        sudo mkdir -p $UPLOAD_HOME
-        sudo chown tomcat:tomcat $UPLOAD_HOME
-    fi
-    CUSTOMSCRIPT_HOME=/var/lib/hootenanny/customscript
-    if [ ! -d $CUSTOMSCRIPT_HOME ]; then
-        echo "Creating customscript directory for webapp"
-        sudo mkdir -p $CUSTOMSCRIPT_HOME
-        sudo chown tomcat:tomcat $CUSTOMSCRIPT_HOME
-    fi
-    TMP_HOME=/var/lib/hootenanny/tmp
-    if [ ! -d $TMP_HOME ]; then
-        echo "Creating tmp directory for webapp"
-        sudo mkdir -p $TMP_HOME
-        sudo chown tomcat:tomcat $TMP_HOME
-    fi
-    REPORT_HOME=/var/lib/hootenanny/data/reports
-    if [ ! -d $REPORT_HOME ]; then
-        echo "Creating data/reports directory for webapp"
-        sudo mkdir -p $REPORT_HOME
-        sudo chown tomcat:tomcat $REPORT_HOME
-        sudo chown tomcat:tomcat $REPORT_HOME/..
-    fi
+
+    migrateFiles
 
     sudo service tomcat8 restart
 
@@ -312,14 +300,44 @@ EOT
 
     sudo sed -i s/password\:\ hoottest/password\:\ $DB_PASSWORD/ /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/db/liquibase.properties
     sudo sed -i s/DB_PASSWORD=hoottest/DB_PASSWORD=$DB_PASSWORD/ /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/db/db.properties
-    sudo sed -i s/dbPassword=hoottest/dbPassword=$DB_PASSWORD/g /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/conf/hoot-services.conf
     sudo sed -i s/\<Password\>hoottest\<\\/Password\>/\<Password\>$DB_PASSWORD\<\\/Password\>/ /var/lib/tomcat8/webapps/hoot-services/WEB-INF/workspace/jdbc/WFS_Connection.xml
-    sudo sed -i s/\<jdbcPassword\>hoottest\<\\/jdbcPassword\>/\<jdbcPassword\>$DB_PASSWORD\<\\/jdbcPassword\>/ /var/lib/tomcat8/webapps/hoot-services/META-INF/maven/hoot/hoot-services/pom.xml
 
     # make sure tomcat is using correct Java
     sudo sed -i '/.*JAVA_HOME=.*/c\JAVA_HOME=\/usr\/java\/jdk1.8.0_111' /etc/tomcat8/tomcat8.conf
 
     sudo service tomcat8 restart
+}
+
+function migrateFiles() {
+    if [ ! -d "$HOOT_HOME/userfiles/ingest/processed" ]; then
+        mkdir -p $HOOT_HOME/userfiles/ingest/processed
+    fi
+
+    # tmp and upload will now reside under $HOOT_HOME/userfiles/
+    # The folders will be automatically created under $HOOT_HOME/userfiles by hoot-services webapp during Tomcat startup
+    rm -rf $HOOT_HOME/upload
+    rm -rf $HOOT_HOME/tmp
+
+    if [ -d "$HOOT_HOME/data/reports" ]; then
+        echo "Moving contents of $HOOT_HOME/data/reports to $HOOT_HOME/userfiles/"
+        cp -R $HOOT_HOME/data/reports $HOOT_HOME/userfiles/
+        rm -rf $HOOT_HOME/data/reports
+    fi
+
+    if [ -d "$HOOT_HOME/customscript" ]; then
+        echo "Moving contents of $HOOT_HOME/customscript to $HOOT_HOME/userfiles/"
+        cp -R $HOOT_HOME/customscript $HOOT_HOME/userfiles/
+        rm -rf $HOOT_HOME/customscript
+    fi
+
+    if [ -d "$HOOT_HOME/ingest" ]; then
+        echo "Moving contents of $HOOT_HOME/ingest to $HOOT_HOME/userfiles/"
+        cp -R $HOOT_HOME/ingest $HOOT_HOME/userfiles/
+        rm -rf $HOOT_HOME/ingest
+    fi
+
+    # Always start with a clean $HOOT_HOME/userfiles/tmp
+    rm -rf $HOOT_HOME/userfiles/tmp
 }
 
 function updateLiquibase () {
