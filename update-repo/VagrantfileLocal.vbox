@@ -1,0 +1,51 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+preSh = <<-SHELL
+  set -e
+  set -x
+
+  createrepo --update /home/vagrant/hootrepo/el6
+
+SHELL
+
+# Add the repo making stuff _after_ we install createrepo
+$provisionSh = $provisionSh + preSh
+
+
+Vagrant.configure(2) do |config|
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://atlas.hashicorp.com/search.
+  config.vm.box = "centos/6"
+  config.vm.box_url = "https://atlas.hashicorp.com/centos/boxes/6"
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  config.vm.network "private_network", ip: "192.168.33.10"
+  #config.vm.network "private_network", type: "dhcp"
+
+  config.vm.provider "virtualbox" do |vb|
+    # Customize the amount of memory on the VM:
+    vb.memory = 2048
+    vb.cpus = 1
+  end
+
+  # We disable rsync since we are using NFS
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+
+  # Fixing CentOS 6 error with bindfs in vagrant 1.9.1
+  config.bindfs.install_bindfs_from_source = true
+
+  config.nfs.map_uid = Process.uid
+  config.nfs.map_gid = Process.gid
+
+  # This is Ugly and hardcoded
+  config.vm.synced_folder "/fouo/jenkins/centos_rpm", "/home/vagrant/.hootrepo-nfs", type: "nfs",
+    # Enabled async, this makes small file writes much faster (e.g. unzip)
+    :linux__nfs_options => ['rw','no_subtree_check','all_squash','async']
+  config.bindfs.bind_folder "/home/vagrant/.hootrepo-nfs",
+    "/home/vagrant/hootrepo", perms: nil
+
+end
+
+

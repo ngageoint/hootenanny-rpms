@@ -75,6 +75,12 @@ vagrant-test:
 		--exclude=.*ExactMatchInputsTest.sh \
 		--slow"
 
+# This spawns a small VM up update the main repo so we can copy it to S3
+vagrant-repo:
+	cd update-repo; vagrant up
+	cd update-repo; vagrant destroy -f
+
+
 # As of 11/29/2016, hootenanny-rpms project in Github supports files <= 100MB in size.  Everything over this size limit,
 # will is currently rejected by Github.  In order to workaround this limitation, we will download a desired JDK RPM
 # every time we build.
