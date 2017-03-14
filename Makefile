@@ -75,7 +75,7 @@ vagrant-test:
 		--exclude=.*ExactMatchInputsTest.sh \
 		--slow"
 
-# This spawns a small VM up update the main repo so we can copy it to S3
+# This spawns a small VM to update the main repo so we can copy it to S3
 vagrant-repo:
 	cd update-repo; vagrant up
 	cd update-repo; vagrant destroy -f
