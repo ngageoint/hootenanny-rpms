@@ -2,7 +2,7 @@
 ### This is far from complete. Just playing.
 ####
 Name:		FileGDB_API
-Version:	1.4
+Version:	1.5
 Release:	1%{?dist}
 Summary:	ESRI FileGDB libraries
 
@@ -11,7 +11,7 @@ License:	Copyright © 2012 ESRI
 URL:		http://www.esri.com/apps/products/download/#File_Geodatabase_API_1.4
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-Source1:        FileGDB_API_1_4-64.tar.gz
+Source1:        FileGDB_API_1_5_64.tar.gz
 
 %description
 
@@ -53,7 +53,7 @@ email: contracts@esri.com
 %prep
 mkdir -p %{name}-%{version}/FileGDB_API
 cd %{name}-%{version}/FileGDB_API
-tar xf %{_sourcedir}/FileGDB_API_1_4-64.tar.gz --strip-components 1
+tar xf %{_sourcedir}/FileGDB_API_1_5_64.tar.gz --strip-components 1
 
 %build
 true
@@ -79,6 +79,9 @@ install -D $BUILD_DIR/include/* $INSTALL_DIR/include/
 %clean
 
 %changelog
+* Tue Mar 07 2017 Benjamin Marchant <benjamin.marchant@digitalglobe.com>
+- Upgrade to v1.5
 * Thu Jan 19 2017 Benjamin Marchant <benjamin.marchant@digitalglobe.com>
+- Upgrade to v1.4
 * Thu Jan 26 2016 Jason R. Surratt <jason.surratt@digitalglobe.com>
 - Initial attempt
