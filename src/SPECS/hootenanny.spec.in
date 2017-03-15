@@ -272,7 +272,7 @@ EOT
         sudo chown tomcat:tomcat $TOMCAT_HOME/.deegree
     fi
 
-    # Directory that now consolidates several folders used by the Services code.
+    # Directory that now hosts several folders used by the Services code.
     USER_FILES_HOME=/var/lib/hootenanny/userfiles
     if [ ! -d $USER_FILES_HOME ]; then
         echo "Creating userfiles directory"
@@ -335,6 +335,8 @@ function migrateFiles() {
         cp -R $HOOT_HOME/ingest $HOOT_HOME/userfiles/
         rm -rf $HOOT_HOME/ingest
     fi
+
+    rm -rf $HOOT_HOME/data
 
     # Always start with a clean $HOOT_HOME/userfiles/tmp
     rm -rf $HOOT_HOME/userfiles/tmp
