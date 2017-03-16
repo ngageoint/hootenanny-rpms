@@ -277,7 +277,6 @@ EOT
     if [ ! -d $USER_FILES_HOME ]; then
         echo "Creating userfiles directory"
         sudo mkdir -p $USER_FILES_HOME
-        sudo chown tomcat:tomcat $USER_FILES_HOME
     fi
 
     # Tomcat needs this directory to exist for the server to start.
@@ -286,10 +285,12 @@ EOT
     if [ ! -d $BASEMAP_UPLOAD_HOME ]; then
         echo "Creating $BASEMAP_UPLOAD_HOME directory"
         sudo mkdir -p $BASEMAP_UPLOAD_HOME
-        sudo chown tomcat:tomcat $BASEMAP_UPLOAD_HOME
     fi
 
     migrateFiles
+
+    # make sure everything undedr $HOOT_HOME/userfiles is owned by tomcat:tomcat
+    sudo chown -R tomcat:tomcat $HOOT_HOME/userfiles
 
     sudo service tomcat8 restart
 
