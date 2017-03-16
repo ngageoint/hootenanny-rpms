@@ -234,23 +234,26 @@ function updateConfigFiles () {
     # Create Tomcat context path for tile images
     TOMCAT_SRV=/etc/tomcat8/server.xml
 
-    # Make sure to remove the old entry
-    sudo sed -i.bak '/<Context docBase=\"\/var\/lib\/hootenanny\/ingest\/processed\" path=\"\/static\" \/>/d' server.xml
+    # First make sure to remove the old Context entry if it exists
+    sudo sed -i '/<Context docBase=\"\/var\/lib\/hootenanny\/ingest\/processed\" path=\"\/static\" \/>/d' $TOMCAT_SRV
 
     if ! grep -i --quiet 'userfiles/ingest/processed' $TOMCAT_SRV; then
         echo "Adding Tomcat context path for tile images"
-        sudo sed -i "s@<\/Host>@ <Context docBase=\"\/var\/lib\/hootenanny\/userfiles\/ingest\/processed\" path=\"\/static\" \/>\n &@" $TOMCAT_SRV
+        sudo sed -i "s@<\/Host>@      <Context docBase=\"\/var\/lib\/hootenanny\/userfiles\/ingest\/processed\" path=\"\/static\" \/>\n      &@" $TOMCAT_SRV
     fi
 
     # Allow linking in Tomcat context
     TOMCAT_CTX=/etc/tomcat8/context.xml
+
     # First, fix potential pre-existing setting of 'allowLinking' that doesn't work on tomcat8
     sudo sed -i "s@^<Context allowLinking=\"true\">@<Context>@" $TOMCAT_CTX
+
     # Now, set allowLinking if needed
     if ! grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
         echo "Set allowLinking to true in Tomcat context"
         sudo sed -i "/<Context>/a \    <Resources allowLinking=\"true\" />" $TOMCAT_CTX
     fi
+
     # Increase the Tomcat java heap size
     TOMCAT_CONF=/etc/tomcat8/tomcat8.conf
     if ! grep -i --quiet 'Xmx2048m' $TOMCAT_CONF; then
