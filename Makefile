@@ -199,6 +199,7 @@ deps: force install-java
 	  libicu-devel \
 	  cppunit-devel \
 	  python-argparse \
+          libXfixes-devel \
 	  libXrandr-devel \
 	  libXrender-devel \
 	  libdrm-devel \
