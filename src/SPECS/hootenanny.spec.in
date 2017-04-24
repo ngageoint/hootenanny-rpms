@@ -159,6 +159,7 @@ Requires:   postgis2_92 >= 2.1
 Requires:   jdk1.8.0_111
 Requires:   liquibase
 Requires:   pwgen
+Requires:   npm
 Group:      Applications/Engineering
 
 %description services-ui
