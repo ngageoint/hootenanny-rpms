@@ -62,7 +62,8 @@ export JAVA_HOME=/usr/java/jdk1.8.0_111
 #export JAVA_HOME=/etc/alternatives/java_sdk
 
 # The dir configurations set the install directory to work with EL's dir structure
-./configure --with-rnd --with-services -q \
+aclocal && autoconf && autoheader && automake --add-missing --copy && \
+  ./configure --with-rnd --with-services -q \
     --prefix=$RPM_BUILD_ROOT/usr/ \
     --datarootdir=$RPM_BUILD_ROOT/usr/share/hootenanny/ \
     --docdir=$RPM_BUILD_ROOT/usr/share/doc/hootenanny/ \
