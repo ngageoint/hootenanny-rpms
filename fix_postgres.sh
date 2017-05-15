@@ -1,6 +1,7 @@
 #!/bin/bash
 
-PG_VERSION=9.2
+# NOTE: This assumes that postgres has already been initialised
+PG_VERSION=$(ls /etc/init.d | grep postgresql- | sort | tail -1 | egrep -o '[0-9]{1,}\.[0-9]{1,}')
 
 if ! sudo grep -i --quiet HOOT /var/lib/pgsql/$PG_VERSION/data/postgresql.conf; then
     echo "Tuning PostgreSQL"
