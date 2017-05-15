@@ -34,6 +34,7 @@ $provisionSh = <<-SHELL
 
     sudo yum -y -q update --exclude=puppet*
     echo "Install Hootenanny"
+#     sudo yum -y -v install hootenanny-autostart
     sudo yum -y -q install hootenanny-autostart
 
     if yum list installed | grep --quiet postgresql92 ; then

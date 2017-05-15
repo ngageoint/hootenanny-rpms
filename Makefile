@@ -1,7 +1,9 @@
 
 # Default branch of hoot to build
-#GIT_COMMIT?=origin/develop
-GIT_COMMIT=b146af25190210dab38d01e5b
+GIT_COMMIT?=origin/develop
+# Branch #1560 for testing
+#GIT_COMMIT=b146af25190210dab38d01e5b
+
 TARBALLS := $(wildcard src/SOURCES/hootenanny*.tar.gz)
 DOCBALLS := $(wildcard src/SOURCES/hootenanny*-documentation.tar.gz)
 HOOTBALL := $(filter-out $(DOCBALLS), $(TARBALLS))
@@ -69,6 +71,8 @@ vagrant-clean:
 	rm -f src/tmp/*-install
 
 vagrant-test:
+	# Adding this in so we always have a clean test VM.
+	cd test && vagrant halt && vagrant destroy -f
 	cd test; vagrant up
 	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --diff \
 		--exclude=.*ConflateAverageTest.sh \
