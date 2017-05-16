@@ -20,15 +20,20 @@ $provisionSh = <<-SHELL
 
     # Remove Postgres 8.4
     if yum list installed | grep --quiet postgresql.x86_64 ; then
-        echo "Removing Postgres 8.4"
+        echo "### Removing Postgres 8.4 ###"
         sudo yum remove -y postgresql.x86_64 postgresql-devel.x86_64 postgresql-libs.x86_64
     fi
+
+    echo "Update OS"
+    sudo yum -y -q update --exclude=puppet*
 
     echo "[hoot]" | sudo tee /etc/yum.repos.d/hoot.repo
     echo "name=hoot" | sudo tee -a /etc/yum.repos.d/hoot.repo
     echo "baseurl=file:///home/vagrant/el6/" | sudo tee -a /etc/yum.repos.d/hoot.repo
     echo "gpgcheck=0" | sudo tee -a /etc/yum.repos.d/hoot.repo
+
     sudo yum -y -q update --exclude=puppet*
+    echo "Install Hootenanny"
     sudo yum -y install hootenanny-autostart
 
     if yum list installed | grep --quiet postgresql92 ; then

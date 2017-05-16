@@ -39,7 +39,12 @@ content, geometry and attributes, to transfer to the output map.
 
 %package core
 Summary:    Hootenanny Core
+# Hardcoding the postgresql93 version of libpq. If we don't then RPM decides to install the 8.4 version
+Requires:       postgresql-libs >= 9.1
+%global __requires_exclude ^libpq\\.so
 Requires:   %{name}-core-deps = %{version}-%{release}
+
+
 Group:      Applications/Engineering
 
 %description core
@@ -61,9 +66,13 @@ source ./SetupEnv.sh
 export JAVA_HOME=/usr/java/jdk1.8.0_111
 #export JAVA_HOME=/etc/alternatives/java_sdk
 
+# Sort out the postgres version. We can't rely on having pg_config in our path
+PG_VERSION=`ls /etc/init.d | grep postgresql- | sort | tail -1 | egrep -o '[0-9]{1,}\.[0-9]{1,}'`
+
 # The dir configurations set the install directory to work with EL's dir structure
 aclocal && autoconf && autoheader && automake --add-missing --copy && \
-  ./configure --with-rnd --with-services -q \
+  ./configure -q --with-rnd --with-services \
+    --with-postgresql=/usr/pgsql-$PG_VERSION/bin/pg_config      \
     --prefix=$RPM_BUILD_ROOT/usr/ \
     --datarootdir=$RPM_BUILD_ROOT/usr/share/hootenanny/ \
     --docdir=$RPM_BUILD_ROOT/usr/share/doc/hootenanny/ \
@@ -156,7 +165,8 @@ Requires:   tomcat8
 Requires:   %{name}-core = %{version}-%{release}
 Requires:   postgresql-server >= 9.1
 Requires:   postgresql-contrib >= 9.1
-Requires:   postgis2_92 >= 2.1
+# NOTE: We need to look at postgis versions
+Requires:   postgis2_93 >= 2.1
 Requires:   jdk1.8.0_111
 Requires:   liquibase
 Requires:   pwgen
@@ -376,7 +386,7 @@ if [ "$1" = "1" ]; then
     source /etc/profile.d/hootenanny.sh
 
     # init and start Postgres
-    PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
+    PG_SERVICE=$(ls /etc/init.d | grep postgresql- | sort | tail -1)
     sudo service $PG_SERVICE initdb
     sudo service $PG_SERVICE start
     while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
@@ -499,7 +509,7 @@ if [ "$1" = "0" ]; then
     # Stop tomcat
     sudo service tomcat8 stop
     # Ensure Postgres is started
-    PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
+    PG_SERVICE=$(ls /etc/init.d | grep postgresql- | sort | tail -1)
     sudo service $PG_SERVICE start
     while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
         echo "Waiting for postgres to start"
@@ -594,7 +604,8 @@ Requires:   nodejs
 Requires:   npm
 Requires:   postgresql-server >= 9.1
 Requires:   postgresql-contrib >= 9.1
-Requires:   postgis2_92 >= 2.1
+# NOTE: We need to look at postgis versions
+Requires:   postgis2_93 >= 2.1
 Requires:   liquibase
 
 %description services-devel-deps
@@ -616,7 +627,7 @@ if [ "$1" = "1" ]; then
     # Perform tasks to prepare for the initial installation
 
     # init and start Postgres
-    PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
+    PG_SERVICE=$(ls /etc/init.d | grep postgresql- | sort | tail -1)
     sudo service $PG_SERVICE initdb
     sudo service $PG_SERVICE start
     while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
@@ -682,7 +693,7 @@ if [ "$1" = "0" ]; then
     # Perform tasks to clean up after uninstallation
 
     # Ensure Postgres is started
-    PG_SERVICE=$(ls /etc/init.d | grep postgresql-)
+    PG_SERVICE=$(ls /etc/init.d | grep postgresql- | sort | tail -1)
     sudo service $PG_SERVICE start
     while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
         echo "Waiting for postgres to start"
@@ -733,7 +744,6 @@ Requires:   hootenanny-words = 1.0.0
 # Needed by gnuplot for report generation
 Requires:       liberation-fonts-common liberation-sans-fonts
 Requires:       libxslt log4cxx nodejs opencv  protobuf qt
-Requires:       postgresql-libs >= 9.1
 Requires:       proj, proj-devel
 Requires:       qt-postgresql
 Requires:       stxxl
@@ -755,6 +765,9 @@ This packages contains the dependencies to run the Hootenanny core.
 %files core-deps
 
 %changelog
+* Fri May 12 2017 Matt Jackson <matthew.jacksondigitalglobe.com> - 0.2.33+
+- Fix libpq issues
+
 * Wed Feb 22 2017 Brandon Witham <brandon.witham@digitalglobe.com> - 0.2.32+
 - hoot #1415 changes
 
