@@ -366,7 +366,9 @@ export CFLAGS="$RPM_OPT_FLAGS -fPIC"
 export CFLAGS="$RPM_OPT_FLAGS -fpic"
 %endif
 export CXXFLAGS="$CFLAGS -I%{_includedir}/libgeotiff"
-export CPPFLAGS="$CPPFLAGS -I%{_includedir}/libgeotiff"
+
+# jasper uses SIZE_MAX and friends in its headers.
+export CPPFLAGS="$CPPFLAGS -D__STDC_LIMIT_MACROS -I%{_includedir}/libgeotiff"
 
 # Sort out what version of Postgres we have - MJ
 PG_VERSION=`ls /etc/init.d | grep postgresql- | sort | tail -1 | egrep -o '[0-9]{1,}\.[0-9]{1,}'`
