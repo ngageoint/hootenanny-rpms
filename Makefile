@@ -1,8 +1,6 @@
 
 # Default branch of hoot to build
-GIT_COMMIT?=origin/develop
-# Branch #1560 for testing
-#GIT_COMMIT=de1062a307fae27257f80d3085c1eb439fc90121
+#GIT_COMMIT?=origin/develop
 
 TARBALLS := $(wildcard src/SOURCES/hootenanny*.tar.gz)
 DOCBALLS := $(wildcard src/SOURCES/hootenanny*-documentation.tar.gz)
