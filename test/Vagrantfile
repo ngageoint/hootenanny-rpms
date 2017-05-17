@@ -40,7 +40,7 @@ $provisionSh = <<-SHELL
     # NOTE: The will get fixed in the VM - later....
     PG_VERSION=$(ls /etc/init.d | grep postgresql- | sort | tail -1 | egrep -o '[0-9]{1,}\.[0-9]{1,}')
 
-    if [ -n $PG_VERSION ]; then
+    if [ -n "$PG_VERSION" ]; then
         if ! sudo grep -i --quiet HOOT /var/lib/pgsql/$PG_VERSION/data/postgresql.conf; then
             echo "Tuning PostgreSQL"
             sudo -u postgres sed -i.bak s/^max_connections/\#max_connections/ /var/lib/pgsql/$PG_VERSION/data/postgresql.conf
