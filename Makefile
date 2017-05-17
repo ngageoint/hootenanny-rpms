@@ -1,6 +1,6 @@
 
 # Default branch of hoot to build
-#GIT_COMMIT?=origin/develop
+GIT_COMMIT?=origin/develop
 
 TARBALLS := $(wildcard src/SOURCES/hootenanny*.tar.gz)
 DOCBALLS := $(wildcard src/SOURCES/hootenanny*-documentation.tar.gz)
