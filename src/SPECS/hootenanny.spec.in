@@ -70,8 +70,9 @@ export JAVA_HOME=/usr/java/jdk1.8.0_111
 PG_VERSION=`ls /etc/init.d | grep postgresql- | sort | tail -1 | egrep -o '[0-9]{1,}\.[0-9]{1,}'`
 
 # The dir configurations set the install directory to work with EL's dir structure
-aclocal && autoconf && autoheader && automake --add-missing --copy && \
-  ./configure -q --with-rnd --with-services \
+# aclocal && autoconf && autoheader && automake --add-missing --copy && \
+
+./configure -q --with-rnd --with-services \
     --with-postgresql=/usr/pgsql-$PG_VERSION/bin/pg_config      \
     --prefix=$RPM_BUILD_ROOT/usr/ \
     --datarootdir=$RPM_BUILD_ROOT/usr/share/hootenanny/ \

@@ -23,4 +23,3 @@ EOT
     sudo service postgresql-$PG_VERSION restart
     fi
 fi
-
