@@ -83,6 +83,8 @@ aclocal && autoconf && autoheader && automake --add-missing --copy && \
 if [ ! -f conf/database/DatabaseConfigDefault.sh ]; then
     cp conf/database/DatabaseConfig.sh.orig conf/database/DatabaseConfig.sh
 fi
+
+echo "### About to Make Clean ###"
 make -s clean
 
 # Remove any old archives
@@ -91,6 +93,8 @@ rm -f /home/vagrant/hootenanny-rpms/src/SOURCES/hootenanny-*.tar.gz
 rm -f /home/vagrant/hootenanny-rpms/src/SOURCES/hootenanny-services*.war
 
 [ -e /tmp/words1.sqlite ] && cp /tmp/words1.sqlite conf/
+
+echo "### About to Make Archive ###"
 make -s -j `nproc` archive
 
 cp -l hootenanny-[0-9]*.tar.gz /home/vagrant/hootenanny-rpms/src/SOURCES/
