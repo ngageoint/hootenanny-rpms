@@ -7,7 +7,7 @@ DOCBALLS := $(wildcard src/SOURCES/hootenanny*-documentation.tar.gz)
 HOOTBALL := $(filter-out $(DOCBALLS), $(TARBALLS))
 
 # URL for downloading the Java8 JDK 
-JDKURL=http://download.oracle.com/otn-pub/java/jdk/8u111-b14/jdk-8u111-linux-x64.rpm
+JDKURL=http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
 
 all: copy-rpms
 
