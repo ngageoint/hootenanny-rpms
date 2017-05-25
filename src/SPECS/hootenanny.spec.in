@@ -139,6 +139,8 @@ HootTest \
     --exclude=.*ConflateAverageTest.sh \
     --exclude=.*ExactMatchInputsTest.sh \
     --exclude=.*Osm2OgrTranslation.sh \
+    --exclude=.*RafahConflateTest.sh \
+    --exclude=.*HaitiDrConflateTest.sh \
     --slow --diff
 cd hoot-services
 make test -s
