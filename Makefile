@@ -1,12 +1,13 @@
 
 # Default branch of hoot to build
 GIT_COMMIT?=origin/develop
+
 TARBALLS := $(wildcard src/SOURCES/hootenanny*.tar.gz)
 DOCBALLS := $(wildcard src/SOURCES/hootenanny*-documentation.tar.gz)
 HOOTBALL := $(filter-out $(DOCBALLS), $(TARBALLS))
 
 # URL for downloading the Java8 JDK 
-JDKURL=http://download.oracle.com/otn-pub/java/jdk/8u111-b14/jdk-8u111-linux-x64.rpm
+JDKURL=http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
 
 all: copy-rpms
 
@@ -45,7 +46,7 @@ vagrant-plugins:
 
 
 # NOTE: We grab a copy of the Oracle 8 JDK before installing the deps
-vagrant-build-deps: copy-words1 el6-src/jdk-8u111-linux-x64.rpm
+vagrant-build-deps: copy-words1 el6-src/jdk-8u131-linux-x64.rpm
 	vagrant ssh -c "cd hootenanny-rpms && make -j$$((`nproc` + 2)) deps"
 
 vagrant-build: vagrant-build-rpms
@@ -68,11 +69,15 @@ vagrant-clean:
 	rm -f src/tmp/*-install
 
 vagrant-test:
+	# Adding this in so we always have a clean test VM.
+	cd test && vagrant halt && vagrant destroy -f
 	cd test; vagrant up
 	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --diff \
 		--exclude=.*ConflateAverageTest.sh \
 		--exclude=.*RubberSheetConflateTest.sh \
 		--exclude=.*ExactMatchInputsTest.sh \
+		--exclude=.*RafahConflateTest.sh \
+		--exclude=.*HaitiDrConflateTest.sh \
 		--slow"
 
 # This spawns a small VM to update the main repo so we can copy it to S3
@@ -84,12 +89,12 @@ vagrant-repo:
 # As of 11/29/2016, hootenanny-rpms project in Github supports files <= 100MB in size.  Everything over this size limit,
 # will is currently rejected by Github.  In order to workaround this limitation, we will download a desired JDK RPM
 # every time we build.
-jdk_rpm = jdk-8u111-linux-x64.rpm
-jdk_download_url = http://download.oracle.com/otn-pub/java/jdk/8u111-b14/jdk-8u111-linux-x64.rpm
+jdk_rpm = jdk-8u131-linux-x64.rpm
+jdk_download_url = http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
 
 install-java:
-	(sudo yum list installed jdk1.8.0_111 > /dev/null 2>&1) || sudo wget --quiet --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" $(jdk_download_url) -P /tmp
-	(sudo yum list installed jdk1.8.0_111 > /dev/null 2>&1) || sudo rpm -Uvh --force /tmp/$(jdk_rpm)
+	(sudo yum list installed jdk1.8.0_131 > /dev/null 2>&1) || sudo wget --quiet --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" $(jdk_download_url) -P /tmp
+	(sudo yum list installed jdk1.8.0_131 > /dev/null 2>&1) || sudo rpm -Uvh --force /tmp/$(jdk_rpm)
 
 deps: force install-java
 	sudo cp repos/HootBuild.repo /etc/yum.repos.d
@@ -199,6 +204,7 @@ deps: force install-java
 	  libicu-devel \
 	  cppunit-devel \
 	  python-argparse \
+	  libXfixes-devel \
 	  libXrandr-devel \
 	  libXrender-devel \
 	  libdrm-devel \
@@ -213,7 +219,7 @@ el6: el6-src/* custom-rpms
 # Everything over this size gets rejected by Github.  In order to workaround this limitation, 
 # we download a copy of the 159Mb JDK and store it in the el6 directory. This ensures that it
 # is installed and is copied to the S3 repo.
-el6-src/jdk-8u111-linux-x64.rpm:
+el6-src/jdk-8u131-linux-x64.rpm:
 	wget --quiet --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" $(JDKURL) -P el6-src
 
 
