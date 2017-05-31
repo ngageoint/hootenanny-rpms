@@ -27,7 +27,7 @@ Source2:    %{name}.sysconfig
 Source3:    %{name}.logrotate
 Source4:    %{name}.conf
 Requires:   jpackage-utils
-Requires:   jdk1.8.0_111
+Requires:   jdk1.8.0_131
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
