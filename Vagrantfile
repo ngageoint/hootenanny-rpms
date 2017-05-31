@@ -16,7 +16,7 @@ $provisionSh = <<-SHELL
     sudo yum -y -q update --exclude=puppet*
 
     # Enable NTP to synchronize clock
-    sudo yum -y install ntp
+    sudo yum -y -q install ntp
     sudo chkconfig ntpd on
     sudo /etc/init.d/ntpd stop
     sudo ntpdate pool.ntp.org

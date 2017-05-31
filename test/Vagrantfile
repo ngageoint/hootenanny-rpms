@@ -20,27 +20,32 @@ $provisionSh = <<-SHELL
 
     # Remove Postgres 8.4
     if yum list installed | grep --quiet postgresql.x86_64 ; then
-        echo "Removing Postgres 8.4"
+        echo "### Removing Postgres 8.4 ###"
         sudo yum remove -y postgresql.x86_64 postgresql-devel.x86_64 postgresql-libs.x86_64
     fi
+
+    echo "Update OS"
+    sudo yum -y -q update --exclude=puppet*
 
     echo "[hoot]" | sudo tee /etc/yum.repos.d/hoot.repo
     echo "name=hoot" | sudo tee -a /etc/yum.repos.d/hoot.repo
     echo "baseurl=file:///home/vagrant/el6/" | sudo tee -a /etc/yum.repos.d/hoot.repo
     echo "gpgcheck=0" | sudo tee -a /etc/yum.repos.d/hoot.repo
+
     sudo yum -y -q update --exclude=puppet*
+    echo "Install Hootenanny"
     sudo yum -y install hootenanny-autostart
 
-    if yum list installed | grep --quiet postgresql92 ; then
     # Fix Postgres
     # NOTE: The will get fixed in the VM - later....
-    echo
-    echo "About to tune Postgres"
-    if ! sudo grep -i --quiet HOOT /var/lib/pgsql/9.2/data/postgresql.conf; then
-        echo "Tuning PostgreSQL"
-        sudo -u postgres sed -i.bak s/^max_connections/\#max_connections/ /var/lib/pgsql/9.2/data/postgresql.conf
-        sudo -u postgres sed -i.bak s/^shared_buffers/\#shared_buffers/ /var/lib/pgsql/9.2/data/postgresql.conf
-        sudo -u postgres bash -c "cat >> /var/lib/pgsql/9.2/data/postgresql.conf" <<EOT
+    PG_VERSION=$(ls /etc/init.d | grep postgresql- | sort | tail -1 | egrep -o '[0-9]{1,}\.[0-9]{1,}')
+
+    if [ -n "$PG_VERSION" ]; then
+        if ! sudo grep -i --quiet HOOT /var/lib/pgsql/$PG_VERSION/data/postgresql.conf; then
+            echo "Tuning PostgreSQL"
+            sudo -u postgres sed -i.bak s/^max_connections/\#max_connections/ /var/lib/pgsql/$PG_VERSION/data/postgresql.conf
+            sudo -u postgres sed -i.bak s/^shared_buffers/\#shared_buffers/ /var/lib/pgsql/$PG_VERSION/data/postgresql.conf
+            sudo -u postgres bash -c "cat >> /var/lib/pgsql/$PG_VERSION/data/postgresql.conf" <<EOT
 #--------------
 # Hoot Settings
 #--------------
@@ -52,10 +57,11 @@ maintenance_work_mem = 256MB
 checkpoint_segments = 20
 autovacuum = off
 EOT
-fi
-        echo
-        echo "About to restart Postgres"
-        sudo service postgresql-9.2 restart
+
+            echo
+            echo "About to restart Postgres"
+            sudo service postgresql-$PG_VERSION restart
+        fi
     fi
 
  SHELL
