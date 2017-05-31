@@ -43,6 +43,8 @@ Summary:    Hootenanny Core
 Requires:       postgresql-libs >= 9.1
 %global __requires_exclude ^libpq\\.so
 Requires:   %{name}-core-deps = %{version}-%{release}
+
+
 Group:      Applications/Engineering
 
 %description core
@@ -66,6 +68,7 @@ export JAVA_HOME=/usr/java/jdk1.8.0_111
 
 # Sort out the postgres version. We can't rely on having pg_config in our path
 PG_VERSION=`ls /etc/init.d | grep postgresql- | sort | tail -1 | egrep -o '[0-9]{1,}\.[0-9]{1,}'`
+
 # The dir configurations set the install directory to work with EL's dir structure
 # aclocal && autoconf && autoheader && automake --add-missing --copy && \
 
@@ -169,6 +172,7 @@ Requires:   postgresql-contrib >= 9.1
 Requires:   postgis2_93 >= 2.1
 Requires:   jdk1.8.0_111
 Requires:   liquibase
+Requires:   npm
 Requires:   pwgen
 Group:      Applications/Engineering
 
@@ -767,6 +771,7 @@ This packages contains the dependencies to run the Hootenanny core.
 %changelog
 * Fri May 12 2017 Matt Jackson <matthew.jacksondigitalglobe.com> - 0.2.33+
 - Fix libpq issues
+
 * Wed Feb 22 2017 Brandon Witham <brandon.witham@digitalglobe.com> - 0.2.32+
 - hoot #1415 changes
 
