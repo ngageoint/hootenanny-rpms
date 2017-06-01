@@ -172,6 +172,7 @@ Requires:   postgresql-contrib >= 9.1
 Requires:   postgis2_93 >= 2.1
 Requires:   jdk1.8.0_131
 Requires:   liquibase
+Requires:   npm
 Requires:   pwgen
 Group:      Applications/Engineering
 
