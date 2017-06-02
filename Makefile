@@ -190,7 +190,6 @@ deps: force install-java
 	  ImageMagick \
 	  expat-devel \
 	  fontconfig-devel \
-	  geos-devel \
 	  libtool \
 	  giflib-devel \
 	  mysql-devel \
