@@ -91,10 +91,10 @@ make -s %{?_smp_mflags}
 # Requires: libc.so.6(GLIBC_2.14)(64bit)
 # Install node modules
 #cd node-mapnik-server
-#npm install
+#npm install --production
 
 cd node-export-server
-npm install
+npm install --production
 
 %install
 
