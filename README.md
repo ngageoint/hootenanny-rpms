@@ -12,7 +12,7 @@ name=hoot
 baseurl=https://s3.amazonaws.com/hoot-rpms/stable/el6/
 gpgcheck=0
 ```
-* Run ```sudo yum hootenanny-autostart```
+* Run ```sudo yum install hootenanny-autostart```
 
 Once installed, the UI can be accessed via a browser at ```http://localhost:8080/hootenanny-id/```.  NOTE: If accessing from a remote computer, use the hostname in place of 'localhost'.
 
