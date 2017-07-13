@@ -191,7 +191,8 @@ This package contains the UI and web services.
 
 %files services-ui
 %attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hoot-services.war
-%attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hootenanny-id
+%attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hootenanny-id/dist
+%attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hootenanny-id/data
 /etc/init.d/node-mapnik-server
 /etc/init.d/node-export-server
 
