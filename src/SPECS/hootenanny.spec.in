@@ -143,6 +143,7 @@ HootTest \
     --exclude=.*ExactMatchInputsTest.sh \
     --exclude=.*Osm2OgrTranslation.sh \
     --exclude=.*OsmApiDbHootApiDb.* \
+    --exclude=.*MultiaryIngest.* \
     --slow --diff
 cd hoot-services
 make test -s
