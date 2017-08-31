@@ -2,9 +2,22 @@
 This repository contains both 3rd-party RPMs that are required by Hootenanny as
 well as source RPMs that are custom built for Hootenanny.
 
-At some point in the future we'll host a RPM repo where you can simply install
-hoot, but until then you can use the following to create your own RPM repo.
+The easiest and quickest way to install and run Hootenanny is by installing from RPMs in CentOS 6.7.  A public facing repository exists that includes the latest stable release as well as many previous versions.  To install from RPMs, perform the following steps:
 
+* Create the following file: ```/etc/yum.repos.d/hoot.repo```
+* Add the following content to that file:
+```
+[hoot]
+name=hoot
+baseurl=https://s3.amazonaws.com/hoot-rpms/stable/el6/
+gpgcheck=0
+```
+* Run ```sudo yum update```
+* Then run ```sudo yum install hootenanny-autostart```
+
+Once installed, the UI can be accessed via a browser at ```http://localhost:8080/hootenanny-id/```.  NOTE: If accessing from a remote computer, use the hostname in place of 'localhost'.
+
+It is also possible to build RPMs from source code by performing the following steps:
 ```
 # As of 2016-02-12 the develop branch works for building RPMs.
 # a different compatible branch/tag/revision can be specified.

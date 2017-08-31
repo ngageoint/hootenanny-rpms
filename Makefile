@@ -76,8 +76,8 @@ vagrant-test:
 		--exclude=.*ConflateAverageTest.sh \
 		--exclude=.*RubberSheetConflateTest.sh \
 		--exclude=.*ExactMatchInputsTest.sh \
-		--exclude=.*RafahConflateTest.sh \
-		--exclude=.*HaitiDrConflateTest.sh \
+		--exclude=.*OsmApiDbHootApiDb.* \
+		--exclude=.*MultiaryIngest.* \
 		--slow"
 
 # This spawns a small VM to update the main repo so we can copy it to S3
