@@ -10,13 +10,13 @@ baseurl=https://jnovy.fedorapeople.org/texlive/2011/packages.el6/
 enabled=0
 gpgcheck=0
 
-[nodesource]
-name=Node.js Packages for Enterprise Linux 6 - $basearch
-baseurl=https://rpm.nodesource.com/pub/el/6/$basearch
-failovermethod=priority
-enabled=0
-gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/NODESOURCE-GPG-SIGNING-KEY-EL
+#[nodesource]
+#name=Node.js Packages for Enterprise Linux 6 - $basearch
+#baseurl=https://rpm.nodesource.com/pub/el/6/$basearch
+#failovermethod=priority
+#enabled=0
+#gpgcheck=1
+#gpgkey=file:///etc/pki/rpm-gpg/NODESOURCE-GPG-SIGNING-KEY-EL
 
 [nodesource-source]
 name=Node.js for Enterprise Linux 6 - $basearch - Source
