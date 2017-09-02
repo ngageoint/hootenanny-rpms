@@ -98,8 +98,10 @@ deps: force el7-src/jdk-8u144-linux-x64.rpm
 	sudo yum update -y --exclude=puppet* || sleep 30
 	sudo yum update -y --exclude=puppet*
 	sudo true || true
+	sudo yum install -y yum-plugin-versionlock el7-src/*
+	sudo yum versionlock nodejs*
+
 	sudo yum install -y \
-	el7-src/* \
 	ant \
 	armadillo-devel \
 	asciidoc \
