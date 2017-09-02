@@ -5,39 +5,44 @@
 set -e
 set -x
 
+# For testing
+export GIT_COMMIT=1042_new
+
+
 if [ -z "$GIT_COMMIT" ]; then
     export GIT_COMMIT=develop
 fi
 echo $GIT_COMMIT
 
-#export JAVA_HOME=/etc/alternatives/jre_1.7.0
-#export JAVA_HOME=/usr/java/jdk1.8.0_131
-export JAVA_HOME=/etc/alternatives/java_sdk
+# NOTE: This is after we have removed the OpenJdk
+export JAVA_HOME=/usr/java/jdk1.8.0_144
 
 echo "%__make /usr/bin/make -sj4" >> /home/vagrant/.rpmmacros
 
-sudo yum install -y -q ccache
-
 cd /home/vagrant/hootenanny-rpms/src/
+
+# This is needed by the Makefile
+mkdir -p tmp
 
 # Builds and installs necessary RPMs for archiving hoot
 rm -f RPMS/x86_64/hoot*.rpm
 make -j $((`nproc` + 2)) tmp/hoot-deps
 
 # init and start Postgres
+# Need to figure out a way to do this automagically
+#PG_VERSION=9.5
+PG_VERSION=$(psql --version | egrep -o '[0-9]{1,}\.[0-9]{1,}')
+
 cd /tmp
-# init and start Postgres
-PG_SERVICE=$(ls /etc/init.d | grep postgresql- | sort | tail -1)
-sudo service $PG_SERVICE initdb
-sudo service $PG_SERVICE start
+sudo /usr/pgsql-$PG_VERSION/bin/postgresql95-setup initdb
+sudo systemctl start postgresql-$PG_VERSION
+sudo systemctl enable postgresql-$PG_VERSION
+
 while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
     echo "Waiting for postgres to start"
     sleep 1
 done
 
-# set Postgres to autostart
-sudo /sbin/chkconfig --add postgresql-$PG_VERSION
-sudo /sbin/chkconfig postgresql-$PG_VERSION on
 
 # create Hoot services db
 if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw hoot; then
@@ -55,7 +60,7 @@ fi
 if ! sudo grep -i --quiet hoot /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf; then
     sudo sed -i '1ihost    all            hoot            127.0.0.1/32            md5' /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
     sudo sed -i '1ihost    all            hoot            ::1/128                 md5' /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
-    sudo /etc/init.d/postgresql-$PG_VERSION restart
+    sudo systemctl restart postgresql-$PG_VERSION
 fi
 
 # Build the Hootenanny archive

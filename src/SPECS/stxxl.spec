@@ -36,6 +36,9 @@ make config_gnu
 echo STXXL_ROOT	=`pwd` > make.settings.local
 echo "ENABLE_SHARED	= yes" >> make.settings.local
 echo "COMPILER_GCC	= g++ -std=c++0x" >> make.settings.local
+# Total hack because 1.3.1 doesn't compile right on CentOS7
+sed -i 's/#include <sys\/mman.h>/#include <sys\/mman.h>\n#include <unistd.h>/g' ./utils/mlock.cpp
+
 make library_g++
 
 %install

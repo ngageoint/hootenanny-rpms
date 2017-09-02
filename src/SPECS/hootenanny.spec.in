@@ -9,11 +9,11 @@ URL:        https://github.com/ngageoint/hootenanny
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  autoconf automake boost-devel cppunit-devel doxygen gcc-c++
-BuildRequires:  gdal-devel >= 2.1.3
-BuildRequires:  gdal-python >= 2.1.3
-BuildRequires:  gdal-esri-epsg >= 2.1.3
+BuildRequires:  gdal-devel >= 2.1.4
+BuildRequires:  gdal-python >= 2.1.4
+BuildRequires:  gdal-esri-epsg >= 2.1.4
 BuildRequires:  gdb
-BuildRequires:  geos-devel = 3.4.2
+BuildRequires:  geos-devel >= 3.4.2
 BuildRequires:  git glpk-devel graphviz libicu-devel
 BuildRequires:  hootenanny-words = 1.0.0
 BuildRequires:  libspatialite-devel
@@ -24,7 +24,7 @@ BuildRequires:  proj-devel protobuf-devel python-argparse python-devel qt-devel
 BuildRequires:  texlive libxslt
 BuildRequires:  gnuplot
 BuildRequires:  unzip v8-devel w3m wget words zip
-BuildRequires:  jdk1.8.0_131
+BuildRequires:  jdk1.8.0_144
 
 Source0:        %{name}-%{version}.tar.gz
 
@@ -63,8 +63,7 @@ This package contains the core algorithms and command line interface.
 
 %build
 source ./SetupEnv.sh
-export JAVA_HOME=/usr/java/jdk1.8.0_131
-#export JAVA_HOME=/etc/alternatives/java_sdk
+export JAVA_HOME=/usr/java/jdk1.8.0_144
 
 # Sort out the postgres version. We can't rely on having pg_config in our path
 PG_VERSION=`ls /etc/init.d | grep postgresql- | sort | tail -1 | egrep -o '[0-9]{1,}\.[0-9]{1,}'`
@@ -114,7 +113,7 @@ cp -R node-export-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-export-server
 
 make install
 echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
-echo "export JAVA_HOME=/usr/java/jdk1.8.0_131" >> $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
+echo "export JAVA_HOME=/usr/java/jdk1.8.0_144" >> $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
 
 chmod 755 $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
 cp -R test-files/ $RPM_BUILD_ROOT/var/lib/hootenanny/
@@ -131,20 +130,15 @@ ln -s /usr/share/doc/hootenanny  $RPM_BUILD_ROOT/var/lib/hootenanny/docs
 
 %check
 source ./SetupEnv.sh
-export JAVA_HOME=/usr/java/jdk1.8.0_131
+export JAVA_HOME=/usr/java/jdk1.8.0_144
 #export JAVA_HOME=/etc/alternatives/java_sdk
 # The excluded tests are failing on CentOS now and waiting on a fix
 # https://github.com/ngageoint/hootenanny/issues/279
 # https://github.com/ngageoint/hootenanny/issues/281
 #
 # HootTest --exclude=.*RubberSheetConflateTest.sh \
-HootTest \
-    --exclude=.*ConflateAverageTest.sh \
-    --exclude=.*ExactMatchInputsTest.sh \
-    --exclude=.*Osm2OgrTranslation.sh \
-    --exclude=.*OsmApiDbHootApiDb.* \
-    --exclude=.*MultiaryIngest.* \
-    --slow --diff
+HootTest --slow --diff
+
 cd hoot-services
 make test -s
 
@@ -173,7 +167,7 @@ Requires:   postgresql-server >= 9.1
 Requires:   postgresql-contrib >= 9.1
 # NOTE: We need to look at postgis versions
 Requires:   postgis2_93 >= 2.1
-Requires:   jdk1.8.0_131
+Requires:   jdk1.8.0_144
 Requires:   liquibase
 Requires:   npm
 Requires:   pwgen
@@ -216,19 +210,19 @@ if [ "$1" = "2" ]; then
     fi
 fi
 
-# Setting /usr/java/jdk1.8.0_131/bin/java's priority to something really atrocious to guarantee that it will be
+# Setting /usr/java/jdk1.8.0_144/bin/java's priority to something really atrocious to guarantee that it will be
 # the one used when alternatives' auto mode is used.
-sudo alternatives --install /usr/bin/java java /usr/java/jdk1.8.0_131/bin/java 999999
+sudo alternatives --install /usr/bin/java java /usr/java/jdk1.8.0_144/bin/java 999999
 
-# Setting /usr/java/jdk1.8.0_131/bin/javac's priority to something really atrocious to guarantee that it will be
+# Setting /usr/java/jdk1.8.0_144/bin/javac's priority to something really atrocious to guarantee that it will be
 # the one used when alternatives' auto mode is enabled.
-sudo alternatives --install /usr/bin/javac javac /usr/java/jdk1.8.0_131/bin/javac 9999999
+sudo alternatives --install /usr/bin/javac javac /usr/java/jdk1.8.0_144/bin/javac 9999999
 
 # switching to manual and forcing the desired version of java be configured
-sudo alternatives --set java /usr/java/jdk1.8.0_131/bin/java
+sudo alternatives --set java /usr/java/jdk1.8.0_144/bin/java
 
 # switching to manual and forcing the desired version of javac be configured
-sudo alternatives --set javac /usr/java/jdk1.8.0_131/bin/javac
+sudo alternatives --set javac /usr/java/jdk1.8.0_144/bin/javac
 
 
 %post services-ui
@@ -325,7 +319,7 @@ EOT
     sudo sed -i s/\<Password\>hoottest\<\\/Password\>/\<Password\>$DB_PASSWORD\<\\/Password\>/ /var/lib/tomcat8/webapps/hoot-services/WEB-INF/workspace/jdbc/WFS_Connection.xml
 
     # make sure tomcat is using correct Java
-    sudo sed -i '/.*JAVA_HOME=.*/c\JAVA_HOME=\/usr\/java\/jdk1.8.0_131' /etc/tomcat8/tomcat8.conf
+    sudo sed -i '/.*JAVA_HOME=.*/c\JAVA_HOME=\/usr\/java\/jdk1.8.0_144' /etc/tomcat8/tomcat8.conf
 
     sudo service tomcat8 restart
 }

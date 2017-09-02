@@ -1,0 +1,15 @@
+diff -up postgis-1.5.1/postgis/Makefile.pgxs.pgsql9 postgis-1.5.1/postgis/Makefile.pgxs
+--- postgis-1.5.1/postgis/Makefile.pgxs.pgsql9	2010-01-12 11:33:49.000000000 +0100
++++ postgis-1.5.1/postgis/Makefile.pgxs	2011-04-03 13:45:33.972315988 +0200
+@@ -12,6 +12,11 @@ datamoduledir = contrib
+ docmoduledir = contrib
+ endif
+ 
++# cope with PostgreSQL 9.0 build environment
++ifndef mkinstalldirs
++mkinstalldirs = $(MKDIR_P)
++endif
++
+ install: all installdirs
+ ifneq (,$(DATA)$(DATA_built))
+ 	@for file in $(addprefix $(srcdir)/, $(DATA)) $(DATA_built); do \

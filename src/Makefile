@@ -2,13 +2,21 @@ TARBALLS := $(wildcard SOURCES/hootenanny*.tar.gz)
 DOCBALLS := $(wildcard SOURCES/hootenanny*-documentation.tar.gz)
 HOOTBALL := $(filter-out $(DOCBALLS), $(TARBALLS))
 
-FILEGDB_RPM=RPMS/x86_64/FileGDB_API-1.5-1.el6.x86_64.rpm
+FILEGDB_RPM=RPMS/x86_64/FileGDB_API-1.5.1-1.el7.centos.x86_64.rpm
 INSTALL_FILEGDB=yum list installed FileGDB_API || sudo yum -y install $(FILEGDB_RPM)
 # Synchronizing the make build with rpmbuild parallel flags causes problems. This way we
 # spawn at most nproc processes per sub-job and if the load is above nproc + 2 no more
 # jobs will be spawned. This is a poor man parallelism, but should avoid killing the
 # host.
-RPMBUILD_OPTS=--quiet --define "_topdir `pwd`" --define "_smp_mflags -j`nproc` -l$$((`nproc` + 2))"
+
+POSTGISRPM=RPMS/x86_64/postgis-2.3.3-3.el7.centos.x86_64.rpm
+INSTALL_POSTGIS=yum list installed postgis || sudo yum -y install $(POSTGISRPM)
+
+# RPMBUILD_OPTS=--quiet --define "_topdir `pwd`" --define "_smp_mflags -j`nproc` -l$$((`nproc` + 2))"
+RPMBUILD_OPTS=--define "_topdir `pwd`" --define "_smp_mflags -j`nproc` -l$$((`nproc` + 2))"
+
+#Trying this
+RPM_OPT_FLAGS=--std=c++11
 
 hoottarball=$(lastword $(sort $(HOOTBALL)))
 
@@ -27,16 +35,11 @@ not-hoot: tmp/not-hoot
 
 tmp/not-hoot: \
 	RPMS/noarch/hootenanny-words-1.0.0-1.el6.noarch.rpm \
-	RPMS/noarch/autoconf-2.69-3.el6.noarch.rpm \
-	RPMS/noarch/dblatex-0.3-5.el6.noarch.rpm \
-	RPMS/noarch/python-which-1.1.0-12.el6.noarch.rpm \
-	RPMS/noarch/tomcat-8.5.8-1.el6.noarch.rpm \
+	RPMS/noarch/tomcat-8.5.20-1.el6.noarch.rpm \
+	$(POSTGISRPM) \
 	$(FILEGDB_RPM) \
-	RPMS/x86_64/gdal-2.1.3-2.el6.x86_64.rpm \
-	RPMS/x86_64/gdal-esri-epsg-2.1.3-2.el6.x86_64.rpm \
-	RPMS/x86_64/geos-3.4.2-2.el6.x86_64.rpm \
-	RPMS/x86_64/gnuplot-4.6.1-1.el6.x86_64.rpm \
-	RPMS/x86_64/log4cxx-0.10.0-14.el6.x86_64.rpm \
+	RPMS/x86_64/gdal-2.1.4-2.el6.x86_64.rpm \
+	RPMS/x86_64/gdal-esri-epsg-2.1.4-2.el6.x86_64.rpm \
 	RPMS/x86_64/stxxl-1.3.1-1.el6.x86_64.rpm
 	# touch was sometimes cropping down to second resolution
 	echo > $@
@@ -81,44 +84,28 @@ RPMS/x86_64/hootenanny-core-$(hootversion).el6.x86_64.rpm: SPECS/hootenanny.spec
 	rm -rf BUILD/hootenanny-* BUILDROOT/hootenanny-* RPMS/x86_64/hootenanny-* SRPMS/hootenanny-*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
-RPMS/noarch/autoconf-2.69-3.el6.noarch.rpm: SPECS/autoconf.spec
-	rm -f RPMS/noarch/autoconf* RPMS/x86_64/autoconf*
-	# autoconf fails intermittently with some odd test failures. See:
-	# https://github.com/ngageoint/hootenanny-rpms/issues/62
-	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $< || MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
-
-RPMS/noarch/dblatex-0.3-5.el6.noarch.rpm: SPECS/dblatex.spec tmp/python-which-install
-	rm -f RPMS/noarch/dblatex* RPMS/x86_64/dblatex*
-	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
-
 $(FILEGDB_RPM): SPECS/FileGDB_API.spec
 	rm -f RPMS/noarch/FileGDB_API* RPMS/x86_64/FileGDB_API*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
-RPMS/x86_64/gdal-2.1.3-2.el6.x86_64.rpm: SPECS/gdal.spec $(FILEGDB_RPM)
+RPMS/x86_64/postgis-2.3.3-3.el7.centos.x86_64.rpm: SPECS/postgis.spec
+	rm -f RPMS/noarch/postgis* RPMS/x86_64/postgis*
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
+
+
+RPMS/x86_64/gdal-2.1.4-2.el6.x86_64.rpm: SPECS/gdal.spec $(FILEGDB_RPM)
 	# The gdal-2* prevents deleting the gdal-esri-epsg RPM
 	rm -f RPMS/noarch/gdal-2* RPMS/x86_64/gdal-2*
 	$(INSTALL_FILEGDB)
+	$(INSTALL_POSTGIS)
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
-RPMS/x86_64/geos-3.4.2-2.el6.x86_64.rpm: SPECS/geos.spec
-	rm -f RPMS/noarch/geos* RPMS/x86_64/geos*
-	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
-
-RPMS/x86_64/gdal-esri-epsg-2.1.3-2.el6.x86_64.rpm: SPECS/gdal-esri-epsg.spec
+RPMS/x86_64/gdal-esri-epsg-2.1.4-2.el6.x86_64.rpm: SPECS/gdal-esri-epsg.spec
 	rm -f RPMS/noarch/gdal-esri-epsg* RPMS/x86_64/gdal-esri-epsg*
-	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
-
-RPMS/x86_64/gnuplot-4.6.1-1.el6.x86_64.rpm: SPECS/gnuplot.spec
-	rm -f RPMS/noarch/gnuplot* RPMS/x86_64/gnuplot*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 RPMS/noarch/python-which-1.1.0-12.el6.noarch.rpm: SPECS/python-which.spec
 	rm -f RPMS/noarch/python-which* RPMS/x86_64/python-which*
-	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
-
-RPMS/x86_64/log4cxx-0.10.0-14.el6.x86_64.rpm: SPECS/log4cxx.spec
-	rm -f RPMS/noarch/log4cxx* RPMS/x86_64/log4cxx*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 RPMS/x86_64/stxxl-1.3.1-1.el6.x86_64.rpm: SPECS/stxxl.spec
@@ -129,7 +116,7 @@ RPMS/noarch/hootenanny-words-1.0.0-1.el6.noarch.rpm: SPECS/hootenanny-words.spec
 	rm -f RPMS/noarch/hootenanny-words* RPMS/x86_64/hootenanny-words*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
-#As for 12/16/2016, there doesn't exist an official RPM for tomcat-8.5.8 release.  Build our own then.
-RPMS/noarch/tomcat-8.5.8-1.el6.noarch.rpm: SPECS/tomcat8.spec
+#As for 12/16/2016, there doesn't exist an official RPM for tomcat-8.5.20 release.  Build our own then.
+RPMS/noarch/tomcat-8.5.20-1.el6.noarch.rpm: SPECS/tomcat8.spec
 	rm -f RPMS/noarch/tomcat* tomcat*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<

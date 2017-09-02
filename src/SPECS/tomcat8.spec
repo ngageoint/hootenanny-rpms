@@ -9,13 +9,13 @@
 %define tomcat_home /usr/share/tomcat8
 %define tomcat_user_home /var/lib/tomcat8
 %define tomcat_cache_home /var/cache/tomcat8
-%define tomcat_logs_home=/var/log/tomcat8
-%define tomcat_config_home=/etc/tomcat8
+%define tomcat_logs_home /var/log/tomcat8
+%define tomcat_config_home /etc/tomcat8
 
 
 Summary:    Apache Servlet/JSP Engine, RI for Servlet 3.1/JSP 2.3 API
 Name:       tomcat8
-Version:    8.5.8
+Version:    8.5.20
 BuildArch:  noarch
 Release:    1
 License:    Apache Software License
@@ -27,7 +27,7 @@ Source2:    %{name}.sysconfig
 Source3:    %{name}.logrotate
 Source4:    %{name}.conf
 Requires:   jpackage-utils
-Requires:   jdk1.8.0_131
+Requires:   jdk1.8.0_144
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description

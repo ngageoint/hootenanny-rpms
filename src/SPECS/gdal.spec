@@ -20,8 +20,11 @@
 
 # He also suggest to use --with-static-proj4 to actually link to proj, instead of dlopen()ing it.
 
+# Major digit of the proj so version
+%global proj_somaj 12
+
 # Tests can be of a different version
-%global testversion 2.1.3
+%global testversion 2.1.4
 %global run_tests 0
 
 %global with_spatialite 1
@@ -39,125 +42,135 @@
 %global compdir %(dirname $(pkg-config --variable=compatdir bash-completion))
 
 
-Name:		gdal
-Epoch:		1
-Version:	2.1.3
-Release:	2%{?dist}
-Summary:	GIS file format library
-Group:		System Environment/Libraries
-License:	MIT
-URL:		http://www.gdal.org
+Name:       gdal
+Version:    2.1.4
+Release:    8%{?dist}
+Summary:    GIS file format library
+Group:      System Environment/Libraries
+License:    MIT
+URL:        http://www.gdal.org
 # Source0:   http://download.osgeo.org/gdal/%%{version}/gdal-%%{version}.tar.xz
 # See PROVENANCE.TXT-fedora and the cleaner script for details!
 
-Source0:	%{name}-%{version}-fedora.tar.xz
-Source1:	http://download.osgeo.org/%{name}/%{testversion}/%{name}autotest-%{testversion}.tar.gz
-Source2:	%{name}.pom
+Source0:    %{name}-%{version}-fedora.tar.xz
+Source1:    http://download.osgeo.org/%{name}/%{testversion}/%{name}autotest-%{testversion}.tar.gz
+Source2:    %{name}.pom
 
 # Cleaner script for the tarball
-Source3:	%{name}-cleaner.sh
+Source3:    %{name}-cleaner.sh
 
-Source4:	PROVENANCE.TXT-fedora
+Source4:    PROVENANCE.TXT-fedora
 
 # Patch to use system g2clib
-Patch1:		%{name}-g2clib.patch
+Patch1:     %{name}-g2clib.patch
 # Patch for Fedora JNI library location
-Patch2:		%{name}-jni.patch
+Patch2:     %{name}-jni.patch
 # Fix bash-completion install dir
-Patch3:		%{name}-completion.patch
+Patch3:     %{name}-completion.patch
 # Fix uchar type
-Patch4:		%{name}-uchar.patch
+Patch4:     %{name}-uchar.patch
 
 # Fedora uses Alternatives for Java
-Patch8:		%{name}-1.9.0-java.patch
-Patch9:		%{name}-2.1.0-zlib.patch
+Patch8:     %{name}-1.9.0-java.patch
+Patch9:     %{name}-2.1.0-zlib.patch
 
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # Adding FileGDB API for Hootenanny
-BuildRequires:	FileGDB_API
+BuildRequires:  FileGDB_API
 
-BuildRequires:	ant
+BuildRequires:  ant
 # No armadillo in EL5
-BuildRequires:	armadillo-devel
-BuildRequires:	bash-completion
-BuildRequires:	cfitsio-devel
+BuildRequires:  armadillo-devel
+BuildRequires:  bash-completion
+BuildRequires:  cfitsio-devel
 # No CharLS in EL5
 #BuildRequires: CharLS-devel
-BuildRequires:	chrpath
-BuildRequires:	curl-devel
-BuildRequires:	doxygen
-BuildRequires:	expat-devel
-BuildRequires:	fontconfig-devel
+BuildRequires:  chrpath
+BuildRequires:  curl-devel
+BuildRequires:  doxygen
+BuildRequires:  expat-devel
+BuildRequires:  fontconfig-devel
 # No freexl in EL5
-BuildRequires:	freexl-devel
-BuildRequires:	g2clib-static
-BuildRequires:	geos-devel
-BuildRequires:	ghostscript
-BuildRequires:	hdf-devel
-BuildRequires:	hdf-static
-BuildRequires:	hdf5-devel
-BuildRequires:	java-devel >= 1:1.6.0
-BuildRequires:	jasper-devel
-BuildRequires:	jpackage-utils
-BuildRequires:	json-c-devel
-BuildRequires:	libgeotiff-devel
+BuildRequires:  freexl-devel
+BuildRequires:  g2clib-static
+BuildRequires:  geos-devel
+BuildRequires:  ghostscript
+BuildRequires:  hdf-devel
+BuildRequires:  hdf-static
+BuildRequires:  hdf5-devel
+BuildRequires:  java-devel >= 1:1.6.0
+BuildRequires:  jasper-devel
+BuildRequires:  jpackage-utils
+# add_maven_depmap macro moved into this package in F27, it seems like
+#BuildRequires:  javapackages-local
+BuildRequires:  json-c-devel
+BuildRequires:  libgeotiff-devel
 # No libgta in EL5
-BuildRequires:	libgta-devel
+BuildRequires:  libgta-devel
 
-BuildRequires:	libjpeg-devel
-BuildRequires:	libpng-devel
+BuildRequires:  libjpeg-devel
+BuildRequires:  libpng-devel
+# No libkml in EL
+BuildRequires:  libkml-devel
 
 %if %{with_spatialite}
-BuildRequires:	libspatialite-devel
+BuildRequires:  libspatialite-devel
 %endif
 
-BuildRequires:	libtiff-devel
+BuildRequires:  libtiff-devel
 # No libwebp in EL 5 and 6
-BuildRequires:	libwebp-devel
-BuildRequires:	libtool
-BuildRequires:	giflib-devel
-BuildRequires:	netcdf-devel
-BuildRequires:	libdap-devel
-BuildRequires:	librx-devel
-BuildRequires:	mysql-devel
-BuildRequires:	numpy
-BuildRequires:	pcre-devel
-BuildRequires:	perl-devel
-BuildRequires:	perl-generators
-BuildRequires:	openjpeg2-devel
-BuildRequires:	perl(ExtUtils::MakeMaker)
-BuildRequires:	%{_bindir}/pkg-config
-BuildRequires:	poppler-devel
-BuildRequires:	postgresql-devel
-BuildRequires:	proj-devel
-BuildRequires:	python2-devel
-BuildRequires:	sqlite-devel
-BuildRequires:	swig
-BuildRequires:	texlive-latex
+BuildRequires:  libwebp-devel
+BuildRequires:  libtool
+BuildRequires:  giflib-devel
+BuildRequires:  netcdf-devel
+BuildRequires:  libdap-devel
+BuildRequires:  librx-devel
+BuildRequires:  mysql-devel
+BuildRequires:  numpy
+BuildRequires:  python34-numpy
+BuildRequires:  pcre-devel
+BuildRequires:  ogdi-devel
+BuildRequires:  perl-devel
+BuildRequires:  perl-generators
+BuildRequires:  openjpeg2-devel
+BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  %{_bindir}/pkg-config
+BuildRequires:  poppler-devel
+BuildRequires:  postgresql-devel
+BuildRequires:  proj-devel
+BuildRequires:  python2-devel
+BuildRequires:  python34-devel
+BuildRequires:  sqlite-devel
+BuildRequires:  swig
+BuildRequires:  texlive-latex
 %if 0%{?fedora} >= 20
-BuildRequires:	texlive-collection-fontsrecommended
-BuildRequires:	texlive-collection-langcyrillic
-BuildRequires:	texlive-collection-langportuguese
-BuildRequires:	texlive-collection-latex
-BuildRequires:	texlive-epstopdf
-BuildRequires:	tex(multirow.sty)
-BuildRequires:	tex(sectsty.sty)
-BuildRequires:	tex(tocloft.sty)
-BuildRequires:	tex(xtab.sty)
+BuildRequires:  texlive-collection-fontsrecommended
+BuildRequires:  texlive-collection-langcyrillic
+BuildRequires:  texlive-collection-langportuguese
+BuildRequires:  texlive-collection-latex
+BuildRequires:  texlive-epstopdf
+BuildRequires:  tex(multirow.sty)
+BuildRequires:  tex(sectsty.sty)
+BuildRequires:  tex(tocloft.sty)
+BuildRequires:  tex(xtab.sty)
 %endif
-BuildRequires:	unixODBC-devel
-BuildRequires:	xerces-c-devel
-BuildRequires:	xz-devel
-BuildRequires:	zlib-devel
+BuildRequires:  unixODBC-devel
+BuildRequires:  xerces-c-devel
+BuildRequires:  xz-devel
+BuildRequires:  zlib-devel
 
-Requires:	proj
 # Run time dependency for gpsbabel driver
-Requires:	gpsbabel
+Requires:   gpsbabel
 
-# Nameing from the older 1.10.1 builds sscript
-Provides:	%{name}-fgdb
-Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+# proj DL-opened in ogrct.cpp, see also fix in %%prep
+# %if 0%{?__isa_bits} == 64
+# Requires:   libproj.so.%{proj_somaj}()(64bit)
+# %else
+# Requires:   libproj.so.%{proj_somaj}
+# %endif
+
+Requires:   %{name}-libs%{?_isa} = %{version}-%{release}
 
 # Enable/disable generating refmans
 %global build_refman 1
@@ -187,92 +200,109 @@ GDAL/OGR is the most widely used geospatial data access library.
 
 
 %package devel
-Summary:	Development files for the GDAL file format library
-Group:		Development/Libraries
-Provides:	%{name}-devel-fgdb
+Summary:    Development files for the GDAL file format library
+Group:  Development/Libraries
+Provides:   %{name}-devel-fgdb
 
 # Old rpm didn't figure out
 %if 0%{?rhel} < 6
-Requires:	pkgconfig
+Requires: pkgconfig
 %endif
 
-Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
-Requires:	%{name}-libs-fgdb
-Obsoletes:	%{name}-static < 1.9.0-1
+Requires:   %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:   %{name}-libs-fgdb
+Obsoletes:  %{name}-static < 1.9.0-1
 
 %description devel
 This package contains development files for GDAL.
 
 
 %package libs
-Summary:	GDAL file format library
-Group:		System Environment/Libraries
-Provides:	%{name}-libs-fgdb
+Summary:    GDAL file format library
+Group:      System Environment/Libraries
+Provides:   %{name}-libs-fgdb
 # https://trac.osgeo.org/gdal/ticket/3978#comment:5
-Obsoletes:	%{name}-ruby < 1.11.0-1
+Obsoletes:  %{name}-ruby < 1.11.0-1
 
 %description libs
 This package contains the GDAL file format library.
 
 
 %package java
-Summary:	Java modules for the GDAL file format library
-Group:		Development/Libraries
-Provides:	%{name}-java-fgdb
-Requires:	java >= 1:1.8.0
-Requires:	jpackage-utils
-Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+Summary:    Java modules for the GDAL file format library
+Group:      Development/Libraries
+Provides:   %{name}-java-fgdb
+Requires:   java >= 1:1.8.0
+Requires:   jpackage-utils
+Requires:   %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description java
 The GDAL Java modules provide support to handle multiple GIS file formats.
 
 
 %package javadoc
-Summary:	Javadocs for %{name}
-Group:		Documentation
-Provides:	%{name}-javadoc-fgdb
-Requires:	jpackage-utils
-BuildArch:	noarch
+Summary:    Javadocs for %{name}
+Group:      Documentation
+Provides:   %{name}-javadoc-fgdb
+Requires:   jpackage-utils
+BuildArch:  noarch
 
 %description javadoc
 This package contains the API documentation for %{name}.
 
 
 %package perl
-Summary:	Perl modules for the GDAL file format library
-Group:		Development/Libraries
-Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
-Requires:	%{name}-libs-fgdb
-Requires:	perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
-Provides:	%{name}-perl-fgdb
+Summary:    Perl modules for the GDAL file format library
+Group:      Development/Libraries
+Requires:   %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:   %{name}-libs-fgdb
+Requires:   perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+Provides:   %{name}-perl-fgdb
 
 %description perl
 The GDAL Perl modules provide support to handle multiple GIS file formats.
 
 
-%package python
-Summary:	Python modules for the GDAL file format library
-Group:		Development/Libraries
-Requires:	numpy
-Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
-Requires:	%{name}-libs-fgdb
-Provides:	%{name}-python-fgdb
+%package -n python2-gdal
+%{?python_provide:%python_provide python2-gdal}
+# Remove before F30
+Provides: %{name}-python = %{version}-%{release}
+Provides: %{name}-python%{?_isa} = %{version}-%{release}
+Obsoletes: %{name}-python < %{version}-%{release}
+Summary:    Python modules for the GDAL file format library
+Group:      Development/Libraries
+Requires:   numpy
+Requires:   %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:   %{name}-libs-fgdb
+Provides:   %{name}-python-fgdb
 
-%description python
+%description -n python2-gdal
 The GDAL Python modules provide support to handle multiple GIS file formats.
 The package also includes a couple of useful utilities in Python.
 
 
+%package python3
+Summary:    Python modules for the GDAL file format library
+Group:      Development/Libraries
+Requires:   python34-numpy
+Requires:   %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:   %{name}-libs-fgdb
+Provides:   %{name}-python3-fgdb
+
+%description python3
+The GDAL Python 3 modules provide support to handle multiple GIS file formats.
+
+
 %package doc
-Summary:	Documentation for GDAL
-Group:		Documentation
-BuildArch:	noarch
+Summary:    Documentation for GDAL
+Group:      Documentation
+BuildArch:  noarch
 
 %description doc
 This package contains HTML and PDF documentation for GDAL.
 
 # We don't want to provide private Python extension libs
-%global __provides_exclude_from ^(%{python_sitearch})/.*\.so$
+%global __provides_exclude_from ^(%{python2_sitearch}|%{python3_sitearch})/.*\.so$
 
 %prep
 %setup -q -n %{name}-%{version}-fedora -a 1
@@ -330,18 +360,26 @@ sed -i 's|-L\$with_cfitsio -L\$with_cfitsio/lib -lcfitsio|-lcfitsio|g' configure
 sed -i 's|-I\$with_cfitsio -I\$with_cfitsio/include|-I\$with_cfitsio/include/cfitsio|g' configure
 sed -i 's|-L\$with_netcdf -L\$with_netcdf/lib -lnetcdf|-lnetcdf|g' configure
 sed -i 's|-L\$DODS_LIB -ldap++|-ldap++|g' configure
+sed -i 's|-L\$with_ogdi -L\$with_ogdi/lib -logdi|-logdi|g' configure
 sed -i 's|-L\$with_jpeg -L\$with_jpeg/lib -ljpeg|-ljpeg|g' configure
 sed -i 's|-L\$with_libtiff\/lib -ltiff|-ltiff|g' configure
 sed -i 's|-lgeotiff -L$with_geotiff $LIBS|-lgeotiff $LIBS|g' configure
 sed -i 's|-L\$with_geotiff\/lib -lgeotiff $LIBS|-lgeotiff $LIBS|g' configure
 
+# libproj is dlopened; upstream sources point to .so, which is usually not present
+# http://trac.osgeo.org/gdal/ticket/3602
+#sed -i 's|libproj.so|libproj.so.%{proj_somaj}|g' ogr/ogrct.cpp
+
 # Fix Python installation path
 sed -i 's|setup.py install|setup.py install --root=%{buildroot}|' swig/python/GNUmakefile
 
 # Fix Python samples to depend on correct interpreter
+mkdir -p swig/python3/samples
 pushd swig/python/samples
 for f in `find . -name '*.py'`; do
-  sed -i 's|^#!.\+python$|#!/usr/bin/python|' $f
+  sed 's|^#!.\+python$|#!/usr/bin/python3|' $f > ../../python3/samples/$f
+  chmod --reference=$f ../../python3/samples/$f
+  sed -i 's|^#!.\+python$|#!/usr/bin/python2|' $f
 done
 popd
 
@@ -366,69 +404,80 @@ export CFLAGS="$RPM_OPT_FLAGS -fPIC"
 export CFLAGS="$RPM_OPT_FLAGS -fpic"
 %endif
 export CXXFLAGS="$CFLAGS -I%{_includedir}/libgeotiff"
-
-# jasper uses SIZE_MAX and friends in its headers.
-export CPPFLAGS="$CPPFLAGS -D__STDC_LIMIT_MACROS -I%{_includedir}/libgeotiff"
+export CPPFLAGS="$CPPFLAGS -I%{_includedir}/libgeotiff"
 
 # Sort out what version of Postgres we have - MJ
-PG_VERSION=`ls /etc/init.d | grep postgresql- | sort | tail -1 | egrep -o '[0-9]{1,}\.[0-9]{1,}'`
+PG_VERSION=`ls /usr | grep pgsql- | sort | tail -1 | egrep -o '[0-9]{1,}\.[0-9]{1,}'`
 
 # For future reference:
 # epsilon: Stalled review -- https://bugzilla.redhat.com/show_bug.cgi?id=660024
 # Building without pgeo driver, because it drags in Java
 
+# Centos7 doesn't like this - MJ
+# %if 0%{?fedora} >= 27
+# %global g2clib grib2c
+# %else
+# %global g2clib g2c_v1.6.0
+# %endif
+#     LIBS=-l%{g2clib} \
+
+
+# NOTE: /usr/java/default is a symlink to the Oracle JDK
+
 %configure \
-	LIBS=-lgrib2c \
-	--datadir=%{_datadir}/%{name}/ \
-	--includedir=%{_includedir}/%{name}/ \
-	--prefix=%{_prefix}	\
-	--without-bsb		\
-	--with-armadillo	\
-	--with-curl		\
-	--with-cfitsio=%{_prefix}	\
-	--with-dods-root=%{_prefix}	\
-	--with-expat		\
-	--with-fgdb		\
-	--with-freexl		\
-	--with-geos		\
-	--with-geotiff=external	\
-	--with-gif		\
-	--with-gta		\
-	--with-hdf4		\
-	--with-hdf5		\
-	--with-jasper		\
-	--with-java		\
-	--with-jpeg		\
-	--with-libjson-c	\
-	--without-jpeg12	\
-	--with-liblzma		\
-	--with-libtiff=external	\
-	--with-libz		\
-	--without-mdb		\
-	--with-mysql		\
-	--with-netcdf		\
-	--with-odbc		\
-	--without-ogdi		\
-	--without-msg		\
-	--with-openjpeg		\
-	--with-pcraster		\
-	--with-pg=/usr/pgsql-$PG_VERSION/bin/pg_config		\
-	--with-png		\
-	--with-poppler		\
-	%{spatialite}		\
-	--with-sqlite3		\
-	--with-threads		\
-	--with-webp		\
-	--with-xerces		\
-	--enable-shared		\
-	--with-perl		\
-	--with-python		
+    LIBS=-lgrib2c \
+    --datadir=%{_datadir}/%{name}/ \
+    --includedir=%{_includedir}/%{name}/ \
+    --prefix=%{_prefix} \
+    --without-bsb       \
+    --with-armadillo    \
+    --with-curl     \
+    --with-cfitsio=%{_prefix}   \
+    --with-dods-root=%{_prefix} \
+    --with-expat        \
+    --with-fgdb     \
+    --with-freexl       \
+    --with-geos     \
+    --with-geotiff=external \
+    --with-gif      \
+    --with-gta      \
+    --with-hdf4     \
+    --with-hdf5     \
+    --with-jasper       \
+    --with-java=/usr/java/default     \
+    --with-jpeg     \
+    --with-libjson-c    \
+    --without-jpeg12    \
+    --with-liblzma      \
+    --with-libtiff=external \
+    --with-libz     \
+    --without-mdb       \
+    --with-mysql        \
+    --with-netcdf       \
+    --with-odbc     \
+    --with-ogdi     \
+    --without-msg       \
+    --with-openjpeg     \
+    --with-pcraster     \
+    --with-pg=/usr/pgsql-$PG_VERSION/bin/pg_config      \
+    --with-png      \
+    --with-poppler      \
+    %{spatialite}       \
+    --with-sqlite3      \
+    --with-threads      \
+    --with-webp     \
+    --with-xerces       \
+    --enable-shared     \
+    --with-perl     \
+    --with-python       \
+    --with-libkml > smurf_config
 
 # {?_smp_mflags} doesn't work; Or it does -- who knows!
-# Adding "-s" to cut down the output a bit - MCJ
-make %{?_smp_mflags} -s
-make man
-make docs
+# Adding "-s" to cut down the output a bit - MJ
+# make %{?_smp_mflags}
+make -s > smurf_gdal
+make -s man
+make -s docs
 
 # Make Perl modules
 pushd swig/perl
@@ -455,12 +504,14 @@ sed -i 's|>> $(DESTINSTALLARCHLIB)\/perllocal.pod|> \/dev\/null|g' swig/perl/Mak
 # Make Java module and documentation
 pushd swig/java
   make
+  PATH=$PATH:/usr/java/default/bin
+  export PATH
   ./make_doc.sh
 popd
 
-# Make Python module
+# Make Python 3 module
 pushd swig/python
-  %{__python} setup.py build
+  %{__python3} setup.py build
 popd
 
 # --------- Documentation ----------
@@ -487,10 +538,10 @@ for docdir in %{docdirs}; do
 
     %if %{build_refman}
       pushd latex
-	sed -i -e '/rfoot\[/d' -e '/lfoot\[/d' doxygen.sty
-	sed -i -e '/small/d' -e '/large/d' refman.tex
-	sed -i -e 's|pdflatex|pdflatex -interaction nonstopmode |g' Makefile
-	make refman.pdf || true
+    sed -i -e '/rfoot\[/d' -e '/lfoot\[/d' doxygen.sty
+    sed -i -e '/small/d' -e '/large/d' refman.tex
+    sed -i -e 's|pdflatex|pdflatex -interaction nonstopmode |g' Makefile
+    make refman.pdf || true
       popd
     %endif
   popd
@@ -500,14 +551,15 @@ done
 %install
 rm -rf %{buildroot}
 
-# Install Python 2 module
+# Install Python 3 module
+# Must be done first so executables are Python 2.
 pushd swig/python
-  %{__python} setup.py install --skip-build --root %{buildroot}
+  %{__python3} setup.py install --skip-build --root %{buildroot}
 popd
 
-make	DESTDIR=%{buildroot}	\
-	install	\
-	install-man
+make    DESTDIR=%{buildroot}    \
+    install \
+    install-man
 
 install -pm 755 ogr/ogrsf_frmts/s57/s57dump %{buildroot}%{_bindir}
 install -pm 755 frmts/iso8211/8211createfromxml %{buildroot}%{_bindir}
@@ -540,7 +592,7 @@ install -pm 644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
 sed -i 's|<version></version>|<version>%{version}</version>|' %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
 
 # Create depmap fragment
-%add_to_maven_depmap JPP-%{name}.pom %{name}.jar
+%add_maven_depmap JPP-%{name}.pom %{name}.jar
 
 # 775 on the .so?
 # copy JNI libraries and links, non versioned link needed by JNI
@@ -563,10 +615,10 @@ for docdir in %{docdirs}; do
 
     # Install all Refmans
     %if %{build_refman}
-	if [ -f latex/refman.pdf ]; then
-		mkdir -p $path/pdf/$docdir
-		cp latex/refman.pdf $path/pdf/$docdir
-	fi
+    if [ -f latex/refman.pdf ]; then
+        mkdir -p $path/pdf/$docdir
+        cp latex/refman.pdf $path/pdf/$docdir
+    fi
     %endif
   popd
 done
@@ -664,7 +716,7 @@ for f in 'GDAL*' BandProperty ColorAssociation CutlineTransformer DatasetPropert
 done
 
 # Fix python interpreter
-sed -i '1s|^#!/usr/bin/env python$|#!%{__python}|' %{buildroot}%{_bindir}/*.py
+sed -i '1s|^#!/usr/bin/env python$|#!%{__python2}|' %{buildroot}%{_bindir}/*.py
 
 # Cleanup .pyc for now
 rm -f %{buildroot}%{_bindir}/*.pyc
@@ -762,7 +814,7 @@ popd
 %{_libdir}/pkgconfig/%{name}.pc
 
 # Can I even have a separate Java package anymore?
-%files java
+%files java -f .mfiles
 %doc swig/java/apps
 %{_jnidir}/%{name}/
 
@@ -774,7 +826,7 @@ popd
 %{perl_vendorarch}/*
 %{_mandir}/man3/*.3pm*
 
-%files python
+%files -n python2-gdal
 %doc swig/python/README.txt
 %doc swig/python/samples
 #TODO: Bug with .py files in EPEL 5 bindir, see http://fedoraproject.org/wiki/EPEL/GuidelinesAndPolicies
@@ -786,11 +838,23 @@ popd
 %{_mandir}/man1/gdal_merge.1*
 %{_mandir}/man1/gdal_retile.1*
 %{_mandir}/man1/gdal_sieve.1*
-%{python_sitearch}/osgeo
-%{python_sitearch}/GDAL-%{version}-py*.egg-info
-%{python_sitearch}/osr.py*
-%{python_sitearch}/ogr.py*
-%{python_sitearch}/gdal*.py*
+%{python2_sitearch}/osgeo
+%{python2_sitearch}/GDAL-%{version}-py*.egg-info
+%{python2_sitearch}/osr.py*
+%{python2_sitearch}/ogr.py*
+%{python2_sitearch}/gdal*.py*
+
+%files python3
+%doc swig/python/README.txt
+%doc swig/python3/samples
+%{python3_sitearch}/osgeo
+%{python3_sitearch}/GDAL-%{version}-py*.egg-info
+%{python3_sitearch}/osr.py
+%{python3_sitearch}/__pycache__/osr.*.py*
+%{python3_sitearch}/ogr.py
+%{python3_sitearch}/__pycache__/ogr.*.py*
+%{python3_sitearch}/gdal*.py
+%{python3_sitearch}/__pycache__/gdal*.*.py*
 
 %files doc
 %doc gdal_frmts ogrsf_frmts refman
@@ -804,6 +868,38 @@ popd
 #Or as before, using ldconfig
 
 %changelog
+* Sun Aug 20 2017 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.1.4-8
+- Add Provides for the old name without %%_isa
+
+* Sat Aug 19 2017 Orion Poplawski <orion@cora.nwra.com> - 2.1.4-7
+- Handle new g2clib name in Fedora 27+
+
+* Sat Aug 19 2017 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.1.4-6
+- Python 2 binary package renamed to python2-gdal
+  See https://fedoraproject.org/wiki/FinalizingFedoraSwitchtoPython3
+
+* Thu Aug 03 2017 David Tardon <dtardon@redhat.com> - 2.1.4-5
+- rebuild for poppler 0.57.0
+
+* Wed Aug 02 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
+
+* Wed Jul 26 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
+* Wed Jul 19 2017 Adam Williamson <awilliam@redhat.com> - 2.1.4-2
+- Rebuild against MariaDB 10.2
+- BuildRequires: javapackages-local, for a macro that got moved there
+
+* Sat Jul 01 2017 Volker Froehlich <volker27@gmx.at> - 2.1.4-1
+- New upstream release
+
+* Sun Jun 04 2017 Jitka Plesnikova <jplesnik@redhat.com> - 2.1.3-4
+- Perl 5.26 rebuild
+
+* Tue Mar 28 2017 David Tardon <dtardon@redhat.com> - 2.1.3-3
+- rebuild for poppler 0.53.0
+
 * Wed Feb 01 2017 Sandro Mani <manisandro@gmail.com> - 2.1.3-2
 - Rebuild (libwebp)
 
