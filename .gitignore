@@ -1,6 +1,7 @@
 .*.swp
 .vagrant
 el6
+el7
 tmp
 src/BUILD
 src/BUILDROOT
@@ -10,5 +11,6 @@ src/SRPMS
 src/SOURCES/hoot*.tar.gz
 src/SOURCES/hoot*.war
 src/SOURCES/words1.sqlite
-el6-src/jdk-8u131-linux-x64.rpm
+el6-src/jdk-8*
+el7-src/jdk-8*
 **VagrantfileLocal
