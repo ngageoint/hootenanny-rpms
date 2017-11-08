@@ -74,8 +74,8 @@ vagrant-test:
 	cd test; vagrant up
 	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --diff \
 		--exclude=.*ConflateAverageTest.sh \
-		--exclude=.*RubberSheetConflateTest.sh \
 		--exclude=.*ExactMatchInputsTest.sh \
+		--exclude=.*Osm2OgrTranslation.sh \
 		--exclude=.*OsmApiDbHootApiDb.* \
 		--exclude=.*MultiaryIngest.* \
 		--slow"
