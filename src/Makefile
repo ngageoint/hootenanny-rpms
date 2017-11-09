@@ -18,7 +18,7 @@ hootversion=$(patsubst SOURCES/hootenanny-%.tar.gz,%,$(hoottarball))
 
 HOOT_RPM=RPMS/x86_64/hootenanny-core-$(hootversion).el7.x86_64.rpm
 
-WORDS_RPM=RPMS/noarch/hootenanny-words-1.0.0-1.el7.noarch.rpm
+WORDS_RPM=RPMS/noarch/hootenanny-words-1.0.0-1.noarch.rpm
 TOMCAT8_RPM=RPMS/noarch/tomcat8-8.5.23-1.el7.noarch.rpm
 STXXL_RPM=RPMS/x86_64/stxxl-1.3.1-1.el7.x86_64.rpm
 

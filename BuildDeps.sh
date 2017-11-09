@@ -36,15 +36,15 @@ if  ! rpm -qa | grep --quiet stxxl-1.3.1; then
 fi
 
 if  ! rpm -qa | grep --quiet hootenanny-words; then
-    if [ ! -f el7-src/hootenanny-words-1.0.0-1.el7.noarch.rpm ]; then
+    if [ ! -f el7-src/hootenanny-words-1.0.0-1.noarch.rpm ]; then
         echo "#### Building RPM: Hootenanny Words"
         pushd src
-        make -s RPMS/noarch/hootenanny-words-1.0.0-1.el7.noarch.rpm
-        cp RPMS/noarch/hootenanny-words-1.0.0-1.el7.noarch.rpm  ../el7-src
+        make -s RPMS/noarch/hootenanny-words-1.0.0-1.noarch.rpm
+        cp RPMS/noarch/hootenanny-words-1.0.0-1.noarch.rpm  ../el7-src
         popd
     fi
     echo "  Installing RPM: Hootenanny Words"
-    sudo yum install -y el7-src/hootenanny-words-1.0.0-1.el7.noarch.rpm
+    sudo yum install -y el7-src/hootenanny-words-1.0.0-1.noarch.rpm
 fi
 
 if  ! rpm -qa | grep --quiet tomcat8; then
@@ -59,7 +59,7 @@ if  ! rpm -qa | grep --quiet tomcat8; then
     sudo yum install -y el7-src/tomcat8-8.5.23-1.noarch.rpm
 fi
 
-if  ! rpm -qa | grep --quiet gdal.x86_64; then
+if  ! rpm -qa | grep --quiet gdal-2; then
     if [ ! -f el7-src/gdal-2.1.4-8.el7.centos.x86_64.rpm ]; then
         echo "#### Building RPM: GDAL"
         pushd src
