@@ -1,6 +1,6 @@
 Name:		hootenanny-words
 Version:	1.0.0
-Release:	1%{?dist}
+Release:	1
 Summary:	Hootenanny words dictionary
 BuildArch:	noarch
 

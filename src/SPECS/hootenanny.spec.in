@@ -15,7 +15,7 @@ BuildRequires:  gdal-esri-epsg >= 2.1.4
 BuildRequires:  gdb
 BuildRequires:  geos-devel >= 3.4.2
 BuildRequires:  git glpk-devel graphviz libicu-devel
-BuildRequires:  hootenanny-words = 1.0.0
+BuildRequires:  hootenanny-words >= 1.0.0
 BuildRequires:  libspatialite-devel
 BuildRequires:  log4cxx-devel nodejs-devel opencv-devel
 BuildRequires:  postgresql-devel >= 9.1
@@ -24,7 +24,7 @@ BuildRequires:  proj-devel protobuf-devel python-argparse python-devel qt-devel
 BuildRequires:  texlive libxslt
 BuildRequires:  gnuplot
 BuildRequires:  unzip v8-devel w3m wget words zip
-BuildRequires:  jdk1.8.0_144
+BuildRequires:  java-1.8.0-openjdk
 
 Source0:        %{name}-%{version}.tar.gz
 
@@ -63,10 +63,10 @@ This package contains the core algorithms and command line interface.
 
 %build
 source ./SetupEnv.sh
-export JAVA_HOME=/usr/java/jdk1.8.0_144
 
 # Sort out the postgres version. We can't rely on having pg_config in our path
-PG_VERSION=`ls /etc/init.d | grep postgresql- | sort | tail -1 | egrep -o '[0-9]{1,}\.[0-9]{1,}'`
+PG_VERSION=$(psql --version | egrep -o '[0-9]{1,}\.[0-9]{1,}')
+
 
 # The dir configurations set the install directory to work with EL's dir structure
 # aclocal && autoconf && autoheader && automake --add-missing --copy && \
@@ -88,9 +88,8 @@ make -s %{?_smp_mflags}
 
 # This may be causing failure due to node-mapnik dependency on
 # Requires: libc.so.6(GLIBC_2.14)(64bit)
-# Install node modules
-#cd node-mapnik-server
-#npm install --production
+cd node-mapnik-server
+npm install --production
 
 cd node-export-server
 npm install --production
@@ -104,16 +103,15 @@ cp -R hoot-ui/dist $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hootenanny-id
 mkdir -p $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hootenanny-id/data
 cp hoot-ui/data/osm-plus-taginfo.csv $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hootenanny-id/data
 cp hoot-ui/data/tdsv61_field_values.json $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hootenanny-id/data
-mkdir -p $RPM_BUILD_ROOT/etc/init.d
-cp node-mapnik-server/init.d/centos-rpm $RPM_BUILD_ROOT/etc/init.d/node-mapnik-server
-cp node-export-server/init.d/centos-rpm $RPM_BUILD_ROOT/etc/init.d/node-export-server
+mkdir -p $RPM_BUILD_ROOT/etc/systemd
+cp node-mapnik-server/systemd/node-mapnik.service $RPM_BUILD_ROOT/etc/systemd/system/node-mapnik.service
+cp node-export-server/systemd/node-export.service $RPM_BUILD_ROOT/etc/systemd/system/node-export.service
 mkdir -p $RPM_BUILD_ROOT/var/lib/hootenanny
 cp -R node-mapnik-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-mapnik-server
 cp -R node-export-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-export-server
 
 make install
 echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
-echo "export JAVA_HOME=/usr/java/jdk1.8.0_144" >> $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
 
 chmod 755 $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
 cp -R test-files/ $RPM_BUILD_ROOT/var/lib/hootenanny/
@@ -130,12 +128,7 @@ ln -s /usr/share/doc/hootenanny  $RPM_BUILD_ROOT/var/lib/hootenanny/docs
 
 %check
 source ./SetupEnv.sh
-export JAVA_HOME=/usr/java/jdk1.8.0_144
-#export JAVA_HOME=/etc/alternatives/java_sdk
 # The excluded tests are failing on CentOS now and waiting on a fix
-# https://github.com/ngageoint/hootenanny/issues/279
-# https://github.com/ngageoint/hootenanny/issues/281
-#
 # HootTest --exclude=.*RubberSheetConflateTest.sh \
 HootTest --slow --diff
 
@@ -157,8 +150,6 @@ rm -rf %{buildroot}
 %{_sysconfdir}/asciidoc/filters/
 
 
-
-
 %package services-ui
 Summary:    Hootenanny UI and Services
 Requires:   tomcat8
@@ -166,8 +157,8 @@ Requires:   %{name}-core = %{version}-%{release}
 Requires:   postgresql-server >= 9.1
 Requires:   postgresql-contrib >= 9.1
 # NOTE: We need to look at postgis versions
-Requires:   postgis2_93 >= 2.1
-Requires:   jdk1.8.0_144
+Requires:   postgis >= 2.1
+Requires:   java-1.8.0-openjdk
 Requires:   liquibase
 Requires:   npm
 Requires:   pwgen
@@ -209,21 +200,6 @@ if [ "$1" = "2" ]; then
         sudo rm -rf $SERVICES_HOME
     fi
 fi
-
-# Setting /usr/java/jdk1.8.0_144/bin/java's priority to something really atrocious to guarantee that it will be
-# the one used when alternatives' auto mode is used.
-sudo alternatives --install /usr/bin/java java /usr/java/jdk1.8.0_144/bin/java 999999
-
-# Setting /usr/java/jdk1.8.0_144/bin/javac's priority to something really atrocious to guarantee that it will be
-# the one used when alternatives' auto mode is enabled.
-sudo alternatives --install /usr/bin/javac javac /usr/java/jdk1.8.0_144/bin/javac 9999999
-
-# switching to manual and forcing the desired version of java be configured
-sudo alternatives --set java /usr/java/jdk1.8.0_144/bin/java
-
-# switching to manual and forcing the desired version of javac be configured
-sudo alternatives --set javac /usr/java/jdk1.8.0_144/bin/javac
-
 
 %post services-ui
 function updateConfigFiles () {
@@ -566,9 +542,9 @@ to run Hootenanny.
 
 %post autostart
 # set Postgres to autostart
-export PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
-sudo /sbin/chkconfig --add postgresql-$PG_VERSION
-sudo /sbin/chkconfig postgresql-$PG_VERSION on
+#export PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
+export PG_VERSION=$(psql --version | egrep -o '[0-9]{1,}\.[0-9]{1,}')
+sudo systemctl enable postgresql-$PG_VERSION
 
 # Turn off tomcat6 if installed
 if /sbin/chkconfig | grep --quiet tomcat6 ; then
@@ -576,8 +552,8 @@ if /sbin/chkconfig | grep --quiet tomcat6 ; then
 fi
 
 # set Tomcat to autostart
-sudo /sbin/chkconfig --add tomcat8
-sudo /sbin/chkconfig tomcat8 on
+sudo systemctl enable tomcat8
+
 # set NodeJS node-mapnik-server to autostart
 sudo /sbin/chkconfig --add node-mapnik-server
 sudo /sbin/chkconfig node-mapnik-server on
@@ -708,7 +684,7 @@ Group:      Development/Libraries
 Requires:   %{name}-core-deps = %{version}-%{release}
 Requires:   autoconf automake boost-devel cppunit-devel gcc-c++
 Requires:       gdb
-Requires:       geos-devel = 3.4.2
+Requires:       geos-devel >= 3.4.2
 Requires:       git glpk-devel libicu-devel
 Requires:   hootenanny-words = 1.0.0
 Requires:       libspatialite-devel
@@ -740,8 +716,8 @@ Requires:   asciidoc cppunit dblatex doxygen FileGDB_API
 Requires:       gdal-devel >= 2.1.3
 Requires:       gdal-python >= 2.1.3
 Requires:       gdal-esri-epsg >= 2.1.3
-Requires:       geos = 3.4.2, gnuplot, graphviz
-Requires:   hootenanny-words = 1.0.0
+Requires:       geos >= 3.4.2, gnuplot, graphviz
+Requires:   hootenanny-words >= 1.0.0
 # Needed by gnuplot for report generation
 Requires:       liberation-fonts-common liberation-sans-fonts
 Requires:       libxslt log4cxx nodejs opencv  protobuf qt
@@ -766,6 +742,9 @@ This packages contains the dependencies to run the Hootenanny core.
 %files core-deps
 
 %changelog
+* Wed Nov 08 2017 Matt Jackson <matthew.jacksondigitalglobe.com> - 0.2.36+
+- Many Centos7 fixes
+
 * Fri May 12 2017 Matt Jackson <matthew.jacksondigitalglobe.com> - 0.2.33+
 - Fix libpq issues
 

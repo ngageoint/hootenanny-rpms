@@ -4,91 +4,55 @@
 $provisionSh = <<-SHELL
     set -e
     set -x
-  
-    if ! yum list installed | grep --quiet epel-release.noarch ; then
-        echo "Installing epel repo"
-        sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm || true
-    fi
 
-    # Enable NTP to synchronize clock
-    sudo yum -y install ntp
-    sudo chkconfig ntpd on
+    export LANG=en_US.UTF-8
 
-    sudo /etc/init.d/ntpd stop
-    sudo ntpdate pool.ntp.org
-    sudo /etc/init.d/ntpd start
+    # add EPEL repo for extra packages
+    echo "### Add epel repo ###" > CentOS_upgrade.txt
+    sudo yum -y install epel-release >> CentOS_upgrade.txt 2>&1
 
-    # Remove Postgres 8.4
-    if yum list installed | grep --quiet postgresql.x86_64 ; then
-        echo "### Removing Postgres 8.4 ###"
-        sudo yum remove -y postgresql.x86_64 postgresql-devel.x86_64 postgresql-libs.x86_64
-    fi
-
-    echo "Update OS"
-    sudo yum -y -q update --exclude=puppet*
+    echo "Updating OS..."
+    echo "### Update ###" >> CentOS_upgrade.txt
+    sudo yum -q -y update >> CentOS_upgrade.txt 2>&1
+    echo "### Upgrade ###" >> CentOS_upgrade.txt
+    sudo yum -q -y upgrade >> CentOS_upgrade.txt 2>&1
 
     echo "[hoot]" | sudo tee /etc/yum.repos.d/hoot.repo
     echo "name=hoot" | sudo tee -a /etc/yum.repos.d/hoot.repo
-    echo "baseurl=file:///home/vagrant/el6/" | sudo tee -a /etc/yum.repos.d/hoot.repo
+    echo "baseurl=file:///home/vagrant/el7/" | sudo tee -a /etc/yum.repos.d/hoot.repo
     echo "gpgcheck=0" | sudo tee -a /etc/yum.repos.d/hoot.repo
 
     sudo yum -y -q update --exclude=puppet*
-    echo "Install Hootenanny"
+    echo "Install Hootenanny..."
     sudo yum -y install hootenanny-autostart
-
-    # Fix Postgres
-    # NOTE: The will get fixed in the VM - later....
-    PG_VERSION=$(ls /etc/init.d | grep postgresql- | sort | tail -1 | egrep -o '[0-9]{1,}\.[0-9]{1,}')
-
-    if [ -n "$PG_VERSION" ]; then
-        if ! sudo grep -i --quiet HOOT /var/lib/pgsql/$PG_VERSION/data/postgresql.conf; then
-            echo "Tuning PostgreSQL"
-            sudo -u postgres sed -i.bak s/^max_connections/\#max_connections/ /var/lib/pgsql/$PG_VERSION/data/postgresql.conf
-            sudo -u postgres sed -i.bak s/^shared_buffers/\#shared_buffers/ /var/lib/pgsql/$PG_VERSION/data/postgresql.conf
-            sudo -u postgres bash -c "cat >> /var/lib/pgsql/$PG_VERSION/data/postgresql.conf" <<EOT
-#--------------
-# Hoot Settings
-#--------------
-max_connections = 1000
-shared_buffers = 1024MB
-max_files_per_process = 1000
-work_mem = 16MB
-maintenance_work_mem = 256MB
-checkpoint_segments = 20
-autovacuum = off
-EOT
-
-            echo
-            echo "About to restart Postgres"
-            sudo service postgresql-$PG_VERSION restart
-        fi
-    fi
 
  SHELL
 
-# All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
 Vagrant.configure(2) do |config|
+  config.vm.box = "hoot/centos7-minimal"
+  config.vm.hostname = "hoot-centos"
 
-  config.vm.box = "centos/6"
-  config.vm.box_url = "https://atlas.hashicorp.com/centos/boxes/6"
-
-  config.vm.synced_folder "../el6", "/home/vagrant/el6", type: "rsync"
-  config.vm.synced_folder ".", "/home/vagrant/tmp", type: "rsync"
+  config.vm.synced_folder "../el7", "/home/vagrant/el7"
+  config.vm.synced_folder ".", "/home/vagrant/tmp"
 
   config.vm.provision "shell", inline: $provisionSh
 
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  # Example for VirtualBox:
+  #
   config.vm.provider "virtualbox" do |vb|
-    # Customize the amount of memory on the VM:
-    vb.memory = 4096
-    vb.cpus = 2
+      # Customize the amount of memory on the VM:
+      vb.memory = 4096
+      vb.cpus = 2
   end
-
 end
 
 # Allow local overrides of vagrant settings
 if File.exists?('VagrantfileLocal')
   load 'VagrantfileLocal'
+else
+  if File.exists?('VagrantfileLocal.vbox')
+    load 'VagrantfileLocal.vbox'
+  end
 end

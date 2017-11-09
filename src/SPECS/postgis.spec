@@ -179,10 +179,10 @@ rm -rf %{buildroot}
 %{_prefix}/pgsql-*/share/extension/address_standardizer*.sql
 %{_prefix}/pgsql-*/share/extension/address_standardizer*.control
 %{_prefix}/pgsql-*/share/extension/postgis-*.sql
-%{_prefix}/pgsql-*/share/extension/postgis_sfcgal*.sql
+#%{_prefix}/pgsql-*/share/extension/postgis_sfcgal*.sql
 %{_prefix}/pgsql-*/share/extension/postgis_topology*.sql
 %{_prefix}/pgsql-*/share/extension/postgis.control
-%{_prefix}/pgsql-*/share/extension/postgis_sfcgal.control
+#%{_prefix}/pgsql-*/share/extension/postgis_sfcgal.control
 %{_prefix}/pgsql-*/share/extension/postgis_topology.control
 %{_prefix}/pgsql-*/share/extension/postgis_tiger_geocoder*.sql
 %{_prefix}/pgsql-*/share/extension/postgis_tiger_geocoder.control
@@ -239,7 +239,7 @@ rm -rf %{buildroot}
 
 %changelog
 * Wed Aug 30 2017 Matt Jackson <matthew.jackson@digitalglobe.com>
-- Edited to work woth Hootenanny
+- Edited to work with Hootenanny
 
 * Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.3-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild

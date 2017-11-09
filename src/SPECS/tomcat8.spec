@@ -15,7 +15,7 @@
 
 Summary:    Apache Servlet/JSP Engine, RI for Servlet 3.1/JSP 2.3 API
 Name:       tomcat8
-Version:    8.5.20
+Version:    8.5.23
 BuildArch:  noarch
 Release:    1
 License:    Apache Software License
@@ -27,7 +27,8 @@ Source2:    %{name}.sysconfig
 Source3:    %{name}.logrotate
 Source4:    %{name}.conf
 Requires:   jpackage-utils
-Requires:   jdk1.8.0_144
+Requires:   java-1.8.0-openjdk
+#Requires:   jdk1.8.0_144
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description

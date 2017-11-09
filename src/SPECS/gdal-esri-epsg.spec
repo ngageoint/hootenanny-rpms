@@ -12,8 +12,8 @@ URL:		http://www.gdal.org
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires:       gdal >= %{version}
-#Source0:        http://download.osgeo.org/gdal/%{version}/gdal-%{version}.tar.gz
-Source0:        gdal-%{version}-fedora.tar.xz
+Source0:        http://download.osgeo.org/gdal/%{version}/gdal-%{version}.tar.xz
+#Source0:        gdal-%{version}-fedora.tar.xz
 
 %description
 The license for the EPSG codes distributed with GDAL are a bit complicated. See:
@@ -31,7 +31,7 @@ As a result they aren't included in the standard GDAL RPM.
 %prep
 mkdir -p %{name}-%{version}
 cd %{name}-%{version}
-tar xf %{_sourcedir}/gdal-%{version}-fedora.tar.xz
+tar xJf %{_sourcedir}/gdal-%{version}.tar.xz
 cd gdal-%{version}
 
 %build
@@ -54,7 +54,8 @@ install $DATA_DIR/ecw_cs.wkt $INSTALL_DIR
 #rm -rf %{buildroot}
 
 %changelog
-* Thu Aug 24 2017 Matt Jackson <matthew.jackson@digitalglobe.com> - Updated version number
-* Wed Jan 25 2016 Benjamin Marchant <benjamin.marchant@digitalglobe.com> - 0.2.33+
-* Thu Jan 25 2016 Jason R. Surratt <jason.surratt@digitalglobe.com> - 0.2.21+
+* Thu Aug 24 2017 Matt Jackson <matthew.jackson@digitalglobe.com>
+- Updated version number
+* Mon Jan 25 2016 Benjamin Marchant <benjamin.marchant@digitalglobe.com> - 0.2.33+
+* Thu Jan 21 2016 Jason R. Surratt <jason.surratt@digitalglobe.com> - 0.2.21+
 - Initial attempt
