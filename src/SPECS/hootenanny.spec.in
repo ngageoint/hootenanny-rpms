@@ -132,19 +132,13 @@ ln -s /usr/share/doc/hootenanny  $RPM_BUILD_ROOT/var/lib/hootenanny/docs
 %check
 source ./SetupEnv.sh
 export JAVA_HOME=/usr/java/jdk1.8.0_131
-#export JAVA_HOME=/etc/alternatives/java_sdk
-# The excluded tests are failing on CentOS now and waiting on a fix
-# https://github.com/ngageoint/hootenanny/issues/279
-# https://github.com/ngageoint/hootenanny/issues/281
-#
-# HootTest --exclude=.*RubberSheetConflateTest.sh \
-HootTest \
-    --exclude=.*ConflateAverageTest.sh \
+# The excluded tests are failing on CentOS now and waiting on the upgrade to CentOS 7
+HootTest --diff --glacial --parallel $(nproc) \
+    --exclude=.*NetworkConflateCmdTest.sh \
     --exclude=.*ExactMatchInputsTest.sh \
-    --exclude=.*Osm2OgrTranslation.sh \
-    --exclude=.*OsmApiDbHootApiDb.* \
-    --exclude=.*MultiaryIngest.* \
-    --slow --diff
+    --exclude=.*ConflateAverageTest.sh \
+    --exclude=.*ServiceMultiaryIngestCmdTest.sh \
+    --exclude=.*TileConflatorTest.*
 cd hoot-services
 make test -s
 
