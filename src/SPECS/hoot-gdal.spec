@@ -1,3 +1,6 @@
+%global pgmajorversion 95
+%global pginstdir /usr/pgsql-9.5
+
 #TODO: g2clib and grib (said to be modified)
 #TODO: Python 3 modules should be possible since 1.7
 #TODO: Create script to make clean tarball
@@ -42,9 +45,9 @@
 %global compdir %(dirname $(pkg-config --variable=compatdir bash-completion))
 
 
-Name:		gdal
+Name:		hoot-gdal
 Version:	2.1.4
-Release:	8%{?dist}
+Release:	1%{?dist}
 Summary:	GIS file format library
 Group:		System Environment/Libraries
 License:	MIT
@@ -136,7 +139,7 @@ BuildRequires:	openjpeg2-devel
 BuildRequires:	perl(ExtUtils::MakeMaker)
 BuildRequires:	%{_bindir}/pkg-config
 BuildRequires:	poppler-devel
-BuildRequires:	postgresql-devel
+BuildRequires:	postgresql%{pgmajorversion}-devel
 BuildRequires:	proj-devel
 BuildRequires:	python2-devel
 BuildRequires:	python34-devel
@@ -160,6 +163,7 @@ BuildRequires:	xz-devel
 BuildRequires:	zlib-devel
 
 # Run time dependency for gpsbabel driver
+Conflicts:	gdal
 Requires:	gpsbabel
 
 # proj DL-opened in ogrct.cpp, see also fix in %%prep
@@ -201,7 +205,8 @@ GDAL/OGR is the most widely used geospatial data access library.
 %package devel
 Summary:	Development files for the GDAL file format library
 Group:	Development/Libraries
-Provides:   %{name}-devel-fgdb
+Conflicts:	gdal-devel
+Provides:	%{name}-devel
 
 # Old rpm didn't figure out
 %if 0%{?rhel} < 6
@@ -209,7 +214,7 @@ Requires: pkgconfig
 %endif
 
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
-Requires:   %{name}-libs-fgdb
+Requires:	%{name}-libs
 Obsoletes:	%{name}-static < 1.9.0-1
 
 %description devel
@@ -219,7 +224,8 @@ This package contains development files for GDAL.
 %package libs
 Summary:	GDAL file format library
 Group:		System Environment/Libraries
-Provides:   %{name}-libs-fgdb
+Conflicts:	gdal-libs
+Provides:	%{name}-libs
 # https://trac.osgeo.org/gdal/ticket/3978#comment:5
 Obsoletes:	%{name}-ruby < 1.11.0-1
 
@@ -230,7 +236,8 @@ This package contains the GDAL file format library.
 %package java
 Summary:	Java modules for the GDAL file format library
 Group:		Development/Libraries
-Provides:   %{name}-java-fgdb
+Conflicts:	gdal-java
+Provides:	%{name}-java
 Requires:	jpackage-utils
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 
@@ -241,7 +248,8 @@ The GDAL Java modules provide support to handle multiple GIS file formats.
 %package javadoc
 Summary:	Javadocs for %{name}
 Group:		Documentation
-Provides:   %{name}-javadoc-fgdb
+Conflicts:	gdal-javadoc
+Provides:	%{name}-javadoc
 Requires:	jpackage-utils
 BuildArch:	noarch
 
@@ -253,9 +261,10 @@ This package contains the API documentation for %{name}.
 Summary:	Perl modules for the GDAL file format library
 Group:		Development/Libraries
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
-Requires:   %{name}-libs-fgdb
+Requires:	%{name}-libs
 Requires:	perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
-Provides:   %{name}-perl-fgdb
+Conflicts:	gdal-perl
+Provides:	%{name}-perl
 
 %description perl
 The GDAL Perl modules provide support to handle multiple GIS file formats.
@@ -266,8 +275,9 @@ Summary:	Python modules for the GDAL file format library
 Group:		Development/Libraries
 Requires:	numpy
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
-Requires:   %{name}-libs-fgdb
-Provides:   %{name}-python-fgdb
+Requires:	%{name}-libs
+Conflicts:	gdal-python
+Provides:	%{name}-python
 
 %description python
 The GDAL Python modules provide support to handle multiple GIS file formats.
@@ -279,8 +289,9 @@ Summary:	Python modules for the GDAL file format library
 Group:		Development/Libraries
 Requires:	python34-numpy
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
-Requires:   %{name}-libs-fgdb
-Provides:   %{name}-python3-fgdb
+Requires:	%{name}-libs
+Conflicts:	gdal-python3
+Provides:	%{name}-python3
 
 %description python3
 The GDAL Python 3 modules provide support to handle multiple GIS file formats.
@@ -290,6 +301,7 @@ The GDAL Python 3 modules provide support to handle multiple GIS file formats.
 Summary:	Documentation for GDAL
 Group:		Documentation
 BuildArch:	noarch
+Conflicts:	gdal-doc
 
 %description doc
 This package contains HTML and PDF documentation for GDAL.
@@ -393,15 +405,12 @@ sed -i 's|CFLAGS=\"${GEOS_CFLAGS}\"|CFLAGS=\"${CFLAGS} ${GEOS_CFLAGS}\"|g' confi
 %build
 #TODO: Couldn't I have modified that in the prep section?
 %ifarch sparcv9 sparc64 s390 s390x
-export CFLAGS="$RPM_OPT_FLAGS -fPIC"
+export CFLAGS="$RPM_OPT_FLAGS -fPIC -I%{_includedir}/FileGDB_API"
 %else
-export CFLAGS="$RPM_OPT_FLAGS -fpic"
+export CFLAGS="$RPM_OPT_FLAGS -fpic -I%{_includedir}/FileGDB_API"
 %endif
 export CXXFLAGS="$CFLAGS -I%{_includedir}/libgeotiff"
 export CPPFLAGS="$CPPFLAGS -I%{_includedir}/libgeotiff"
-
-# Sort out what version of Postgres we have - MJ
-PG_VERSION=`ls /usr | grep pgsql- | sort | tail -1 | egrep -o '[0-9]{1,}\.[0-9]{1,}'`
 
 # For future reference:
 # epsilon: Stalled review -- https://bugzilla.redhat.com/show_bug.cgi?id=660024
@@ -442,7 +451,7 @@ PG_VERSION=`ls /usr | grep pgsql- | sort | tail -1 | egrep -o '[0-9]{1,}\.[0-9]{
 	--without-msg		\
 	--with-openjpeg		\
 	--with-pcraster		\
-	--with-pg		\
+        --with-pg=%{pginstdir}/bin/pg_config		\
 	--with-png		\
 	--with-poppler		\
 	%{spatialite}		\
@@ -454,9 +463,6 @@ PG_VERSION=`ls /usr | grep pgsql- | sort | tail -1 | egrep -o '[0-9]{1,}\.[0-9]{
 	--with-perl		\
 	--with-python		\
 	--with-libkml
-
-#     --with-pg=/usr/pgsql-$PG_VERSION/bin/pg_config      \
-
 
 # {?_smp_mflags} doesn't work; Or it does -- who knows!
 #make %{?_smp_mflags}

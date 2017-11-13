@@ -29,7 +29,7 @@ BuildRequires:	gtk2-devel, libxml2-devel, gdal-devel >= 1.10.0
 BuildRequires:	pcre-devel
 BuildRequires:	autoconf, automake, libtool
 Requires:	postgresql-server >= %{pg_version_minimum}
-Requires:	geos >= 3.4.2, proj, gdal >= 1.10.0, json-c
+Requires:	geos >= 3.4.2, proj, hoot-gdal >= 2.1.0, json-c
 
 
 %description
