@@ -1,21 +1,24 @@
-####
-### This is far from complete. Just playing.
-####
+# ESRI File Geodatabase API Library
 Name:		FileGDB_API
 Version:	1.5.1
 Release:	1%{?dist}
-Summary:	ESRI FileGDB libraries
+Summary:	ESRI FileGDB API
 
 Group:		System Environment/Libraries
-License:	Copyright © 2012 ESRI
-URL:		http://www.esri.com/apps/products/download/#File_Geodatabase_API_1.4
+License:	ASL 2.0
+URL:		https://github.com/Esri/file-geodatabase-api
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-Source1:        FileGDB_API_1_5_1-64.tar.gz
+
+%global filegdbtarball FileGDB_API_%(echo %{version} | tr '.' '_')-64.tar.gz
+Source0:	%{filegdbtarball}
 
 %description
+The FileGDB API provides basic tools that allow the creation of file
+geodatbases, feature classes and tables. Simple features can be created
+and loaded.
 
-Copyright © 2012 ESRI
+Copyright © 2014 ESRI
 
 All rights reserved under the copyright laws of the United States and
 applicable international laws, treaties, and conventions.
@@ -46,33 +49,45 @@ email: contracts@esri.com
 
 
 %files
-%{_includedir}/*
-%{_libdir}/*
-/usr/share/*
+%docdir /doc/html
+%{_includedir}/%{name}/*
+%{_libdir}/*.so
+%{_libdir}/*.a
+%{_datarootdir}/doc/%{name}-%{version}/*
+%{_datarootdir}/pkgconfig/%{name}.pc
 
 %prep
-mkdir -p %{name}-%{version}/FileGDB_API
-cd %{name}-%{version}/FileGDB_API
-tar xf %{_sourcedir}/FileGDB_API_1_5_1-64.tar.gz --strip-components 1
+mkdir -p %{name}-%{version}
+cd %{name}-%{version}
+tar xf %{_sourcedir}/%{filegdbtarball} --strip-components 1
 
 %build
 true
 
 %install
-rm -rf $RPM_BUILD_ROOT
-export BUILD_DIR=$RPM_BUILD_DIR/$RPM_PACKAGE_NAME-$RPM_PACKAGE_VERSION/FileGDB_API
-export INSTALL_DIR=$RPM_BUILD_ROOT/usr/
-export SHARE_DIR=$INSTALL_DIR/share/filegdb/
-export LIB_DIR=$INSTALL_DIR/lib64/
-install -d $INSTALL_DIR
-install -d $SHARE_DIR
-install -d $LIB_DIR
-install -d $INSTALL_DIR/include
+rm -fr $RPM_BUILD_ROOT
+install -d %{buildroot}%{_libdir}
+install -d %{buildroot}%{_includedir}/%{name}
+install -d %{buildroot}%{_datarootdir}/pkgconfig
+install -d %{buildroot}%{_datarootdir}/doc/%{name}-%{version}/FileGDB_SQL_files
 
-cp -R $BUILD_DIR/doc/ $SHARE_DIR/
-install -D $BUILD_DIR/license/* $SHARE_DIR/
-install -D $BUILD_DIR/lib/* $LIB_DIR
-install -D $BUILD_DIR/include/* $INSTALL_DIR/include/
+install -m 0755 -D %{_builddir}/%{name}-%{version}/lib/*.so %{buildroot}%{_libdir}
+install -m 0644 -D %{_builddir}/%{name}-%{version}/lib/*.a %{buildroot}%{_libdir}
+install -m 0644 -D %{_builddir}/%{name}-%{version}/include/* %{buildroot}%{_includedir}/%{name}
+install -m 0644 -D %{_builddir}/%{name}-%{version}/doc/html/*.{css,html,js,pdf,png,txt,xml} %{buildroot}%{_datarootdir}/doc/%{name}-%{version}
+install -m 0644 -D %{_builddir}/%{name}-%{version}/doc/html/FileGDB_SQL_files/*.xml %{buildroot}%{_datarootdir}/doc/%{name}-%{version}/FileGDB_SQL_files
+
+cat > %{buildroot}%{_datarootdir}/pkgconfig/%{name}.pc <<EOF
+prefix=%{_prefix}
+libdir=%{_libdir}
+includedir=%{_includedir}/%{name}
+
+Name: %{name}
+Description: ESRI FileGDB API
+Version: %{version}
+Cflags: -I\${includedir}
+EOF
+chmod 0644 %{buildroot}%{_datarootdir}/pkgconfig/%{name}.pc
 
 %check
 
@@ -83,5 +98,5 @@ install -D $BUILD_DIR/include/* $INSTALL_DIR/include/
 - Upgrade to v1.5
 * Thu Jan 19 2017 Benjamin Marchant <benjamin.marchant@digitalglobe.com>
 - Upgrade to v1.4
-* Thu Jan 26 2016 Jason R. Surratt <jason.surratt@digitalglobe.com>
+* Tue Jan 26 2016 Jason R. Surratt <jason.surratt@digitalglobe.com>
 - Initial attempt
