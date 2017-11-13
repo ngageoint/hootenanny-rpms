@@ -72,13 +72,12 @@ vagrant-test:
 	# Adding this in so we always have a clean test VM.
 	cd test && vagrant halt && vagrant destroy -f
 	cd test; vagrant up
-	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --diff \
-		--exclude=.*ConflateAverageTest.sh \
-		--exclude=.*RubberSheetConflateTest.sh \
+	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --diff --glacial --parallel 4 \
+		--exclude=.*NetworkConflateCmdTest.sh \
 		--exclude=.*ExactMatchInputsTest.sh \
-		--exclude=.*OsmApiDbHootApiDb.* \
-		--exclude=.*MultiaryIngest.* \
-		--slow"
+		--exclude=.*ConflateAverageTest.sh \
+		--exclude=.*ServiceMultiaryIngestCmdTest.sh \
+		--exclude=.*TileConflatorTest.*"
 
 # This spawns a small VM to update the main repo so we can copy it to S3
 vagrant-repo:
