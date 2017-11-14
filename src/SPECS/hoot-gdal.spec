@@ -1,6 +1,3 @@
-%global pgmajorversion 95
-%global pginstdir /usr/pgsql-9.5
-
 #TODO: g2clib and grib (said to be modified)
 #TODO: Python 3 modules should be possible since 1.7
 #TODO: Create script to make clean tarball
@@ -137,7 +134,7 @@ BuildRequires:	openjpeg2-devel
 BuildRequires:	perl(ExtUtils::MakeMaker)
 BuildRequires:	%{_bindir}/pkg-config
 BuildRequires:	poppler-devel
-BuildRequires:	postgresql%{pgmajorversion}-devel
+BuildRequires:	postgresql%{pg_dotless}-devel
 BuildRequires:	proj-devel
 BuildRequires:	python2-devel
 BuildRequires:	python34-devel

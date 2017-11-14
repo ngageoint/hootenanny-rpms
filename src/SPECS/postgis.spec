@@ -6,8 +6,6 @@
 %global prevmajorversion 2.2
 %global prevversion %{prevmajorversion}.5
 
-%global pg_version_minimum 9.2
-
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
 Version:	2.3.3
@@ -24,11 +22,11 @@ URL:		http://www.postgis.net
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:	perl-generators
-BuildRequires:	postgresql-devel >= %{pg_version_minimum}, proj-devel, geos-devel >= 3.4.2 byacc, proj-devel, flex, java, java-devel, ant
+BuildRequires:	postgresql%{pg_dotless}-devel, proj-devel, geos-devel >= 3.4.2 byacc, proj-devel, flex, java, java-devel, ant
 BuildRequires:	gtk2-devel, libxml2-devel, hoot-gdal-devel >= 2.1.0
 BuildRequires:	pcre-devel
 BuildRequires:	autoconf, automake, libtool
-Requires:	postgresql-server >= %{pg_version_minimum}
+Requires:	postgresql%{pg_dotless}-server
 Requires:	geos >= 3.4.2, proj, hoot-gdal-libs >= 2.1.0, json-c
 
 
@@ -93,12 +91,8 @@ cp -p %{SOURCE2} .
 
 %build
 ./autogen.sh
-# Sort out what version of Postgres we have - MJ
-PG_VERSION=`ls /usr | grep pgsql- | sort | tail -1 | egrep -o '[0-9]{1,}\.[0-9]{1,}'`
-
-
 # %configure --with-gui --enable-raster --with-pgconfig=/usr/pgsql-$PG_VERSION/bin/pg_config
-%configure --with-gui --enable-raster --with-pgconfig=/usr/pgsql-$PG_VERSION/bin/pg_config
+%configure --with-gui --enable-raster --with-pgconfig=/usr/pgsql-%{pg_version}/bin/pg_config
 # FIXME {_smp_mflags} macro doesn't work
 make -s LPATH=`pg_config --pkglibdir` shlib="%{name}.so"
 

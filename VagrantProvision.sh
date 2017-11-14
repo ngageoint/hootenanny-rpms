@@ -13,7 +13,9 @@ sudo yum -y install epel-release >> CentOS_upgrade.txt 2>&1
 
 # add the Postgres repo
 echo "### Add Postgres repo ###" > CentOS_upgrade.txt
-sudo rpm -Uvh https://download.postgresql.org/pub/repos/yum/9.5/redhat/rhel-7-x86_64/pgdg-centos95-9.5-3.noarch.rpm  >> CentOS_upgrade.txt 2>&1
+export PG_VERSION=9.5
+export PG_DOTLESS="$(echo ${PG_VERSION} | tr -d '.')"
+sudo rpm -Uvh https://download.postgresql.org/pub/repos/yum/$PG_VERSION/redhat/rhel-7-x86_64/pgdg-centos$PG_DOTLESS-$PG_VERSION-3.noarch.rpm  >> CentOS_upgrade.txt 2>&1
 
 echo "Updating OS..."
 echo "### Update ###" >> CentOS_upgrade.txt
@@ -41,7 +43,6 @@ sudo yum versionlock nodejs*
 echo "### Installing dependencies from repos..."
 echo "  If this dies, check the Centos7_pkgInstall.txt file"
 sudo yum -y install \
-    hootenanny-rpms/el7-src/* \
     ant \
     armadillo-devel \
     asciidoc \
@@ -109,10 +110,10 @@ sudo yum -y install \
     perl-devel \
     perl-generators \
     poppler-devel \
-    postgresql95 \
-    postgresql95-contrib \
-    postgresql95-devel \
-    postgresql95-server \
+    postgresql$PG_DOTLESS \
+    postgresql$PG_DOTLESS-contrib \
+    postgresql$PG_DOTLESS-devel \
+    postgresql$PG_DOTLESS-server \
     proj \
     proj-devel \
     protobuf \
@@ -156,29 +157,25 @@ sudo yum -y install \
 
 
 # Get ready for build RPM's
-echo "%__make /usr/bin/make -sj$(nproc)" >> ~/.rpmmacros
+cat > $HOME/.rpmmacros <<EOF
+%__make /usr/bin/make -sj$(nproc)
+%pg_version ${PG_VERSION}
+%pg_dotless %(echo %{pg_version} | tr -d '.')
+%pginstdir /usr/pgsql-%{pg_version}
+EOF
 
 # Now setup stuff for building hootenanny
-# First, Postgres
-# Need to figure out a way to do this automagically
-#PG_VERSION=9.5
-PG_VERSION=$(psql --version | egrep -o '[0-9]{1,}\.[0-9]{1,}')
 
 # Defensive.
 cd /tmp
 
-sudo PGSETUP_INITDB_OPTIONS="-E 'UTF-8' --lc-collate='en_US.UTF-8' --lc-ctype='en_US.UTF-8'" /usr/pgsql-$PG_VERSION/bin/postgresql95-setup initdb
+# First, Postgres
+sudo PGSETUP_INITDB_OPTIONS="-E 'UTF-8' --lc-collate='en_US.UTF-8' --lc-ctype='en_US.UTF-8'" /usr/pgsql-$PG_VERSION/bin/postgresql$PG_DOTLESS-setup initdb
 sudo systemctl start postgresql-$PG_VERSION
 sudo systemctl enable postgresql-$PG_VERSION
 
 if ! grep --quiet "psql-" ~/.bash_profile; then
     echo "Adding PostGres path vars to profile..."
-    echo "export PATH=\$PATH:/usr/pgsql-$PG_VERSION/bin" >> ~/.bash_profile
+    echo "export PATH=\$PATH:/usr/pgsql-${PG_VERSION}/bin" >> ~/.bash_profile
     source ~/.bash_profile
 fi
-
-if [ ! -f /etc/ld.so.conf.d/postgres$PG_VERSION.conf ]; then
-    sudo sh -c "echo '/usr/pgsql-$PG_VERSION/lib' > /etc/ld.so.conf.d/postgres$PG_VERSION.conf"
-    sudo ldconfig
-fi
-
