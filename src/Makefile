@@ -20,6 +20,7 @@ HOOT_RPM=RPMS/x86_64/hootenanny-core-$(hootversion).el7.x86_64.rpm
 
 WAMERICAN_RPM=RPMS/noarch/wamerican-insane-7.1-1.el7.noarch.rpm
 WORDS_RPM=RPMS/noarch/hoot-words-1.0.0-1.el7.noarch.rpm
+OSMOSIS_RPM=RPMS/noarch/osmosis-0.46-1.el7.noarch.rpm
 TOMCAT8_RPM=RPMS/noarch/tomcat8-8.5.23-1.el7.noarch.rpm
 STXXL_RPM=RPMS/x86_64/stxxl-1.3.1-1.el7.x86_64.rpm
 
@@ -44,6 +45,7 @@ not-hoot: tmp/not-hoot
 tmp/not-hoot: \
 	$(WAMERICAN_RPM) \
 	$(WORDS_RPM) \
+	$(OSMOSIS_RPM) \
 	$(TOMCAT8_RPM) \
 	$(STXXL_RPM) \
 	$(FILEGDB_RPM) \
@@ -101,6 +103,10 @@ $(WAMERICAN_RPM): SPECS/wamerican-insane.spec
 
 $(WORDS_RPM): SPECS/hoot-words.spec
 	rm -f RPMS/noarch/hoot-words* RPMS/x86_64/hoot-words*
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
+
+$(OSMOSIS_RPM): SPECS/osmosis.spec
+	rm -f RPMS/noarch/osmosis*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 $(TOMCAT8_RPM): SPECS/tomcat8.spec

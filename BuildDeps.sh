@@ -59,6 +59,18 @@ if  ! rpm -qa | grep --quiet wamerican-insane; then
     sudo yum install -y el7-src/wamerican-insane-7.1-1.el7.noarch.rpm
 fi
 
+if  ! rpm -qa | grep --quiet osmosis; then
+    if [ ! -f el7-src/osmosis-0.46-1.el7.noarch.rpm ]; then
+        echo "#### Building RPM: Osmosis"
+        pushd src
+        make -s RPMS/noarch/osmosis-0.46-1.el7.noarch.rpm
+        cp RPMS/noarch/osmosis-0.46-1.el7.noarch.rpm  ../el7-src
+        popd
+    fi
+    echo "  Installing RPM: Osmosis"
+    sudo yum install -y el7-src/osmosis-0.46-1.el7.noarch.rpm
+fi
+
 if  ! rpm -qa | grep --quiet tomcat8; then
     if [ ! -f el7-src/tomcat8-8.5.23-1.el7.noarch.rpm ]; then
         echo "#### Building RPM: Tomcat8"
