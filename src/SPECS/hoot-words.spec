@@ -1,8 +1,9 @@
-Name:		hootenanny-words
+Name:		hoot-words
 Version:	1.0.0
-Release:	1
+Release:	1%{?dist}
 Summary:	Hootenanny words dictionary
 BuildArch:	noarch
+BuildRequires:	wget
 
 %define words_filename	words1.sqlite
 %define words_compress	%{words_filename}.bz2
@@ -33,8 +34,8 @@ bzcat %{_sourcedir}/%{words_compress} > %{words_filename}
 
 %install
 export BUILD_DIR=%{_builddir}/%{name}-%{version}-%{release}.%{_arch}
-install -m 755 -d $RPM_BUILD_ROOT%{deploy_dir}
-install -m 644 $BUILD_DIR/%{words_filename} $RPM_BUILD_ROOT%{deploy_dir}
+install -m 0755 -d $RPM_BUILD_ROOT%{deploy_dir}
+install -m 0644 $BUILD_DIR/%{words_filename} $RPM_BUILD_ROOT%{deploy_dir}
 cd $RPM_BUILD_ROOT%{deploy_dir}; ln -s %{words_filename} words.sqlite
 
 %clean

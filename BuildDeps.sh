@@ -35,16 +35,16 @@ if  ! rpm -qa | grep --quiet stxxl-1.3.1; then
     sudo yum install -y el7-src/stxxl-1.3.1-1.el7.centos.x86_64.rpm el7-src/stxxl-devel-1.3.1-1.el7.centos.x86_64.rpm
 fi
 
-if  ! rpm -qa | grep --quiet hootenanny-words; then
-    if [ ! -f el7-src/hootenanny-words-1.0.0-1.noarch.rpm ]; then
+if  ! rpm -qa | grep --quiet hoot-words; then
+    if [ ! -f el7-src/hoot-words-1.0.0-1.el7.noarch.rpm ]; then
         echo "#### Building RPM: Hootenanny Words"
         pushd src
-        make -s RPMS/noarch/hootenanny-words-1.0.0-1.noarch.rpm
-        cp RPMS/noarch/hootenanny-words-1.0.0-1.noarch.rpm  ../el7-src
+        make -s RPMS/noarch/hoot-words-1.0.0-1.el7.noarch.rpm
+        cp RPMS/noarch/hoot-words-1.0.0-1.el7.noarch.rpm  ../el7-src
         popd
     fi
     echo "  Installing RPM: Hootenanny Words"
-    sudo yum install -y el7-src/hootenanny-words-1.0.0-1.noarch.rpm
+    sudo yum install -y el7-src/hoot-words-1.0.0-1.el7.noarch.rpm
 fi
 
 if  ! rpm -qa | grep --quiet tomcat8; then

@@ -18,7 +18,7 @@ hootversion=$(patsubst SOURCES/hootenanny-%.tar.gz,%,$(hoottarball))
 
 HOOT_RPM=RPMS/x86_64/hootenanny-core-$(hootversion).el7.x86_64.rpm
 
-WORDS_RPM=RPMS/noarch/hootenanny-words-1.0.0-1.noarch.rpm
+WORDS_RPM=RPMS/noarch/hoot-words-1.0.0-1.el7.noarch.rpm
 TOMCAT8_RPM=RPMS/noarch/tomcat8-8.5.23-1.el7.noarch.rpm
 STXXL_RPM=RPMS/x86_64/stxxl-1.3.1-1.el7.x86_64.rpm
 
@@ -94,8 +94,8 @@ $(STXXL_RPM): SPECS/stxxl.spec
 	rm -f RPMS/noarch/stxxl* RPMS/x86_64/stxxl*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
-$(WORDS_RPM): SPECS/hootenanny-words.spec
-	rm -f RPMS/noarch/hootenanny-words* RPMS/x86_64/hootenanny-words*
+$(WORDS_RPM): SPECS/hoot-words.spec
+	rm -f RPMS/noarch/hoot-words* RPMS/x86_64/hoot-words*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 $(TOMCAT8_RPM): SPECS/tomcat8.spec
