@@ -24,7 +24,7 @@ STXXL_RPM=RPMS/x86_64/stxxl-1.3.1-1.el7.x86_64.rpm
 
 # GDAL depends on FileGDB and Postgis depends on GDAL
 FILEGDB_RPM=RPMS/x86_64/FileGDBAPI-1.5.1-1.el7.centos.x86_64.rpm
-POSTGIS_RPM=RPMS/x86_64/postgis-2.3.3-3.el7.centos.x86_64.rpm
+POSTGIS_RPM=RPMS/x86_64/hoot-postgis-2.3.4-1.el7.centos.x86_64.rpm
 GDAL_RPM=RPMS/x86_64/hoot-gdal-2.1.4-1.el7.x86_64.rpm
 
 # all: not-hoot hoot
@@ -86,8 +86,8 @@ $(GDAL_RPM): SPECS/hoot-gdal.spec
 	rm -f RPMS/noarch/hoot-gdal-2* RPMS/x86_64/hoot-gdal-2*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
-$(POSTGIS_RPM): SPECS/postgis.spec
-	rm -f RPMS/noarch/postgis* RPMS/x86_64/postgis*
+$(POSTGIS_RPM): SPECS/hoot-postgis23.spec
+	rm -f RPMS/noarch/hoot-postgis* RPMS/x86_64/hoot-postgis*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 $(STXXL_RPM): SPECS/stxxl.spec

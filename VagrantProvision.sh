@@ -162,6 +162,7 @@ cat > $HOME/.rpmmacros <<EOF
 %pg_version ${PG_VERSION}
 %pg_dotless %(echo %{pg_version} | tr -d '.')
 %pginstdir /usr/pgsql-%{pg_version}
+%sfcgal 0
 EOF
 
 # Now setup stuff for building hootenanny
