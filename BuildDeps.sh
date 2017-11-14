@@ -10,29 +10,29 @@ set -x
 
 cd /home/vagrant/hootenanny-rpms
 
-if  ! rpm -qa | grep --quiet FileGDB_API; then
-    if [ ! -f el7-src/FileGDB_API-1.5.1-1.el7.centos.x86_64.rpm ]; then
-        echo "#### Building RPM: FileGDB_API"
+if  ! rpm -qa | grep --quiet FileGDBAPI; then
+    if [ ! -f el7-src/FileGDBAPI-1.5.1-1.el7.x86_64.rpm ]; then
+        echo "#### Building RPM: FileGDBAPI"
         pushd src
-        make -s RPMS/x86_64/FileGDB_API-1.5.1-1.el7.centos.x86_64.rpm
-        cp RPMS/x86_64/FileGDB_API-1.5.1-1.el7.centos.x86_64.rpm ../el7-src
+        make -s RPMS/x86_64/FileGDBAPI-1.5.1-1.el7.x86_64.rpm
+        cp RPMS/x86_64/FileGDBAPI-1.5.1-1.el7.x86_64.rpm ../el7-src
         popd
     fi
-    echo "  Installing RPM: FileGDB_API"
-    sudo yum install -y el7-src/FileGDB_API-1.5.1-1.el7.centos.x86_64.rpm
+    echo "  Installing RPM: FileGDBAPI"
+    sudo yum install -y el7-src/FileGDBAPI-1.5.1-1.el7.x86_64.rpm
 fi
 
 if  ! rpm -qa | grep --quiet stxxl-1.3.1; then
-    if [ ! -f el7-src/stxxl-1.3.1-1.el7.centos.x86_64.rpm ]; then
+    if [ ! -f el7-src/stxxl-1.3.1-1.el7.x86_64.rpm ]; then
         echo "#### Building RPM: stxxl"
         pushd src
         make -s RPMS/x86_64/stxxl-1.3.1-1.el7.x86_64.rpm
         cp RPMS/x86_64/stxxl-1.3.1-1.el7.x86_64.rpm ../el7-src
-        cp RPMS/x86_64/stxxl-devel-1.3.1-1.el7.centos.x86_64.rpm ../el7-src
+        cp RPMS/x86_64/stxxl-devel-1.3.1-1.el7.x86_64.rpm ../el7-src
         popd
     fi
     echo "  Installing RPM: stxxl"
-    sudo yum install -y el7-src/stxxl-1.3.1-1.el7.centos.x86_64.rpm el7-src/stxxl-devel-1.3.1-1.el7.centos.x86_64.rpm
+    sudo yum install -y el7-src/stxxl-1.3.1-1.el7.x86_64.rpm el7-src/stxxl-devel-1.3.1-1.el7.x86_64.rpm
 fi
 
 if  ! rpm -qa | grep --quiet hoot-words; then
@@ -48,53 +48,40 @@ if  ! rpm -qa | grep --quiet hoot-words; then
 fi
 
 if  ! rpm -qa | grep --quiet tomcat8; then
-    if [ ! -f el7-src/tomcat8-8.5.23-1.noarch.rpm ]; then
+    if [ ! -f el7-src/tomcat8-8.5.23-1.el7.noarch.rpm ]; then
         echo "#### Building RPM: Tomcat8"
         pushd src
-        make -s RPMS/noarch/tomcat8-8.5.23-1.noarch.rpm
-        cp  RPMS/noarch/tomcat8-8.5.23-1.noarch.rpm ../el7-src
+        make -s RPMS/noarch/tomcat8-8.5.23-1.el7.noarch.rpm
+        cp  RPMS/noarch/tomcat8-8.5.23-1.el7.noarch.rpm ../el7-src
         popd
     fi
     echo "  Installing RPM: Tomcat8"
-    sudo yum install -y el7-src/tomcat8-8.5.23-1.noarch.rpm
+    sudo yum install -y el7-src/tomcat8-8.5.23-1.el7.noarch.rpm
 fi
 
-if  ! rpm -qa | grep --quiet gdal-2; then
-    if [ ! -f el7-src/gdal-2.1.4-8.el7.centos.x86_64.rpm ]; then
+if  ! rpm -qa | grep --quiet hoot-gdal; then
+    if [ ! -f el7-src/hoot-gdal-2.1.4-1.el7.x86_64.rpm ]; then
         echo "#### Building RPM: GDAL"
         pushd src
-        make -s RPMS/x86_64/gdal-2.1.4-2.el7.x86_64.rpm
-        cp  RPMS/x86_64/gdal-* ../el7-src
+        make -s RPMS/x86_64/hoot-gdal-2.1.4-1.el7.x86_64.rpm
+        cp  RPMS/x86_64/hoot-gdal-* ../el7-src
         # Save space
-        rm ../el7-src/gdal-debuginfo-2.1.4-8.el7.centos.x86_64.rpm
+        rm ../el7-src/hoot-gdal-debuginfo-2.1.4-8.el7.x86_64.rpm
         popd
     fi
     echo "  Installing RPM: GDAL"
-    sudo yum install -y el7-src/gdal-*
+    sudo yum install -y el7-src/hoot-gdal-*
 fi
 
-# Not needed since we are building from the main GDAL source code
-# if  ! rpm -qa | grep --quiet gdal.x86_64; then
-#     if [ ! -f el7-src/gdal-esri-epsg-2.1.4-2.el7.centos.x86_64.rpm ]; then
-#         echo "#### Building RPM: GDAL epsg"
-#         pushd src
-#         make -s  RPMS/x86_64/gdal-esri-epsg-2.1.4-2.el7.centos.x86_64.rpm
-#         cp   RPMS/x86_64/gdal-esri-epsg-2.1.4-2.el7.centos.x86_64.rpm ../el7-src
-#         popd
-#     fi
-#     echo "  Installing RPM: GDAL epsg"
-#     sudo yum install -y el7-src/gdal-esri-epsg-2.1.4-2.el7.centos.x86_64.rpm
-# fi
-
-if  ! rpm -qa | grep --quiet postgis; then
-    if [ ! -f el7-src/postgis-2.3.3-3.el7.centos.x86_64.rpm ]; then
-        echo "#### Building RPM: postgis"
+if  ! rpm -qa | grep --quiet hoot-postgis; then
+    if [ ! -f el7-src/hoot-postgis-2.3.4-1.el7.x86_64.rpm ]; then
+        echo "#### Building RPM: hoot-postgis"
         pushd src
-        make -s RPMS/x86_64/postgis-2.3.3-3.el7.centos.x86_64.rpm
-        cp  RPMS/x86_64/postgis-* ../el7-src
-        rm ../el7-src/postgis-debuginfo-2.3.3-3.el7.centos.x86_64.rpm
+        make -s RPMS/x86_64/hoot-postgis-2.3.4-1.el7.x86_64.rpm
+        cp  RPMS/x86_64/hoot-postgis-* ../el7-src
+        rm ../el7-src/hoot-postgis-debuginfo-2.3.4-1.el7.x86_64.rpm
         popd
     fi
-    echo "  Installing RPM: Postgis"
-    sudo yum install -y el7-src/postgis-*
+    echo "  Installing RPM: PostGIS"
+    sudo yum install -y el7-src/hoot-postgis-*
 fi
