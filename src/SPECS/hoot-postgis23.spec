@@ -82,6 +82,8 @@ Requires:	advance-toolchain-%{atstring}-runtime
 %endif
 
 Provides:	%{sname} = %{version}-%{release}
+Conflicts:	postgis
+Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}
 
 %description
 PostGIS adds support for geographic objects to the PostgreSQL object-relational
