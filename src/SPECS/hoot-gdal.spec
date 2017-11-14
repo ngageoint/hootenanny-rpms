@@ -42,8 +42,6 @@
 %endif
 %endif
 
-%global compdir %(dirname $(pkg-config --variable=compatdir bash-completion))
-
 
 Name:		hoot-gdal
 Version:	2.1.4
@@ -56,29 +54,29 @@ URL:		http://www.gdal.org
 # See PROVENANCE.TXT-fedora and the cleaner script for details!
 
 #Source0:	%{name}-%{version}-fedora.tar.xz
-Source0:    %{name}-%{version}.tar.xz
-Source1:	http://download.osgeo.org/%{name}/%{testversion}/%{name}autotest-%{testversion}.tar.gz
-Source2:	%{name}.pom
+Source0:    gdal-%{version}.tar.xz
+Source1:	http://download.osgeo.org/gdal/%{testversion}/gdalautotest-%{testversion}.tar.gz
+Source2:	gdal.pom
 
 # Cleaner script for the tarball
-Source3:	%{name}-cleaner.sh
+Source3:	gdal-cleaner.sh
 
 Source4:	PROVENANCE.TXT-fedora
 
 # Patch to use system g2clib
-Patch1:		%{name}-g2clib.patch
+Patch1:		gdal-g2clib.patch
 # Patch for Fedora JNI library location
-Patch2:		%{name}-jni.patch
+Patch2:		gdal-jni.patch
 # Fix bash-completion install dir
-Patch3:		%{name}-completion.patch
+Patch3:		gdal-completion.patch
 # Fix uchar type
-Patch4:		%{name}-uchar.patch
+Patch4:		gdal-uchar.patch
 
 # Fedora uses Alternatives for Java
-Patch8:		%{name}-1.9.0-java.patch
-Patch9:		%{name}-2.1.0-zlib.patch
+Patch8:		gdal-1.9.0-java.patch
+Patch9:		gdal-2.1.0-zlib.patch
 
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRoot:	%{_tmppath}/gdal-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # Adding FileGDB API for Hootenanny
 BuildRequires:  FileGDB_API
@@ -162,8 +160,10 @@ BuildRequires:	xerces-c-devel
 BuildRequires:	xz-devel
 BuildRequires:	zlib-devel
 
-# Run time dependency for gpsbabel driver
+# Note that we conflict with EPEL's GDAL.
 Conflicts:	gdal
+
+# Run time dependency for gpsbabel driver
 Requires:	gpsbabel
 
 # proj DL-opened in ogrct.cpp, see also fix in %%prep
@@ -206,7 +206,6 @@ GDAL/OGR is the most widely used geospatial data access library.
 Summary:	Development files for the GDAL file format library
 Group:	Development/Libraries
 Conflicts:	gdal-devel
-Provides:	%{name}-devel
 
 # Old rpm didn't figure out
 %if 0%{?rhel} < 6
@@ -225,9 +224,6 @@ This package contains development files for GDAL.
 Summary:	GDAL file format library
 Group:		System Environment/Libraries
 Conflicts:	gdal-libs
-Provides:	%{name}-libs
-# https://trac.osgeo.org/gdal/ticket/3978#comment:5
-Obsoletes:	%{name}-ruby < 1.11.0-1
 
 %description libs
 This package contains the GDAL file format library.
@@ -237,7 +233,6 @@ This package contains the GDAL file format library.
 Summary:	Java modules for the GDAL file format library
 Group:		Development/Libraries
 Conflicts:	gdal-java
-Provides:	%{name}-java
 Requires:	jpackage-utils
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 
@@ -249,7 +244,6 @@ The GDAL Java modules provide support to handle multiple GIS file formats.
 Summary:	Javadocs for %{name}
 Group:		Documentation
 Conflicts:	gdal-javadoc
-Provides:	%{name}-javadoc
 Requires:	jpackage-utils
 BuildArch:	noarch
 
@@ -261,10 +255,8 @@ This package contains the API documentation for %{name}.
 Summary:	Perl modules for the GDAL file format library
 Group:		Development/Libraries
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
-Requires:	%{name}-libs
 Requires:	perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Conflicts:	gdal-perl
-Provides:	%{name}-perl
 
 %description perl
 The GDAL Perl modules provide support to handle multiple GIS file formats.
@@ -275,9 +267,7 @@ Summary:	Python modules for the GDAL file format library
 Group:		Development/Libraries
 Requires:	numpy
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
-Requires:	%{name}-libs
 Conflicts:	gdal-python
-Provides:	%{name}-python
 
 %description python
 The GDAL Python modules provide support to handle multiple GIS file formats.
@@ -289,9 +279,7 @@ Summary:	Python modules for the GDAL file format library
 Group:		Development/Libraries
 Requires:	python34-numpy
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
-Requires:	%{name}-libs
 Conflicts:	gdal-python3
-Provides:	%{name}-python3
 
 %description python3
 The GDAL Python 3 modules provide support to handle multiple GIS file formats.
@@ -311,7 +299,7 @@ This package contains HTML and PDF documentation for GDAL.
 
 %prep
 #%setup -q -n %{name}-%{version}-fedora -a 1
-%setup -q -n %{name}-%{version} -a 1
+%setup -q -n gdal-%{version} -a 1
 
 # Delete bundled libraries
 rm -rf frmts/zlib
@@ -410,7 +398,7 @@ export CFLAGS="$RPM_OPT_FLAGS -fPIC -I%{_includedir}/FileGDB_API"
 export CFLAGS="$RPM_OPT_FLAGS -fpic -I%{_includedir}/FileGDB_API"
 %endif
 export CXXFLAGS="$CFLAGS -I%{_includedir}/libgeotiff"
-export CPPFLAGS="$CPPFLAGS -I%{_includedir}/libgeotiff"
+export CPPFLAGS="$CPPFLAGS -I%{_includedir}/FileGDB_API -I%{_includedir}/libgeotiff"
 
 # For future reference:
 # epsilon: Stalled review -- https://bugzilla.redhat.com/show_bug.cgi?id=660024
@@ -418,9 +406,9 @@ export CPPFLAGS="$CPPFLAGS -I%{_includedir}/libgeotiff"
 
 %configure \
 	LIBS=-lgrib2c \
-	--with-autoload=%{_libdir}/%{name}plugins \
-	--datadir=%{_datadir}/%{name}/ \
-	--includedir=%{_includedir}/%{name}/ \
+	--with-autoload=%{_libdir}/gdalplugins \
+	--datadir=%{_datadir}/gdal/ \
+	--includedir=%{_includedir}/gdal/ \
 	--prefix=%{_prefix}	\
 	--without-bsb		\
 	--with-armadillo	\
@@ -428,6 +416,7 @@ export CPPFLAGS="$CPPFLAGS -I%{_includedir}/libgeotiff"
 	--with-cfitsio=%{_prefix}	\
 	--with-dods-root=%{_prefix}	\
 	--with-expat		\
+        --with-fgdb		\
 	--with-freexl		\
 	--with-geos		\
 	--with-geotiff=external	\
@@ -556,7 +545,7 @@ install -pm 755 frmts/iso8211/8211dump %{buildroot}%{_bindir}
 install -pm 755 frmts/iso8211/8211view %{buildroot}%{_bindir}
 
 # Directory for auto-loading plugins
-mkdir -p %{buildroot}%{_libdir}/%{name}plugins
+mkdir -p %{buildroot}%{_libdir}/gdalplugins
 
 #TODO: Don't do that?
 find %{buildroot}%{perl_vendorarch} -name "*.dox" -exec rm -rf '{}' \;
@@ -573,34 +562,34 @@ find %{buildroot}%{perl_vendorarch} -name "*.pm" -exec chmod 644 '{}' \;
 touch -r NEWS swig/java/gdal.jar
 mkdir -p %{buildroot}%{_javadir}
 cp -p swig/java/gdal.jar  \
-    %{buildroot}%{_javadir}/%{name}.jar
+    %{buildroot}%{_javadir}/gdal.jar
 
 # Install Maven pom and update version number
 install -dm 755 %{buildroot}%{_mavenpomdir}
-install -pm 644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
-sed -i 's|<version></version>|<version>%{version}</version>|' %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
+install -pm 644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/JPP-gdal.pom
+sed -i 's|<version></version>|<version>%{version}</version>|' %{buildroot}%{_mavenpomdir}/JPP-gdal.pom
 
 # Create depmap fragment
-%add_maven_depmap JPP-%{name}.pom %{name}.jar
+%add_maven_depmap JPP-gdal.pom gdal.jar
 
 # 775 on the .so?
 # copy JNI libraries and links, non versioned link needed by JNI
 # What is linked here?
-mkdir -p %{buildroot}%{_jnidir}/%{name}
+mkdir -p %{buildroot}%{_jnidir}/gdal
 # cp -pl swig/java/.libs/*.so*  \
 cp -pl swig/java/.libs/*.so*  \
-    %{buildroot}%{_jnidir}/%{name}/
-chrpath --delete %{buildroot}%{_jnidir}/%{name}/*jni.so*
+    %{buildroot}%{_jnidir}/gdal/
+chrpath --delete %{buildroot}%{_jnidir}/gdal/*jni.so*
 
 # Install Java API documentation in the designated place
-mkdir -p %{buildroot}%{_javadocdir}/%{name}
-cp -pr swig/java/java/org %{buildroot}%{_javadocdir}/%{name}
+mkdir -p %{buildroot}%{_javadocdir}/gdal
+cp -pr swig/java/java/org %{buildroot}%{_javadocdir}/gdal
 
 # Install refmans
 for docdir in %{docdirs}; do
   pushd $docdir
-#     path=%{_builddir}/%{name}-%{version}-fedora/refman
-    path=%{_builddir}/%{name}-%{version}/refman
+#     path=%{_builddir}/gdal-%{version}-fedora/refman
+    path=%{_builddir}/gdal-%{version}/refman
     mkdir -p $path/html/$docdir
     cp -r html $path/html/$docdir
 
@@ -622,13 +611,13 @@ done
 
 #TODO: Header date lost during installation
 # Install multilib cpl_config.h bz#430894
-install -p -D -m 644 port/cpl_config.h %{buildroot}%{_includedir}/%{name}/cpl_config-%{cpuarch}.h
+install -p -D -m 644 port/cpl_config.h %{buildroot}%{_includedir}/gdal/cpl_config-%{cpuarch}.h
 # Create universal multilib cpl_config.h bz#341231
 # The problem is still there in 1.9.
 #TODO: Ticket?
 
 #>>>>>>>>>>>>>
-cat > %{buildroot}%{_includedir}/%{name}/cpl_config.h <<EOF
+cat > %{buildroot}%{_includedir}/gdal/cpl_config.h <<EOF
 #include <bits/wordsize.h>
 
 #if __WORDSIZE == 32
@@ -648,7 +637,7 @@ touch -r NEWS port/cpl_config.h
 #TODO: Why does that exist? Does Grass really use it? I don't think so.
 # http://trac.osgeo.org/gdal/ticket/3470
 #>>>>>>>>>>>>>
-cat > %{name}.pc <<EOF
+cat > gdal.pc <<EOF
 prefix=%{_prefix}
 exec_prefix=%{_prefix}
 libdir=%{_libdir}
@@ -658,36 +647,36 @@ Name: GDAL
 Description: GIS file format library
 Version: %{version}
 Libs: -L\${libdir} -lgdal
-Cflags: -I\${includedir}/%{name}
+Cflags: -I\${includedir}/gdal
 EOF
 #<<<<<<<<<<<<<
 mkdir -p %{buildroot}%{_libdir}/pkgconfig/
-install -m 644 %{name}.pc %{buildroot}%{_libdir}/pkgconfig/
-touch -r NEWS %{buildroot}%{_libdir}/pkgconfig/%{name}.pc
+install -m 644 gdal.pc %{buildroot}%{_libdir}/pkgconfig/
+touch -r NEWS %{buildroot}%{_libdir}/pkgconfig/gdal.pc
 
 # Multilib gdal-config
 # Rename the original script to gdal-config-$arch (stores arch-specific information)
 # and create a script to call one or the other -- depending on detected architecture
 # TODO: The extra script will direct you to 64 bit libs on
 # 64 bit systems -- whether you like that or not
-mv %{buildroot}%{_bindir}/%{name}-config %{buildroot}%{_bindir}/%{name}-config-%{cpuarch}
+mv %{buildroot}%{_bindir}/gdal-config %{buildroot}%{_bindir}/gdal-config-%{cpuarch}
 #>>>>>>>>>>>>>
-cat > %{buildroot}%{_bindir}/%{name}-config <<EOF
+cat > %{buildroot}%{_bindir}/gdal-config <<EOF
 #!/bin/bash
 
 ARCH=\$(uname -m)
 case \$ARCH in
 x86_64 | ppc64 | ppc64le | ia64 | s390x | sparc64 | alpha | alphaev6 | aarch64 )
-%{name}-config-64 \${*}
+gdal-config-64 \${*}
 ;;
 *)
-%{name}-config-32 \${*}
+gdal-config-32 \${*}
 ;;
 esac
 EOF
 #<<<<<<<<<<<<<
-touch -r NEWS %{buildroot}%{_bindir}/%{name}-config
-chmod 755 %{buildroot}%{_bindir}/%{name}-config
+touch -r NEWS %{buildroot}%{_bindir}/gdal-config
+chmod 755 %{buildroot}%{_bindir}/gdal-config
 
 # Clean up junk
 rm -f %{buildroot}%{_bindir}/*.dox
@@ -699,7 +688,7 @@ for junk in {*.a,*.la,*.bs,.exists,.packlist} ; do
 done
 
 # Don't duplicate license files
-rm -f %{buildroot}%{_datadir}/%{name}/LICENSE.TXT
+rm -f %{buildroot}%{_datadir}/gdal/LICENSE.TXT
 
 # Throw away random API man mages plus artefact seemingly caused by Doxygen 1.8.1 or 1.8.1.1
 for f in 'GDAL*' BandProperty ColorAssociation CutlineTransformer DatasetProperty EnhanceCBInfo ListFieldDesc NamedColor OGRSplitListFieldLayer VRTBuilder; do
@@ -713,8 +702,8 @@ sed -i '1s|^#!/usr/bin/env python$|#!%{__python2}|' %{buildroot}%{_bindir}/*.py
 rm -f %{buildroot}%{_bindir}/*.pyc
 
 #TODO: What's that?
-# rm -f %{buildroot}%{_mandir}/man1/*_%{name}-%{version}-fedora_apps_*
-rm -f %{buildroot}%{_mandir}/man1/*_%{name}-%{version}_apps_*
+# rm -f %{buildroot}%{_mandir}/man1/*_gdal-%{version}-fedora_apps_*
+rm -f %{buildroot}%{_mandir}/man1/*_gdal-%{version}_apps_*
 rm -f %{buildroot}%{_mandir}/man1/_home_rouault_dist_wrk_gdal_apps_.1*
 
 %check
@@ -724,14 +713,14 @@ for i in -I/usr/lib/jvm/java/include{,/linux}; do
 done
 
 
-pushd %{name}autotest-%{testversion}
+pushd gdalautotest-%{testversion}
   # Export test enviroment
   export PYTHONPATH=$PYTHONPATH:%{buildroot}%{python_sitearch}
   #TODO: Nötig?
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:%{buildroot}%{_libdir}
 #  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:%%{buildroot}%%{_libdir}:$java_inc
 
-  export GDAL_DATA=%{buildroot}%{_datadir}/%{name}/
+  export GDAL_DATA=%{buildroot}%{_datadir}/gdal/
 
   # Enable these tests on demand
   #export GDAL_RUN_SLOW_TESTS=1
@@ -755,7 +744,7 @@ popd
 
 
 %files
-%{compdir}/
+%{_sysconfdir}/bash_completion.d/gdal
 %{_bindir}/gdallocationinfo
 %{_bindir}/gdal_contour
 %{_bindir}/gdal_rasterize
@@ -792,26 +781,26 @@ popd
 %files libs
 %doc LICENSE.TXT NEWS PROVENANCE.TXT COMMITERS PROVENANCE.TXT-fedora
 %{_libdir}/libgdal.so.*
-%{_datadir}/%{name}
+%{_datadir}/gdal
 #TODO: Possibly remove files like .dxf, .dgn, ...
-%dir %{_libdir}/%{name}plugins
+%dir %{_libdir}/gdalplugins
 
 %files devel
-%{_bindir}/%{name}-config
-%{_bindir}/%{name}-config-%{cpuarch}
+%{_bindir}/gdal-config
+%{_bindir}/gdal-config-%{cpuarch}
 %{_mandir}/man1/gdal-config.1*
-%dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*.h
+%dir %{_includedir}/gdal
+%{_includedir}/gdal/*.h
 %{_libdir}/*.so
-%{_libdir}/pkgconfig/%{name}.pc
+%{_libdir}/pkgconfig/gdal.pc
 
 # Can I even have a separate Java package anymore?
 %files java -f .mfiles
 %doc swig/java/apps
-%{_jnidir}/%{name}/
+%{_jnidir}/gdal/
 
 %files javadoc
-%{_javadocdir}/%{name}
+%{_javadocdir}/gdal
 
 %files perl
 %doc swig/perl/README
