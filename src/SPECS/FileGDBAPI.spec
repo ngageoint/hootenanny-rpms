@@ -1,5 +1,5 @@
 # ESRI File Geodatabase API Library
-Name:		FileGDB_API
+Name:		FileGDBAPI
 Version:	1.5.1
 Release:	1%{?dist}
 Summary:	ESRI FileGDB API
@@ -10,8 +10,7 @@ URL:		https://github.com/Esri/file-geodatabase-api
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-%global filegdbtarball FileGDB_API_%(echo %{version} | tr '.' '_')-64.tar.gz
-Source0:	%{filegdbtarball}
+Source0:	FileGDB_API_%(echo %{version} | tr '.' '_')-64.tar.gz
 
 %description
 The FileGDB API provides basic tools that allow the creation of file
@@ -67,8 +66,7 @@ email: contracts@esri.com
 
 %prep
 mkdir -p %{name}-%{version}
-cd %{name}-%{version}
-tar xf %{_sourcedir}/%{filegdbtarball} --strip-components 1
+tar -C %{name}-%{version} -xf %{SOURCE0} --strip-components 1
 
 %build
 true

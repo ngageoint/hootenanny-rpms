@@ -25,11 +25,11 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:	perl-generators
 BuildRequires:	postgresql-devel >= %{pg_version_minimum}, proj-devel, geos-devel >= 3.4.2 byacc, proj-devel, flex, java, java-devel, ant
-BuildRequires:	gtk2-devel, libxml2-devel, gdal-devel >= 1.10.0
+BuildRequires:	gtk2-devel, libxml2-devel, hoot-gdal-devel >= 2.1.0
 BuildRequires:	pcre-devel
 BuildRequires:	autoconf, automake, libtool
 Requires:	postgresql-server >= %{pg_version_minimum}
-Requires:	geos >= 3.4.2, proj, hoot-gdal >= 2.1.0, json-c
+Requires:	geos >= 3.4.2, proj, hoot-gdal-libs >= 2.1.0, json-c
 
 
 %description

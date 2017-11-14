@@ -79,7 +79,7 @@ Patch9:		gdal-2.1.0-zlib.patch
 BuildRoot:	%{_tmppath}/gdal-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # Adding FileGDB API for Hootenanny
-BuildRequires:  FileGDB_API
+BuildRequires:  FileGDBAPI
 
 BuildRequires:  ant
 # No armadillo in EL5
@@ -393,12 +393,12 @@ sed -i 's|CFLAGS=\"${GEOS_CFLAGS}\"|CFLAGS=\"${CFLAGS} ${GEOS_CFLAGS}\"|g' confi
 %build
 #TODO: Couldn't I have modified that in the prep section?
 %ifarch sparcv9 sparc64 s390 s390x
-export CFLAGS="$RPM_OPT_FLAGS -fPIC -I%{_includedir}/FileGDB_API"
+export CFLAGS="$RPM_OPT_FLAGS -fPIC $(pkg-config FileGDBAPI --cflags)"
 %else
-export CFLAGS="$RPM_OPT_FLAGS -fpic -I%{_includedir}/FileGDB_API"
+export CFLAGS="$RPM_OPT_FLAGS -fpic $(pkg-config FileGDBAPI --cflags)"
 %endif
 export CXXFLAGS="$CFLAGS -I%{_includedir}/libgeotiff"
-export CPPFLAGS="$CPPFLAGS -I%{_includedir}/FileGDB_API -I%{_includedir}/libgeotiff"
+export CPPFLAGS="$CPPFLAGS $(pkg-config FileGDBAPI --cflags) -I%{_includedir}/libgeotiff"
 
 # For future reference:
 # epsilon: Stalled review -- https://bugzilla.redhat.com/show_bug.cgi?id=660024
