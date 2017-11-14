@@ -47,18 +47,10 @@ Summary:	GIS file format library
 Group:		System Environment/Libraries
 License:	MIT
 URL:		http://www.gdal.org
-# Source0:   http://download.osgeo.org/gdal/%%{version}/gdal-%%{version}.tar.xz
-# See PROVENANCE.TXT-fedora and the cleaner script for details!
 
-#Source0:	%{name}-%{version}-fedora.tar.xz
-Source0:    gdal-%{version}.tar.xz
+Source0:	gdal-%{version}.tar.xz
 Source1:	http://download.osgeo.org/gdal/%{testversion}/gdalautotest-%{testversion}.tar.gz
 Source2:	gdal.pom
-
-# Cleaner script for the tarball
-Source3:	gdal-cleaner.sh
-
-Source4:	PROVENANCE.TXT-fedora
 
 # Patch to use system g2clib
 Patch1:		gdal-g2clib.patch
@@ -314,9 +306,6 @@ rm -r frmts/grib/degrib18/g2clib-1.0.4
 %patch4 -p1 -b .uchar~
 %patch8 -p1 -b .java~
 %patch9 -p1 -b .zlib~
-
-# Copy in PROVENANCE.TXT-fedora
-cp -p %SOURCE4 .
 
 # Sanitize linebreaks and encoding
 #TODO: Don't touch data directory!
@@ -776,7 +765,7 @@ popd
 
 
 %files libs
-%doc LICENSE.TXT NEWS PROVENANCE.TXT COMMITERS PROVENANCE.TXT-fedora
+%doc LICENSE.TXT NEWS PROVENANCE.TXT COMMITERS
 %{_libdir}/libgdal.so.*
 %{_datadir}/gdal
 #TODO: Possibly remove files like .dxf, .dgn, ...

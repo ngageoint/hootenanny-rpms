@@ -11,7 +11,6 @@ BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  autoconf automake boost-devel cppunit-devel doxygen gcc-c++
 BuildRequires:  hoot-gdal-devel >= 2.1.4
 BuildRequires:  hoot-gdal-python >= 2.1.4
-BuildRequires:  hoot-gdal-esri-epsg >= 2.1.4
 BuildRequires:  gdb
 BuildRequires:  geos-devel >= 3.4.2
 BuildRequires:  git glpk-devel graphviz libicu-devel
@@ -711,9 +710,8 @@ core. Use this if you want to build from github.
 Summary:    Dependencies for Hootenanny Core
 Group:      Development/Libraries
 Requires:   asciidoc cppunit dblatex doxygen FileGDB_API
-Requires:       hoot-gdal-devel >= 2.1.3
-Requires:       hoot-gdal-python >= 2.1.3
-Requires:       hoot-gdal-esri-epsg >= 2.1.3
+Requires:       hoot-gdal-devel >= 2.1.4
+Requires:       hoot-gdal-python >= 2.1.4
 Requires:       geos >= 3.4.2, gnuplot, graphviz
 Requires:   hootenanny-words >= 1.0.0
 # Needed by gnuplot for report generation
