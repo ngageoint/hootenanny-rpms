@@ -90,7 +90,7 @@ if  ! rpm -qa | grep --quiet hoot-gdal; then
         make -s RPMS/x86_64/hoot-gdal-2.1.4-1.el7.x86_64.rpm
         cp  RPMS/x86_64/hoot-gdal-* ../el7-src
         # Save space
-        rm ../el7-src/hoot-gdal-debuginfo-2.1.4-8.el7.x86_64.rpm
+        rm ../el7-src/hoot-gdal-debuginfo-2.1.4-1.el7.x86_64.rpm
         popd
     fi
     echo "  Installing RPM: GDAL"
@@ -98,14 +98,14 @@ if  ! rpm -qa | grep --quiet hoot-gdal; then
 fi
 
 if  ! rpm -qa | grep --quiet hoot-postgis; then
-    if [ ! -f el7-src/hoot-postgis-2.3.4-1.el7.x86_64.rpm ]; then
+    if [ ! -f el7-src/hoot-postgis23_95-2.3.4-1.el7.x86_64.rpm ]; then
         echo "#### Building RPM: hoot-postgis"
         pushd src
-        make -s RPMS/x86_64/hoot-postgis-2.3.4-1.el7.x86_64.rpm
-        cp  RPMS/x86_64/hoot-postgis-* ../el7-src
-        rm ../el7-src/hoot-postgis-debuginfo-2.3.4-1.el7.x86_64.rpm
+        make -s RPMS/x86_64/hoot-postgis23_95-2.3.4-1.el7.x86_64.rpm
+        cp  RPMS/x86_64/hoot-postgis23_95-* ../el7-src
+        rm ../el7-src/hoot-postgis23_95-debuginfo-2.3.4-1.el7.x86_64.rpm
         popd
     fi
     echo "  Installing RPM: PostGIS"
-    sudo yum install -y el7-src/hoot-postgis-*
+    sudo yum install -y el7-src/hoot-postgis23_95-*
 fi
