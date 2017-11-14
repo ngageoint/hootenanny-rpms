@@ -18,7 +18,7 @@ BuildRequires:  git glpk-devel graphviz libicu-devel
 BuildRequires:  hootenanny-words >= 1.0.0
 BuildRequires:  libspatialite-devel
 BuildRequires:  log4cxx-devel nodejs-devel opencv-devel
-BuildRequires:  postgresql-devel >= 9.1
+BuildRequires:  postgresql%{pg_dotless}-devel
 BuildRequires:  proj-devel protobuf-devel python-argparse python-devel qt-devel
 # Needed to build the documentation
 BuildRequires:  texlive libxslt
@@ -39,8 +39,7 @@ content, geometry and attributes, to transfer to the output map.
 
 %package core
 Summary:    Hootenanny Core
-# Hardcoding the postgresql93 version of libpq. If we don't then RPM decides to install the 8.4 version
-Requires:       postgresql-libs >= 9.1
+Requires:       postgresql%{pg_dotless}-libs
 %global __requires_exclude ^libpq\\.so
 Requires:   %{name}-core-deps = %{version}-%{release}
 
@@ -154,10 +153,9 @@ rm -rf %{buildroot}
 Summary:    Hootenanny UI and Services
 Requires:   tomcat8
 Requires:   %{name}-core = %{version}-%{release}
-Requires:   postgresql-server >= 9.1
-Requires:   postgresql-contrib >= 9.1
-# NOTE: We need to look at postgis versions
-Requires:   postgis >= 2.1
+Requires:   postgresql%{pg_dotless}-server
+Requires:   postgresql%{pg_dotless}-contrib
+Requires:   hoot-postgis
 Requires:   java-1.8.0-openjdk
 Requires:   liquibase
 Requires:   npm
@@ -579,10 +577,10 @@ Requires:   %{name}-core-devel-deps = %{version}-%{release}
 Requires:   apache-maven
 Requires:   nodejs
 Requires:   npm
-Requires:   postgresql-server >= 9.1
-Requires:   postgresql-contrib >= 9.1
-# NOTE: We need to look at postgis versions
-Requires:   postgis2_93 >= 2.1
+Requires:   postgresql%{pg_dotless}-server
+Requires:   postgresql%{pg_dotless}-contrib
+Requires:   hoot-postgis
+Requires:   hoot-postgis-utils
 Requires:   liquibase
 
 %description services-devel-deps
@@ -689,7 +687,7 @@ Requires:       git glpk-devel libicu-devel
 Requires:   hootenanny-words = 1.0.0
 Requires:       libspatialite-devel
 Requires:       log4cxx-devel nodejs-devel opencv-devel
-Requires:       postgresql-devel >= 9.1
+Requires:       postgresql%{pg_dotless}-devel
 Requires:       proj-devel protobuf-devel python-argparse python-devel qt-devel v8-devel
 Requires:   stxxl-devel
 # Needed to build the documentation
