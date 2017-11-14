@@ -15,6 +15,7 @@ BuildRequires:  gdb
 BuildRequires:  geos-devel >= 3.4.2
 BuildRequires:  git glpk-devel graphviz libicu-devel
 BuildRequires:  hoot-words >= 1.0.0
+BuildRequires:  wamerican-insane >= 7.1
 BuildRequires:  libspatialite-devel
 BuildRequires:  log4cxx-devel nodejs-devel opencv-devel
 BuildRequires:  postgresql%{pg_dotless}-devel
@@ -684,6 +685,7 @@ Requires:       gdb
 Requires:       geos-devel >= 3.4.2
 Requires:       git glpk-devel libicu-devel
 Requires:   hoot-words >= 1.0.0
+Requires:   wamerican-insane >= 7.1
 Requires:       libspatialite-devel
 Requires:       log4cxx-devel nodejs-devel opencv-devel
 Requires:       postgresql%{pg_dotless}-devel
@@ -714,6 +716,7 @@ Requires:       hoot-gdal-devel >= 2.1.4
 Requires:       hoot-gdal-python >= 2.1.4
 Requires:       geos >= 3.4.2, gnuplot, graphviz
 Requires:   hoot-words >= 1.0.0
+Requires:   wamerican-insane >= 7.1
 # Needed by gnuplot for report generation
 Requires:       liberation-fonts-common liberation-sans-fonts
 Requires:       libxslt log4cxx nodejs opencv  protobuf qt

@@ -18,6 +18,7 @@ hootversion=$(patsubst SOURCES/hootenanny-%.tar.gz,%,$(hoottarball))
 
 HOOT_RPM=RPMS/x86_64/hootenanny-core-$(hootversion).el7.x86_64.rpm
 
+WAMERICAN_RPM=RPMS/noarch/wamerican-insane-7.1-1.el7.noarch.rpm
 WORDS_RPM=RPMS/noarch/hoot-words-1.0.0-1.el7.noarch.rpm
 TOMCAT8_RPM=RPMS/noarch/tomcat8-8.5.23-1.el7.noarch.rpm
 STXXL_RPM=RPMS/x86_64/stxxl-1.3.1-1.el7.x86_64.rpm
@@ -41,6 +42,7 @@ not-hoot: tmp/not-hoot
 
 # NOTE: POSTGIS_RPM installs GDAL RPM and GDAL_RPM installs FILEGDB_RPM
 tmp/not-hoot: \
+	$(WAMERICAN_RPM) \
 	$(WORDS_RPM) \
 	$(TOMCAT8_RPM) \
 	$(STXXL_RPM) \
@@ -82,8 +84,7 @@ $(FILEGDB_RPM): SPECS/FileGDBAPI.spec
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 $(GDAL_RPM): SPECS/hoot-gdal.spec
-	# The gdal-2* prevents deleting the gdal-esri-epsg RPM
-	rm -f RPMS/noarch/hoot-gdal-2* RPMS/x86_64/hoot-gdal-2*
+	rm -f RPMS/noarch/hoot-gdal* RPMS/x86_64/hoot-gdal*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 $(POSTGIS_RPM): SPECS/hoot-postgis23.spec
@@ -92,6 +93,10 @@ $(POSTGIS_RPM): SPECS/hoot-postgis23.spec
 
 $(STXXL_RPM): SPECS/stxxl.spec
 	rm -f RPMS/noarch/stxxl* RPMS/x86_64/stxxl*
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
+
+$(WAMERICAN_RPM): SPECS/wamerican-insane.spec
+	rm -f RPMS/noarch/wamerican-insane*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 $(WORDS_RPM): SPECS/hoot-words.spec
