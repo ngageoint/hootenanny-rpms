@@ -48,13 +48,22 @@ USA
 email: contracts@esri.com
 
 
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
+
+
 %files
-%docdir /doc/html
+%{_libdir}/libFileGDBAPI.so
+%{_libdir}/libfgdbunixrtl.so
+
+#%files devel
 %{_includedir}/%{name}/*
-%{_libdir}/*.so
-%{_libdir}/*.a
-%{_datarootdir}/doc/%{name}-%{version}/*
+%{_libdir}/libfgdbunixrtl.a
 %{_datarootdir}/pkgconfig/%{name}.pc
+
+#%files doc
+%{_datarootdir}/doc/%{name}-%{version}/*
 
 %prep
 mkdir -p %{name}-%{version}
@@ -71,9 +80,15 @@ install -d %{buildroot}%{_includedir}/%{name}
 install -d %{buildroot}%{_datarootdir}/pkgconfig
 install -d %{buildroot}%{_datarootdir}/doc/%{name}-%{version}/FileGDB_SQL_files
 
-install -m 0755 -D %{_builddir}/%{name}-%{version}/lib/*.so %{buildroot}%{_libdir}
-install -m 0644 -D %{_builddir}/%{name}-%{version}/lib/*.a %{buildroot}%{_libdir}
+# TODO: Version dynamic libs?
+install -m 0755 -D %{_builddir}/%{name}-%{version}/lib/libFileGDBAPI.so %{buildroot}%{_libdir}/libFileGDBAPI.so
+install -m 0755 -D %{_builddir}/%{name}-%{version}/lib/libfgdbunixrtl.so %{buildroot}%{_libdir}/libfgdbunixrtl.so
+
+# devel
+install -m 0644 -D %{_builddir}/%{name}-%{version}/lib/libfgdbunixrtl.a %{buildroot}%{_libdir}
 install -m 0644 -D %{_builddir}/%{name}-%{version}/include/* %{buildroot}%{_includedir}/%{name}
+
+# doc
 install -m 0644 -D %{_builddir}/%{name}-%{version}/doc/html/*.{css,html,js,pdf,png,txt,xml} %{buildroot}%{_datarootdir}/doc/%{name}-%{version}
 install -m 0644 -D %{_builddir}/%{name}-%{version}/doc/html/FileGDB_SQL_files/*.xml %{buildroot}%{_datarootdir}/doc/%{name}-%{version}/FileGDB_SQL_files
 
