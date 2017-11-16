@@ -10,7 +10,7 @@ URL:		https://github.com/openstreetmap/osmosis
 BuildArch:	noarch
 Requires:	java-1.8.0-openjdk
 
-Source0:	osmosis-%{version}.tgz
+Source0:	http://bretth.dev.openstreetmap.org/osmosis-build/osmosis-%{version}.tgz
 Patch1:		osmosis-fix_launcher.patch
 
 %description

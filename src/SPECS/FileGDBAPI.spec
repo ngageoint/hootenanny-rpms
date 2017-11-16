@@ -12,7 +12,7 @@ URL:		https://github.com/Esri/file-geodatabase-api
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-Source0:	FileGDB_API_%(echo %{version} | tr '.' '_')-64.tar.gz
+Source0:	https://github.com/Esri/file-geodatabase-api/raw/master/FileGDB_API_%{version}/FileGDB_API_%(echo %{version} | tr '.' '_')-64.tar.gz
 
 %description
 The FileGDB API provides basic tools that allow the creation of file

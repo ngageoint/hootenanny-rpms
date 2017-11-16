@@ -48,7 +48,7 @@ Group:		System Environment/Libraries
 License:	MIT
 URL:		http://www.gdal.org
 
-Source0:	gdal-%{version}.tar.xz
+Source0:	http://download.osgeo.org/gdal/%{version}/gdal-%{version}.tar.xz
 Source1:	http://download.osgeo.org/gdal/%{testversion}/gdalautotest-%{testversion}.tar.gz
 Source2:	gdal.pom
 
