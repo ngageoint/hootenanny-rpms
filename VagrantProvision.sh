@@ -66,14 +66,13 @@ sudo yum -y install \
     gcc \
     gcc-c++ \
     gdb \
-    geos \
-    geos-devel \
     giflib-devel \
     git \
     git-core \
     glpk \
     glpk-devel \
     gnuplot \
+    gtest-devel \
     gtk2-devel \
     hdf-devel \
     hdf-static \
@@ -82,18 +81,17 @@ sudo yum -y install \
     java-1.8.0-openjdk-devel \
     json-c-devel \
     libdap-devel \
-    libgeotiff-devel \
     libgta-devel \
     libicu-devel \
     libjpeg-turbo-devel \
     libpng-devel \
     librx-devel \
-    libspatialite-devel \
     libtiff-devel \
     libtool \
     libwebp-devel \
     m4 \
     maven \
+    minizip-devel \
     mlocate \
     mysql-devel \
     netcdf-devel \
@@ -142,6 +140,7 @@ sudo yum -y install \
     texlive-collection-langcyrillic \
     unixODBC-devel \
     unzip \
+    uriparser-devel \
     v8-devel \
     vim \
     w3m \

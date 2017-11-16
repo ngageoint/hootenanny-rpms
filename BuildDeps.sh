@@ -22,6 +22,48 @@ if  ! rpm -qa | grep --quiet FileGDBAPI; then
     sudo yum install -y el7-src/FileGDBAPI-1.5.1-1.el7.x86_64.rpm
 fi
 
+if  ! rpm -qa | grep --quiet geos-3\.6\.1; then
+    if [ ! -f el7-src/geos-3.6.1-1.el7.x86_64.rpm ]; then
+        echo "#### Building RPM: GEOS"
+        pushd src
+        make -s RPMS/x86_64/geos-3.6.1-1.el7.x86_64.rpm
+        cp  RPMS/x86_64/geos-* ../el7-src
+        rm ../el7-src/geos-debuginfo-3.6.1-1.el7.x86_64.rpm
+        popd
+    fi
+    echo "  Installing RPM: GEOS"
+    sudo yum install -y el7-src/geos-3.6.1-1.el7.x86_64.rpm
+    sudo yum install -y el7-src/geos-devel-3.6.1-1.el7.x86_64.rpm
+fi
+
+if  ! rpm -qa | grep --quiet libgeotiff-1\.4\.2; then
+    if [ ! -f el7-src/libgeotiff-1.4.2-1.el7.x86_64.rpm ]; then
+        echo "#### Building RPM: libgeotiff"
+        pushd src
+        make -s RPMS/x86_64/libgeotiff-1.4.2-1.el7.x86_64.rpm
+        cp  RPMS/x86_64/libgeotiff-* ../el7-src
+        rm ../el7-src/libgeotiff-debuginfo-1.4.2-1.el7.x86_64.rpm
+        popd
+    fi
+    echo "  Installing RPM: libgeotiff"
+    sudo yum install -y el7-src/libgeotiff-1.4.2-1.el7.x86_64.rpm
+    sudo yum install -y el7-src/libgeotiff-devel-1.4.2-1.el7.x86_64.rpm
+fi
+
+if  ! rpm -qa | grep --quiet libkml-1\.3\.0; then
+    if [ ! -f el7-src/libkml-1.3.0-1.el7.x86_64.rpm ]; then
+        echo "#### Building RPM: libkml"
+        pushd src
+        make -s RPMS/x86_64/libkml-1.3.0-1.el7.x86_64.rpm
+        cp  RPMS/x86_64/libkml-* ../el7-src
+        rm ../el7-src/libkml-debuginfo-1.3.0-1.el7.x86_64.rpm
+        popd
+    fi
+    echo "  Installing RPM: libkml"
+    sudo yum install -y el7-src/libkml-1.3.0-1.el7.x86_64.rpm
+    sudo yum install -y el7-src/libkml-devel-1.3.0-1.el7.x86_64.rpm
+fi
+
 if  ! rpm -qa | grep --quiet stxxl-1.3.1; then
     if [ ! -f el7-src/stxxl-1.3.1-1.el7.x86_64.rpm ]; then
         echo "#### Building RPM: stxxl"

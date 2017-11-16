@@ -22,10 +22,13 @@ WAMERICAN_RPM=RPMS/noarch/wamerican-insane-7.1-1.el7.noarch.rpm
 WORDS_RPM=RPMS/noarch/hoot-words-1.0.0-1.el7.noarch.rpm
 OSMOSIS_RPM=RPMS/noarch/osmosis-0.46-1.el7.noarch.rpm
 TOMCAT8_RPM=RPMS/noarch/tomcat8-8.5.23-1.el7.noarch.rpm
-STXXL_RPM=RPMS/x86_64/stxxl-1.3.1-1.el7.x86_64.rpm
 
-# GDAL depends on FileGDB and Postgis depends on GDAL
+STXXL_RPM=RPMS/x86_64/stxxl-1.3.1-1.el7.x86_64.rpm
+# GDAL depends on FileGDB, GEOS, LibKML, and GeoTIFF; and PostGIS depends on GDAL.
+GEOS_RPM=RPMS/x86_64/geos-3.6.1-1.el7.x86_64.rpm
+GEOTIFF_RPM=RPMS/x86_64/libgeotiff-1.4.2-1.el7.x86_64.rpm
 FILEGDB_RPM=RPMS/x86_64/FileGDBAPI-1.5.1-1.el7.x86_64.rpm
+LIBKML_RPM=RPMS/x86_64/libkml-1.3.0-1.el7.x86_64.rpm
 POSTGIS_RPM=RPMS/x86_64/hoot-postgis23_95-2.3.4-1.el7.x86_64.rpm
 GDAL_RPM=RPMS/x86_64/hoot-gdal-2.1.4-1.el7.x86_64.rpm
 
@@ -41,14 +44,17 @@ clean-hoot:
 
 not-hoot: tmp/not-hoot
 
-# NOTE: POSTGIS_RPM installs GDAL RPM and GDAL_RPM installs FILEGDB_RPM
+# NOTE: POSTGIS_RPM installs GDAL RPM and GDAL_RPM installs FILEGDB_RPM, GEOTIFF_RPM, and LIBKML_RPM
 tmp/not-hoot: \
 	$(WAMERICAN_RPM) \
 	$(WORDS_RPM) \
 	$(OSMOSIS_RPM) \
 	$(TOMCAT8_RPM) \
 	$(STXXL_RPM) \
+	$(GEOS_RPM) \
+	$(GEOTIFF_RPM) \
 	$(FILEGDB_RPM) \
+	$(LIBKML_RPM) \
 	$(GDAL_RPM) \
 	$(POSTGIS_RPM)
 # touch was sometimes cropping down to second resolution
@@ -95,6 +101,18 @@ $(POSTGIS_RPM): SPECS/hoot-postgis23.spec
 
 $(STXXL_RPM): SPECS/stxxl.spec
 	rm -f RPMS/noarch/stxxl* RPMS/x86_64/stxxl*
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
+
+$(GEOS_RPM): SPECS/geos.spec
+	rm -f RPMS/noarch/geos* RPMS/x86_64/geos*
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
+
+$(GEOTIFF_RPM): SPECS/libgeotiff.spec
+	rm -f RPMS/x86_64/libgeotiff*
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
+
+$(LIBKML_RPM): SPECS/libkml.spec
+	rm -f RPMS/x86_64/libkml*
 	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba $<
 
 $(WAMERICAN_RPM): SPECS/wamerican-insane.spec

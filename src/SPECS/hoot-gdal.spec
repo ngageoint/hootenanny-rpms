@@ -27,7 +27,7 @@
 %global testversion 2.1.4
 %global run_tests 0
 
-%global with_spatialite 1
+%global with_spatialite 0
 %global spatialite "--with-spatialite"
 
 # No ppc64 build for spatialite in EL6
