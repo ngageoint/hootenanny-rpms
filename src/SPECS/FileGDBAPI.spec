@@ -1,4 +1,6 @@
-# ESRI File Geodatabase API Library
+## ESRI File Geodatabase API Library
+%define debug_package %{nil}
+
 Name:		FileGDBAPI
 Version:	1.5.1
 Release:	1%{?dist}
@@ -47,9 +49,6 @@ USA
 email: contracts@esri.com
 
 
-%post -p /sbin/ldconfig
-
-%postun -p /sbin/ldconfig
 
 
 %files
@@ -59,38 +58,39 @@ email: contracts@esri.com
 #%files devel
 %{_includedir}/%{name}/*
 %{_libdir}/libfgdbunixrtl.a
-%{_datarootdir}/pkgconfig/%{name}.pc
+%{_libdir}/pkgconfig/%{name}.pc
 
 #%files doc
 %{_datarootdir}/doc/%{name}-%{version}/*
 
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
+
 %prep
-mkdir -p %{name}-%{version}
-tar -C %{name}-%{version} -xf %{SOURCE0} --strip-components 1
+%setup -q -n FileGDB_API-64
 
 %build
-true
 
 %install
 rm -fr $RPM_BUILD_ROOT
 install -d %{buildroot}%{_libdir}
 install -d %{buildroot}%{_includedir}/%{name}
-install -d %{buildroot}%{_datarootdir}/pkgconfig
+install -d %{buildroot}%{_libdir}/pkgconfig
 install -d %{buildroot}%{_datarootdir}/doc/%{name}-%{version}/FileGDB_SQL_files
 
 # TODO: Version dynamic libs?
-install -m 0755 -D %{_builddir}/%{name}-%{version}/lib/libFileGDBAPI.so %{buildroot}%{_libdir}/libFileGDBAPI.so
-install -m 0755 -D %{_builddir}/%{name}-%{version}/lib/libfgdbunixrtl.so %{buildroot}%{_libdir}/libfgdbunixrtl.so
+install -m 0755 -D %{_builddir}/FileGDB_API-64/lib/libFileGDBAPI.so %{buildroot}%{_libdir}/libFileGDBAPI.so
+install -m 0755 -D %{_builddir}/FileGDB_API-64/lib/libfgdbunixrtl.so %{buildroot}%{_libdir}/libfgdbunixrtl.so
 
 # devel
-install -m 0644 -D %{_builddir}/%{name}-%{version}/lib/libfgdbunixrtl.a %{buildroot}%{_libdir}
-install -m 0644 -D %{_builddir}/%{name}-%{version}/include/* %{buildroot}%{_includedir}/%{name}
+install -m 0644 -D %{_builddir}/FileGDB_API-64/lib/libfgdbunixrtl.a %{buildroot}%{_libdir}
+install -m 0644 -D %{_builddir}/FileGDB_API-64/include/* %{buildroot}%{_includedir}/%{name}
 
 # doc
-install -m 0644 -D %{_builddir}/%{name}-%{version}/doc/html/*.{css,html,js,pdf,png,txt,xml} %{buildroot}%{_datarootdir}/doc/%{name}-%{version}
-install -m 0644 -D %{_builddir}/%{name}-%{version}/doc/html/FileGDB_SQL_files/*.xml %{buildroot}%{_datarootdir}/doc/%{name}-%{version}/FileGDB_SQL_files
+install -m 0644 -D %{_builddir}/FileGDB_API-64/doc/html/*.{css,html,js,pdf,png,txt,xml} %{buildroot}%{_datarootdir}/doc/%{name}-%{version}
+install -m 0644 -D %{_builddir}/FileGDB_API-64/doc/html/FileGDB_SQL_files/*.xml %{buildroot}%{_datarootdir}/doc/%{name}-%{version}/FileGDB_SQL_files
 
-cat > %{buildroot}%{_datarootdir}/pkgconfig/%{name}.pc <<EOF
+cat > %{buildroot}%{_libdir}/pkgconfig/%{name}.pc <<EOF
 prefix=%{_prefix}
 libdir=%{_libdir}
 includedir=%{_includedir}/%{name}
@@ -100,7 +100,7 @@ Description: ESRI FileGDB API
 Version: %{version}
 Cflags: -I\${includedir}
 EOF
-chmod 0644 %{buildroot}%{_datarootdir}/pkgconfig/%{name}.pc
+chmod 0644 %{buildroot}%{_libdir}/pkgconfig/%{name}.pc
 
 %check
 
