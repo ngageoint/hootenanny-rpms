@@ -120,6 +120,5 @@ rm -rf %{buildroot}%{_datadir}/epsg_csv/*.py*
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
-* Sat Dec 27 2014 Devrim Gündüz <devrim@gunduz.org> - 1.4.0-1
-- Initial build for PostgreSQL YUM repository, to satisfy dependency
-  for gdal (and so PostGIS). based on EPEL spec.
+* Wed Nov 15 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 1.4.2-1
+- Initial release for use with Hootenanny.

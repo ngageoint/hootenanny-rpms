@@ -107,6 +107,8 @@ chmod 0644 %{buildroot}%{_libdir}/pkgconfig/%{name}.pc
 %clean
 
 %changelog
+* Wed Nov 15 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 1.5.1-1
+- Upgrade to v1.5.1, refactor spec file, and add pkg-config support.
 * Tue Mar 07 2017 Benjamin Marchant <benjamin.marchant@digitalglobe.com>
 - Upgrade to v1.5
 * Thu Jan 19 2017 Benjamin Marchant <benjamin.marchant@digitalglobe.com>

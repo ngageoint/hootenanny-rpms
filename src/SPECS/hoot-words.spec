@@ -48,5 +48,7 @@ rm -rf $RPM_BUILD_ROOT
 %{deploy_dir}/words.sqlite
 
 %changelog
+* Wed Nov 15 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 1.0.0-1
+- Changed package name to hoot-words.
 * Wed Feb 10 2016 Benjamin Marchant <benjamin.marchant@digitalglobe.com> - 1.0.0+
 - Initial RPM creation
