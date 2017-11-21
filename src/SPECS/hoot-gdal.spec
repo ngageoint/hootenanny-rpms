@@ -21,7 +21,7 @@
 # He also suggest to use --with-static-proj4 to actually link to proj, instead of dlopen()ing it.
 
 # Major digit of the proj so version
-%global proj_somaj 12
+%global proj_somaj 0
 
 # Tests can be of a different version
 %global testversion 2.1.4
