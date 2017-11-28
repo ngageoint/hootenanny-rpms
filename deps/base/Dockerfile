@@ -2,6 +2,27 @@ FROM centos:centos7.4.1708
 LABEL \
   description="Base container for building Hootenanny RPMs" \
   maintainer="justin.bronn@digitalglobe.com"
+
+# Arguments for tweaking:
+#  * RPM distribution.
+#  * Language and locale.
+#  * RPM building user and home.
+ARG dist=.el7
+ARG lang=en_US.UTF-8
+ARG locale=en_US.UTF-8
+ARG rpmbuild_uid=1000
+ARG rpmbuild_user=rpmbuild
+ARG rpmbuild_home=/${rpmbuild_user}
+
+# Ensure proper language/locale environment settings.
+ENV LANG ${lang}
+ENV LC_ALL ${locale}
+
+# Put some key arguments in environment to allow access in child containers.
+ENV RPMBUILD_USER=${rpmbuild_user}
+ENV RPMBUILD_HOME=${rpmbuild_home}
+
+# Install basic development and RPM authoring tools.
 RUN yum -q -y update && \
     yum -q -y install \
         autoconf \
@@ -24,3 +45,11 @@ RUN yum -q -y update && \
         vim \
         wget \
         zip
+
+# Create unprivileged user for building RPMs, and setup basic macros.
+RUN useradd -d ${rpmbuild_home} -m -s /bin/bash -u ${rpmbuild_uid} ${rpmbuild_user} && \
+    echo "%_smp_mflags -j%(nproc)" >> ${rpmbuild_home}/.rpmmacros && \
+    echo "%_topdir ${rpmbuild_home}" >> ${rpmbuild_home}/.rpmmacros && \
+    echo "%debug_package %{nil}" >> ${rpmbuild_home}/.rpmmacros && \
+    echo "%dist ${dist}" >> ${rpmbuild_home}/.rpmmacros && \
+    chown ${rpmbuild_user}:${rpbumbuild_user} ${rpmbuild_home}/.rpmmacros
