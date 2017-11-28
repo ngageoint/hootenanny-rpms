@@ -9,8 +9,9 @@ URL:		http://trac.osgeo.org/geos/
 Source0:	http://download.osgeo.org/geos/%{name}-%{version}.tar.bz2
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:	doxygen libtool
+BuildRequires:	doxygen
 BuildRequires:	gcc-c++
+BuildRequires:	libtool
 
 %description
 GEOS (Geometry Engine - Open Source) is a C++ port of the Java Topology

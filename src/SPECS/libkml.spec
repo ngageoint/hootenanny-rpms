@@ -25,12 +25,8 @@ BuildRequires:  gtest-devel
 BuildRequires:  java-devel
 BuildRequires:  junit
 BuildRequires:  minizip-devel
-%if 0%{?fedora}
-BuildRequires:  python2-devel
-BuildRequires:  python3-devel
-%else
 BuildRequires:  python-devel
-%endif
+BuildRequires:  python34-devel
 BuildRequires:  swig
 BuildRequires:  uriparser-devel
 BuildRequires:  zlib-devel

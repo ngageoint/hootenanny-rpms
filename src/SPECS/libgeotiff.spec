@@ -6,7 +6,10 @@ Group:		System Environment/Libraries
 License:	MIT
 URL:		http://trac.osgeo.org/geotiff/
 Source:		http://download.osgeo.org/geotiff/libgeotiff/libgeotiff-%{version}.tar.gz
-BuildRequires:	libtiff-devel libjpeg-devel proj-devel zlib-devel
+BuildRequires:	libjpeg-devel
+BuildRequires:	libtiff-devel
+BuildRequires:	proj-devel
+BuildRequires:	zlib-devel
 
 %description
 GeoTIFF represents an effort by over 160 different remote sensing,
