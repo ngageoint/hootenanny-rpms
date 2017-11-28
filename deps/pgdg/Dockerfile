@@ -16,5 +16,6 @@ RUN /tmp/pgdg-install.sh ${pg_version} && \
     alternatives --install /usr/bin/pg_config pgsql-pg_config /usr/pgsql-${pg_version}/bin/pg_config 500 && \
     if [ ! -z "${packages}" ] ; then yum -q -y install ${packages}; fi
 
+# Set default user and work directory.
 USER ${RPMBUILD_USER}
 WORKDIR ${RPMBUILD_HOME}
