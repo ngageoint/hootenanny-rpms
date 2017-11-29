@@ -4,12 +4,12 @@ LABEL \
   maintainer="justin.bronn@digitalglobe.com"
 
 # Arguments for tweaking:
-#  * RPM distribution.
 #  * Language and locale.
+#  * RPM distribution.
 #  * RPM building user and home.
-ARG dist=.el7
 ARG lang=en_US.UTF-8
 ARG locale=en_US.UTF-8
+ARG rpmbuild_dist=.el7
 ARG rpmbuild_uid=1000
 ARG rpmbuild_user=rpmbuild
 ARG rpmbuild_home=/${rpmbuild_user}
@@ -19,6 +19,7 @@ ENV LANG ${lang}
 ENV LC_ALL ${locale}
 
 # Put some key arguments in environment to allow access in child containers.
+ENV RPMBUILD_DIST=${rpmbuild_dist}
 ENV RPMBUILD_USER=${rpmbuild_user}
 ENV RPMBUILD_HOME=${rpmbuild_home}
 
@@ -28,7 +29,6 @@ RUN yum -q -y update && \
         autoconf \
         automake \
         bzip2 \
-        cmake \
         epel-release \
         gcc \
         gcc-c++ \
@@ -51,5 +51,5 @@ RUN useradd -d ${rpmbuild_home} -m -s /bin/bash -u ${rpmbuild_uid} ${rpmbuild_us
     echo "%_smp_mflags -j%(nproc)" >> ${rpmbuild_home}/.rpmmacros && \
     echo "%_topdir ${rpmbuild_home}" >> ${rpmbuild_home}/.rpmmacros && \
     echo "%debug_package %{nil}" >> ${rpmbuild_home}/.rpmmacros && \
-    echo "%dist ${dist}" >> ${rpmbuild_home}/.rpmmacros && \
+    echo "%dist ${rpmbuild_dist}" >> ${rpmbuild_home}/.rpmmacros && \
     chown ${rpmbuild_user}:${rpbumbuild_user} ${rpmbuild_home}/.rpmmacros
