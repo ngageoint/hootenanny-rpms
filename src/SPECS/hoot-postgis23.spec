@@ -5,11 +5,6 @@
 %global sname hoot-postgis
 
 %{!?utils:%global	utils 1}
-%if 0%{?fedora} >= 24 || 0%{?rhel} >= 7 || 0%{?suse_version} >= 1315
-%{!?shp2pgsqlgui:%global	shp2pgsqlgui 1}
-%else
-%{!?shp2pgsqlgui:%global	shp2pgsqlgui 0}
-%endif
 %if 0%{?fedora} >= 24 || 0%{?rhel} >= 6 || 0%{?suse_version} >= 1315
 %{!?raster:%global     raster 1}
 %else
@@ -42,18 +37,13 @@ Patch0:		postgis-gdalfpic.patch
 URL:		http://www.postgis.net/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:	postgresql%{pg_dotless}-devel, geos-devel >= 3.5.0, pcre-devel
-%if 0%{?suse_version}
-%if 0%{?suse_version} >= 1315
-BuildRequires:  libjson-c-devel libproj-devel
-%endif
-%else
-BuildRequires:	proj-devel, flex, json-c-devel
-%endif
+BuildRequires:	postgresql%{pg_dotless}-devel
+BuildRequires:	geos-devel >= 3.5.0
+BuildRequires:	pcre-devel
+BuildRequires:	proj-devel
+BuildRequires:	flex
+BuildRequires:	json-c-devel
 BuildRequires:	libxml2-devel
-%if %{shp2pgsqlgui}
-BuildRequires:	gtk2-devel > 2.8.0
-%endif
 %if %{sfcgal}
 BuildRequires:	SFCGAL-devel
 Requires:	SFCGAL
@@ -62,9 +52,9 @@ Requires:	SFCGAL
 BuildRequires:	hoot-gdal-devel >= 2.1.0
 %endif
 
-%ifarch ppc64 ppc64le
-BuildRequires:	advance-toolchain-%{atstring}-devel
-%endif
+# %ifarch ppc64 ppc64le
+# BuildRequires:	advance-toolchain-%{atstring}-devel
+# %endif
 
 Requires:	postgresql%{pg_dotless}, geos >= 3.5.0, proj
 %if 0%{?rhel} && 0%{?rhel} < 6
@@ -76,10 +66,10 @@ Requires:	hdf5
 Requires:	hoot-gdal-libs > 2.1.0, json-c, pcre
 Requires(post):	%{_sbindir}/update-alternatives
 
-%ifarch ppc64 ppc64le
-AutoReq:	0
-Requires:	advance-toolchain-%{atstring}-runtime
-%endif
+# %ifarch ppc64 ppc64le
+# AutoReq:	0
+# Requires:	advance-toolchain-%{atstring}-runtime
+# %endif
 
 Provides:	%{sname} = %{version}-%{release}
 Conflicts:	postgis
@@ -181,9 +171,6 @@ The postgis-utils package provides the utilities for PostGIS.
 %if %{sfcgal}
 	--with-sfcgal=%{_bindir}/sfcgal-config \
 %endif
-%if %{shp2pgsqlgui}
-	--with-gui \
-%endif
 	--disable-rpath --libdir=%{pginstdir}/lib
 
 %{__make} LPATH=`%{pginstdir}/bin/pg_config --pkglibdir` shlib="%{name}.so"
@@ -284,11 +271,6 @@ fi
 %{pginstdir}/share/extension/postgis_topology.control
 %{pginstdir}/share/extension/postgis_tiger_geocoder*.sql
 %{pginstdir}/share/extension/postgis_tiger_geocoder.control
-%endif
-%if %shp2pgsqlgui
-%{pginstdir}/bin/shp2pgsql-gui
-%{pginstdir}/share/applications/shp2pgsql-gui.desktop
-%{pginstdir}/share/icons/hicolor/*/apps/shp2pgsql-gui.png
 %endif
 
 %files client
