@@ -24,7 +24,7 @@
 
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		%{sname}%{postgiscurrmajorversion}_%{pg_dotless}
-Version:	%{postgismajorversion}.4
+Version:	%{postgismajorversion}.5
 Release:	1%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
@@ -298,5 +298,7 @@ fi
 %doc postgis-%{version}.pdf
 
 %changelog
+* Wed Nov 29 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 2.3.5-1
+- Upgrade to 2.3.5.
 * Wed Nov 15 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 2.3.4-1
 - Initial release.

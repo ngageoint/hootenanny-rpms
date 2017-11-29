@@ -1,5 +1,5 @@
 Name:		geos
-Version:	3.6.1
+Version:	3.6.2
 Release:	1%{?dist}
 Summary:	GEOS is a C++ port of the Java Topology Suite
 
@@ -85,5 +85,7 @@ rm -rf %{buildroot}
 %exclude %{_libdir}/*.a
 
 %changelog
+* Wed Nov 29 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 3.6.2-1
+- Upgrade to 3.6.2.
 * Wed Nov 15 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 3.6.1-1
 - Initial release for use with Hootenanny.
