@@ -18,13 +18,14 @@ ARG packages
 USER root
 
 # Copy in dependency RPMs.
-COPY FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm /tmp
-COPY geos-${geos_version}${RPMBUILD_DIST}.x86_64.rpm /tmp
-COPY geos-devel-${geos_version}${RPMBUILD_DIST}.x86_64.rpm /tmp
-COPY libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm /tmp
-COPY libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm /tmp
-COPY libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm /tmp
-COPY libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm /tmp
+COPY FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
+     geos-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
+     geos-devel-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
+     libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
+     libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
+     libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
+     libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
+     /tmp/
 
 # Install GDAL prerequisites first, before installing the package list
 # so they take precedence over packages from other repositories.

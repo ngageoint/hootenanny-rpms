@@ -12,9 +12,10 @@ ARG packages
 USER root
 
 # Copy in GDAL dependency RPMs.
-COPY hoot-gdal-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm /tmp
-COPY hoot-gdal-devel-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm /tmp
-COPY hoot-gdal-libs-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm /tmp
+COPY hoot-gdal-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+     hoot-gdal-devel-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+     hoot-gdal-libs-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+     /tmp/
 
 # Install GDAL prerequisites first, before installing the package list
 # so they take precedence over packages from other repositories.
