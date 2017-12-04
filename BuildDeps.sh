@@ -17,6 +17,8 @@ function get_release() {
 
 # Get build requirement packages from spec file.
 function get_requires() {
+    # Note: This does not respect `BuildRequires` statements within conditional
+    #       macro statements nor version specifiers.
     cat $SCRIPT_HOME/src/SPECS/$1.spec | grep '^BuildRequires:' | awk '{ for (i = 2; i <= NF; ++i) if ($i ~ /^[[:alpha:]]/ && $i !~ /[\%\{\}]/) print $i }' ORS=' '
 }
 
@@ -79,9 +81,24 @@ WORDS_RPM=hoot-words-$WORDS_VERSION-$WORDS_RELEASE.el7.noarch.rpm
 
 ## Build base images.
 
-docker build -t hoot/rpmbuild-base $SCRIPT_HOME/deps/base
-docker build -t hoot/rpmbuild-generic $SCRIPT_HOME/deps/generic
-docker build --build-arg pg_version=$PG_VERSION -t hoot/rpmbuild-pgdg:$PG_VERSION $SCRIPT_HOME/deps/pgdg
+# Base image that has basic development, RPM authoring, and
+# a non-privileged user for building spec files.
+docker build \
+       --build-arg rpmbuild_uid=$(id -u) \
+       -t hoot/rpmbuild-base \
+       $SCRIPT_HOME/deps/base
+
+# Generic image for building RPMS without any other prerequisites.
+docker build \
+       -t hoot/rpmbuild-generic \
+       $SCRIPT_HOME/deps/generic
+
+# Base image with PostgreSQL develop libraries from PGDG at the
+# requested version.
+docker build \
+       --build-arg pg_version=$PG_VERSION \
+       -t hoot/rpmbuild-pgdg:$PG_VERSION \
+       $SCRIPT_HOME/deps/pgdg
 
 ## Build GDAL dependencies.
 
