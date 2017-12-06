@@ -8,22 +8,41 @@ License:    GPLv3
 URL:        https://github.com/ngageoint/hootenanny
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:  autoconf automake boost-devel cppunit-devel doxygen gcc-c++
-BuildRequires:  hoot-gdal-devel >= 2.1.4
-BuildRequires:  hoot-gdal-python >= 2.1.4
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  boost-devel
+BuildRequires:  cppunit-devel
+BuildRequires:  doxygen
+BuildRequires:  gcc-c++
 BuildRequires:  gdb
 BuildRequires:  geos-devel >= 3.4.2
-BuildRequires:  git glpk-devel graphviz libicu-devel
+BuildRequires:  git
+BuildRequires:  glpk-devel
+BuildRequires:  graphviz
+BuildRequires:  hoot-gdal-devel >= 2.1.4
+BuildRequires:  hoot-gdal-python >= 2.1.4
 BuildRequires:  hoot-words >= 1.0.0
-BuildRequires:  libspatialite-devel
-BuildRequires:  log4cxx-devel nodejs-devel opencv-devel
-BuildRequires:  postgresql%{pg_dotless}-devel
-BuildRequires:  proj-devel protobuf-devel python-argparse python-devel qt-devel
-# Needed to build the documentation
-BuildRequires:  texlive libxslt
-BuildRequires:  gnuplot
-BuildRequires:  unzip v8-devel w3m wget words zip
 BuildRequires:  java-1.8.0-openjdk
+BuildRequires:  libicu-devel
+BuildRequires:  libspatialite-devel
+BuildRequires:  libxslt
+BuildRequires:  log4cxx-devel
+BuildRequires:  nodejs-devel
+BuildRequires:  opencv-devel
+BuildRequires:  postgresql%{pg_dotless}-devel
+BuildRequires:  proj-devel
+BuildRequires:  protobuf-devel
+BuildRequires:  python-argparse
+BuildRequires:  python-devel
+BuildRequires:  qt-devel
+BuildRequires:  texlive
+BuildRequires:  gnuplot
+BuildRequires:  unzip
+BuildRequires:  v8-devel
+BuildRequires:  w3m
+BuildRequires:  wget
+BuildRequires:  words
+BuildRequires:  zip
 
 Source0:        %{name}-%{version}.tar.gz
 
@@ -37,10 +56,10 @@ where the user's workflow determines the best reference dataset and source
 content, geometry and attributes, to transfer to the output map.
 
 %package core
-Summary:    Hootenanny Core
-Requires:       postgresql%{pg_dotless}-libs
+Summary:   Hootenanny Core
+Requires:  postgresql%{pg_dotless}-libs
 %global __requires_exclude ^libpq\\.so
-Requires:   %{name}-core-deps = %{version}-%{release}
+Requires:  %{name}-core-deps = %{version}-%{release}
 
 
 Group:      Applications/Engineering
@@ -149,17 +168,17 @@ rm -rf %{buildroot}
 
 
 %package services-ui
-Summary:    Hootenanny UI and Services
-Requires:   tomcat8
-Requires:   %{name}-core = %{version}-%{release}
-Requires:   postgresql%{pg_dotless}-server
-Requires:   postgresql%{pg_dotless}-contrib
-Requires:   hoot-postgis
-Requires:   java-1.8.0-openjdk
-Requires:   liquibase
-Requires:   npm
-Requires:   pwgen
-Group:      Applications/Engineering
+Summary:   Hootenanny UI and Services
+Requires:  tomcat8
+Requires:  %{name}-core = %{version}-%{release}
+Requires:  postgresql%{pg_dotless}-server
+Requires:  postgresql%{pg_dotless}-contrib
+Requires:  hoot-postgis
+Requires:  java-1.8.0-openjdk
+Requires:  liquibase
+Requires:  npm
+Requires:  pwgen
+Group:     Applications/Engineering
 
 %description services-ui
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -678,19 +697,31 @@ fi
 %package core-devel-deps
 Summary:    Development dependencies for Hootenanny Core
 Group:      Development/Libraries
-Requires:   %{name}-core-deps = %{version}-%{release}
-Requires:   autoconf automake boost-devel cppunit-devel gcc-c++
-Requires:       gdb
-Requires:       geos-devel >= 3.4.2
-Requires:       git glpk-devel libicu-devel
-Requires:   hoot-words >= 1.0.0
-Requires:       libspatialite-devel
-Requires:       log4cxx-devel nodejs-devel opencv-devel
-Requires:       postgresql%{pg_dotless}-devel
-Requires:       proj-devel protobuf-devel python-argparse python-devel qt-devel v8-devel
-Requires:   stxxl-devel
-# Needed to build the documentation
-Requires:       texlive
+Requires:  %{name}-core-deps = %{version}-%{release}
+Requires:  autoconf
+Requires:  automake
+Requires:  boost-devel
+Requires:  cppunit-devel
+Requires:  gcc-c++
+Requires:  gdb
+Requires:  geos-devel >= 3.4.2
+Requires:  git
+Requires:  glpk-devel
+Requires:  libicu-devel
+Requires:  hoot-words >= 1.0.0
+Requires:  libspatialite-devel
+Requires:  log4cxx-devel
+Requires:  nodejs-devel
+Requires:  opencv-devel
+Requires:  postgresql%{pg_dotless}-devel
+Requires:  proj-devel
+Requires:  protobuf-devel
+Requires:  python-argparse
+Requires:  python-devel
+Requires:  qt-devel
+Requires:  stxxl-devel
+Requires:  v8-devel
+Requires:  texlive
 
 %description core-devel-deps
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -709,20 +740,36 @@ core. Use this if you want to build from github.
 %package core-deps
 Summary:    Dependencies for Hootenanny Core
 Group:      Development/Libraries
-Requires:   asciidoc cppunit dblatex doxygen FileGDB_API
-Requires:       hoot-gdal-devel >= 2.1.4
-Requires:       hoot-gdal-python >= 2.1.4
-Requires:       geos >= 3.4.2, gnuplot, graphviz
-Requires:   hoot-words >= 1.0.0
+Requires:  asciidoc
+Requires:  cppunit
+Requires:  dblatex
+Requires:  doxygen
+Requires:  FileGDBAPI
+Requires:  geos >= 3.4.2
+Requires:  gnuplot
+Requires:  graphviz
+Requires:  hoot-gdal-devel >= 2.1.4
+Requires:  hoot-gdal-python >= 2.1.4
+Requires:  hoot-words >= 1.0.0
 # Needed by gnuplot for report generation
-Requires:       liberation-fonts-common liberation-sans-fonts
-Requires:       libxslt log4cxx nodejs opencv  protobuf qt
-Requires:       proj, proj-devel
-Requires:       qt-postgresql
-Requires:       stxxl
-Requires:       texlive
-Requires:       unzip w3m wget words
-Requires:       zip
+Requires:  liberation-fonts-common
+Requires:  liberation-sans-fonts
+Requires:  libxslt
+Requires:  log4cxx
+Requires:  nodejs
+Requires:  opencv
+Requires:  protobuf
+Requires:  proj
+Requires:  proj-devel
+Requires:  qt
+Requires:  qt-postgresql
+Requires:  stxxl
+Requires:  texlive
+Requires:  unzip
+Requires:  w3m
+Requires:  wget
+Requires:  words
+Requires:  zip
 
 %description core-deps
 Hootenanny was developed to provide an open source, standards-based approach to
