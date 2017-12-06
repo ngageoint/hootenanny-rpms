@@ -1,9 +1,6 @@
 # The base image depends on the version of PosgreSQL from PGDG.
 ARG pg_version
 FROM hoot/rpmbuild-pgdg:${pg_version}
-LABEL \
-  description="Container for building Hootenanny GDAL RPMs" \
-  maintainer="justin.bronn@digitalglobe.com"
 
 # Our GDAL package depends on RPMs we build; the desired package
 # versions, *including* the release iteration (e.g, '1.0.0-1') are
@@ -13,6 +10,13 @@ ARG geos_version
 ARG libgeotiff_version
 ARG libkml_version
 ARG packages
+ARG pg_version
+
+LABEL \
+  description="Container for building Hootenanny GDAL RPMs with PostgreSQL ${pg_version}, GEOS ${geos_version}, FileGDBAPI ${filegdbapi_version}, libgeotiff ${libgeotiff_version}, and libkml ${libkml_version}" \
+  maintainer="justin.bronn@digitalglobe.com" \
+  name="Hootenanny GDAL RPM Build Image" \
+  vendor="Radiant Solutions"
 
 # Switch to root temporarily for dependency installs.
 USER root

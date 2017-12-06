@@ -1,10 +1,14 @@
 FROM hoot/rpmbuild-base:latest
-LABEL \
-  description="PostgreSQL (PGDG) container for building Hootenanny RPMs" \
-  maintainer="justin.bronn@digitalglobe.com"
 
 ARG packages
-ARG pg_version=9.5
+ARG pg_version
+
+LABEL \
+  description="PostgreSQL ${pg_version} (PGDG) container for building Hootenanny RPMs" \
+  maintainer="justin.bronn@digitalglobe.com" \
+  name="Hootenanny PostgreSQL ${pg_version} RPM Build Image" \
+  vendor="Radiant Solutions"
+
 ENV PG_VERSION=${pg_version}
 
 # Install PostgreSQL development files from PGDG for the desired version

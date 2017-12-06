@@ -1,7 +1,9 @@
 FROM hoot/rpmbuild-base:latest
 LABEL \
   description="Generic container for building Hootenanny dependency RPMs" \
-  maintainer="justin.bronn@digitalglobe.com"
+  maintainer="justin.bronn@digitalglobe.com" \
+  name="Hootenanny Generic RPM Build Image" \
+  vendor="Radiant Solutions"
 
 ARG packages
 

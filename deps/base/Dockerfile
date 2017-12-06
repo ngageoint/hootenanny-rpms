@@ -1,7 +1,9 @@
 FROM centos:centos7.4.1708
 LABEL \
   description="Base container for building Hootenanny RPMs" \
-  maintainer="justin.bronn@digitalglobe.com"
+  maintainer="justin.bronn@digitalglobe.com" \
+  name="Hootenanny Base RPM Build Image" \
+  vendor="Radiant Solutions"
 
 # Arguments for tweaking:
 #  * Language and locale.

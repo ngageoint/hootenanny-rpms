@@ -1,12 +1,15 @@
 FROM hoot/rpmbuild-gdal:latest
-LABEL \
-  description="Container for building Hootenanny PostGIS RPMs" \
-  maintainer="justin.bronn@digitalglobe.com"
 
 # GDAL version, including release iteration (e.g., '2.1.4-1') is
 # a required argument.
 ARG gdal_version
 ARG packages
+
+LABEL \
+  description="Container for building Hootenanny PostGIS RPMs with GDAL ${gdal_version}" \
+  maintainer="justin.bronn@digitalglobe.com" \
+  name="Hootenanny PostGIS RPM Build Image" \
+  vendor="Radiant Solutions"
 
 # Temporarily switch to root for package installation.
 USER root
