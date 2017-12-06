@@ -5,7 +5,7 @@ LABEL \
   name="Hootenanny Base RPM Build Image" \
   vendor="Radiant Solutions"
 
-# Arguments for tweaking:
+# Arguments for setting:
 #  * Language and locale.
 #  * RPM distribution.
 #  * RPM building user and home.
@@ -50,7 +50,7 @@ RUN yum -q -y update && \
 
 # Create unprivileged user for building RPMs, and setup basic macros.
 RUN useradd -d ${rpmbuild_home} -m -s /bin/bash -u ${rpmbuild_uid} ${rpmbuild_user} && \
-    echo "%_smp_mflags -j%(nproc)" >> ${rpmbuild_home}/.rpmmacros && \
+    echo "%_smp_mflags -j%(nproc) -l%(expr %(nproc) + 2)" >> ${rpmbuild_home}/.rpmmacros && \
     echo "%_topdir ${rpmbuild_home}" >> ${rpmbuild_home}/.rpmmacros && \
     echo "%debug_package %{nil}" >> ${rpmbuild_home}/.rpmmacros && \
     echo "%dist ${rpmbuild_dist}" >> ${rpmbuild_home}/.rpmmacros && \
