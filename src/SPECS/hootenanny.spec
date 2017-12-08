@@ -1,6 +1,6 @@
 Name:       hootenanny
-Version:    %%HOOT_VERSION%%
-Release:    1%{?dist}
+Version:    %{hoot_version}
+Release:    %{hoot_release}%{?dist}
 Summary:    Hootenanny - we merge maps.
 
 Group:      Applications/Engineering
@@ -15,12 +15,12 @@ BuildRequires:  cppunit-devel
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
 BuildRequires:  gdb
-BuildRequires:  geos-devel >= 3.4.2
+BuildRequires:  geos-devel >= %{geos_min_version}
 BuildRequires:  git
 BuildRequires:  glpk-devel
 BuildRequires:  graphviz
-BuildRequires:  hoot-gdal-devel >= 2.1.4
-BuildRequires:  hoot-gdal-python >= 2.1.4
+BuildRequires:  hoot-gdal-devel >= %{gdal_min_version}
+BuildRequires:  hoot-gdal-python >= %{gdal_min_version}
 BuildRequires:  hoot-words >= 1.0.0
 BuildRequires:  java-1.8.0-openjdk
 BuildRequires:  libicu-devel
@@ -89,7 +89,7 @@ PG_VERSION=$(psql --version | egrep -o '[0-9]{1,}\.[0-9]{1,}')
 # aclocal && autoconf && autoheader && automake --add-missing --copy && \
 
 ./configure -q --with-rnd --with-services \
-    --with-postgresql=/usr/pgsql-$PG_VERSION/bin/pg_config      \
+    --with-postgresql=/usr/pgsql-%{pg_version}/bin/pg_config      \
     --prefix=$RPM_BUILD_ROOT/usr/ \
     --datarootdir=$RPM_BUILD_ROOT/usr/share/hootenanny/ \
     --docdir=$RPM_BUILD_ROOT/usr/share/doc/hootenanny/ \
@@ -419,12 +419,12 @@ if [ "$1" = "1" ]; then
     fi
 
     # configure Postgres settings
-    PG_HB_CONF=/var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
+    PG_HB_CONF=/var/lib/pgsql/%{pg_version}/data/pg_hba.conf
     if ! sudo grep -i --quiet hoot $PG_HB_CONF; then
         sudo -u postgres sed -i '1ihost    all            hoot            127.0.0.1/32            md5' $PG_HB_CONF
         sudo -u postgres sed -i '1ihost    all            hoot            ::1/128                 md5' $PG_HB_CONF
     fi
-    POSTGRES_CONF=/var/lib/pgsql/$PG_VERSION/data/postgresql.conf
+    POSTGRES_CONF=/var/lib/pgsql/%{pg_version}/data/postgresql.conf
     if ! grep -i --quiet HOOT $POSTGRES_CONF; then
         sudo -u postgres sed -i s/^max_connections/\#max_connections/ $POSTGRES_CONF
         sudo -u postgres sed -i s/^shared_buffers/\#shared_buffers/ $POSTGRES_CONF
@@ -455,7 +455,7 @@ EOT
         sudo sh -c "echo 'kernel.shmall=2097152' >> $SYSCTL_CONF"
         #                 kernel.shmall=4294967296
     fi
-    sudo service postgresql-$PG_VERSION restart
+    sudo service postgresql-%{pg_version} restart
 
     # create the osm api test db
     /var/lib/hootenanny/scripts/database/SetupOsmApiDB.sh
@@ -502,8 +502,7 @@ if [ "$1" = "0" ]; then
     # Stop tomcat
     sudo service tomcat8 stop
     # Ensure Postgres is started
-    PG_SERVICE=$(ls /etc/init.d | grep postgresql- | sort | tail -1)
-    sudo service $PG_SERVICE start
+    sudo service postgresql-%{pg_version} start
     while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
         echo "Waiting for postgres to start"
         sleep 1
@@ -558,9 +557,7 @@ to run Hootenanny.
 
 %post autostart
 # set Postgres to autostart
-#export PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
-export PG_VERSION=$(psql --version | egrep -o '[0-9]{1,}\.[0-9]{1,}')
-sudo systemctl enable postgresql-$PG_VERSION
+sudo systemctl enable postgresql-%{pg_version}
 
 # Turn off tomcat6 if installed
 if /sbin/chkconfig | grep --quiet tomcat6 ; then
@@ -579,8 +576,7 @@ sudo /sbin/chkconfig node-export-server on
 
 %postun autostart
 # set Postgres to NOT autostart
-export PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}')
-sudo /sbin/chkconfig --del postgresql-$PG_VERSION
+sudo /sbin/chkconfig --del postgresql-%{pg_version}
 # set Tomcat to NOT autostart
 sudo /sbin/chkconfig --del tomcat8
 # set NodeJS node-mapnik-server to NOT autostart
@@ -620,9 +616,8 @@ if [ "$1" = "1" ]; then
     # Perform tasks to prepare for the initial installation
 
     # init and start Postgres
-    PG_SERVICE=$(ls /etc/init.d | grep postgresql- | sort | tail -1)
-    sudo service $PG_SERVICE initdb
-    sudo service $PG_SERVICE start
+    sudo service postgresql-%{pg_version} initdb
+    sudo service postgresql-%{pg_version} start
     while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
         echo "Waiting for postgres to start"
         sleep 1
@@ -642,12 +637,12 @@ if [ "$1" = "1" ]; then
     fi
 
     # configure Postgres settings
-    PG_HB_CONF=/var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
+    PG_HB_CONF=/var/lib/pgsql/%{pg_version}/data/pg_hba.conf
     if ! sudo grep -i --quiet hoot $PG_HB_CONF; then
         sudo -u postgres sed -i '1ihost    all            hoot            127.0.0.1/32            md5' $PG_HB_CONF
         sudo -u postgres sed -i '1ihost    all            hoot            ::1/128                 md5' $PG_HB_CONF
     fi
-    POSTGRES_CONF=/var/lib/pgsql/$PG_VERSION/data/postgresql.conf
+    POSTGRES_CONF=/var/lib/pgsql/%{pg_version}/data/postgresql.conf
     if ! grep -i --quiet HOOT $POSTGRES_CONF; then
         sudo -u postgres sed -i s/^max_connections/\#max_connections/ $POSTGRES_CONF
         sudo -u postgres sed -i s/^shared_buffers/\#shared_buffers/ $POSTGRES_CONF
@@ -678,7 +673,7 @@ EOT
         sudo sh -c "echo 'kernel.shmall=2097152' >> $SYSCTL_CONF"
         #                 kernel.shmall=4294967296
     fi
-    sudo service postgresql-$PG_VERSION restart
+    sudo service postgresql-%{pg_version} restart
 fi
 
 %postun services-devel-deps
@@ -686,8 +681,7 @@ if [ "$1" = "0" ]; then
     # Perform tasks to clean up after uninstallation
 
     # Ensure Postgres is started
-    PG_SERVICE=$(ls /etc/init.d | grep postgresql- | sort | tail -1)
-    sudo service $PG_SERVICE start
+    sudo service postgresql-%{pg_version} start
     while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
         echo "Waiting for postgres to start"
         sleep 1
@@ -704,7 +698,7 @@ Requires:  boost-devel
 Requires:  cppunit-devel
 Requires:  gcc-c++
 Requires:  gdb
-Requires:  geos-devel >= 3.4.2
+Requires:  geos-devel >= %{geos_min_version}
 Requires:  git
 Requires:  glpk-devel
 Requires:  libicu-devel
@@ -745,11 +739,11 @@ Requires:  cppunit
 Requires:  dblatex
 Requires:  doxygen
 Requires:  FileGDBAPI
-Requires:  geos >= 3.4.2
+Requires:  geos >= %{geos_min_version}
 Requires:  gnuplot
 Requires:  graphviz
-Requires:  hoot-gdal-devel >= 2.1.4
-Requires:  hoot-gdal-python >= 2.1.4
+Requires:  hoot-gdal-devel >= %{gdal_min_version}
+Requires:  hoot-gdal-python >= %{gdal_min_version}
 Requires:  hoot-words >= 1.0.0
 # Needed by gnuplot for report generation
 Requires:  liberation-fonts-common
