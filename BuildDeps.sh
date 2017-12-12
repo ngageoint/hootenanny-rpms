@@ -25,6 +25,10 @@ function get_requires() {
 
 ## Package versioning variables.
 
+# Where binary RPMs are placed.
+RPM_X86_64=$SCRIPT_HOME/src/RPMS/x86_64
+RPM_NOARCH=$SCRIPT_HOME/src/RPMS/noarch
+
 # Important: Hootenanny and PostgreSQL depend on this.
 PG_VERSION=9.5
 PG_DOTLESS=$(echo $PG_VERSION | tr -d '.')
@@ -58,7 +62,7 @@ OSMOSIS_RELEASE=$( get_release osmosis )
 OSMOSIS_RPM=osmosis-$OSMOSIS_VERSION-$OSMOSIS_RELEASE.el7.noarch.rpm
 
 POSTGIS_VERSION=$( get_version hoot-postgis23 )
-POSTGIS_RELEASE=$( get_release hoot-postgis23)
+POSTGIS_RELEASE=$( get_release hoot-postgis23 )
 POSTGIS_RPM=hoot-postgis23_$PG_DOTLESS-$POSTGIS_VERSION-$POSTGIS_RELEASE.el7.x86_64.rpm
 
 STXXL_VERSION=$( get_version stxxl )
@@ -78,20 +82,19 @@ WORDS_VERSION=$( get_version hoot-words )
 WORDS_RELEASE=$( get_release hoot-words )
 WORDS_RPM=hoot-words-$WORDS_VERSION-$WORDS_RELEASE.el7.noarch.rpm
 
-
 ## Build base images.
 
 # Base image that has basic development, RPM authoring, and
 # a non-privileged user for building spec files.
 docker build \
        --build-arg rpmbuild_uid=$(id -u) \
-       -f $SCRIPT_HOME/deps/base/Dockerfile \
+       -f $SCRIPT_HOME/docker/base/Dockerfile \
        -t hoot/rpmbuild-base \
        $SCRIPT_HOME
 
 # Generic image for building RPMS without any other prerequisites.
 docker build \
-       -f $SCRIPT_HOME/deps/generic/Dockerfile \
+       -f $SCRIPT_HOME/docker/generic/Dockerfile \
        -t hoot/rpmbuild-generic \
        $SCRIPT_HOME
 
@@ -99,14 +102,14 @@ docker build \
 # requested version.
 docker build \
        --build-arg pg_version=$PG_VERSION \
-       -f $SCRIPT_HOME/deps/pgdg/Dockerfile \
+       -f $SCRIPT_HOME/docker/pgdg/Dockerfile \
        -t hoot/rpmbuild-pgdg:$PG_VERSION \
        $SCRIPT_HOME
 
 ## Build GDAL dependencies.
 
 # FileGDBAPI
-if [ ! -f $SCRIPT_HOME/el7-src/$FILEGDBAPI_RPM ]; then
+if [ ! -f $RPM_X86_64/$FILEGDBAPI_RPM ]; then
     echo "#### Building RPM: FileGDBAPI"
     docker run \
            -v "${SCRIPT_HOME}/src/SOURCES":/rpmbuild/SOURCES:ro \
@@ -118,13 +121,13 @@ if [ ! -f $SCRIPT_HOME/el7-src/$FILEGDBAPI_RPM ]; then
 fi
 
 # GEOS
-if [ ! -f $SCRIPT_HOME/el7-src/$GEOS_RPM ]; then
+if [ ! -f $RPM_X86_64/$GEOS_RPM ]; then
     echo "#### Building RPM: GEOS"
 
     # Build image for building GEOS.
     docker build \
            --build-arg packages=doxygen \
-           -f $SCRIPT_HOME/deps/generic/Dockerfile \
+           -f $SCRIPT_HOME/docker/generic/Dockerfile \
            -t hoot/rpmbuild-geos \
            $SCRIPT_HOME
 
@@ -139,13 +142,13 @@ if [ ! -f $SCRIPT_HOME/el7-src/$GEOS_RPM ]; then
 fi
 
 # libgeotiff
-if [ ! -f $SCRIPT_HOME/el7-src/$LIBGEOTIFF_RPM ]; then
+if [ ! -f $RPM_X86_64/$LIBGEOTIFF_RPM ]; then
     echo "#### Building RPM: libgeotiff"
 
     # Build image for building libgeotiff.
     docker build \
            --build-arg "packages=$( get_requires libgeotiff )" \
-           -f $SCRIPT_HOME/deps/generic/Dockerfile \
+           -f $SCRIPT_HOME/docker/generic/Dockerfile \
            -t hoot/rpmbuild-libgeotiff \
            $SCRIPT_HOME
 
@@ -160,13 +163,13 @@ if [ ! -f $SCRIPT_HOME/el7-src/$LIBGEOTIFF_RPM ]; then
 fi
 
 # libkml
-if [ ! -f $SCRIPT_HOME/el7-src/$LIBKML_RPM ]; then
+if [ ! -f $RPM_X86_64/$LIBKML_RPM ]; then
     echo "#### Building RPM: libkml"
 
     # Build image for building libkml.
     docker build \
            --build-arg "packages=$( get_requires libkml )" \
-           -f $SCRIPT_HOME/deps/generic/Dockerfile \
+           -f $SCRIPT_HOME/docker/generic/Dockerfile \
            -t hoot/rpmbuild-libkml \
            $SCRIPT_HOME
 
@@ -183,7 +186,7 @@ fi
 ## GDAL and PostGIS (requires PostgreSQL from PGDG)
 
 # GDAL
-if [ ! -f $SCRIPT_HOME/el7-src/$GDAL_RPM ]; then
+if [ ! -f $RPM_X86_64/$GDAL_RPM ]; then
     echo "#### Building RPM: GDAL (with PostgreSQL ${PG_VERSION})"
 
     # Make GDAL RPM container, specifying the versions of RPMs we
@@ -195,7 +198,7 @@ if [ ! -f $SCRIPT_HOME/el7-src/$GDAL_RPM ]; then
            --build-arg libgeotiff_version=$LIBGEOTIFF_VERSION-$LIBGEOTIFF_RELEASE \
            --build-arg libkml_version=$LIBKML_VERSION-$LIBKML_RELEASE \
            --build-arg pg_version=$PG_VERSION \
-           -f $SCRIPT_HOME/deps/gdal/Dockerfile \
+           -f $SCRIPT_HOME/docker/gdal/Dockerfile \
            -t hoot/rpmbuild-gdal \
            $SCRIPT_HOME
 
@@ -210,13 +213,13 @@ if [ ! -f $SCRIPT_HOME/el7-src/$GDAL_RPM ]; then
 fi
 
 # PostGIS
-if [ ! -f $SCRIPT_HOME/el7-src/$POSTGIS_RPM ]; then
+if [ ! -f $RPM_X86_64/$POSTGIS_RPM ]; then
     echo "#### Building RPM: PostGIS"
 
     docker build \
            --build-arg "packages=$( get_requires hoot-postgis23 )" \
            --build-arg gdal_version=$GDAL_VERSION-$GDAL_RELEASE \
-           -f $SCRIPT_HOME/deps/postgis/Dockerfile \
+           -f $SCRIPT_HOME/docker/postgis/Dockerfile \
            -t hoot/rpmbuild-postgis \
            $SCRIPT_HOME
 
@@ -232,7 +235,7 @@ fi
 ## Simple Dependencies
 
 # hoot-words
-if [ ! -f $SCRIPT_HOME/el7-src/$WORDS_RPM ]; then
+if [ ! -f $RPM_NOARCH/$WORDS_RPM ]; then
     echo "#### Building RPM: hoot-words"
 
     # Generate hoot-words RPM (do not share SOURCES directory, as
@@ -246,7 +249,7 @@ if [ ! -f $SCRIPT_HOME/el7-src/$WORDS_RPM ]; then
 fi
 
 # osmosis
-if [ ! -f $SCRIPT_HOME/el7-src/$OSMOSIS_RPM ]; then
+if [ ! -f $RPM_NOARCH/$OSMOSIS_RPM ]; then
     echo "#### Building RPM: osmosis"
 
     # Generate osmosis RPM.
@@ -260,7 +263,7 @@ if [ ! -f $SCRIPT_HOME/el7-src/$OSMOSIS_RPM ]; then
 fi
 
 # stxxl
-if [ ! -f $SCRIPT_HOME/el7-src/$STXXL_RPM ]; then
+if [ ! -f $RPM_X86_64/$STXXL_RPM ]; then
     echo "#### Building RPM: stxxl"
 
     # Generate stxxl RPM.
@@ -274,7 +277,7 @@ if [ ! -f $SCRIPT_HOME/el7-src/$STXXL_RPM ]; then
 fi
 
 # tomcat8
-if [ ! -f $SCRIPT_HOME/el7-src/$TOMCAT8_RPM ]; then
+if [ ! -f $RPM_NOARCH/$TOMCAT8_RPM ]; then
     echo "#### Building RPM: tomcat8"
 
     # Generate tomcat8 RPM.
@@ -288,7 +291,7 @@ if [ ! -f $SCRIPT_HOME/el7-src/$TOMCAT8_RPM ]; then
 fi
 
 # wamerican-insane
-if [ ! -f $SCRIPT_HOME/el7-src/$WAMERICAN_RPM ]; then
+if [ ! -f $RPM_NOARCH/$WAMERICAN_RPM ]; then
     echo "#### Building RPM: wamerican-insane"
 
     # Generate wamerican-insane RPM.
