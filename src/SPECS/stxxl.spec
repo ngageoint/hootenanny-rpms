@@ -1,11 +1,11 @@
 Name:		stxxl
 Version:	1.3.1
 Release:	1%{?dist}
-Summary:	C++ STL drop-in replacement for extremely large datasets 
+Summary:	C++ STL drop-in replacement for extremely large datasets
 
-Group:		Development/Libraries	
-License:	Boost	
-URL:		http://%{name}.sourceforge.net	
+Group:		Development/Libraries
+License:	Boost
+URL:		http://%{name}.sourceforge.net
 Source0:	http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -19,7 +19,7 @@ I/O bound calculations. STXXL has been developed at the University
 of Karlsruhe.
 
 %package devel
-Group:		Development/Libraries	
+Group:		Development/Libraries
 Summary:	Provides development files for %{name} applications
 Requires:	%{name} = %{version}-%{release}
 
@@ -42,8 +42,8 @@ sed -i 's/#include <sys\/mman.h>/#include <sys\/mman.h>\n#include <unistd.h>/g' 
 make library_g++
 
 %install
-rm -rf %{buildroot} 
-# There is no install target provided. However the library consists of a .so and a set of headers. 
+rm -rf %{buildroot}
+# There is no install target provided. However the library consists of a .so and a set of headers.
 # Let us install them, as required
 
 # Install the library
@@ -66,11 +66,11 @@ popd
 %postun -p /sbin/ldconfig
 
 %clean
-rm -rf %{buildroot} 
+rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
-%doc LICENSE_1_0.txt CHANGELOG TODO README TROUBLESHOOTING 
+%doc LICENSE_1_0.txt CHANGELOG TODO README TROUBLESHOOTING
 %{_libdir}/libstxxl.so.*
 
 %files devel
@@ -83,6 +83,5 @@ rm -rf %{buildroot}
 %{_libdir}/libstxxl.so
 
 %changelog
-* Fri Jan 30 2016 Benjamin Marchant <benjamin.marchant(a!t)digitalglobe.com> 1.3.1-1
+* Sat Jan 30 2016 Benjamin Marchant <benjamin.marchant(a!t)digitalglobe.com> 1.3.1-1
 - Create spec file
-
