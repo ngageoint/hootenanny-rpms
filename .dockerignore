@@ -1,0 +1,6 @@
+.git/*
+.vagrant/*
+el7/*
+el7-src/*
+src/SOURCES
+src/SRPMS

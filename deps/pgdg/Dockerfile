@@ -13,7 +13,7 @@ ENV PG_VERSION=${pg_version}
 
 # Install PostgreSQL development files from PGDG for the desired version
 # as well as any additional packages.
-COPY pgdg-install.sh /tmp/pgdg-install.sh
+COPY scripts/pgdg-install.sh /tmp/pgdg-install.sh
 RUN /tmp/pgdg-install.sh ${pg_version} && \
     rm /tmp/pgdg-install.sh && \
     yum -q -y install postgresql$(echo ${pg_version} | tr -d '.')-devel && \

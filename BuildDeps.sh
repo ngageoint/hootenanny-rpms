@@ -85,20 +85,23 @@ WORDS_RPM=hoot-words-$WORDS_VERSION-$WORDS_RELEASE.el7.noarch.rpm
 # a non-privileged user for building spec files.
 docker build \
        --build-arg rpmbuild_uid=$(id -u) \
+       -f $SCRIPT_HOME/deps/base/Dockerfile \
        -t hoot/rpmbuild-base \
-       $SCRIPT_HOME/deps/base
+       $SCRIPT_HOME
 
 # Generic image for building RPMS without any other prerequisites.
 docker build \
+       -f $SCRIPT_HOME/deps/generic/Dockerfile \
        -t hoot/rpmbuild-generic \
-       $SCRIPT_HOME/deps/generic
+       $SCRIPT_HOME
 
 # Base image with PostgreSQL develop libraries from PGDG at the
 # requested version.
 docker build \
        --build-arg pg_version=$PG_VERSION \
+       -f $SCRIPT_HOME/deps/pgdg/Dockerfile \
        -t hoot/rpmbuild-pgdg:$PG_VERSION \
-       $SCRIPT_HOME/deps/pgdg
+       $SCRIPT_HOME
 
 ## Build GDAL dependencies.
 
@@ -112,7 +115,6 @@ if [ ! -f $SCRIPT_HOME/el7-src/$FILEGDBAPI_RPM ]; then
            -it --rm \
            hoot/rpmbuild-generic \
            rpmbuild -bb SPECS/FileGDBAPI.spec
-    cp $SCRIPT_HOME/src/RPMS/x86_64/$FILEGDBAPI_RPM $SCRIPT_HOME/el7-src
 fi
 
 # GEOS
@@ -122,8 +124,9 @@ if [ ! -f $SCRIPT_HOME/el7-src/$GEOS_RPM ]; then
     # Build image for building GEOS.
     docker build \
            --build-arg packages=doxygen \
+           -f $SCRIPT_HOME/deps/generic/Dockerfile \
            -t hoot/rpmbuild-geos \
-           $SCRIPT_HOME/deps/generic
+           $SCRIPT_HOME
 
     # Generate GEOS RPM.
     docker run \
@@ -133,7 +136,6 @@ if [ ! -f $SCRIPT_HOME/el7-src/$GEOS_RPM ]; then
            -it --rm \
            hoot/rpmbuild-geos \
            rpmbuild -bb SPECS/geos.spec
-    cp $SCRIPT_HOME/src/RPMS/x86_64/{$GEOS_RPM,$GEOS_DEVEL_RPM} $SCRIPT_HOME/el7-src
 fi
 
 # libgeotiff
@@ -143,8 +145,9 @@ if [ ! -f $SCRIPT_HOME/el7-src/$LIBGEOTIFF_RPM ]; then
     # Build image for building libgeotiff.
     docker build \
            --build-arg "packages=$( get_requires libgeotiff )" \
+           -f $SCRIPT_HOME/deps/generic/Dockerfile \
            -t hoot/rpmbuild-libgeotiff \
-           $SCRIPT_HOME/deps/generic
+           $SCRIPT_HOME
 
     # Generate libgeotiff RPM.
     docker run \
@@ -154,7 +157,6 @@ if [ ! -f $SCRIPT_HOME/el7-src/$LIBGEOTIFF_RPM ]; then
            -it --rm \
            hoot/rpmbuild-libgeotiff \
            rpmbuild -bb SPECS/libgeotiff.spec
-    cp $SCRIPT_HOME/src/RPMS/x86_64/{$LIBGEOTIFF_RPM,$LIBGEOTIFF_DEVEL_RPM} $SCRIPT_HOME/el7-src
 fi
 
 # libkml
@@ -164,8 +166,9 @@ if [ ! -f $SCRIPT_HOME/el7-src/$LIBKML_RPM ]; then
     # Build image for building libkml.
     docker build \
            --build-arg "packages=$( get_requires libkml )" \
+           -f $SCRIPT_HOME/deps/generic/Dockerfile \
            -t hoot/rpmbuild-libkml \
-           $SCRIPT_HOME/deps/generic
+           $SCRIPT_HOME
 
     # Generate libkml RPM.
     docker run \
@@ -175,7 +178,6 @@ if [ ! -f $SCRIPT_HOME/el7-src/$LIBKML_RPM ]; then
            -it --rm \
            hoot/rpmbuild-libkml \
            rpmbuild -bb SPECS/libkml.spec
-    cp $SCRIPT_HOME/src/RPMS/x86_64/{$LIBKML_RPM,$LIBKML_DEVEL_RPM} $SCRIPT_HOME/el7-src
 fi
 
 ## GDAL and PostGIS (requires PostgreSQL from PGDG)
@@ -183,10 +185,6 @@ fi
 # GDAL
 if [ ! -f $SCRIPT_HOME/el7-src/$GDAL_RPM ]; then
     echo "#### Building RPM: GDAL (with PostgreSQL ${PG_VERSION})"
-
-    # Copy in dependency RPMs into GDAL container's folder.
-    cp $SCRIPT_HOME/src/RPMS/x86_64/{$FILEGDBAPI_RPM,$GEOS_RPM,$GEOS_DEVEL_RPM,$LIBGEOTIFF_RPM,$LIBGEOTIFF_DEVEL_RPM,$LIBKML_RPM,$LIBKML_DEVEL_RPM} \
-       $SCRIPT_HOME/deps/gdal
 
     # Make GDAL RPM container, specifying the versions of RPMs we
     # need to install.
@@ -197,11 +195,9 @@ if [ ! -f $SCRIPT_HOME/el7-src/$GDAL_RPM ]; then
            --build-arg libgeotiff_version=$LIBGEOTIFF_VERSION-$LIBGEOTIFF_RELEASE \
            --build-arg libkml_version=$LIBKML_VERSION-$LIBKML_RELEASE \
            --build-arg pg_version=$PG_VERSION \
+           -f $SCRIPT_HOME/deps/gdal/Dockerfile \
            -t hoot/rpmbuild-gdal \
-           $SCRIPT_HOME/deps/gdal
-
-    # Cleanup dependency RPMs.
-    rm -f $SCRIPT_HOME/deps/gdal/*.rpm
+           $SCRIPT_HOME
 
     # Generate GDAL RPM.
     docker run \
@@ -211,33 +207,18 @@ if [ ! -f $SCRIPT_HOME/el7-src/$GDAL_RPM ]; then
            -it --rm \
            hoot/rpmbuild-gdal \
            rpmbuild -bb SPECS/hoot-gdal.spec
-    cp $SCRIPT_HOME/src/RPMS/x86_64/$GDAL_RPM \
-       $SCRIPT_HOME/src/RPMS/x86_64/hoot-gdal-devel-$GDAL_RPM_SUFFIX \
-       $SCRIPT_HOME/src/RPMS/x86_64/hoot-gdal-java-$GDAL_RPM_SUFFIX \
-       $SCRIPT_HOME/src/RPMS/x86_64/hoot-gdal-libs-$GDAL_RPM_SUFFIX \
-       $SCRIPT_HOME/src/RPMS/x86_64/hoot-gdal-perl-$GDAL_RPM_SUFFIX \
-       $SCRIPT_HOME/src/RPMS/x86_64/hoot-gdal-python-$GDAL_RPM_SUFFIX \
-       $SCRIPT_HOME/src/RPMS/x86_64/hoot-gdal-python3-$GDAL_RPM_SUFFIX \
-       $SCRIPT_HOME/el7-src
 fi
 
 # PostGIS
 if [ ! -f $SCRIPT_HOME/el7-src/$POSTGIS_RPM ]; then
     echo "#### Building RPM: PostGIS"
 
-    cp $SCRIPT_HOME/src/RPMS/x86_64/$GDAL_RPM \
-       $SCRIPT_HOME/src/RPMS/x86_64/hoot-gdal-devel-$GDAL_RPM_SUFFIX \
-       $SCRIPT_HOME/src/RPMS/x86_64/hoot-gdal-libs-$GDAL_RPM_SUFFIX \
-       $SCRIPT_HOME/deps/postgis
-
     docker build \
            --build-arg "packages=$( get_requires hoot-postgis23 )" \
            --build-arg gdal_version=$GDAL_VERSION-$GDAL_RELEASE \
+           -f $SCRIPT_HOME/deps/postgis/Dockerfile \
            -t hoot/rpmbuild-postgis \
-           $SCRIPT_HOME/deps/postgis
-
-    # Cleanup dependency RPMs.
-    rm -f $SCRIPT_HOME/deps/postgis/*.rpm
+           $SCRIPT_HOME
 
     docker run \
            -v "${SCRIPT_HOME}/src/SOURCES":/rpmbuild/SOURCES:ro \
@@ -246,9 +227,6 @@ if [ ! -f $SCRIPT_HOME/el7-src/$POSTGIS_RPM ]; then
            -it --rm \
            hoot/rpmbuild-postgis \
            rpmbuild -bb SPECS/hoot-postgis23.spec
-
-    cp $SCRIPT_HOME/src/RPMS/x86_64/hoot-postgis23*.rpm \
-       $SCRIPT_HOME/el7-src
 fi
 
 ## Simple Dependencies
@@ -265,7 +243,6 @@ if [ ! -f $SCRIPT_HOME/el7-src/$WORDS_RPM ]; then
            -it --rm \
            hoot/rpmbuild-generic \
            rpmbuild -bb SPECS/hoot-words.spec
-    cp $SCRIPT_HOME/src/RPMS/noarch/$WORDS_RPM $SCRIPT_HOME/el7-src
 fi
 
 # osmosis
@@ -280,7 +257,6 @@ if [ ! -f $SCRIPT_HOME/el7-src/$OSMOSIS_RPM ]; then
            -it --rm \
            hoot/rpmbuild-generic \
            rpmbuild -bb SPECS/osmosis.spec
-    cp $SCRIPT_HOME/src/RPMS/noarch/$OSMOSIS_RPM $SCRIPT_HOME/el7-src
 fi
 
 # stxxl
@@ -295,7 +271,6 @@ if [ ! -f $SCRIPT_HOME/el7-src/$STXXL_RPM ]; then
            -it --rm \
            hoot/rpmbuild-generic \
            rpmbuild -bb SPECS/stxxl.spec
-    cp $SCRIPT_HOME/src/RPMS/x86_64/{$STXXL_RPM,$STXXL_DEVEL_RPM} $SCRIPT_HOME/el7-src
 fi
 
 # tomcat8
@@ -310,7 +285,6 @@ if [ ! -f $SCRIPT_HOME/el7-src/$TOMCAT8_RPM ]; then
            -it --rm \
            hoot/rpmbuild-generic \
            rpmbuild -bb SPECS/tomcat8.spec
-    cp $SCRIPT_HOME/src/RPMS/noarch/$TOMCAT8_RPM $SCRIPT_HOME/el7-src
 fi
 
 # wamerican-insane
@@ -325,5 +299,4 @@ if [ ! -f $SCRIPT_HOME/el7-src/$WAMERICAN_RPM ]; then
            -it --rm \
            hoot/rpmbuild-generic \
            rpmbuild -bb SPECS/wamerican-insane.spec
-    cp $SCRIPT_HOME/src/RPMS/noarch/$WAMERICAN_RPM $SCRIPT_HOME/el7-src
 fi
