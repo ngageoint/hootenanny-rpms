@@ -1,4 +1,4 @@
-FROM centos:centos7.4.1708
+FROM centos:7
 LABEL \
   description="Base container for building Hootenanny RPMs" \
   maintainer="justin.bronn@digitalglobe.com" \
