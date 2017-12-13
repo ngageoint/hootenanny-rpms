@@ -12,13 +12,13 @@ source $SCRIPT_HOME/Vars.sh
 docker build \
        --build-arg rpmbuild_dist=$RPMBUILD_DIST \
        --build-arg rpmbuild_uid=$(id -u) \
-       -f $SCRIPT_HOME/docker/base/Dockerfile \
+       -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-base \
        -t hoot/rpmbuild-base \
        $SCRIPT_HOME
 
 # Generic image for building RPMS without any other prerequisites.
 docker build \
-       -f $SCRIPT_HOME/docker/generic/Dockerfile \
+       -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic \
        -t hoot/rpmbuild-generic \
        $SCRIPT_HOME
 
@@ -26,7 +26,7 @@ docker build \
 # requested version.
 docker build \
        --build-arg pg_version=$PG_VERSION \
-       -f $SCRIPT_HOME/docker/pgdg/Dockerfile \
+       -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-pgdg \
        -t hoot/rpmbuild-pgdg:$PG_VERSION \
        $SCRIPT_HOME
 
@@ -51,7 +51,7 @@ if [ ! -f $RPM_X86_64/$GEOS_RPM ]; then
     # Build image for building GEOS.
     docker build \
            --build-arg packages=doxygen \
-           -f $SCRIPT_HOME/docker/generic/Dockerfile \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic \
            -t hoot/rpmbuild-geos \
            $SCRIPT_HOME
 
@@ -72,7 +72,7 @@ if [ ! -f $RPM_X86_64/$LIBGEOTIFF_RPM ]; then
     # Build image for building libgeotiff.
     docker build \
            --build-arg "packages=$( get_requires libgeotiff )" \
-           -f $SCRIPT_HOME/docker/generic/Dockerfile \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic \
            -t hoot/rpmbuild-libgeotiff \
            $SCRIPT_HOME
 
@@ -93,7 +93,7 @@ if [ ! -f $RPM_X86_64/$LIBKML_RPM ]; then
     # Build image for building libkml.
     docker build \
            --build-arg "packages=$( get_requires libkml )" \
-           -f $SCRIPT_HOME/docker/generic/Dockerfile \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic \
            -t hoot/rpmbuild-libkml \
            $SCRIPT_HOME
 
@@ -122,7 +122,7 @@ if [ ! -f $RPM_X86_64/$GDAL_RPM ]; then
            --build-arg libgeotiff_version=$LIBGEOTIFF_VERSION-$LIBGEOTIFF_RELEASE \
            --build-arg libkml_version=$LIBKML_VERSION-$LIBKML_RELEASE \
            --build-arg pg_version=$PG_VERSION \
-           -f $SCRIPT_HOME/docker/gdal/Dockerfile \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-gdal \
            -t hoot/rpmbuild-gdal \
            $SCRIPT_HOME
 
@@ -143,7 +143,7 @@ if [ ! -f $RPM_X86_64/$POSTGIS_RPM ]; then
     docker build \
            --build-arg "packages=$( get_requires hoot-postgis23 )" \
            --build-arg gdal_version=$GDAL_VERSION-$GDAL_RELEASE \
-           -f $SCRIPT_HOME/docker/postgis/Dockerfile \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-postgis \
            -t hoot/rpmbuild-postgis \
            $SCRIPT_HOME
 
