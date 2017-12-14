@@ -1,9 +1,4 @@
-%global with_debug 1
-
-# bundle dependencies that are not available as Fedora modules
-# %%{!?_with_bootstrap: %%global bootstrap 1}
-# use bcond for building modules
-%bcond_with bootstrap
+%global with_debug 0
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -26,6 +21,7 @@
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
+%global nodejs_somaj 57
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -84,8 +80,8 @@
 
 Name: nodejs
 Epoch: %{nodejs_epoch}
-Version: 8.9.3
-Release: 1%{?dist}
+Version: %{nodejs_version}
+Release: %{nodejs_release}%{?dist}
 Summary: JavaScript runtime
 License: MIT and ASL 2.0 and ISC and BSD
 Group: Development/Languages
@@ -93,11 +89,7 @@ URL: http://nodejs.org/
 
 ExclusiveArch: %{nodejs_arches}
 
-# nodejs bundles openssl, but we use the system version in Fedora
-# because openssl contains prohibited code, we remove openssl completely from
-# the tarball, using the script in Source100
-Source0: node-v%{nodejs_version}-stripped.tar.gz
-Source100: %{name}-tarball.sh
+Source0: http://nodejs.org/dist/v%{version}/node-v%{version}.tar.gz
 
 # The native module Requires generator remains in the nodejs SRPM, so it knows
 # the nodejs and v8 versions.  The remainder has migrated to the
@@ -105,32 +97,25 @@ Source100: %{name}-tarball.sh
 Source7: nodejs_native.attr
 
 # Disable running gyp on bundled deps we don't use
-Patch1: 0001-Disable-running-gyp-files-for-bundled-deps.patch
+Patch1: nodejs-0001-Disable-running-gyp-files-for-bundled-deps.patch
 
 # Being fixed upstream.
 # Follow https://bugs.chromium.org/p/v8/issues/detail?id=6939
-Patch2: 0001-Fix-aarch64-debug.patch
+Patch2: nodejs-0002-Fix-aarch64-debug.patch
 
+# Patch for compatibility with Hootenanny.
+Patch3: nodejs-0003-hoot-value-json-object.patch
+
+BuildRequires: ccache
 BuildRequires: python2-devel
-BuildRequires: libicu-devel
 BuildRequires: zlib-devel
-BuildRequires: gcc >= 4.9.4
-BuildRequires: gcc-c++ >= 4.9.4
-
-#%if ! 0%%{?bootstrap}
-%if %{with bootstrap}
-Provides: bundled(http-parser) = %{http_parser_version}
-Provides: bundled(libuv) = %{libuv_version}
-%else
+BuildRequires: gcc
+BuildRequires: gcc-c++
 BuildRequires: systemtap-sdt-devel
 BuildRequires: http-parser-devel >= 2.7.0
+BuildRequires: openssl-devel <= 1:1.1.0
+
 Requires: http-parser >= 2.7.0
-BuildRequires: libuv-devel >= 1:1.9.1
-Requires: libuv >= 1:1.9.1
-%endif
-
-BuildRequires: (openssl-devel <= 1:1.1.0 or compat-openssl10-devel)
-
 # we need the system certificate store when Patch2 is applied
 Requires: ca-certificates
 
@@ -178,17 +163,11 @@ Provides: bundled(v8) = %{v8_version}
 # option yet.
 Provides: bundled(nghttp2) = 1.25.0
 
-# Make sure we keep NPM up to date when we update Node.js
-%if 0%{?epel}
 # EPEL doesn't support Recommends, so make it strict
 Requires: npm = %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
-%else
-Recommends: npm = %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
-%endif
-
 
 %description
-Node.js is a platform built on Chrome's JavaScript runtime
+Node.js is a platform built on the Chrome JavaScript runtime
 for easily building fast, scalable network applications.
 Node.js uses an event-driven, non-blocking I/O model that
 makes it lightweight and efficient, perfect for data-intensive
@@ -201,14 +180,7 @@ Requires: %{name}%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 Requires: openssl-devel%{?_isa}
 Requires: zlib-devel%{?_isa}
 Requires: nodejs-packaging
-
-#%if ! 0%%{?bootstrap}
-%if %{with bootstrap}
-# deps are bundled
-%else
 Requires: http-parser-devel%{?_isa}
-Requires: libuv-devel%{?_isa}
-%endif
 
 %description devel
 Development headers for the Node.js JavaScript runtime.
@@ -239,6 +211,11 @@ Summary: Node.js API documentation
 Group: Documentation
 BuildArch: noarch
 
+# Have to reset Version/Release here, otherwise we'll use the unique
+# values for the npm package.
+Version: %{nodejs_version}
+Release: %{nodejs_release}%{?dist}
+
 # We don't require that the main package be installed to
 # use the docs, but if it is installed, make sure the
 # version always matches
@@ -250,14 +227,15 @@ The API documentation for the Node.js JavaScript runtime.
 
 
 %prep
-%setup -q -n node-v%{nodejs_version}
+%setup -q -D -n node-v%{nodejs_version}
 
 # remove bundled dependencies that we aren't building
 %patch1 -p1
-rm -rf deps/icu-small \
+rm -rf deps/openssl \
        deps/zlib
 
 %patch2 -p1
+%patch3 -p1
 
 %build
 # build with debugging symbols and add defines from libuv (#892601)
@@ -278,30 +256,20 @@ export CXXFLAGS='%{optflags} -g \
 export CFLAGS="$(echo ${CFLAGS} | tr '\n\\' '  ')"
 export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
 
-#%if ! 0%%{?bootstrap}
-%if %{with bootstrap}
-./configure --prefix=%{_prefix} \
-           --shared-openssl \
-           --shared-zlib \
-           --without-dtrace \
-           --with-intl=system-icu \
-           --debug-http2 \
-           --debug-nghttp2 \
-           --openssl-use-def-ca-store
-%else
-./configure --prefix=%{_prefix} \
-           --shared-openssl \
-           --shared-zlib \
-           --shared-libuv \
-           --shared-http-parser \
-           --with-dtrace \
-           --with-intl=system-icu \
-           --debug-http2 \
-           --debug-nghttp2 \
-           --openssl-use-def-ca-store
+./configure \
+  --prefix=%{_prefix} \
+%if 0%{?shared} == 1
+  --shared \
 %endif
+  --shared-openssl \
+  --shared-zlib \
+  --shared-http-parser \
+  --with-dtrace \
+  --debug-http2 \
+  --debug-nghttp2 \
+  --openssl-use-def-ca-store
 
-%if %{?with_debug} == 1
+%if 0%{?with_debug} == 1
 # Setting BUILDTYPE=Debug builds both release and debug binaries
 make BUILDTYPE=Debug %{?_smp_mflags}
 %else
@@ -314,12 +282,26 @@ rm -rf %{buildroot}
 
 ./tools/install.py install %{buildroot} %{_prefix}
 
-# Set the binary permissions properly
-chmod 0755 %{buildroot}/%{_bindir}/node
 
-%if %{?with_debug} == 1
+%if 0%{?shared} == 1
+# Move shared library to /usr/lib64 (since NodeJS's non-standard ./configure
+# doesn't support specifying the right library directory for the platform).
+mkdir -p %{buildroot}%{_libdir}
+mv %{buildroot}%{_usr}/lib/libnode.so.%{nodejs_somaj} %{buildroot}%{_libdir}
+pushd %{buildroot}%{_libdir}
+ln -s libnode.so.%{nodejs_somaj} libnode.so
+popd
+
+# Copy in the NPM binary from previous build.
+cp %{_buildrootdir}/%{name}-%{nodejs_version}-%{nodejs_release}-unshared%{_bindir}/node %{buildroot}%{_bindir}/node
+%endif
+
+# Set the binary permissions properly
+chmod 0755 %{buildroot}%{_bindir}/node
+
+%if 0%{?with_debug} == 1
 # Install the debug binary and set its permissions
-install -Dpm0755 out/Debug/node %{buildroot}/%{_bindir}/node_g
+install -Dpm0755 out/Debug/node %{buildroot}%{_bindir}/node_g
 %endif
 
 # own the sitelib directory
@@ -401,19 +383,17 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 
 %files
 %{_bindir}/node
+%if 0%{?shared} == 1
+%{_libdir}/libnode.so.%{nodejs_somaj}
+%endif
 %dir %{_prefix}/lib/node_modules
 %dir %{_datadir}/node
 %dir %{_datadir}/systemtap
 %dir %{_datadir}/systemtap/tapset
 %{_datadir}/systemtap/tapset/node.stp
 
-#%if ! 0%%{?bootstrap}
-%if %{with bootstrap}
-# no dtrace
-%else
 %dir %{_usr}/lib/dtrace
 %{_usr}/lib/dtrace/node.d
-%endif
 
 %{_rpmconfigdir}/fileattrs/nodejs_native.attr
 %{_rpmconfigdir}/nodejs_native.req
@@ -423,8 +403,11 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 
 
 %files devel
-%if %{?with_debug} == 1
+%if 0%{?with_debug} == 1
 %{_bindir}/node_g
+%endif
+%if 0%{?shared} == 1
+%{_libdir}/libnode.so
 %endif
 %{_includedir}/node
 %{_datadir}/node/common.gypi
@@ -448,7 +431,6 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %files docs
 %dir %{_pkgdocdir}
 %{_pkgdocdir}/html
-%{_pkgdocdir}/npm*
 %{_pkgdocdir}/npm/html
 %{_pkgdocdir}/npm/doc
 

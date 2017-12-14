@@ -107,6 +107,32 @@ if [ ! -f $RPM_X86_64/$LIBKML_RPM ]; then
            rpmbuild -bb SPECS/libkml.spec
 fi
 
+# NodeJS
+if [ ! -f $RPM_X86_64/$NODEJS_RPM ]; then
+    echo "#### Building RPM: NodeJS"
+
+    # Build image for building NodeJS.
+    docker build \
+           --build-arg "packages=$( get_requires nodejs )" \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic \
+           -t hoot/rpmbuild-nodejs \
+           $SCRIPT_HOME
+
+    # Generate NodeJS RPM.
+    docker run \
+           -v "${SCRIPT_HOME}/src/SOURCES":/rpmbuild/SOURCES:ro \
+           -v "${SCRIPT_HOME}/src/SPECS":/rpmbuild/SPECS:ro \
+           -v "${SCRIPT_HOME}/src/RPMS":/rpmbuild/RPMS:rw \
+           -it --rm \
+           hoot/rpmbuild-nodejs \
+           /bin/bash -c \
+           "rpmbuild \
+              --buildroot '/rpmbuild/BUILDROOT/nodejs-${NODEJS_VERSION}-${NODEJS_RELEASE}-unshared' \
+              -bi SPECS/nodejs.spec && \
+            rpmbuild --define 'shared 1' -bb SPECS/nodejs.spec"
+fi
+
+
 ## GDAL and PostGIS (requires PostgreSQL from PGDG)
 
 # GDAL
