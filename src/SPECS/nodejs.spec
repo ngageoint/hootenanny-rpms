@@ -67,12 +67,6 @@
 %global npm_patch 1
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
-# In order to avoid needing to keep incrementing the release version for the
-# main package forever, we will just construct one for npm that is guaranteed
-# to increment safely. Changing this can only be done during an update when the
-# base npm version number is increasing.
-%global npm_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
-
 # Filter out the NPM bundled dependencies so we aren't providing them
 %global __provides_exclude_from ^%{_prefix}/lib/node_modules/npm/.*$
 %global __requires_exclude_from ^%{_prefix}/lib/node_modules/npm/.*$
@@ -163,8 +157,11 @@ Provides: bundled(v8) = %{v8_version}
 # option yet.
 Provides: bundled(nghttp2) = 1.25.0
 
-# EPEL doesn't support Recommends, so make it strict
-Requires: npm = %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
+# We used to ship npm separately, but it is so tightly integrated with Node.js
+# (and expected to be present on all Node.js systems) that we ship it bundled
+# now.
+Provides: npm = %{npm_epoch}:%{npm_version}
+Provides: npm(npm) = %{npm_version}
 
 %description
 Node.js is a platform built on the Chrome JavaScript runtime
@@ -185,36 +182,10 @@ Requires: http-parser-devel%{?_isa}
 %description devel
 Development headers for the Node.js JavaScript runtime.
 
-%package -n npm
-Summary: Node.js Package Manager
-Epoch: %{npm_epoch}
-Version: %{npm_version}
-Release: %{npm_release}%{?dist}
-
-# We used to ship npm separately, but it is so tightly integrated with Node.js
-# (and expected to be present on all Node.js systems) that we ship it bundled
-# now.
-Obsoletes: npm < 0:3.5.4-6
-Provides: npm = %{npm_epoch}:%{npm_version}
-Requires: nodejs = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
-
-# Do not add epoch to the virtual NPM provides or it will break
-# the automatic dependency-generation script.
-Provides: npm(npm) = %{npm_version}
-
-%description -n npm
-npm is a package manager for node.js. You can use it to install and publish
-your node programs. It manages dependencies and does other cool stuff.
-
 %package docs
 Summary: Node.js API documentation
 Group: Documentation
 BuildArch: noarch
-
-# Have to reset Version/Release here, otherwise we'll use the unique
-# values for the npm package.
-Version: %{nodejs_version}
-Release: %{nodejs_release}%{?dist}
 
 # We don't require that the main package be installed to
 # use the docs, but if it is installed, make sure the
@@ -281,7 +252,6 @@ make BUILDTYPE=Release %{?_smp_mflags}
 rm -rf %{buildroot}
 
 ./tools/install.py install %{buildroot} %{_prefix}
-
 
 %if 0%{?shared} == 1
 # Move shared library to /usr/lib64 (since NodeJS's non-standard ./configure
@@ -369,6 +339,7 @@ ln -sf %{_pkgdocdir}/npm/html %{buildroot}%{_prefix}/lib/node_modules/npm/doc
 rm -f %{buildroot}/%{_defaultdocdir}/node/lldb_commands.py \
       %{buildroot}/%{_defaultdocdir}/node/lldbinit
 
+
 %check
 # Fail the build if the versions don't match
 %{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.node, '%{nodejs_version}')"
@@ -381,27 +352,42 @@ rm -f %{buildroot}/%{_defaultdocdir}/node/lldb_commands.py \
 # Ensure we have npm and that the version matches
 NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"npm\").version, '%{npm_version}')"
 
+
+# NodeJS and NPM package.
 %files
+%{_bindir}/npm
+%{_bindir}/npx
 %{_bindir}/node
 %if 0%{?shared} == 1
 %{_libdir}/libnode.so.%{nodejs_somaj}
 %endif
 %dir %{_prefix}/lib/node_modules
+%{_prefix}/lib/node_modules/npm
 %dir %{_datadir}/node
 %dir %{_datadir}/systemtap
 %dir %{_datadir}/systemtap/tapset
 %{_datadir}/systemtap/tapset/node.stp
-
 %dir %{_usr}/lib/dtrace
 %{_usr}/lib/dtrace/node.d
 
+%ghost %{_sysconfdir}/npmrc
+%ghost %{_sysconfdir}/npmignore
+
 %{_rpmconfigdir}/fileattrs/nodejs_native.attr
 %{_rpmconfigdir}/nodejs_native.req
+
 %license LICENSE
 %doc AUTHORS CHANGELOG.md COLLABORATOR_GUIDE.md GOVERNANCE.md README.md
 %doc %{_mandir}/man1/node.1*
+%doc %{_mandir}/man*/npm*
+%doc %{_mandir}/man*/npx*
+%doc %{_mandir}/man5/package.json.5*
+%doc %{_mandir}/man5/package-lock.json.5*
+%doc %{_mandir}/man7/removing-npm.7*
+%doc %{_mandir}/man7/semver.7*
 
 
+# Development package.
 %files devel
 %if 0%{?with_debug} == 1
 %{_bindir}/node_g
@@ -414,20 +400,7 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/gdbinit
 
 
-%files -n npm
-%{_bindir}/npm
-%{_bindir}/npx
-%{_prefix}/lib/node_modules/npm
-%ghost %{_sysconfdir}/npmrc
-%ghost %{_sysconfdir}/npmignore
-%doc %{_mandir}/man*/npm*
-%doc %{_mandir}/man*/npx*
-%doc %{_mandir}/man5/package.json.5*
-%doc %{_mandir}/man5/package-lock.json.5*
-%doc %{_mandir}/man7/removing-npm.7*
-%doc %{_mandir}/man7/semver.7*
-
-
+# Documenatation package.
 %files docs
 %dir %{_pkgdocdir}
 %{_pkgdocdir}/html
@@ -435,5 +408,5 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
-* Tue Dec 12 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 8.9.3-1
-- Initial Release
+* Thu Dec 14 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 8.9.3-1
+- Initial Release, includes shared library and bundled NPM.
