@@ -77,7 +77,8 @@ vagrant-test:
 		--exclude=.*ExactMatchInputsTest.sh \
 		--exclude=.*ConflateAverageTest.sh \
 		--exclude=.*ServiceMultiaryIngestCmdTest.sh \
-		--exclude=.*TileConflatorTest.*"
+		--exclude=.*TileConflatorTest.* \
+		--exclude=.*Osm2OgrTranslation.sh"
 
 # This spawns a small VM to update the main repo so we can copy it to S3
 vagrant-repo:

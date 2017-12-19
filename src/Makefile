@@ -8,7 +8,7 @@ INSTALL_FILEGDB=yum list installed FileGDB_API || sudo yum -y install $(FILEGDB_
 # spawn at most nproc processes per sub-job and if the load is above nproc + 2 no more
 # jobs will be spawned. This is a poor man parallelism, but should avoid killing the
 # host.
-RPMBUILD_OPTS=--quiet --define "_topdir `pwd`" --define "_smp_mflags -j`nproc` -l$$((`nproc` + 2))"
+RPMBUILD_OPTS=--define "_topdir `pwd`" --define "_smp_mflags -j`nproc` -l$$((`nproc` + 2))"
 
 hoottarball=$(lastword $(sort $(HOOTBALL)))
 
