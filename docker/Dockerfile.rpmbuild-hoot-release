@@ -1,0 +1,23 @@
+# The base image depends on the version of PosgreSQL from PGDG.
+ARG pg_version
+FROM hoot/rpmbuild-pgdg:${pg_version}
+
+ARG packages
+ARG pg_version
+
+LABEL \
+  description="Container for building Hootenanny RPMs" \
+  maintainer="justin.bronn@digitalglobe.com" \
+  name="Hootenanny Release RPM Build Image" \
+  vendor="Radiant Solutions"
+
+USER root
+
+COPY scripts/hoot-repo.sh /tmp/hoot-repo.sh
+RUN /tmp/hoot-repo.sh && \
+    rm /tmp/hoot-repo.sh && \
+    if [ ! -z "${packages}" ] ; then yum -q -y install ${packages}; fi
+
+# Set default user and work directory.
+USER ${RPMBUILD_USER}
+WORKDIR ${RPMBUILD_HOME}
