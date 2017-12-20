@@ -138,7 +138,9 @@ HootTest --diff --glacial --parallel $(nproc) \
     --exclude=.*ExactMatchInputsTest.sh \
     --exclude=.*ConflateAverageTest.sh \
     --exclude=.*ServiceMultiaryIngestCmdTest.sh \
-    --exclude=.*TileConflatorTest.*
+    --exclude=.*TileConflatorTest.* \
+    --exclude=.*Osm2OgrTranslation.sh
+    
 cd hoot-services
 make test -s
 
