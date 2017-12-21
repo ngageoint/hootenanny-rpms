@@ -2,6 +2,7 @@
 ARG pg_version
 FROM hoot/rpmbuild-pgdg:${pg_version}
 
+ARG node_version
 ARG packages
 ARG pg_version
 
@@ -13,10 +14,20 @@ LABEL \
 
 USER root
 
-COPY scripts/hoot-repo.sh /tmp/hoot-repo.sh
+COPY scripts/hoot-repo.sh \
+     scripts/nodejs-install.sh \
+     /tmp/
+
 RUN /tmp/hoot-repo.sh && \
     rm /tmp/hoot-repo.sh && \
-    if [ ! -z "${packages}" ] ; then yum -q -y install ${packages}; fi
+    /tmp/nodejs-install.sh ${node_version} && \
+    rm /tmp/nodejs-install.sh && \
+    yum install -y \
+      nodejs-${node_version} \
+      nodejs-devel-${node_version} \
+      yum-plugin-versionlock && \
+    yum versionlock nodejs* && \
+    if [ ! -z "${packages}" ] ; then yum -y install ${packages}; fi
 
 # Set default user and work directory.
 USER ${RPMBUILD_USER}

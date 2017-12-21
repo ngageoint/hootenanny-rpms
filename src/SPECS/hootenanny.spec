@@ -19,6 +19,7 @@ BuildRequires:  geos-devel >= %{geos_min_version}
 BuildRequires:  git
 BuildRequires:  glpk-devel
 BuildRequires:  graphviz
+BuildRequires:  hoot-gdal >= %{gdal_min_version}
 BuildRequires:  hoot-gdal-devel >= %{gdal_min_version}
 BuildRequires:  hoot-gdal-python >= %{gdal_min_version}
 BuildRequires:  hoot-words >= 1.0.0
@@ -27,6 +28,7 @@ BuildRequires:  libicu-devel
 BuildRequires:  libspatialite-devel
 BuildRequires:  libxslt
 BuildRequires:  log4cxx-devel
+BuildRequires:  maven
 BuildRequires:  nodejs-devel
 BuildRequires:  opencv-devel
 BuildRequires:  postgresql%{pg_dotless}-devel
@@ -81,10 +83,6 @@ This package contains the core algorithms and command line interface.
 %build
 source ./SetupEnv.sh
 
-# Sort out the postgres version. We can't rely on having pg_config in our path
-PG_VERSION=$(psql --version | egrep -o '[0-9]{1,}\.[0-9]{1,}')
-
-
 # The dir configurations set the install directory to work with EL's dir structure
 # aclocal && autoconf && autoheader && automake --add-missing --copy && \
 
@@ -130,7 +128,7 @@ cp -R node-export-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-export-server
 make install
 echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
 
-chmod 755 $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
+chmod 0755 $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
 cp -R test-files/ $RPM_BUILD_ROOT/var/lib/hootenanny/
 ln -s /usr/lib64 $RPM_BUILD_ROOT/var/lib/hootenanny/lib
 rm $RPM_BUILD_ROOT/usr/bin/HootEnv.sh
@@ -192,8 +190,8 @@ content, geometry and attributes, to transfer to the output map.
 This package contains the UI and web services.
 
 %files services-ui
-%attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hoot-services.war
-%attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hootenanny-id
+%attr(0755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hoot-services.war
+%attr(0755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hootenanny-id
 /etc/init.d/node-mapnik-server
 /etc/init.d/node-export-server
 

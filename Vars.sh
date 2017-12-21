@@ -5,6 +5,9 @@ set -e
 
 SCRIPT_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# NodeJS
+NODE_VERSION=0.10.46
+
 # PostgreSQL
 PG_VERSION=9.5
 PG_DOTLESS=$(echo $PG_VERSION | tr -d '.')
