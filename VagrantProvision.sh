@@ -3,7 +3,7 @@
 set -e
 
 # Link to make building easier
-ln -s hootenanny-rpms/src/ rpmbuild
+ln -s hootenanny-rpms/ rpmbuild
 
 export LANG=en_US.UTF-8
 

@@ -31,6 +31,7 @@ RUN yum -q -y update && \
         autoconf \
         automake \
         bzip2 \
+        createrepo \
         epel-release \
         gcc \
         gcc-c++ \

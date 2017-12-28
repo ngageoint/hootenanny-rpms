@@ -18,7 +18,7 @@ fi
 echo "Building Hootenanny: $GIT_COMMIT"
 
 
-cd /home/vagrant/hootenanny-rpms/src/
+cd /home/vagrant/hootenanny-rpms/
 
 # This is needed by the Makefile
 mkdir -p tmp
@@ -116,8 +116,8 @@ make -sj$(nproc) clean
 
 # Remove any old archives
 rm -f hootenanny-*.tar.gz hootenanny-services-*.war
-rm -f /home/vagrant/hootenanny-rpms/src/SOURCES/hootenanny-*.tar.gz
-rm -f /home/vagrant/hootenanny-rpms/src/SOURCES/hootenanny-services*.war
+rm -f /home/vagrant/hootenanny-rpms/SOURCES/hootenanny-*.tar.gz
+rm -f /home/vagrant/hootenanny-rpms/SOURCES/hootenanny-services*.war
 
 # This hopes that we have already installed the hootenanny-words RPM so we don't have to
 # download it again.
@@ -127,5 +127,5 @@ echo "### Make Archive ###"
 make -s -j$(nproc) archive
 echo "### Make Archive: Done ###"
 
-cp -l hootenanny-[0-9]*.tar.gz /home/vagrant/hootenanny-rpms/src/SOURCES/
-cp -l hootenanny-services*.war /home/vagrant/hootenanny-rpms/src/SOURCES/
+cp -l hootenanny-[0-9]*.tar.gz /home/vagrant/hootenanny-rpms/SOURCES/
+cp -l hootenanny-services*.war /home/vagrant/hootenanny-rpms/SOURCES/
