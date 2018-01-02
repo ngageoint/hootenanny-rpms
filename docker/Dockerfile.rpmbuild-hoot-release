@@ -14,19 +14,21 @@ LABEL \
 
 USER root
 
-COPY scripts/hoot-repo.sh \
-     scripts/nodejs-install.sh \
-     /tmp/
+# Copy in repository setup scripts.
+COPY scripts/hoot-repo.sh scripts/nodesource-repo.sh /tmp/
 
-RUN /tmp/hoot-repo.sh && \
-    rm /tmp/hoot-repo.sh && \
-    /tmp/nodejs-install.sh ${node_version} && \
-    rm /tmp/nodejs-install.sh && \
-    yum install -y \
+# Install NodeJS and pin to desired version.
+RUN /tmp/nodesource-repo.sh ${node_version} && \
+    rm /tmp/nodesource-repo.sh && \
+    yum install -q -y \
       nodejs-${node_version} \
       nodejs-devel-${node_version} \
       yum-plugin-versionlock && \
-    yum versionlock nodejs* && \
+    yum versionlock nodejs*
+
+# Install Hootenanny release repository and dependencies.
+RUN /tmp/hoot-repo.sh && \
+    rm /tmp/hoot-repo.sh && \
     if [ ! -z "${packages}" ] ; then yum -y install ${packages}; fi
 
 # Set default user and work directory.
