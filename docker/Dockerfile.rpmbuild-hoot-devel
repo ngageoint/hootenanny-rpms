@@ -1,0 +1,79 @@
+# The base image depends on the version of PosgreSQL from PGDG.
+ARG pg_version
+FROM hoot/rpmbuild-pgdg:${pg_version}
+
+ARG filegdbapi_version
+ARG gdal_version
+ARG geos_version
+ARG libgeotiff_version
+ARG libkml_version
+ARG node_version
+ARG packages
+ARG postgis_version
+ARG pg_version
+ARG pg_data=/var/lib/pgsql/${pg_version}/data
+
+LABEL \
+  description="Container for building Hootenanny RPMs from development dependencies." \
+  maintainer="justin.bronn@digitalglobe.com" \
+  name="Hootenanny Development RPM Build Image" \
+  vendor="Radiant Solutions"
+
+USER root
+
+# Copy in development RPMs at the desired versions.
+COPY RPMS/x86_64/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/geos-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/geos-devel-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/hoot-gdal-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/hoot-gdal-devel-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/hoot-gdal-libs-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/hoot-gdal-python-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/hoot-postgis23_95-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/hoot-postgis23_95-devel-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/hoot-postgis23_95-utils-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+     scripts/nodesource-repo.sh \
+     /tmp/
+
+# Install NodeJS at desired version.
+RUN /tmp/nodesource-repo.sh ${node_version} && \
+    rm /tmp/nodesource-repo.sh && \
+    yum install -q -y \
+      nodejs-${node_version} \
+      nodejs-devel-${node_version} \
+      yum-plugin-versionlock && \
+    yum versionlock nodejs*
+
+# Install PostgreSQL server at desired version.
+RUN yum -q -y install postgresql$(echo ${pg_version} | tr -d '.')-server && \
+    alternatives --install /usr/bin/initdb pgsql-initdb /usr/pgsql-${pg_version}/bin/initdb 500 && \
+    alternatives --install /usr/bin/pg_ctl pgsql-pg_ctl /usr/pgsql-${pg_version}/bin/pg_ctl 500 && \
+    su -l postgres -c "initdb -D ${pg_data} --locale ${LANG}"
+
+# Install Hootenanny dependencies.
+RUN yum install -y \
+    /tmp/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/geos-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/geos-devel-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-gdal-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-gdal-devel-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-gdal-libs-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-gdal-python-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-postgis23_95-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-postgis23_95-devel-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-postgis23_95-utils-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+    && \
+    rm -f /*.rpm && \
+    if [ ! -z "${packages}" ] ; then yum -y install ${packages}; fi
+
+# Set default user and work directory.
+USER ${RPMBUILD_USER}
+WORKDIR ${RPMBUILD_HOME}
