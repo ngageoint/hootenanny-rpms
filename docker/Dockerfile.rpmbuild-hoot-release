@@ -5,6 +5,7 @@ FROM hoot/rpmbuild-pgdg:${pg_version}
 ARG node_version
 ARG packages
 ARG pg_version
+ARG pg_data=/var/lib/pgsql/${pg_version}/data
 
 LABEL \
   description="Container for building Hootenanny RPMs" \
@@ -25,6 +26,12 @@ RUN /tmp/nodesource-repo.sh ${node_version} && \
       nodejs-devel-${node_version} \
       yum-plugin-versionlock && \
     yum versionlock nodejs*
+
+# Install PostgreSQL server at desired version.
+RUN yum -q -y install postgresql$(echo ${pg_version} | tr -d '.')-server && \
+    alternatives --install /usr/bin/initdb pgsql-initdb /usr/pgsql-${pg_version}/bin/initdb 500 && \
+    alternatives --install /usr/bin/pg_ctl pgsql-pg_ctl /usr/pgsql-${pg_version}/bin/pg_ctl 500 && \
+    su -l postgres -c "initdb -D ${pg_data} --locale ${LANG}"
 
 # Install Hootenanny release repository and dependencies.
 RUN /tmp/hoot-repo.sh && \
