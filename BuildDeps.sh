@@ -213,6 +213,20 @@ if [ ! -f $RPM_X86_64/$STXXL_RPM ]; then
            rpmbuild -bb SPECS/stxxl.spec
 fi
 
+# su-exec
+if [ ! -f $RPM_X86_64/$SUEXEC_RPM ]; then
+    echo "#### Building RPM: su-exec"
+
+    # Generate su-exec RPM.
+    docker run \
+           -v $SOURCES:/rpmbuild/SOURCES:ro \
+           -v $SPECS:/rpmbuild/SPECS:ro \
+           -v $RPMS:/rpmbuild/RPMS:rw \
+           -it --rm \
+           hoot/rpmbuild-generic \
+           rpmbuild -bb SPECS/su-exec.spec
+fi
+
 # tomcat8
 if [ ! -f $RPM_NOARCH/$TOMCAT8_RPM ]; then
     echo "#### Building RPM: tomcat8"
