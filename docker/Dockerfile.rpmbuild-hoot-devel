@@ -12,6 +12,7 @@ ARG packages
 ARG postgis_version
 ARG pg_version
 ARG pg_data=/var/lib/pgsql/${pg_version}/data
+ARG suexec_version
 
 LABEL \
   description="Container for building Hootenanny RPMs using development dependencies." \
@@ -36,6 +37,7 @@ COPY RPMS/x86_64/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/su-exec-${suexec_version}${RPMBUILD_DIST}.x86_64.rpm \
      scripts/nodesource-repo.sh \
      /tmp/
 
@@ -47,12 +49,6 @@ RUN /tmp/nodesource-repo.sh ${node_version} && \
       nodejs-devel-${node_version} \
       yum-plugin-versionlock && \
     yum versionlock nodejs*
-
-# Install PostgreSQL server at desired version.
-RUN yum -q -y install postgresql$(echo ${pg_version} | tr -d '.')-server && \
-    alternatives --install /usr/bin/initdb pgsql-initdb /usr/pgsql-${pg_version}/bin/initdb 500 && \
-    alternatives --install /usr/bin/pg_ctl pgsql-pg_ctl /usr/pgsql-${pg_version}/bin/pg_ctl 500 && \
-    su -l postgres -c "initdb -D ${pg_data} --locale ${LANG}"
 
 # Install Hootenanny dependencies.
 RUN yum install -y \
@@ -70,9 +66,16 @@ RUN yum install -y \
     /tmp/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/su-exec-${suexec_version}${RPMBUILD_DIST}.x86_64.rpm \
     && \
     rm -f /*.rpm && \
     if [ ! -z "${packages}" ] ; then yum -y install ${packages}; fi
+
+# Install PostgreSQL server at desired version.
+RUN yum -q -y install postgresql$(echo ${pg_version} | tr -d '.')-server && \
+    alternatives --install /usr/bin/initdb pgsql-initdb /usr/pgsql-${pg_version}/bin/initdb 500 && \
+    alternatives --install /usr/bin/pg_ctl pgsql-pg_ctl /usr/pgsql-${pg_version}/bin/pg_ctl 500 && \
+    su-exec postgres:postgres initdb -D ${pg_data} --locale ${LANG}
 
 # Set default user and work directory.
 USER ${RPMBUILD_USER}

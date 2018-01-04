@@ -25,6 +25,7 @@ docker build \
   --build-arg pg_version=$PG_VERSION \
   --build-arg postgis_version=$POSTGIS_VERSION-$POSTGIS_RELEASE \
   --build-arg node_version=$NODE_VERSION \
+  --build-arg suexec_version=$SUEXEC_VERSION-$SUEXEC_RELEASE \
   -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-hoot-devel \
   -t hoot/rpmbuild-hoot-devel \
   $SCRIPT_HOME
