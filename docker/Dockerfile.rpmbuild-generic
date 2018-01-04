@@ -1,6 +1,6 @@
 FROM hoot/rpmbuild-base:latest
 LABEL \
-  description="Generic container for building Hootenanny dependency RPMs" \
+  description="Generic container for building Hootenanny RPMs" \
   maintainer="justin.bronn@digitalglobe.com" \
   name="Hootenanny Generic RPM Build Image" \
   vendor="Radiant Solutions"
@@ -10,5 +10,6 @@ ARG packages
 # If any package dependencies are needed, install them.
 RUN if [ ! -z "${packages}" ] ; then yum -q -y install ${packages}; fi
 
+# Use unprivleged RPM build user and work directory by default.
 USER ${RPMBUILD_USER}
 WORKDIR ${RPMBUILD_HOME}

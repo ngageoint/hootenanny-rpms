@@ -9,11 +9,22 @@ mkdir -p $RPMS
 
 ## Build base images.
 
-# Base image that has basic development, RPM authoring, and
-# a non-privileged user for building spec files.
+# Foundation image that creates unprivileged user for RPM tasks.
 docker build \
        --build-arg rpmbuild_dist=$RPMBUILD_DIST \
        --build-arg rpmbuild_uid=$(id -u) \
+       -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild \
+       -t hoot/rpmbuild \
+       $SCRIPT_HOME
+
+# Image for creating and signing the RPM repository.
+docker build \
+       -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-repo \
+       -t hoot/rpmbuild-repo \
+       $SCRIPT_HOME
+
+# Base image that has basic development and RPM building packages.
+docker build \
        -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-base \
        -t hoot/rpmbuild-base \
        $SCRIPT_HOME
@@ -52,7 +63,7 @@ if [ ! -f $RPM_X86_64/$GEOS_RPM ]; then
 
     # Build image for building GEOS.
     docker build \
-           --build-arg packages=doxygen \
+           --build-arg "packages=$( spec_requires geos )" \
            -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic \
            -t hoot/rpmbuild-geos \
            $SCRIPT_HOME

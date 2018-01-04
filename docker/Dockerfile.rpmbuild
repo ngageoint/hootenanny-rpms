@@ -1,0 +1,35 @@
+FROM centos:7
+LABEL \
+  description="Container with user for building Hootenanny RPMs" \
+  maintainer="justin.bronn@digitalglobe.com" \
+  name="Hootenanny RPM Build User Image" \
+  vendor="Radiant Solutions"
+
+# Arguments for setting:
+#  * Language and locale.
+#  * RPM distribution.
+#  * RPM building user and home.
+ARG lang=en_US.UTF-8
+ARG locale=en_US.UTF-8
+ARG rpmbuild_dist=.el7
+ARG rpmbuild_uid=1000
+ARG rpmbuild_user=rpmbuild
+ARG rpmbuild_home=/${rpmbuild_user}
+
+# Ensure proper language/locale environment settings.
+ENV LANG ${lang}
+ENV LC_ALL ${locale}
+
+# Put some key arguments in environment to allow access in child containers.
+ENV RPMBUILD_DIST=${rpmbuild_dist}
+ENV RPMBUILD_USER=${rpmbuild_user}
+ENV RPMBUILD_HOME=${rpmbuild_home}
+
+# Create unprivileged user for building RPMs, and setup basic macros.
+RUN useradd -d ${rpmbuild_home} -m -s /bin/bash -u ${rpmbuild_uid} ${rpmbuild_user} && \
+    echo "%_smp_mflags -j%(nproc) -l%(expr %(nproc) + 2)" >> ${rpmbuild_home}/.rpmmacros && \
+    echo "%_topdir ${rpmbuild_home}" >> ${rpmbuild_home}/.rpmmacros && \
+    echo "%debug_package %{nil}" >> ${rpmbuild_home}/.rpmmacros && \
+    echo "%dist ${rpmbuild_dist}" >> ${rpmbuild_home}/.rpmmacros && \
+    chmod 0755 ${rpmbuild_home} && \
+    chown ${rpmbuild_user}:${rpbumbuild_user} ${rpmbuild_home}/.rpmmacros

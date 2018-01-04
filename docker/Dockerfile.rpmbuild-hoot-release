@@ -41,3 +41,6 @@ RUN /tmp/hoot-repo.sh && \
 # Set default user and work directory.
 USER ${RPMBUILD_USER}
 WORKDIR ${RPMBUILD_HOME}
+
+# Make directory for Hootenanny source code.
+RUN mkdir -p ${RPMBUILD_HOME}/hoot
