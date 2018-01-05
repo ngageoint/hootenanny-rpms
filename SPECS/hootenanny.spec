@@ -7,22 +7,27 @@ Group:      Applications/Engineering
 License:    GPLv3
 URL:        https://github.com/ngageoint/hootenanny
 
-BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRequires:  asciidoc
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  boost-devel
 BuildRequires:  cppunit-devel
+BuildRequires:  dblatex
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
 BuildRequires:  gdb
-BuildRequires:  geos-devel >= %{geos_min_version}
+BuildRequires:  geos-devel
 BuildRequires:  git
 BuildRequires:  glpk-devel
+BuildRequires:  gnuplot
 BuildRequires:  graphviz
-BuildRequires:  hoot-gdal >= %{gdal_min_version}
-BuildRequires:  hoot-gdal-devel >= %{gdal_min_version}
-BuildRequires:  hoot-gdal-python >= %{gdal_min_version}
-BuildRequires:  hoot-words >= 1.0.0
+BuildRequires:  hoot-gdal
+BuildRequires:  hoot-gdal-devel
+BuildRequires:  hoot-gdal-python
+BuildRequires:  hoot-postgis23_%{pg_dotless}
+BuildRequires:  hoot-postgis23_%{pg_dotless}-devel
+BuildRequires:  hoot-postgis23_%{pg_dotless}-utils
+BuildRequires:  hoot-words
 BuildRequires:  java-1.8.0-openjdk
 BuildRequires:  libicu-devel
 BuildRequires:  libspatialite-devel
@@ -38,7 +43,8 @@ BuildRequires:  python-argparse
 BuildRequires:  python-devel
 BuildRequires:  qt-devel
 BuildRequires:  texlive
-BuildRequires:  gnuplot
+BuildRequires:  texlive-collection-fontsrecommended
+BuildRequires:  texlive-collection-langcyrillic
 BuildRequires:  unzip
 BuildRequires:  v8-devel
 BuildRequires:  w3m
@@ -171,7 +177,7 @@ Requires:  tomcat8
 Requires:  %{name}-core = %{version}-%{release}
 Requires:  postgresql%{pg_dotless}-server
 Requires:  postgresql%{pg_dotless}-contrib
-Requires:  hoot-postgis
+Requires:  hoot-postgis23_%{pg_dotless}
 Requires:  java-1.8.0-openjdk
 Requires:  liquibase
 Requires:  npm
@@ -577,8 +583,8 @@ Requires:   nodejs
 Requires:   npm
 Requires:   postgresql%{pg_dotless}-server
 Requires:   postgresql%{pg_dotless}-contrib
-Requires:   hoot-postgis
-Requires:   hoot-postgis-utils
+Requires:   hoot-postgis23_%{pg_dotless}
+Requires:   hoot-postgis23_%{pg_dotless}-utils
 Requires:   liquibase
 
 %description services-devel-deps
