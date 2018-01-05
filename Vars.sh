@@ -98,3 +98,44 @@ WAMERICAN_RPM=wamerican-insane-$WAMERICAN_VERSION-$WAMERICAN_RELEASE$RPMBUILD_DI
 WORDS_VERSION=$( spec_version hoot-words )
 WORDS_RELEASE=$( spec_release hoot-words )
 WORDS_RPM=hoot-words-$WORDS_VERSION-$WORDS_RELEASE$RPMBUILD_DIST.noarch.rpm
+
+
+## Docker build functions.
+
+function build_base_images() {
+    # Foundation image that creates unprivileged user for RPM tasks
+    # with the same uid as invoking user (for ease of use with
+    # shared folders).
+    docker build \
+           --build-arg rpmbuild_dist=$RPMBUILD_DIST \
+           --build-arg rpmbuild_uid=$(id -u) \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild \
+           -t hoot/rpmbuild \
+           $SCRIPT_HOME
+
+    # Image for creating and signing the RPM repository.
+    docker build \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-repo \
+           -t hoot/rpmbuild-repo \
+           $SCRIPT_HOME
+
+    # Base image that has basic development and RPM building packages.
+    docker build \
+       -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-base \
+       -t hoot/rpmbuild-base \
+       $SCRIPT_HOME
+
+    # Generic image for building RPMS without any other prerequisites.
+    docker build \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic \
+           -t hoot/rpmbuild-generic \
+           $SCRIPT_HOME
+
+    # Base image with PostgreSQL develop libraries from PGDG at the
+    # requested version.
+    docker build \
+           --build-arg pg_version=$PG_VERSION \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-pgdg \
+           -t hoot/rpmbuild-pgdg:$PG_VERSION \
+           $SCRIPT_HOME
+}

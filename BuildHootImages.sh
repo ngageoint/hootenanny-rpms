@@ -5,12 +5,16 @@ set -e
 SCRIPT_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source $SCRIPT_HOME/Vars.sh
 
+# Build base images.
+build_base_images
+
+# Get RPM build requirements.
 HOOT_REQUIRES=$( spec_requires hootenanny )
 
 docker build \
+  --build-arg "packages=${HOOT_REQUIRES}" \
   --build-arg node_version=$NODE_VERSION \
   --build-arg pg_version=$PG_VERSION \
-  --build-arg "packages=${HOOT_REQUIRES}" \
   -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-hoot-release \
   -t hoot/rpmbuild-hoot-release \
   $SCRIPT_HOME

@@ -5,43 +5,10 @@ set -e
 SCRIPT_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source $SCRIPT_HOME/Vars.sh
 
+# Ensure base images are built.
+build_base_images
+
 mkdir -p $RPMS
-
-## Build base images.
-
-# Foundation image that creates unprivileged user for RPM tasks.
-docker build \
-       --build-arg rpmbuild_dist=$RPMBUILD_DIST \
-       --build-arg rpmbuild_uid=$(id -u) \
-       -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild \
-       -t hoot/rpmbuild \
-       $SCRIPT_HOME
-
-# Image for creating and signing the RPM repository.
-docker build \
-       -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-repo \
-       -t hoot/rpmbuild-repo \
-       $SCRIPT_HOME
-
-# Base image that has basic development and RPM building packages.
-docker build \
-       -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-base \
-       -t hoot/rpmbuild-base \
-       $SCRIPT_HOME
-
-# Generic image for building RPMS without any other prerequisites.
-docker build \
-       -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic \
-       -t hoot/rpmbuild-generic \
-       $SCRIPT_HOME
-
-# Base image with PostgreSQL develop libraries from PGDG at the
-# requested version.
-docker build \
-       --build-arg pg_version=$PG_VERSION \
-       -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-pgdg \
-       -t hoot/rpmbuild-pgdg:$PG_VERSION \
-       $SCRIPT_HOME
 
 ## Build GDAL dependencies.
 
