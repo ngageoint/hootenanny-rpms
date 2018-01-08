@@ -2,6 +2,8 @@
 .vagrant/*
 el7/*
 el7-src/*
+hootenanny
+m2
 BUILD
 BUILDROOT
 RPMS/noarch
