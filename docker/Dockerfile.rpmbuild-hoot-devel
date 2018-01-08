@@ -13,11 +13,13 @@ ARG gdal_version
 ARG geos_version
 ARG libgeotiff_version
 ARG libkml_version
+ARG mocha_version
 ARG node_version
 ARG packages
 ARG postgis_version
 ARG pg_version
 ARG pg_data=/var/lib/pgsql/${pg_version}/data
+ARG stxxl_version
 ARG suexec_version
 
 # Have PostgreSQL data directory persist in environment variable.
@@ -31,7 +33,8 @@ COPY scripts/nodejs-install.sh scripts/nodesource-repo.sh /tmp/
 RUN /tmp/nodesource-repo.sh ${node_version} && \
     rm -f /tmp/nodesource-repo.sh && \
     /tmp/nodejs-install.sh ${node_version} && \
-    rm -f /tmp/nodejs-install.sh
+    rm -f /tmp/nodejs-install.sh && \
+    npm install --silent -g mocha@${mocha_version}
 
 # Copy in development RPMs at the desired versions.
 COPY RPMS/x86_64/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
@@ -48,6 +51,7 @@ COPY RPMS/x86_64/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/stxxl-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/su-exec-${suexec_version}${RPMBUILD_DIST}.x86_64.rpm \
      /tmp/
 
@@ -67,6 +71,7 @@ RUN yum install -y \
     /tmp/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/stxxl-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/su-exec-${suexec_version}${RPMBUILD_DIST}.x86_64.rpm \
     && \
     rm -f /*.rpm && \

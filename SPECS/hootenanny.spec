@@ -16,6 +16,7 @@ BuildRequires:  dblatex
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
 BuildRequires:  gdb
+BuildRequires:  geos
 BuildRequires:  geos-devel
 BuildRequires:  git
 BuildRequires:  glpk-devel
@@ -34,6 +35,7 @@ BuildRequires:  libspatialite-devel
 BuildRequires:  libxslt
 BuildRequires:  log4cxx-devel
 BuildRequires:  maven
+BuildRequires:  nodejs
 BuildRequires:  nodejs-devel
 BuildRequires:  opencv-devel
 BuildRequires:  postgresql%{pg_dotless}-devel
@@ -42,6 +44,9 @@ BuildRequires:  protobuf-devel
 BuildRequires:  python-argparse
 BuildRequires:  python-devel
 BuildRequires:  qt-devel
+BuildRequires:  qt-postgresql
+BuildRequires:  stxxl
+BuildRequires:  stxxl-devel
 BuildRequires:  texlive
 BuildRequires:  texlive-collection-fontsrecommended
 BuildRequires:  texlive-collection-langcyrillic
@@ -109,11 +114,13 @@ make -s %{?_smp_mflags}
 
 # This may be causing failure due to node-mapnik dependency on
 # Requires: libc.so.6(GLIBC_2.14)(64bit)
-cd node-mapnik-server
+pushd node-mapnik-server
 npm install --production
+popd
 
-cd node-export-server
+pushd node-export-server
 npm install --production
+popd
 
 %install
 
@@ -124,7 +131,7 @@ cp -R hoot-ui/dist $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hootenanny-id
 mkdir -p $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hootenanny-id/data
 cp hoot-ui/data/osm-plus-taginfo.csv $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hootenanny-id/data
 cp hoot-ui/data/tdsv61_field_values.json $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hootenanny-id/data
-mkdir -p $RPM_BUILD_ROOT/etc/systemd
+mkdir -p $RPM_BUILD_ROOT/etc/systemd/system
 cp node-mapnik-server/systemd/node-mapnik.service $RPM_BUILD_ROOT/etc/systemd/system/node-mapnik.service
 cp node-export-server/systemd/node-export.service $RPM_BUILD_ROOT/etc/systemd/system/node-export.service
 mkdir -p $RPM_BUILD_ROOT/var/lib/hootenanny

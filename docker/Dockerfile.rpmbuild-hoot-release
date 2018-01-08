@@ -8,6 +8,7 @@ LABEL \
   name="Hootenanny Release RPM Build Image" \
   vendor="Radiant Solutions"
 
+ARG mocha_version
 ARG node_version
 ARG packages
 ARG pg_version
@@ -24,7 +25,8 @@ COPY scripts/nodejs-install.sh scripts/nodesource-repo.sh /tmp/
 RUN /tmp/nodesource-repo.sh ${node_version} && \
     rm -f /tmp/nodesource-repo.sh && \
     /tmp/nodejs-install.sh ${node_version} && \
-    rm -f /tmp/nodejs-install.sh
+    rm -f /tmp/nodejs-install.sh && \
+    npm install --silent -g mocha@${mocha_version}
 
 # Install Hootenanny release repository and dependencies.
 COPY scripts/hoot-repo.sh /tmp/
