@@ -583,9 +583,8 @@ sudo /sbin/chkconfig --del node-export-server
 Summary:    Development dependencies for Hootenanny Services
 Group:      Development/Libraries
 Requires:   %{name}-core-devel-deps = %{version}-%{release}
-Requires:   apache-maven
+Requires:   maven
 Requires:   nodejs
-Requires:   npm
 Requires:   postgresql%{pg_dotless}-server
 Requires:   postgresql%{pg_dotless}-contrib
 Requires:   hoot-postgis23_%{pg_dotless}
