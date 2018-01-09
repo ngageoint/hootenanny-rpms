@@ -153,13 +153,8 @@ ln -s %{_docdir}/%{name}  %{buildroot}%{_sharedstatedir}/%{name}/docs
 
 
 %check
-source ./SetupEnv.sh
-# The excluded tests are failing on CentOS now and waiting on a fix
-# HootTest --exclude=.*RubberSheetConflateTest.sh \
-HootTest --slow --diff
-
-cd hoot-services
-make test -s
+# TODO: Determine if tests should be done here, or saved for a
+#       a separate container?
 
 %clean
 rm -rf %{buildroot}
