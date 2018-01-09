@@ -165,6 +165,7 @@ rm -rf %{buildroot}
 %docdir %{_docdir}/%{name}
 %{_docdir}/%{name}
 %{_bindir}/*
+%exclude %{_bindir}/*.war
 %config %{_sharedstatedir}/%{name}/conf/hoot.json
 %{_sharedstatedir}/%{name}
 %{_sysconfdir}/profile.d/hootenanny.sh
