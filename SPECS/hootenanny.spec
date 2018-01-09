@@ -200,8 +200,8 @@ This package contains the UI and web services.
 %files services-ui
 %attr(0755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hoot-services.war
 %attr(0755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hootenanny-id
-/etc/init.d/node-mapnik-server
-/etc/init.d/node-export-server
+%{_sysconfdir}/systemd/system/node-mapnik.service
+%{_sysconfdir}/systemd/system/node-export.service
 
 #the order of operations during an upgrade is:
 #
