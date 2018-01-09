@@ -95,25 +95,20 @@ This package contains the core algorithms and command line interface.
 source ./SetupEnv.sh
 
 # The dir configurations set the install directory to work with EL's dir structure
-# aclocal && autoconf && autoheader && automake --add-missing --copy && \
-
-./configure -q --with-rnd --with-services \
-    --with-postgresql=/usr/pgsql-%{pg_version}/bin/pg_config      \
-    --prefix=$RPM_BUILD_ROOT/usr/ \
-    --datarootdir=$RPM_BUILD_ROOT/usr/share/hootenanny/ \
-    --docdir=$RPM_BUILD_ROOT/usr/share/doc/hootenanny/ \
-    --localstatedir=$RPM_BUILD_ROOT/var/lib/hootenanny/ \
-    --libdir=$RPM_BUILD_ROOT/usr/lib64 \
-    --sysconfdir=$RPM_BUILD_ROOT/etc/
+./configure -q --with-rnd --with-services --with-postgresql \
+    --prefix=%{buildroot}/usr \
+    --datarootdir=%{buildroot}/usr/share/hootenanny \
+    --docdir=%{buildroot}/usr/share/doc/hootenanny \
+    --localstatedir=%{buildroot}/var/lib/hootenanny \
+    --libdir=%{buildroot}/usr/lib64 \
+    --sysconfdir=%{buildroot}/etc
 
 # Use ccache if it is available
 cp LocalConfig.pri.orig LocalConfig.pri
 command -v ccache >/dev/null 2>&1 && echo "QMAKE_CXX=ccache g++" >> LocalConfig.pri
 
-make -s %{?_smp_mflags}
+%make_build
 
-# This may be causing failure due to node-mapnik dependency on
-# Requires: libc.so.6(GLIBC_2.14)(64bit)
 pushd node-mapnik-server
 npm install --production
 popd
@@ -125,33 +120,33 @@ popd
 %install
 
 # UI stuff
-mkdir -p $RPM_BUILD_ROOT/var/lib/tomcat8/webapps
-cp hoot-services/target/hoot-services*.war $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hoot-services.war
-cp -R hoot-ui/dist $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hootenanny-id
-mkdir -p $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hootenanny-id/data
-cp hoot-ui/data/osm-plus-taginfo.csv $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hootenanny-id/data
-cp hoot-ui/data/tdsv61_field_values.json $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hootenanny-id/data
-mkdir -p $RPM_BUILD_ROOT/etc/systemd/system
-cp node-mapnik-server/systemd/node-mapnik.service $RPM_BUILD_ROOT/etc/systemd/system/node-mapnik.service
-cp node-export-server/systemd/node-export.service $RPM_BUILD_ROOT/etc/systemd/system/node-export.service
-mkdir -p $RPM_BUILD_ROOT/var/lib/hootenanny
-cp -R node-mapnik-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-mapnik-server
-cp -R node-export-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-export-server
+mkdir -p %{buildroot}/var/lib/tomcat8/webapps
+cp hoot-services/target/hoot-services*.war %{buildroot}/var/lib/tomcat8/webapps/hoot-services.war
+cp -R hoot-ui/dist %{buildroot}/var/lib/tomcat8/webapps/hootenanny-id
+mkdir -p %{buildroot}/var/lib/tomcat8/webapps/hootenanny-id/data
+cp hoot-ui/data/osm-plus-taginfo.csv %{buildroot}/var/lib/tomcat8/webapps/hootenanny-id/data
+cp hoot-ui/data/tdsv61_field_values.json %{buildroot}/var/lib/tomcat8/webapps/hootenanny-id/data
+mkdir -p %{buildroot}%{_sysconfdir}/systemd/system
+cp node-mapnik-server/systemd/node-mapnik.service %{buildroot}%{_sysconfdir}/systemd/system/node-mapnik.service
+cp node-export-server/systemd/node-export.service %{buildroot}%{_sysconfdir}/systemd/system/node-export.service
+mkdir -p %{buildroot}/var/lib/hootenanny
+cp -R node-mapnik-server/ %{buildroot}/var/lib/hootenanny/node-mapnik-server
+cp -R node-export-server/ %{buildroot}/var/lib/hootenanny/node-export-server
 
 make install
-echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
+echo "export HOOT_HOME=/var/lib/hootenanny" > %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
 
-chmod 0755 $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
-cp -R test-files/ $RPM_BUILD_ROOT/var/lib/hootenanny/
-ln -s /usr/lib64 $RPM_BUILD_ROOT/var/lib/hootenanny/lib
-rm $RPM_BUILD_ROOT/usr/bin/HootEnv.sh
+chmod 0755 %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
+cp -R test-files/ %{buildroot}/var/lib/hootenanny/
+ln -s /usr/lib64 %{buildroot}/var/lib/hootenanny/lib
+rm %{buildroot}/usr/bin/HootEnv.sh
 # This allows all the tests to run.
-mkdir -p $RPM_BUILD_ROOT/var/lib/hootenanny/hoot-core-test/src/test/
-ln -s /var/lib/hootenanny/test-files/ $RPM_BUILD_ROOT/var/lib/hootenanny/hoot-core-test/src/test/resources
+mkdir -p %{buildroot}/var/lib/hootenanny/hoot-core-test/src/test/
+ln -s /var/lib/hootenanny/test-files/ %{buildroot}/var/lib/hootenanny/hoot-core-test/src/test/resources
 # This makes it so HootEnv.sh resolves hoot home properly.
-ln -s /var/lib/hootenanny/bin/HootEnv.sh $RPM_BUILD_ROOT/usr/bin/HootEnv.sh
+ln -s /var/lib/hootenanny/bin/HootEnv.sh %{buildroot}/usr/bin/HootEnv.sh
 # Fix the docs for the UI
-ln -s /usr/share/doc/hootenanny  $RPM_BUILD_ROOT/var/lib/hootenanny/docs
+ln -s /usr/share/doc/hootenanny  %{buildroot}/var/lib/hootenanny/docs
 
 
 %check
