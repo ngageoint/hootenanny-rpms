@@ -1,3 +1,6 @@
+# Default the `hoot_release` variable to 1.
+%{!?hoot_release: %global hoot_release 1}
+
 Name:       hootenanny
 Version:    %{hoot_version}
 Release:    %{hoot_release}%{?dist}
