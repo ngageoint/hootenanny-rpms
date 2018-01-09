@@ -99,12 +99,12 @@ source ./SetupEnv.sh
 
 # The dir configurations set the install directory to work with EL's dir structure
 ./configure -q --with-rnd --with-services --with-postgresql \
-    --prefix=%{buildroot}/usr \
-    --datarootdir=%{buildroot}/usr/share/hootenanny \
-    --docdir=%{buildroot}/usr/share/doc/hootenanny \
-    --localstatedir=%{buildroot}/var/lib/hootenanny \
-    --libdir=%{buildroot}/usr/lib64 \
-    --sysconfdir=%{buildroot}/etc
+    --prefix=%{buildroot}%{_prefix} \
+    --datarootdir=%{buildroot}%{_datarootdir}/%{name} \
+    --docdir=%{buildroot}%{_docdir}/%{name} \
+    --localstatedir=%{buildroot}%{_sharedstatedir}/%{name} \
+    --libdir=%{buildroot}%{_libdir} \
+    --sysconfdir=%{buildroot}%{_sysconfdir}
 
 # Use ccache if it is available
 cp LocalConfig.pri.orig LocalConfig.pri
@@ -123,33 +123,33 @@ popd
 %install
 
 # UI stuff
-mkdir -p %{buildroot}/var/lib/tomcat8/webapps
-cp hoot-services/target/hoot-services*.war %{buildroot}/var/lib/tomcat8/webapps/hoot-services.war
-cp -R hoot-ui/dist %{buildroot}/var/lib/tomcat8/webapps/hootenanny-id
-mkdir -p %{buildroot}/var/lib/tomcat8/webapps/hootenanny-id/data
-cp hoot-ui/data/osm-plus-taginfo.csv %{buildroot}/var/lib/tomcat8/webapps/hootenanny-id/data
-cp hoot-ui/data/tdsv61_field_values.json %{buildroot}/var/lib/tomcat8/webapps/hootenanny-id/data
+mkdir -p %{buildroot}%{_sharedstatedir}/tomcat8/webapps
+cp hoot-services/target/hoot-services*.war %{buildroot}%{_sharedstatedir}/tomcat8/webapps/hoot-services.war
+cp -R hoot-ui/dist %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id
+mkdir -p %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id/data
+cp hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id/data
+cp hoot-ui/data/tdsv61_field_values.json %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id/data
 mkdir -p %{buildroot}%{_sysconfdir}/systemd/system
 cp node-mapnik-server/systemd/node-mapnik.service %{buildroot}%{_sysconfdir}/systemd/system/node-mapnik.service
 cp node-export-server/systemd/node-export.service %{buildroot}%{_sysconfdir}/systemd/system/node-export.service
-mkdir -p %{buildroot}/var/lib/hootenanny
-cp -R node-mapnik-server/ %{buildroot}/var/lib/hootenanny/node-mapnik-server
-cp -R node-export-server/ %{buildroot}/var/lib/hootenanny/node-export-server
+mkdir -p %{buildroot}%{_sharedstatedir}/%{name}
+cp -R node-mapnik-server/ %{buildroot}%{_sharedstatedir}/%{name}/node-mapnik-server
+cp -R node-export-server/ %{buildroot}%{_sharedstatedir}/%{name}/node-export-server
 
 make install
-echo "export HOOT_HOME=/var/lib/hootenanny" > %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
+echo "export HOOT_HOME=%{_sharedstatedir}/%{name}" > %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
 
 chmod 0755 %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
-cp -R test-files/ %{buildroot}/var/lib/hootenanny/
-ln -s /usr/lib64 %{buildroot}/var/lib/hootenanny/lib
+cp -R test-files/ %{buildroot}%{_sharedstatedir}/%{name}/
+ln -s %{_libdir} %{buildroot}%{_sharedstatedir}/%{name}/lib
 rm %{buildroot}/usr/bin/HootEnv.sh
 # This allows all the tests to run.
-mkdir -p %{buildroot}/var/lib/hootenanny/hoot-core-test/src/test/
-ln -s /var/lib/hootenanny/test-files/ %{buildroot}/var/lib/hootenanny/hoot-core-test/src/test/resources
+mkdir -p %{buildroot}%{_sharedstatedir}/%{name}/hoot-core-test/src/test/
+ln -s %{_sharedstatedir}/%{name}/test-files/ %{buildroot}%{_sharedstatedir}/%{name}/hoot-core-test/src/test/resources
 # This makes it so HootEnv.sh resolves hoot home properly.
-ln -s /var/lib/hootenanny/bin/HootEnv.sh %{buildroot}/usr/bin/HootEnv.sh
+ln -s %{_sharedstatedir}/%{name}/bin/HootEnv.sh %{buildroot}/usr/bin/HootEnv.sh
 # Fix the docs for the UI
-ln -s /usr/share/doc/hootenanny  %{buildroot}/var/lib/hootenanny/docs
+ln -s %{_docdir}/%{name}  %{buildroot}%{_sharedstatedir}/%{name}/docs
 
 
 %check
@@ -167,8 +167,8 @@ rm -rf %{buildroot}
 %files core
 %{_includedir}/hoot
 %{_libdir}/*
-%docdir /usr/share/doc/%{name}
-%{_datarootdir}/doc/%{name}
+%docdir %{_docdir}/%{name}
+%{_docdir}/%{name}
 %{_bindir}/*
 %config %{_sharedstatedir}/%{name}/conf/hoot.json
 %{_sharedstatedir}/%{name}
