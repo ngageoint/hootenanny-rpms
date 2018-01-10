@@ -211,6 +211,9 @@ This package contains the UI and web services.
 #    6. Run the %postun hook of the old package.
 
 %pre services-ui
+
+if test -f /.dockerenv; then exit 0; fi
+
 if [ "$1" = "2" ]; then
     # Perform whatever maintenance must occur before the upgrade
 
@@ -222,6 +225,9 @@ if [ "$1" = "2" ]; then
 fi
 
 %post services-ui
+
+if test -f /.dockerenv; then exit 0; fi
+
 function updateConfigFiles () {
     # Check for existing db config from previous install and move to right location
     if [ -f /var/lib/hootenanny/conf/DatabaseConfigLocal.sh ]; then
@@ -486,6 +492,9 @@ elif [ "$1" = "2" ]; then
 fi
 
 %postun services-ui
+
+if test -f /.dockerenv; then exit 0; fi
+
 if [ "$1" = "0" ]; then
     # Perform tasks to clean up after uninstallation
 
@@ -546,6 +555,9 @@ to run Hootenanny.
 %files autostart
 
 %post autostart
+
+if test -f /.dockerenv; then exit 0; fi
+
 # set Postgres to autostart
 sudo systemctl enable postgresql-%{pg_version}
 
@@ -565,6 +577,9 @@ sudo /sbin/chkconfig --add node-export-server
 sudo /sbin/chkconfig node-export-server on
 
 %postun autostart
+
+if test -f /.dockerenv; then exit 0; fi
+
 # set Postgres to NOT autostart
 sudo /sbin/chkconfig --del postgresql-%{pg_version}
 # set Tomcat to NOT autostart
@@ -601,6 +616,9 @@ services. Use this if you want to build and test from github.
 %files services-devel-deps
 
 %post services-devel-deps
+
+if test -f /.dockerenv; then exit 0; fi
+
 if [ "$1" = "1" ]; then
     # Perform tasks to prepare for the initial installation
 
@@ -652,6 +670,9 @@ EOT
 fi
 
 %postun services-devel-deps
+
+if test -f /.dockerenv; then exit 0; fi
+
 if [ "$1" = "0" ]; then
     # Perform tasks to clean up after uninstallation
 
