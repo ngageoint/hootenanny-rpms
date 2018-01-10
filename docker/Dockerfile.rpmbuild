@@ -32,4 +32,4 @@ RUN useradd -d ${rpmbuild_home} -m -s /bin/bash -u ${rpmbuild_uid} ${rpmbuild_us
     echo "%debug_package %{nil}" >> ${rpmbuild_home}/.rpmmacros && \
     echo "%dist ${rpmbuild_dist}" >> ${rpmbuild_home}/.rpmmacros && \
     chmod 0755 ${rpmbuild_home} && \
-    chown ${rpmbuild_user}:${rpbumbuild_user} ${rpmbuild_home}/.rpmmacros
+    chown ${rpmbuild_user}:${rpmbuild_user} ${rpmbuild_home}/.rpmmacros
