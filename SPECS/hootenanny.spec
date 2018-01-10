@@ -181,7 +181,6 @@ Requires:  postgresql%{pg_dotless}-contrib
 Requires:  hoot-postgis23_%{pg_dotless}
 Requires:  java-1.8.0-openjdk
 Requires:  liquibase
-Requires:  npm
 Requires:  pwgen
 Group:     Applications/Engineering
 
