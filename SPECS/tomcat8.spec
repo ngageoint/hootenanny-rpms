@@ -1,35 +1,41 @@
 # To Build:
 #
 # sudo yum -y install rpmdevtools && rpmdev-setuptree
-# rpmbuild -bb ./src/SPECS/tomcat8.spec
-
+# rpmbuild -bb ./SPECS/tomcat8.spec
 %define __jar_repack %{nil}
-%define tomcat_group tomcat
-%define tomcat_user tomcat
-%define tomcat_home /usr/share/tomcat8
-%define tomcat_user_home /var/lib/tomcat8
-%define tomcat_cache_home /var/cache/tomcat8
-%define tomcat_logs_home /var/log/tomcat8
-%define tomcat_config_home /etc/tomcat8
+%global major_version 8
+%global minor_version 5
+%global micro_version 24
+%global tomcat_group tomcat
+%global tomcat_user tomcat
+%global tomcat_uid 91
+%global tomcat_home %{_datadir}/%{name}
+%global tomcat_basedir %{_sharedstatedir}/%{name}
+%global tomcat_cache %{_var}/cache/%{name}
+%global tomcat_config %{_sysconfdir}/%{name}
+%global tomcat_logs %{_var}/log/%{name}
 
 
 Summary:    Apache Servlet/JSP Engine, RI for Servlet 3.1/JSP 2.3 API
 Name:       tomcat8
-Version:    8.5.23
-BuildArch:  noarch
+Version:    %{major_version}.%{minor_version}.%{micro_version}
 Release:    1%{?dist}
-License:    Apache Software License
+License:    ASL 2.0
 Group:      Networking/Daemons
 URL:        http://tomcat.apache.org/
-Source0:    apache-tomcat-%{version}.tar.gz
-Source1:    %{name}.init
-Source2:    %{name}.sysconfig
+Source0:    http://www.apache.org/dist/tomcat/tomcat-%{major_version}/v%{version}/bin/apache-tomcat-%{version}.tar.gz
+Source1:    %{name}.conf
+Source2:    %{name}.functions
 Source3:    %{name}.logrotate
-Source4:    %{name}.conf
+Source4:    %{name}.named-service
+Source5:    %{name}.preamble
+Source6:    %{name}.server
+Source7:    %{name}.service
+Source8:    %{name}.sysconfig
+Source9:    %{name}.wrapper
+BuildArch:  noarch
 Requires:   jpackage-utils
 Requires:   java-1.8.0-openjdk
-#Requires:   jdk1.8.0_144
-BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
 Tomcat is the servlet container that is used in the official Reference
@@ -43,107 +49,151 @@ a collaboration of the best-of-breed developers from around the world.
 We invite you to participate in this open development project. To
 learn more about getting involved, click here.
 
-This package contains the base tomcat installation that depends on Sun's JDK and not
-on JPP packages.
+This package contains the base tomcat installation that depends on OpenJDK
+and not on JPP packages.
 
 %prep
 %setup -q -n apache-tomcat-%{version}
 
 %build
+# Don't need any Windows batch files.
+find . -type f \( -name "*.bat" -o -name "*.tmp" \) -delete
 
 %install
-install -d -m 755 %{buildroot}/%{tomcat_home}/
-cp -R * %{buildroot}/%{tomcat_home}/
+%{__install} -d -m 0755 %{buildroot}%{tomcat_home}
+# Set allowLinking to true in Tomcat context.
+%{__sed} -i '/<Context>/a\    \<Resources allowLinking="true"/>' conf/context.xml
 
-# Remove all webapps. Put webapps in /var/lib and link back.
-rm -rf %{buildroot}/%{tomcat_home}/webapps
-install -d -m 775 %{buildroot}%{tomcat_user_home}/webapps
-cd %{buildroot}/%{tomcat_home}/
-ln -s %{tomcat_user_home}/webapps webapps
-chmod 775 %{buildroot}/%{tomcat_user_home}
-cd -
+# Copy all, but omit documentation.
+%{__cp} -R * %{buildroot}%{tomcat_home}/
+%{__rm} -rf %{buildroot}%{tomcat_home}/{LICENSE,NOTICE,RELEASE-NOTES,RUNNING.txt,temp,work}
 
-# Remove *.bat
-rm -f %{buildroot}/%{tomcat_home}/bin/*.bat
+# Remove all webapps. Put webapps and degree workspace in /var/lib
+# and link back.
+%{__rm} -rf %{buildroot}%{tomcat_home}/webapps
+%{__install} -d -m 0775 %{buildroot}%{tomcat_basedir}/webapps
+pushd %{buildroot}%{tomcat_home}
+%{__ln_s} %{tomcat_basedir}/webapps webapps
+%{__chmod} 0755 %{buildroot}%{tomcat_basedir}
+popd
 
 # Put logging in /var/log and link back.
-rm -rf %{buildroot}/%{tomcat_home}/logs
-install -d -m 755 %{buildroot}/var/log/%{name}/
-cd %{buildroot}/%{tomcat_home}/
-ln -s /var/log/%{name}/ logs
-cd -
+%{__rm} -rf %{buildroot}%{tomcat_home}/logs
+%{__install} -d -m 0775 %{buildroot}%{tomcat_logs}
+pushd %{buildroot}%{tomcat_home}
+%{__ln_s} %{tomcat_logs} logs
+popd
 
 # Put conf in /etc/ and link back.
-install -d -m 755 %{buildroot}/%{_sysconfdir}
-mv %{buildroot}/%{tomcat_home}/conf %{buildroot}/%{_sysconfdir}/%{name}
-cd %{buildroot}/%{tomcat_home}/
-ln -s %{_sysconfdir}/%{name} conf
-cd -
+%{__install} -d -m 0755 %{buildroot}%{_sysconfdir}
+%{__mv} %{buildroot}%{tomcat_home}/conf %{buildroot}%{tomcat_config}
+%{__install} -d -m 0755 %{buildroot}%{tomcat_config}/conf.d
+%{__install} -d -m 0775 %{buildroot}%{tomcat_config}/Catalina
+pushd %{buildroot}%{tomcat_home}
+%{__ln_s} %{tomcat_config} conf
+popd
 
 # Put temp and work to /var/cache and link back.
-install -d -m 775 %{buildroot}%{tomcat_cache_home}
-mv %{buildroot}/%{tomcat_home}/temp %{buildroot}/%{tomcat_cache_home}/
-mv %{buildroot}/%{tomcat_home}/work %{buildroot}/%{tomcat_cache_home}/
-cd %{buildroot}/%{tomcat_home}/
-ln -s %{tomcat_cache_home}/temp
-ln -s %{tomcat_cache_home}/work
-chmod 775 %{buildroot}/%{tomcat_cache_home}/temp
-chmod 775 %{buildroot}/%{tomcat_cache_home}/work
-cd -
-
-# Drop sbin script
-install -d -m 755 %{buildroot}/%{_sbindir}
-install    -m 755 %_sourcedir/%{name}.bin %{buildroot}/%{_sbindir}/%{name}
-
-# Drop init script
-install -d -m 755 %{buildroot}/%{_initrddir}
-install    -m 755 %_sourcedir/%{name}.init %{buildroot}/%{_initrddir}/%{name}
+%{__install} -d -m 0775 %{buildroot}%{tomcat_cache}
+%{__install} -d -m 0775 %{buildroot}%{tomcat_cache}/temp
+%{__install} -d -m 0775 %{buildroot}%{tomcat_cache}/work
+pushd %{buildroot}%{tomcat_home}
+%{__ln_s} %{tomcat_cache}/temp
+%{__ln_s} %{tomcat_cache}/work
+popd
 
 # Drop conf script
-install    -m 644 %_sourcedir/%{name}.conf %{buildroot}/%{_sysconfdir}/%{name}
+%{__install} -m 0644 %{SOURCE1} %{buildroot}%{tomcat_config}/%{name}.conf
+
+# Drop functions.
+%{__install} -d -m 0755 %{buildroot}%{_libexecdir}/%{name}
+%{__install} -m 0755 %{SOURCE2} %{buildroot}%{_libexecdir}/%{name}/functions
+%{__install} -m 0755 %{SOURCE5} %{buildroot}%{_libexecdir}/%{name}/preamble
+%{__install} -m 0755 %{SOURCE6} %{buildroot}%{_libexecdir}/%{name}/server
+
+# Drop sbin script
+%{__install} -m 0755 -d %{buildroot}%{_sbindir}
+%{__install} -m 0755 %{SOURCE9} %{buildroot}%{_sbindir}/%{name}
+
+# Drop systemd service units.
+%{__install} -m 0755 -d %{buildroot}%{_unitdir}
+%{__install} -m 0644 %{SOURCE7} %{buildroot}%{_unitdir}/%{name}.service
+%{__install} -m 0644 %{SOURCE4} %{buildroot}%{_unitdir}/%{name}@.service
 
 # Drop sysconfig script
-#install -d -m 755 %{buildroot}/%{_sysconfdir}/sysconfig/
-#install    -m 644 %_sourcedir/%{name}.sysconfig %{buildroot}/%{_sysconfdir}/sysconfig/%{name}
+%{__install} -m 0755 -d %{buildroot}%{_sysconfdir}/sysconfig
+%{__install} -m 0644 %{SOURCE8} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
 
 # Drop logrotate script
-#install -d -m 755 %{buildroot}/%{_sysconfdir}/logrotate.d
-#install    -m 644 %_sourcedir/%{name}.logrotate %{buildroot}/%{_sysconfdir}/logrotate.d/%{name}
+%{__install} -m 0755 -d %{buildroot}%{_sysconfdir}/logrotate.d
+%{__install} -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 
 %clean
-rm -rf %{buildroot}
+%{__rm} -rf %{buildroot}
 
 %pre
-getent group %{tomcat_group} >/dev/null || groupadd -r %{tomcat_group}
-getent passwd %{tomcat_user} >/dev/null || /usr/sbin/useradd --comment "Tomcat 8 Daemon User" --shell /bin/bash -M -r -g %{tomcat_group} --home %{tomcat_home} %{tomcat_user}
+getent group %{tomcat_group} 2>/dev/null || \
+    %{_sbindir}/groupadd \
+     --system \
+     --gid %{tomcat_uid} \
+     %{tomcat_group}
+getent passwd %{tomcat_user} 2>/dev/null || \
+    %{_sbindir}/useradd \
+     --system \
+     --comment "Apache Tomcat 8 Daemon User" \
+     --uid %{tomcat_uid} \
+     --gid %{tomcat_group} \
+     --home %{tomcat_home} \
+     --shell /sbin/nologin \
+     %{tomcat_user}
 
 %files
-%defattr(-,%{tomcat_user},%{tomcat_group})
-/var/log/%{name}/
+%doc LICENSE NOTICE RELEASE-NOTES RUNNING.txt
 %defattr(-,root,root)
-%{tomcat_user_home}
-%{tomcat_home}
-%{_initrddir}/%{name}
+%{_libexecdir}/%{name}/functions
+%{_libexecdir}/%{name}/preamble
+%{_libexecdir}/%{name}/server
 %{_sbindir}/%{name}
-#%{_sysconfdir}/logrotate.d/%{name}
-%defattr(-,root,%{tomcat_group})
-%{tomcat_cache_home}
-%{tomcat_cache_home}/temp
-%{tomcat_cache_home}/work
-%{tomcat_user_home}/webapps
-#%config(noreplace) %{_sysconfdir}/sysconfig/%{name}
-%config(noreplace) %{_sysconfdir}/%{name}/*
+%{_sysconfdir}/logrotate.d/%{name}
+%{_sysconfdir}/sysconfig/%{name}
+%{_unitdir}/%{name}.service
+%{_unitdir}/%{name}@.service
+%{tomcat_home}/bin
+%{tomcat_home}/conf
+%{tomcat_home}/lib
+%{tomcat_home}/logs
+%{tomcat_home}/temp
+%{tomcat_home}/webapps
+%{tomcat_home}/work
+%dir %{tomcat_config}
+%dir %{tomcat_config}/conf.d
+%config(noreplace) %{tomcat_config}/*.conf
+%config(noreplace) %{tomcat_config}/*.xml
+%config(noreplace) %{tomcat_config}/*.xsd
+%config(noreplace) %{tomcat_config}/*.policy
+%config(noreplace) %{tomcat_config}/*.properties
+# files owned by tomcat user
+%defattr(-,%{tomcat_user},%{tomcat_group})
+%dir %{tomcat_basedir}
+%dir %{tomcat_cache}
+%dir %{tomcat_cache}/temp
+%dir %{tomcat_cache}/work
+%dir %{tomcat_config}/Catalina
+%{tomcat_basedir}/webapps
+%{tomcat_logs}
 
 %post
-chkconfig --add %{name}
+%systemd_post %{name}.service
 
 %preun
-if [ $1 = 0 ]; then
-  service %{name} stop > /dev/null 2>&1
-  chkconfig --del %{name}
-fi
+%systemd_preun %{name}.service
 
 %postun
-if [ $1 -ge 1 ]; then
-  service %{name} condrestart >/dev/null 2>&1
-fi
+%systemd_postun %{name}.service
+
+%changelog
+* Fri Jan 12 2018 Justin Bronn <justin.bronn@digitalglobe.com> - 8.5.24-1
+- Upgrade to 8.5.24.
+- Replaced init script with systemd units.
+* Wed Nov 15 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 8.5.23-1
+- Initial release.
