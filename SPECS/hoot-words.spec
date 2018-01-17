@@ -1,50 +1,38 @@
+# Enable fetch of the source by rpmbuild, as it's too big to keep in VCS.
+%undefine _disable_source_fetch
+%global deploy_dir %{_sharedstatedir}/hootenanny/conf
+%global words_file words1.sqlite
+
 Name:		hoot-words
 Version:	1.0.0
 Release:	1%{?dist}
-Summary:	Hootenanny words dictionary
-BuildArch:	noarch
-BuildRequires:	wget
-
-%define words_filename	words1.sqlite
-%define words_compress	%{words_filename}.bz2
-%define deploy_dir /var/lib/hootenanny/conf
-%define words_url  https://s3.amazonaws.com/hoot-rpms/support-files/%{words_compress}
-
 Group:		Applications/Engineering
+Summary:	Hootenanny words dictionary
 License:	GPLv3
 URL:		https://github.com/ngageoint/hootenanny
-Source0:	%{words_url}
-
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Source0:	https://s3.amazonaws.com/hoot-rpms/support-files/%{words_file}.bz2
+BuildArch:	noarch
+BuildRequires:	bzip2
 
 %description
 
 %prep
-pwd
-export BUILD_DIR=%{_builddir}/%{name}-%{version}-%{release}.%{_arch}
-# Only download if the remote file is newer or a different size
-wget -P %{_sourcedir} -N -nv %{words_url}
-# Is there a shortcut for this?
-mkdir -p $BUILD_DIR
-cd $BUILD_DIR
-bzcat %{_sourcedir}/%{words_compress} > %{words_filename}
-/bin/chmod -Rf a+rX,u+w,g-w,o-w .
 
 %build
+%{_bindir}/bzcat %{SOURCE0} > %{words_file}
 
 %install
-export BUILD_DIR=%{_builddir}/%{name}-%{version}-%{release}.%{_arch}
-install -m 0755 -d $RPM_BUILD_ROOT%{deploy_dir}
-install -m 0644 $BUILD_DIR/%{words_filename} $RPM_BUILD_ROOT%{deploy_dir}
-cd $RPM_BUILD_ROOT%{deploy_dir}; ln -s %{words_filename} words.sqlite
+%{__install} -m 0755 -d %{buildroot}%{deploy_dir}
+%{__install} -m 0644 %{words_file} %{buildroot}%{deploy_dir}
+pushd %{buildroot}%{deploy_dir}
+%{__ln_s} %{words_file} words.sqlite
+popd
 
 %clean
-rm -rf $RPM_BUILD_ROOT
-[ -e %{_topdir}/SOURCES/%{words_compress} ] && rm %{_topdir}/SOURCES/%{words_compress}
-[ -e %{_topdir}/BUILD/%{words_filename} ] && rm %{_topdir}/BUILD/%{words_filename}
+%{__rm} -rf %{buildroot}
 
 %files
-%{deploy_dir}/%{words_filename}
+%{deploy_dir}/%{words_file}
 %{deploy_dir}/words.sqlite
 
 %changelog

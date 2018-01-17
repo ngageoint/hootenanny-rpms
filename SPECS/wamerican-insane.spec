@@ -23,19 +23,17 @@ as look(1).  Adapted from Ubuntu package of the same name.
 %{_mandir}/man5/american-english-insane.5.gz
 
 %prep
-mkdir -p %{name}-%{version}
-tar -C %{name}-%{version} -xf %{SOURCE0}
+%setup -c -n %{name}-%{version}
 
 %build
-true
 
 %install
-install -d -m 0755 %{buildroot}%{_datarootdir}/dict
-install -d -m 0755 %{buildroot}%{_datarootdir}/doc/%{name}-%{version}
-install -d -m 0755 %{buildroot}%{_mandir}/man5
-install -p -m 0644 -D %{_builddir}/%{name}-%{version}%{_datarootdir}/dict/american-english-insane %{buildroot}%{_datarootdir}/dict/american-english-insane
-install -p -m 0644 -D %{_builddir}/%{name}-%{version}%{_datarootdir}/doc/wamerican-insane/copyright %{buildroot}%{_datarootdir}/doc/%{name}-%{version}/copyright
-install -p -m 0644 -D %{_builddir}/%{name}-%{version}%{_mandir}/man5/american-english-insane.5.gz %{buildroot}%{_mandir}/man5/american-english-insane.5.gz
+%{__install} -d -m 0755 %{buildroot}%{_datarootdir}/dict
+%{__install} -d -m 0755 %{buildroot}%{_datarootdir}/doc/%{name}-%{version}
+%{__install} -d -m 0755 %{buildroot}%{_mandir}/man5
+%{__install} -p -m 0644 -D .%{_datarootdir}/dict/american-english-insane %{buildroot}%{_datarootdir}/dict/american-english-insane
+%{__install} -p -m 0644 -D .%{_datarootdir}/doc/wamerican-insane/copyright %{buildroot}%{_datarootdir}/doc/%{name}-%{version}/copyright
+%{__install} -p -m 0644 -D .%{_mandir}/man5/american-english-insane.5.gz %{buildroot}%{_mandir}/man5/american-english-insane.5.gz
 
 %check
 
