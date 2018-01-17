@@ -127,8 +127,8 @@ popd
 %{__cp} hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id/data
 %{__cp} hoot-ui/data/tdsv61_field_values.json %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id/data
 %{__mkdir} -p %{buildroot}%{_unitdir}
-%{__cp} node-mapnik-server/systemd/node-mapnik.service %{_sysconfdir}/systemd/system/node-mapnik.service
-%{__cp} node-export-server/systemd/node-export.service %{_sysconfdir}/systemd/system/node-export.service
+%{__cp} node-mapnik-server/systemd/node-mapnik.service %{buildroot}%{_unitdir}/node-mapnik.service
+%{__cp} node-export-server/systemd/node-export.service %{buildroot}%{_unitdir}/node-export.service
 %{__mkdir} -p %{buildroot}%{_sharedstatedir}/%{name}
 %{__cp} -R node-mapnik-server %{buildroot}%{_sharedstatedir}/%{name}
 %{__cp} -R node-export-server %{buildroot}%{_sharedstatedir}/%{name}
@@ -195,8 +195,8 @@ This package contains the UI and web services.
 %files services-ui
 %attr(0755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hoot-services.war
 %attr(0755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hootenanny-id
-%{_sysconfdir}/systemd/system/node-mapnik.service
-%{_sysconfdir}/systemd/system/node-export.service
+%{_unitdir}/node-mapnik.service
+%{_unitdir}/node-export.service
 
 #the order of operations during an upgrade is:
 #
