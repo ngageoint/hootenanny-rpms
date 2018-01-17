@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 POSTGRES_CONF=$PGDATA/postgresql.conf
 POSTGRES_HBA=$PGDATA/pg_hba.conf

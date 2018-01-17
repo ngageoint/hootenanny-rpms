@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 PG_DOTLESS=$(echo $PG_VERSION | tr -d '.')
 

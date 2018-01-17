@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 NODE_VERSION="${1:-0.10.46}"
 NODESOURCE_DIR=$(echo $NODE_VERSION | awk -F. '{ if ($1 == '0') { print "pub_" $1 "." $2 } else { print "pub_" $1 ".x" } }')

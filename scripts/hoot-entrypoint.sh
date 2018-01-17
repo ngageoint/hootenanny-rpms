@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 # Start PostgreSQL, suppressing output.
 su-exec postgres pg_ctl -D $PGDATA start &> /dev/null
