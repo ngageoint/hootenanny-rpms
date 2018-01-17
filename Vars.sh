@@ -107,6 +107,7 @@ WORDS_RPM=hoot-words-$WORDS_VERSION-$WORDS_RELEASE$RPMBUILD_DIST.noarch.rpm
 
 ## Docker build functions.
 
+# Builds all the base images.
 function build_base_images() {
     # Foundation image that creates unprivileged user for RPM tasks
     # with the same uid as invoking user (for ease of use with
@@ -143,4 +144,43 @@ function build_base_images() {
            -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-pgdg \
            -t hoot/rpmbuild-pgdg:$PG_VERSION \
            $SCRIPT_HOME
+}
+
+# Runs a dependency build image.
+function run_dep_image() {
+    local OPTIND opt
+    local image=hoot/rpmbuild-generic
+    local sources_mode=ro
+    local user=rpmbuild
+    local usage=no
+
+    while getopts ":i:s:u:" opt; do
+        case "${opt}" in
+            i)
+                image="${OPTARG}"
+                ;;
+            s)
+                sources_mode="${OPTARG}"
+                ;;
+            u)
+                user="${OPTARG}"
+                ;;
+            *)
+                usage=yes
+                ;;
+        esac
+    done
+    shift $((OPTIND-1))
+
+    if [ "${usage}" = "yes" ]; then
+        echo "run_image: [-i <image>] [-u <user>] [-s <SOURCES mode>]"
+    else
+        docker run \
+               -v $SOURCES:/rpmbuild/SOURCES:$sources_mode \
+               -v $SPECS:/rpmbuild/SPECS:ro \
+               -v $RPMS:/rpmbuild/RPMS:rw \
+               -u $user \
+               -it --rm \
+               $image "$@"
+    fi
 }

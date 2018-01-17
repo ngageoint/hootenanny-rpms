@@ -15,13 +15,7 @@ mkdir -p $RPMS
 # FileGDBAPI
 if [ ! -f $RPM_X86_64/$FILEGDBAPI_RPM ]; then
     echo "#### Building RPM: FileGDBAPI"
-    docker run \
-           -v $SOURCES:/rpmbuild/SOURCES:ro \
-           -v $SPECS:/rpmbuild/SPECS:ro \
-           -v $RPMS:/rpmbuild/RPMS:rw \
-           -it --rm \
-           hoot/rpmbuild-generic \
-           rpmbuild -bb SPECS/FileGDBAPI.spec
+    run_dep_image rpmbuild -bb SPECS/FileGDBAPI.spec
 fi
 
 # GEOS
@@ -36,13 +30,9 @@ if [ ! -f $RPM_X86_64/$GEOS_RPM ]; then
            $SCRIPT_HOME
 
     # Generate GEOS RPM.
-    docker run \
-           -v $SOURCES:/rpmbuild/SOURCES:ro \
-           -v $SPECS:/rpmbuild/SPECS:ro \
-           -v $RPMS:/rpmbuild/RPMS:rw \
-           -it --rm \
-           hoot/rpmbuild-geos \
-           rpmbuild -bb SPECS/geos.spec
+    run_dep_image \
+        -i hoot/rpmbuild-geos \
+        rpmbuild -bb SPECS/geos.spec
 fi
 
 # libgeotiff
@@ -57,13 +47,9 @@ if [ ! -f $RPM_X86_64/$LIBGEOTIFF_RPM ]; then
            $SCRIPT_HOME
 
     # Generate libgeotiff RPM.
-    docker run \
-           -v $SOURCES:/rpmbuild/SOURCES:ro \
-           -v $SPECS:/rpmbuild/SPECS:ro \
-           -v $RPMS:/rpmbuild/RPMS:rw \
-           -it --rm \
-           hoot/rpmbuild-libgeotiff \
-           rpmbuild -bb SPECS/libgeotiff.spec
+    run_dep_image \
+        -i hoot/rpmbuild-libgeotiff \
+        rpmbuild -bb SPECS/libgeotiff.spec
 fi
 
 # libkml
@@ -78,13 +64,9 @@ if [ ! -f $RPM_X86_64/$LIBKML_RPM ]; then
            $SCRIPT_HOME
 
     # Generate libkml RPM.
-    docker run \
-           -v $SOURCES:/rpmbuild/SOURCES:ro \
-           -v $SPECS:/rpmbuild/SPECS:ro \
-           -v $RPMS:/rpmbuild/RPMS:rw \
-           -it --rm \
-           hoot/rpmbuild-libkml \
-           rpmbuild -bb SPECS/libkml.spec
+    run_dep_image \
+        -i hoot/rpmbuild-libkml \
+        rpmbuild -bb SPECS/libkml.spec
 fi
 
 ## GDAL and PostGIS (requires PostgreSQL from PGDG)
@@ -107,13 +89,9 @@ if [ ! -f $RPM_X86_64/$GDAL_RPM ]; then
            $SCRIPT_HOME
 
     # Generate GDAL RPM.
-    docker run \
-           -v $SOURCES:/rpmbuild/SOURCES:ro \
-           -v $SPECS:/rpmbuild/SPECS:ro \
-           -v $RPMS:/rpmbuild/RPMS:rw \
-           -it --rm \
-           hoot/rpmbuild-gdal \
-           rpmbuild -bb SPECS/hoot-gdal.spec
+    run_dep_image \
+        -i hoot/rpmbuild-gdal \
+        rpmbuild -bb SPECS/hoot-gdal.spec
 fi
 
 # PostGIS
@@ -127,97 +105,54 @@ if [ ! -f $RPM_X86_64/$POSTGIS_RPM ]; then
            -t hoot/rpmbuild-postgis \
            $SCRIPT_HOME
 
-    docker run \
-           -v $SOURCES:/rpmbuild/SOURCES:ro \
-           -v $SPECS:/rpmbuild/SPECS:ro \
-           -v $RPMS:/rpmbuild/RPMS:rw \
-           -it --rm \
-           hoot/rpmbuild-postgis \
-           rpmbuild -bb SPECS/hoot-postgis23.spec
+    run_dep_image \
+        -i hoot/rpmbuild-postgis \
+        rpmbuild -bb SPECS/hoot-postgis23.spec
 fi
 
 ## Simple Dependencies
+
+# dumb-init
+if [ ! -f $RPM_X86_64/$SUEXEC_RPM ]; then
+    echo "#### Building RPM: dumb-init"
+    run_dep_image rpmbuild -bb SPECS/dumb-init.spec
+fi
 
 # hoot-words
 if [ ! -f $RPM_NOARCH/$WORDS_RPM ]; then
     echo "#### Building RPM: hoot-words"
 
-    # Generate hoot-words RPM (do not share SOURCES directory, as
-    # it's a forced download from spec file).
-    docker run \
-           -v $SPECS:/rpmbuild/SPECS:ro \
-           -v $RPMS:/rpmbuild/RPMS:rw \
-           -it --rm \
-           hoot/rpmbuild-generic \
-           rpmbuild -bb SPECS/hoot-words.spec
+    # Generate hoot-words RPM, but make SOURCES writable as the dictionary
+    # file is a download and too big for version control.
+    run_dep_image -s rw rpmbuild -bb SPECS/hoot-words.spec
 fi
 
 # osmosis
 if [ ! -f $RPM_NOARCH/$OSMOSIS_RPM ]; then
     echo "#### Building RPM: osmosis"
-
-    # Generate osmosis RPM.
-    docker run \
-           -v $SOURCES:/rpmbuild/SOURCES:ro \
-           -v $SPECS:/rpmbuild/SPECS:ro \
-           -v $RPMS:/rpmbuild/RPMS:rw \
-           -it --rm \
-           hoot/rpmbuild-generic \
-           rpmbuild -bb SPECS/osmosis.spec
+    run_dep_image rpmbuild -bb SPECS/osmosis.spec
 fi
 
 # stxxl
 if [ ! -f $RPM_X86_64/$STXXL_RPM ]; then
     echo "#### Building RPM: stxxl"
-
-    # Generate stxxl RPM.
-    docker run \
-           -v $SOURCES:/rpmbuild/SOURCES:ro \
-           -v $SPECS:/rpmbuild/SPECS:ro \
-           -v $RPMS:/rpmbuild/RPMS:rw \
-           -it --rm \
-           hoot/rpmbuild-generic \
-           rpmbuild -bb SPECS/stxxl.spec
+    run_dep_image rpmbuild -bb SPECS/stxxl.spec
 fi
 
 # su-exec
 if [ ! -f $RPM_X86_64/$SUEXEC_RPM ]; then
     echo "#### Building RPM: su-exec"
-
-    # Generate su-exec RPM.
-    docker run \
-           -v $SOURCES:/rpmbuild/SOURCES:ro \
-           -v $SPECS:/rpmbuild/SPECS:ro \
-           -v $RPMS:/rpmbuild/RPMS:rw \
-           -it --rm \
-           hoot/rpmbuild-generic \
-           rpmbuild -bb SPECS/su-exec.spec
+    run_dep_image rpmbuild -bb SPECS/su-exec.spec
 fi
 
 # tomcat8
 if [ ! -f $RPM_NOARCH/$TOMCAT8_RPM ]; then
     echo "#### Building RPM: tomcat8"
-
-    # Generate tomcat8 RPM.
-    docker run \
-           -v $SOURCES:/rpmbuild/SOURCES:ro \
-           -v $SPECS:/rpmbuild/SPECS:ro \
-           -v $RPMS:/rpmbuild/RPMS:rw \
-           -it --rm \
-           hoot/rpmbuild-generic \
-           rpmbuild -bb SPECS/tomcat8.spec
+    run_dep_image rpmbuild -bb SPECS/tomcat8.spec
 fi
 
 # wamerican-insane
 if [ ! -f $RPM_NOARCH/$WAMERICAN_RPM ]; then
     echo "#### Building RPM: wamerican-insane"
-
-    # Generate wamerican-insane RPM.
-    docker run \
-           -v $SOURCES:/rpmbuild/SOURCES:ro \
-           -v $SPECS:/rpmbuild/SPECS:ro \
-           -v $RPMS:/rpmbuild/RPMS:rw \
-           -it --rm \
-           hoot/rpmbuild-generic \
-           rpmbuild -bb SPECS/wamerican-insane.spec
+    run_dep_image rpmbuild -bb SPECS/wamerican-insane.spec
 fi
