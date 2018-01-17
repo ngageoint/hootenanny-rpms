@@ -43,6 +43,6 @@ RUN /tmp/postgresql-install.sh && \
     rm -f /tmp/hoot-db-setup.sh
 
 # Copy in the entrypoint.
-COPY scripts/hoot-entrypoint.sh /
-ENTRYPOINT ["/hoot-entrypoint.sh"]
+COPY scripts/hoot-entrypoint.sh /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/bin/bash"]

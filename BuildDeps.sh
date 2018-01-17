@@ -8,8 +8,6 @@ source $SCRIPT_HOME/Vars.sh
 # Ensure base images are built.
 build_base_images
 
-mkdir -p $RPMS
-
 ## Build GDAL dependencies.
 
 # FileGDBAPI
