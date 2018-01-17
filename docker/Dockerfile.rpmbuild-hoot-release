@@ -32,7 +32,7 @@ RUN /tmp/nodesource-repo.sh ${node_version} && \
 COPY scripts/hoot-repo.sh /tmp/
 RUN /tmp/hoot-repo.sh && \
     rm /tmp/hoot-repo.sh && \
-    yum install -y -q su-exec && \
+    yum install -y -q dumb-init su-exec tomcat8 && \
     if [ ! -z "${packages}" ] ; then yum -y -q install ${packages}; fi
 
 # Install PostgreSQL server at desired version, and setup the Hoot databases.

@@ -22,6 +22,7 @@ docker build \
 
 docker build \
        --build-arg "packages=${HOOT_REQUIRES}" \
+       --build-arg dumbinit_version=$DUMBINIT_VERSION-$DUMBINIT_RELEASE \
        --build-arg filegdbapi_version=$FILEGDBAPI_VERSION-$FILEGDBAPI_RELEASE \
        --build-arg gdal_version=$GDAL_VERSION-$GDAL_RELEASE \
        --build-arg geos_version=$GEOS_VERSION-$GEOS_RELEASE \
@@ -33,6 +34,7 @@ docker build \
        --build-arg node_version=$NODE_VERSION \
        --build-arg stxxl_version=$STXXL_VERSION-$STXXL_RELEASE \
        --build-arg suexec_version=$SUEXEC_VERSION-$SUEXEC_RELEASE \
+       --build-arg tomcat8_version=$TOMCAT8_VERSION-$TOMCAT8_RELEASE \
        -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-hoot-devel \
        -t hoot/rpmbuild-hoot-devel \
        $SCRIPT_HOME
