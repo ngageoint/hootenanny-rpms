@@ -59,7 +59,6 @@ BuildRequires:  w3m
 BuildRequires:  wget
 BuildRequires:  words
 BuildRequires:  zip
-
 Source0:        %{name}-%{version}.tar.gz
 
 %description
@@ -76,8 +75,6 @@ Summary:   Hootenanny Core
 Requires:  postgresql%{pg_dotless}-libs
 %global __requires_exclude ^libpq\\.so
 Requires:  %{name}-core-deps = %{version}-%{release}
-
-
 Group:      Applications/Engineering
 
 %description core
@@ -535,10 +532,10 @@ fi
 
 
 
-%package    autostart
-Summary:    Hootenanny Autostart
-Requires:   %{name}-services-ui = %{version}-%{release}
-Group:      Applications/Engineering
+%package   autostart
+Summary:   Hootenanny Autostart
+Requires:  %{name}-services-ui = %{version}-%{release}
+Group:     Applications/Engineering
 
 %description autostart
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -590,16 +587,16 @@ sudo /sbin/chkconfig --del node-mapnik-server
 sudo /sbin/chkconfig --del node-export-server
 
 %package services-devel-deps
-Summary:    Development dependencies for Hootenanny Services
-Group:      Development/Libraries
-Requires:   %{name}-core-devel-deps = %{version}-%{release}
-Requires:   maven
-Requires:   nodejs
-Requires:   postgresql%{pg_dotless}-server
-Requires:   postgresql%{pg_dotless}-contrib
-Requires:   hoot-postgis23_%{pg_dotless}
-Requires:   hoot-postgis23_%{pg_dotless}-utils
-Requires:   liquibase
+Summary:   Development dependencies for Hootenanny Services
+Group:     Development/Libraries
+Requires:  %{name}-core-devel-deps = %{version}-%{release}
+Requires:  maven
+Requires:  nodejs
+Requires:  postgresql%{pg_dotless}-server
+Requires:  postgresql%{pg_dotless}-contrib
+Requires:  hoot-postgis23_%{pg_dotless}
+Requires:  hoot-postgis23_%{pg_dotless}-utils
+Requires:  liquibase
 
 %description services-devel-deps
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -685,8 +682,8 @@ if [ "$1" = "0" ]; then
 fi
 
 %package core-devel-deps
-Summary:    Development dependencies for Hootenanny Core
-Group:      Development/Libraries
+Summary:   Development dependencies for Hootenanny Core
+Group:     Development/Libraries
 Requires:  %{name}-core-deps = %{version}-%{release}
 Requires:  autoconf
 Requires:  automake
@@ -728,8 +725,8 @@ core. Use this if you want to build from github.
 %files core-devel-deps
 
 %package core-deps
-Summary:    Dependencies for Hootenanny Core
-Group:      Development/Libraries
+Summary:   Dependencies for Hootenanny Core
+Group:     Development/Libraries
 Requires:  asciidoc
 Requires:  cppunit
 Requires:  dblatex
