@@ -61,45 +61,42 @@ find . -type f \( -name "*.bat" -o -name "*.tmp" \) -delete
 
 %install
 %{__install} -d -m 0755 %{buildroot}%{tomcat_home}
-# Set allowLinking to true in Tomcat context.
+# Allow Unix symlinks that go outside of web application root directory.
 %{__sed} -i '/<Context>/a\    \<Resources allowLinking="true"/>' conf/context.xml
 
 # Copy all, but omit documentation.
 %{__cp} -R * %{buildroot}%{tomcat_home}/
 %{__rm} -rf %{buildroot}%{tomcat_home}/{LICENSE,NOTICE,RELEASE-NOTES,RUNNING.txt,temp,work}
 
-# Remove all webapps. Put webapps and degree workspace in /var/lib
-# and link back.
+# Remove all webapps. Put webapps in /var/lib.
 %{__rm} -rf %{buildroot}%{tomcat_home}/webapps
+%{__install} -d -m 0775 %{buildroot}%{tomcat_basedir}
 %{__install} -d -m 0775 %{buildroot}%{tomcat_basedir}/webapps
-pushd %{buildroot}%{tomcat_home}
-%{__ln_s} %{tomcat_basedir}/webapps webapps
-%{__chmod} 0755 %{buildroot}%{tomcat_basedir}
-popd
 
-# Put logging in /var/log and link back.
+# Put logging in /var/log.
 %{__rm} -rf %{buildroot}%{tomcat_home}/logs
 %{__install} -d -m 0775 %{buildroot}%{tomcat_logs}
-pushd %{buildroot}%{tomcat_home}
-%{__ln_s} %{tomcat_logs} logs
-popd
 
-# Put conf in /etc/ and link back.
+# Put conf in /etc/tomcat8, and make directory writable by tomcat group.
 %{__install} -d -m 0755 %{buildroot}%{_sysconfdir}
 %{__mv} %{buildroot}%{tomcat_home}/conf %{buildroot}%{tomcat_config}
-%{__install} -d -m 0755 %{buildroot}%{tomcat_config}/conf.d
+%{__chmod} 0775 %{buildroot}%{tomcat_config}
+%{__install} -d -m 0775 %{buildroot}%{tomcat_config}/conf.d
 %{__install} -d -m 0775 %{buildroot}%{tomcat_config}/Catalina
-pushd %{buildroot}%{tomcat_home}
-%{__ln_s} %{tomcat_config} conf
-popd
+%{__install} -d -m 0775 %{buildroot}%{tomcat_config}/Catalina/localhost
 
-# Put temp and work to /var/cache and link back.
+# Put temp and work to /var/cache, make writable by tomcat group.
 %{__install} -d -m 0775 %{buildroot}%{tomcat_cache}
 %{__install} -d -m 0775 %{buildroot}%{tomcat_cache}/temp
 %{__install} -d -m 0775 %{buildroot}%{tomcat_cache}/work
+
+# Link everything back in to tomcat home directory.
 pushd %{buildroot}%{tomcat_home}
+%{__ln_s} %{tomcat_basedir}/webapps webapps
 %{__ln_s} %{tomcat_cache}/temp
 %{__ln_s} %{tomcat_cache}/work
+%{__ln_s} %{tomcat_config} conf
+%{__ln_s} %{tomcat_logs} logs
 popd
 
 # Drop conf script
@@ -165,22 +162,24 @@ getent passwd %{tomcat_user} 2>/dev/null || \
 %{tomcat_home}/temp
 %{tomcat_home}/webapps
 %{tomcat_home}/work
+# files owned by tomcat user
+%defattr(-,root,%{tomcat_group})
 %dir %{tomcat_config}
 %dir %{tomcat_config}/conf.d
+%dir %{tomcat_config}/Catalina
+%dir %{tomcat_config}/Catalina/localhost
 %config(noreplace) %{tomcat_config}/*.conf
+#%config(noreplace) %{tomcat_config}/conf.d/*.conf
 %config(noreplace) %{tomcat_config}/*.xml
 %config(noreplace) %{tomcat_config}/*.xsd
 %config(noreplace) %{tomcat_config}/*.policy
 %config(noreplace) %{tomcat_config}/*.properties
-# files owned by tomcat user
-%defattr(-,%{tomcat_user},%{tomcat_group})
 %dir %{tomcat_basedir}
+%dir %{tomcat_basedir}/webapps
 %dir %{tomcat_cache}
 %dir %{tomcat_cache}/temp
 %dir %{tomcat_cache}/work
-%dir %{tomcat_config}/Catalina
-%{tomcat_basedir}/webapps
-%{tomcat_logs}
+%dir %{tomcat_logs}
 
 %post
 %systemd_post %{name}.service
