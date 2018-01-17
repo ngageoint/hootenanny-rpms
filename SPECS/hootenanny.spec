@@ -694,11 +694,11 @@ Requires:  boost-devel
 Requires:  cppunit-devel
 Requires:  gcc-c++
 Requires:  gdb
-Requires:  geos-devel >= %{geos_min_version}
+Requires:  geos-devel
 Requires:  git
 Requires:  glpk-devel
+Requires:  hoot-words
 Requires:  libicu-devel
-Requires:  hoot-words >= 1.0.0
 Requires:  libspatialite-devel
 Requires:  log4cxx-devel
 Requires:  nodejs-devel
@@ -735,12 +735,13 @@ Requires:  cppunit
 Requires:  dblatex
 Requires:  doxygen
 Requires:  FileGDBAPI
-Requires:  geos >= %{geos_min_version}
+Requires:  geos
 Requires:  gnuplot
 Requires:  graphviz
-Requires:  hoot-gdal-devel >= %{gdal_min_version}
-Requires:  hoot-gdal-python >= %{gdal_min_version}
-Requires:  hoot-words >= 1.0.0
+Requires:  hoot-gdal
+Requires:  hoot-gdal-devel
+Requires:  hoot-gdal-python
+Requires:  hoot-words
 # Needed by gnuplot for report generation
 Requires:  liberation-fonts-common
 Requires:  liberation-sans-fonts
