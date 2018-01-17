@@ -1,5 +1,7 @@
 #!/bin/bash
-PG_VERSION="${1:-9.5}"
+set -euo pipefail
+
+PG_VERSION=$1
 PG_DOTLESS="$(echo ${PG_VERSION} | tr -d '.')"
 PGDG_KEY=/etc/pki/rpm-gpg/RPM-GPG-KEY-PGDG-$PG_DOTLESS
 
