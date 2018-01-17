@@ -14,7 +14,7 @@
 %global tomcat_cache %{_var}/cache/%{name}
 %global tomcat_config %{_sysconfdir}/%{name}
 %global tomcat_logs %{_var}/log/%{name}
-
+%global tomcat_webapps %{tomcat_basedir}/webapps
 
 Summary:    Apache Servlet/JSP Engine, RI for Servlet 3.1/JSP 2.3 API
 Name:       tomcat8
@@ -71,7 +71,7 @@ find . -type f \( -name "*.bat" -o -name "*.tmp" \) -delete
 # Remove all webapps. Put webapps in /var/lib.
 %{__rm} -rf %{buildroot}%{tomcat_home}/webapps
 %{__install} -d -m 0775 %{buildroot}%{tomcat_basedir}
-%{__install} -d -m 0775 %{buildroot}%{tomcat_basedir}/webapps
+%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}
 
 # Put logging in /var/log.
 %{__rm} -rf %{buildroot}%{tomcat_home}/logs
@@ -92,7 +92,7 @@ find . -type f \( -name "*.bat" -o -name "*.tmp" \) -delete
 
 # Link everything back in to tomcat home directory.
 pushd %{buildroot}%{tomcat_home}
-%{__ln_s} %{tomcat_basedir}/webapps webapps
+%{__ln_s} %{tomcat_webapps}
 %{__ln_s} %{tomcat_cache}/temp
 %{__ln_s} %{tomcat_cache}/work
 %{__ln_s} %{tomcat_config} conf
@@ -175,7 +175,7 @@ getent passwd %{tomcat_user} 2>/dev/null || \
 %config(noreplace) %{tomcat_config}/*.policy
 %config(noreplace) %{tomcat_config}/*.properties
 %dir %{tomcat_basedir}
-%dir %{tomcat_basedir}/webapps
+%dir %{tomcat_webapps}
 %dir %{tomcat_cache}
 %dir %{tomcat_cache}/temp
 %dir %{tomcat_cache}/work
