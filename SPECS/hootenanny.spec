@@ -104,7 +104,7 @@ source ./SetupEnv.sh
     --sysconfdir=%{buildroot}%{_sysconfdir}
 
 # Use ccache if it is available
-cp LocalConfig.pri.orig LocalConfig.pri
+%{__cp} LocalConfig.pri.orig LocalConfig.pri
 command -v ccache >/dev/null 2>&1 && echo "QMAKE_CXX=ccache g++" >> LocalConfig.pri
 
 %make_build
@@ -120,33 +120,33 @@ popd
 %install
 
 # UI stuff
-mkdir -p %{buildroot}%{_sharedstatedir}/tomcat8/webapps
-cp hoot-services/target/hoot-services*.war %{buildroot}%{_sharedstatedir}/tomcat8/webapps/hoot-services.war
-cp -R hoot-ui/dist %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id
-mkdir -p %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id/data
-cp hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id/data
-cp hoot-ui/data/tdsv61_field_values.json %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id/data
-mkdir -p %{buildroot}%{_sysconfdir}/systemd/system
-cp node-mapnik-server/systemd/node-mapnik.service %{buildroot}%{_sysconfdir}/systemd/system/node-mapnik.service
-cp node-export-server/systemd/node-export.service %{buildroot}%{_sysconfdir}/systemd/system/node-export.service
-mkdir -p %{buildroot}%{_sharedstatedir}/%{name}
-cp -R node-mapnik-server/ %{buildroot}%{_sharedstatedir}/%{name}/node-mapnik-server
-cp -R node-export-server/ %{buildroot}%{_sharedstatedir}/%{name}/node-export-server
+%{__mkdir} -p %{buildroot}%{_sharedstatedir}/tomcat8/webapps
+%{__cp} hoot-services/target/hoot-services*.war %{buildroot}%{_sharedstatedir}/tomcat8/webapps/hoot-services.war
+%{__cp} -R hoot-ui/dist %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id
+%{__mkdir} -p %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id/data
+%{__cp} hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id/data
+%{__cp} hoot-ui/data/tdsv61_field_values.json %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id/data
+%{__mkdir} -p %{buildroot}%{_unitdir}
+%{__cp} node-mapnik-server/systemd/node-mapnik.service %{_sysconfdir}/systemd/system/node-mapnik.service
+%{__cp} node-export-server/systemd/node-export.service %{_sysconfdir}/systemd/system/node-export.service
+%{__mkdir} -p %{buildroot}%{_sharedstatedir}/%{name}
+%{__cp} -R node-mapnik-server %{buildroot}%{_sharedstatedir}/%{name}
+%{__cp} -R node-export-server %{buildroot}%{_sharedstatedir}/%{name}
 
-make install
+%{__make} install
 echo "export HOOT_HOME=%{_sharedstatedir}/%{name}" > %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
 
-chmod 0755 %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
-cp -R test-files/ %{buildroot}%{_sharedstatedir}/%{name}/
-ln -s %{_libdir} %{buildroot}%{_sharedstatedir}/%{name}/lib
-rm %{buildroot}/usr/bin/HootEnv.sh
+%{__chmod} 0755 %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
+%{__cp} -R test-files %{buildroot}%{_sharedstatedir}/%{name}
+%{__ln_s} %{_libdir} %{buildroot}%{_sharedstatedir}/%{name}/lib
+%{__rm} %{buildroot}%{_bindir}/HootEnv.sh
 # This allows all the tests to run.
-mkdir -p %{buildroot}%{_sharedstatedir}/%{name}/hoot-core-test/src/test/
-ln -s %{_sharedstatedir}/%{name}/test-files/ %{buildroot}%{_sharedstatedir}/%{name}/hoot-core-test/src/test/resources
+%{__mkdir} -p %{buildroot}%{_sharedstatedir}/%{name}/hoot-core-test/src/test/
+%{__ln_s} %{_sharedstatedir}/%{name}/test-files %{buildroot}%{_sharedstatedir}/%{name}/hoot-core-test/src/test/resources
 # This makes it so HootEnv.sh resolves hoot home properly.
-ln -s %{_sharedstatedir}/%{name}/bin/HootEnv.sh %{buildroot}/usr/bin/HootEnv.sh
+%{__ln_s} %{_sharedstatedir}/%{name}/bin/HootEnv.sh %{buildroot}/usr/bin/HootEnv.sh
 # Fix the docs for the UI
-ln -s %{_docdir}/%{name}  %{buildroot}%{_sharedstatedir}/%{name}/docs
+%{__ln_s} %{_docdir}/%{name}  %{buildroot}%{_sharedstatedir}/%{name}/docs
 
 
 %check
@@ -154,7 +154,7 @@ ln -s %{_docdir}/%{name}  %{buildroot}%{_sharedstatedir}/%{name}/docs
 #       a separate container?
 
 %clean
-rm -rf %{buildroot}
+%{__rm} -rf %{buildroot}
 
 %files core
 %{_includedir}/hoot
