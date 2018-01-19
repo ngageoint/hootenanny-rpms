@@ -1,5 +1,8 @@
-# Default the `hoot_release` variable to 1.
+# Default variables for Hootenanny and Tomcat.
+%{!?hoot_home: %global hoot_home %{_sharedstatedir}/%{name}}
 %{!?hoot_release: %global hoot_release 1}
+%{!?tomcat_basedir: %global tomcat_basedir %{_sharedstatedir}/tomcat8}
+%global tomcat_webapps %{tomcat_basedir}/webapps
 
 Name:       hootenanny
 Version:    %{hoot_version}
@@ -99,7 +102,7 @@ source ./SetupEnv.sh
     --prefix=%{buildroot}%{_prefix} \
     --datarootdir=%{buildroot}%{_datarootdir}/%{name} \
     --docdir=%{buildroot}%{_docdir}/%{name} \
-    --localstatedir=%{buildroot}%{_sharedstatedir}/%{name} \
+    --localstatedir=%{buildroot}%{hoot_home} \
     --libdir=%{buildroot}%{_libdir} \
     --sysconfdir=%{buildroot}%{_sysconfdir}
 
@@ -120,33 +123,37 @@ popd
 %install
 
 # UI stuff
-%{__mkdir} -p %{buildroot}%{_sharedstatedir}/tomcat8/webapps
-%{__cp} hoot-services/target/hoot-services*.war %{buildroot}%{_sharedstatedir}/tomcat8/webapps/hoot-services.war
-%{__cp} -R hoot-ui/dist %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id
-%{__mkdir} -p %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id/data
-%{__cp} hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id/data
-%{__cp} hoot-ui/data/tdsv61_field_values.json %{buildroot}%{_sharedstatedir}/tomcat8/webapps/%{name}-id/data
-%{__mkdir} -p %{buildroot}%{_unitdir}
+%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}
+%{__cp} hoot-services/target/hoot-services*.war %{buildroot}%{tomcat_webapps}/hoot-services.war
+%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}
+%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id
+%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id/data
+%{__cp} -R hoot-ui/dist/ %{buildroot}%{tomcat_webapps}/%{name}-id/
+%{__cp} hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{tomcat_webapps}/%{name}-id/data
+%{__cp} hoot-ui/data/tdsv61_field_values.json %{buildroot}%{tomcat_webapps}/%{name}-id/data
+%{__install} -d -m 0755 %{buildroot}%{_unitdir}
 %{__cp} node-mapnik-server/systemd/node-mapnik.service %{buildroot}%{_unitdir}/node-mapnik.service
 %{__cp} node-export-server/systemd/node-export.service %{buildroot}%{_unitdir}/node-export.service
-%{__mkdir} -p %{buildroot}%{_sharedstatedir}/%{name}
-%{__cp} -R node-mapnik-server %{buildroot}%{_sharedstatedir}/%{name}
-%{__cp} -R node-export-server %{buildroot}%{_sharedstatedir}/%{name}
+%{__install} -d -m 0755 %{buildroot}%{hoot_home}
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/node-export-server
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/node-mapnik-server
+%{__cp} -R node-export-server/ %{buildroot}%{hoot_home}/node-export-server/
+%{__cp} -R node-mapnik-server/ %{buildroot}%{hoot_home}/node-mapnik-server/
 
 %{__make} install
-echo "export HOOT_HOME=%{_sharedstatedir}/%{name}" > %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
+echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
 
 %{__chmod} 0755 %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
-%{__cp} -R test-files %{buildroot}%{_sharedstatedir}/%{name}
-%{__ln_s} %{_libdir} %{buildroot}%{_sharedstatedir}/%{name}/lib
+%{__cp} -R test-files %{buildroot}%{hoot_home}
+%{__ln_s} %{_libdir} %{buildroot}%{hoot_home}/lib
 %{__rm} %{buildroot}%{_bindir}/HootEnv.sh
 # This allows all the tests to run.
-%{__mkdir} -p %{buildroot}%{_sharedstatedir}/%{name}/hoot-core-test/src/test/
-%{__ln_s} %{_sharedstatedir}/%{name}/test-files %{buildroot}%{_sharedstatedir}/%{name}/hoot-core-test/src/test/resources
+%{__mkdir} -p %{buildroot}%{hoot_home}/hoot-core-test/src/test/
+%{__ln_s} %{hoot_home}/test-files %{buildroot}%{hoot_home}/hoot-core-test/src/test/resources
 # This makes it so HootEnv.sh resolves hoot home properly.
-%{__ln_s} %{_sharedstatedir}/%{name}/bin/HootEnv.sh %{buildroot}/usr/bin/HootEnv.sh
+%{__ln_s} %{hoot_home}/bin/HootEnv.sh %{buildroot}/usr/bin/HootEnv.sh
 # Fix the docs for the UI
-%{__ln_s} %{_docdir}/%{name}  %{buildroot}%{_sharedstatedir}/%{name}/docs
+%{__ln_s} %{_docdir}/%{name}  %{buildroot}%{hoot_home}/docs
 
 
 %check
@@ -163,8 +170,18 @@ echo "export HOOT_HOME=%{_sharedstatedir}/%{name}" > %{buildroot}%{_sysconfdir}/
 %{_docdir}/%{name}
 %{_bindir}/*
 %exclude %{_bindir}/*.war
-%config %{_sharedstatedir}/%{name}/conf/hoot.json
-%{_sharedstatedir}/%{name}
+%config %{hoot_home}/conf/hoot.json
+%{hoot_home}/bin
+%{hoot_home}/conf
+%{hoot_home}/docs
+%{hoot_home}/hoot-core-test
+%{hoot_home}/lib
+%{hoot_home}/plugins
+%{hoot_home}/report
+%{hoot_home}/rules
+%{hoot_home}/scripts
+%{hoot_home}/test-files
+%{hoot_home}/translations
 %{_sysconfdir}/profile.d/hootenanny.sh
 %{_sysconfdir}/asciidoc/filters/
 
@@ -193,10 +210,12 @@ content, geometry and attributes, to transfer to the output map.
 This package contains the UI and web services.
 
 %files services-ui
-%attr(0755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hoot-services.war
-%attr(0755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hootenanny-id
-%{_unitdir}/node-mapnik.service
 %{_unitdir}/node-export.service
+%{_unitdir}/node-mapnik.service
+%attr(0775, root, tomcat) %{hoot_home}/node-mapnik-server
+%attr(0775, root, tomcat) %{hoot_home}/node-export-server
+%attr(0775, root, tomcat) %{tomcat_webapps}/hoot-services.war
+%attr(0775, root, tomcat) %{tomcat_webapps}/%{name}-id
 
 #the order of operations during an upgrade is:
 #
