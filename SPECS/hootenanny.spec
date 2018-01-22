@@ -37,7 +37,6 @@ BuildRequires:  hoot-postgis23_%{pg_dotless}-utils
 BuildRequires:  hoot-words
 BuildRequires:  java-1.8.0-openjdk
 BuildRequires:  libicu-devel
-BuildRequires:  libspatialite-devel
 BuildRequires:  libxslt
 BuildRequires:  log4cxx-devel
 BuildRequires:  maven
@@ -75,9 +74,10 @@ content, geometry and attributes, to transfer to the output map.
 
 %package core
 Summary:   Hootenanny Core
+Requires:  %{name}-core-deps = %{version}-%{release}
+Requires:  nodejs = %{nodejs_version}
 Requires:  postgresql%{pg_dotless}-libs
 %global __requires_exclude ^libpq\\.so
-Requires:  %{name}-core-deps = %{version}-%{release}
 Group:      Applications/Engineering
 
 %description core
@@ -188,14 +188,14 @@ echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hoot
 
 %package services-ui
 Summary:   Hootenanny UI and Services
-Requires:  tomcat8
 Requires:  %{name}-core = %{version}-%{release}
-Requires:  postgresql%{pg_dotless}-server
-Requires:  postgresql%{pg_dotless}-contrib
-Requires:  hoot-postgis23_%{pg_dotless}
 Requires:  java-1.8.0-openjdk
 Requires:  liquibase
+Requires:  postgresql%{pg_dotless}-contrib
+Requires:  postgresql%{pg_dotless}-server
+Requires:  hoot-postgis23_%{pg_dotless}
 Requires:  pwgen
+Requires:  tomcat8 = %{tomcat_version}
 Group:     Applications/Engineering
 
 %description services-ui
@@ -609,13 +609,14 @@ sudo /sbin/chkconfig --del node-export-server
 Summary:   Development dependencies for Hootenanny Services
 Group:     Development/Libraries
 Requires:  %{name}-core-devel-deps = %{version}-%{release}
-Requires:  maven
-Requires:  nodejs
-Requires:  postgresql%{pg_dotless}-server
-Requires:  postgresql%{pg_dotless}-contrib
 Requires:  hoot-postgis23_%{pg_dotless}
 Requires:  hoot-postgis23_%{pg_dotless}-utils
 Requires:  liquibase
+Requires:  maven
+Requires:  nodejs-devel = %{nodejs_version}
+Requires:  postgresql%{pg_dotless}-devel
+Requires:  postgresql%{pg_dotless}-server
+Requires:  postgresql%{pg_dotless}-contrib
 
 %description services-devel-deps
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -710,14 +711,13 @@ Requires:  boost-devel
 Requires:  cppunit-devel
 Requires:  gcc-c++
 Requires:  gdb
-Requires:  geos-devel
+Requires:  geos-devel = %{geos_version}
 Requires:  git
 Requires:  glpk-devel
 Requires:  hoot-words
 Requires:  libicu-devel
-Requires:  libspatialite-devel
 Requires:  log4cxx-devel
-Requires:  nodejs-devel
+Requires:  nodejs-devel = %{nodejs_version}
 Requires:  opencv-devel
 Requires:  postgresql%{pg_dotless}-devel
 Requires:  proj-devel
@@ -725,9 +725,16 @@ Requires:  protobuf-devel
 Requires:  python-argparse
 Requires:  python-devel
 Requires:  qt-devel
-Requires:  stxxl-devel
+Requires:  stxxl-devel = %{stxxl_version}
 Requires:  v8-devel
+# Documentation and report-related dependencies.
+Requires:  doxygen
+Requires:  liberation-fonts-common
+Requires:  liberation-sans-fonts
+Requires:  libxslt
 Requires:  texlive
+Requires:  texlive-collection-fontsrecommended
+Requires:  texlive-collection-langcyrillic
 
 %description core-devel-deps
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -746,33 +753,34 @@ core. Use this if you want to build from github.
 %package core-deps
 Summary:   Dependencies for Hootenanny Core
 Group:     Development/Libraries
+
 Requires:  asciidoc
+Requires:  boost-iostreams
+Requires:  boost-system
 Requires:  cppunit
-Requires:  dblatex
-Requires:  doxygen
 Requires:  FileGDBAPI
 Requires:  geos
+Requires:  glpk
 Requires:  gnuplot
 Requires:  graphviz
-Requires:  hoot-gdal
-Requires:  hoot-gdal-devel
-Requires:  hoot-gdal-python
+Requires:  hoot-gdal = %{gdal_version}
+Requires:  hoot-gdal-devel = %{gdal_version}
+Requires:  hoot-gdal-python = %{gdal_version}
 Requires:  hoot-words
-# Needed by gnuplot for report generation
-Requires:  liberation-fonts-common
-Requires:  liberation-sans-fonts
-Requires:  libxslt
+Requires:  libicu
 Requires:  log4cxx
-Requires:  nodejs
+Requires:  nodejs = %{nodejs_version}
 Requires:  opencv
+Requires:  perl-libwww-perl
+Requires:  perl-XML-LibXML
+Requires:  postgresql%{pg_dotless}-libs
 Requires:  protobuf
-Requires:  proj
-Requires:  proj-devel
 Requires:  qt
 Requires:  qt-postgresql
-Requires:  stxxl
-Requires:  texlive
+Requires:  qt-x11
+Requires:  stxxl = %{stxxl_version}
 Requires:  unzip
+Requires:  v8
 Requires:  w3m
 Requires:  wget
 Requires:  words
