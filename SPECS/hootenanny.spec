@@ -128,27 +128,39 @@ popd
 
 # UI stuff
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}
-%{__cp} hoot-services/target/hoot-services*.war %{buildroot}%{tomcat_webapps}/hoot-services.war
+%{__install} -m 0775 hoot-services/target/hoot-services*.war %{buildroot}%{tomcat_webapps}/hoot-services.war
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id/data
 %{__cp} -R hoot-ui/dist/ %{buildroot}%{tomcat_webapps}/%{name}-id/
 %{__cp} hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{tomcat_webapps}/%{name}-id/data
 %{__cp} hoot-ui/data/tdsv61_field_values.json %{buildroot}%{tomcat_webapps}/%{name}-id/data
+
 %{__install} -d -m 0755 %{buildroot}%{_unitdir}
-%{__cp} node-mapnik-server/systemd/node-mapnik.service %{buildroot}%{_unitdir}/node-mapnik.service
-%{__cp} node-export-server/systemd/node-export.service %{buildroot}%{_unitdir}/node-export.service
 %{__install} -d -m 0755 %{buildroot}%{hoot_home}
+
+# node-export
 %{__install} -d -m 0775 %{buildroot}%{hoot_home}/node-export-server
+%{__cp} -p node-export-server/*.{js,json} %{buildroot}%{hoot_home}/node-export-server
+%{__cp} -pr node-export-server/{node_modules,test} %{buildroot}%{hoot_home}/node-export-server
+%{__install} -m 0644 node-export-server/systemd/node-export.service %{buildroot}%{_unitdir}/node-export.service
+
+# node-mapnik
 %{__install} -d -m 0775 %{buildroot}%{hoot_home}/node-mapnik-server
-%{__cp} -R node-export-server/ %{buildroot}%{hoot_home}/node-export-server/
-%{__cp} -R node-mapnik-server/ %{buildroot}%{hoot_home}/node-mapnik-server/
+%{__cp} -p node-mapnik-server/*.{js,json,xml,svg} %{buildroot}%{hoot_home}/node-mapnik-server
+%{__cp} -pr node-mapnik-server/{node_modules,utils} %{buildroot}%{hoot_home}/node-mapnik-server
+%{__install} -m 0644 node-mapnik-server/systemd/node-mapnik.service %{buildroot}%{_unitdir}/node-mapnik.service
 
+# install into the buildroot
 %{__make} install
-echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
 
+echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
 %{__chmod} 0755 %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
-%{__cp} -R test-files %{buildroot}%{hoot_home}
+
+# testing files.
+%{__cp} -pr test-files %{buildroot}%{hoot_home}
+%{__install} -m 0775 -d %{buildroot}%{hoot_home}/test-output
+
 %{__ln_s} %{_libdir} %{buildroot}%{hoot_home}/lib
 %{__rm} %{buildroot}%{_bindir}/HootEnv.sh
 # This allows all the tests to run.
@@ -157,7 +169,7 @@ echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hoot
 # This makes it so HootEnv.sh resolves hoot home properly.
 %{__ln_s} %{hoot_home}/bin/HootEnv.sh %{buildroot}/usr/bin/HootEnv.sh
 # Fix the docs for the UI
-%{__ln_s} %{_docdir}/%{name}  %{buildroot}%{hoot_home}/docs
+%{__ln_s} %{_docdir}/%{name} %{buildroot}%{hoot_home}/docs
 
 
 %check
@@ -183,10 +195,10 @@ echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hoot
 %{hoot_home}/report
 %{hoot_home}/rules
 %{hoot_home}/scripts
-%{hoot_home}/test-files
+
 %{hoot_home}/translations
 %{_sysconfdir}/profile.d/hootenanny.sh
-%{_sysconfdir}/asciidoc/filters/
+%{_sysconfdir}/asciidoc/filters
 # No need to double-include the services WAR and the dictionary file
 # already provided by hoot-words.
 %exclude %{_bindir}/*.war
@@ -555,6 +567,13 @@ if [ "$1" = "0" ]; then
     fi
 fi
 
+%defattr(-, root, tomcat, 0775)
+%{hoot_home}/node-export-server
+%{hoot_home}/node-mapnik-server
+%{hoot_home}/test-files
+%{hoot_home}/test-output
+%{tomcat_webapps}/hoot-services.war
+%{tomcat_webapps}/%{name}-id
 
 
 %package   autostart
