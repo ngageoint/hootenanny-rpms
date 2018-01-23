@@ -163,11 +163,14 @@ echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hoot
 
 %{__ln_s} %{_libdir} %{buildroot}%{hoot_home}/lib
 %{__rm} %{buildroot}%{_bindir}/HootEnv.sh
+
 # This allows all the tests to run.
-%{__mkdir} -p %{buildroot}%{hoot_home}/hoot-core-test/src/test/
+%{__install} -m 0775 -d %{buildroot}%{hoot_home}/hoot-core-test/src/test
 %{__ln_s} %{hoot_home}/test-files %{buildroot}%{hoot_home}/hoot-core-test/src/test/resources
-# This makes it so HootEnv.sh resolves hoot home properly.
-%{__ln_s} %{hoot_home}/bin/HootEnv.sh %{buildroot}/usr/bin/HootEnv.sh
+
+# This makes it so HootEnv.sh resolves `$HOOT_HOME` properly.
+%{__ln_s} %{hoot_home}/bin/HootEnv.sh %{buildroot}%{_bindir}/HootEnv.sh
+
 # Fix the docs for the UI
 %{__ln_s} %{_docdir}/%{name} %{buildroot}%{hoot_home}/docs
 
@@ -230,10 +233,14 @@ This package contains the UI and web services.
 %files services-ui
 %{_unitdir}/node-export.service
 %{_unitdir}/node-mapnik.service
-%attr(0775, root, tomcat) %{hoot_home}/node-mapnik-server
-%attr(0775, root, tomcat) %{hoot_home}/node-export-server
-%attr(0775, root, tomcat) %{tomcat_webapps}/hoot-services.war
-%attr(0775, root, tomcat) %{tomcat_webapps}/%{name}-id
+
+%defattr(-, root, tomcat, 0775)
+%{hoot_home}/node-export-server
+%{hoot_home}/node-mapnik-server
+%{hoot_home}/test-files
+%{hoot_home}/test-output
+%{tomcat_webapps}/hoot-services.war
+%{tomcat_webapps}/%{name}-id
 
 #the order of operations during an upgrade is:
 #
@@ -566,14 +573,6 @@ if [ "$1" = "0" ]; then
         sudo service iptables restart
     fi
 fi
-
-%defattr(-, root, tomcat, 0775)
-%{hoot_home}/node-export-server
-%{hoot_home}/node-mapnik-server
-%{hoot_home}/test-files
-%{hoot_home}/test-output
-%{tomcat_webapps}/hoot-services.war
-%{tomcat_webapps}/%{name}-id
 
 
 %package   autostart
