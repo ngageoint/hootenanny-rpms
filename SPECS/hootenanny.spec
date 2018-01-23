@@ -782,6 +782,7 @@ Requires:  asciidoc
 Requires:  boost-iostreams
 Requires:  boost-system
 Requires:  cppunit
+Requires:  dblatex
 Requires:  FileGDBAPI
 Requires:  geos
 Requires:  glpk
