@@ -35,6 +35,7 @@ docker build \
        --build-arg stxxl_version=$STXXL_VERSION-$STXXL_RELEASE \
        --build-arg suexec_version=$SUEXEC_VERSION-$SUEXEC_RELEASE \
        --build-arg tomcat8_version=$TOMCAT8_VERSION-$TOMCAT8_RELEASE \
+       --build-arg words_version=$WORDS_VERSION-$WORDS_RELEASE \
        -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-hoot-devel \
        -t hoot/rpmbuild-hoot-devel \
        $SCRIPT_HOME

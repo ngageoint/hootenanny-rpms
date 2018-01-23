@@ -97,6 +97,10 @@ This package contains the core algorithms and command line interface.
 %build
 source ./SetupEnv.sh
 
+# Link in the dictionary file.
+ln -s %{hoot_home}/conf/dictionary/words1.sqlite conf/dictionary/words.sqlite
+ln -s %{hoot_home}/conf/dictionary/words1.sqlite conf/dictionary/words1.sqlite
+
 # The dir configurations set the install directory to work with EL's dir structure
 ./configure -q --with-rnd --with-services --with-postgresql \
     --prefix=%{buildroot}%{_prefix} \
@@ -169,7 +173,6 @@ echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hoot
 %docdir %{_docdir}/%{name}
 %{_docdir}/%{name}
 %{_bindir}/*
-%exclude %{_bindir}/*.war
 %config %{hoot_home}/conf/hoot.json
 %{hoot_home}/bin
 %{hoot_home}/conf
@@ -184,7 +187,10 @@ echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hoot
 %{hoot_home}/translations
 %{_sysconfdir}/profile.d/hootenanny.sh
 %{_sysconfdir}/asciidoc/filters/
-
+# No need to double-include the services WAR and the dictionary file
+# already provided by hoot-words.
+%exclude %{_bindir}/*.war
+%exclude %{hoot_home}/conf/dictionary/words*.sqlite
 
 %package services-ui
 Summary:   Hootenanny UI and Services
