@@ -18,6 +18,7 @@ It is designed to run as PID1 in minimal container environments.
 # Remove static compilation flag, as we're only targeting Enterprise Linux
 # containers (like the rest of our dependencies).
 %{__sed} -i -e 's/ -static//' Makefile
+%{__make}
 
 # TODO: Consider substituting hard-coded CFLAGS with `%{optflags}` in Makefile.
 
