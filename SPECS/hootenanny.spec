@@ -2,6 +2,8 @@
 %{!?hoot_home: %global hoot_home %{_sharedstatedir}/%{name}}
 %{!?hoot_release: %global hoot_release 1}
 %{!?tomcat_basedir: %global tomcat_basedir %{_sharedstatedir}/tomcat8}
+%{!?tomcat_config: %global tomcat_config %{_sysconfdir}/tomcat8}
+%{!?tomcat_home: %global tomcat_home %{_datadir}/tomcat8}
 %global tomcat_webapps %{tomcat_basedir}/webapps
 
 Name:       hootenanny
@@ -126,30 +128,84 @@ popd
 
 %install
 
-# UI stuff
+# Start with $HOOT_HOME and systemd unit directories.
+%{__install} -d -m 0755 %{buildroot}%{_unitdir}
+%{__install} -d -m 0755 %{buildroot}%{hoot_home}
+
+# User data directories, make directories group-writable.
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/tmp
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/customscript
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/ingest
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/ingest/processed
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/ingest/upload
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/reports
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/tmp
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/upload
+
+# Services (UI) files and directories.
+%{__install} -d -m 0775 %{buildroot}%{tomcat_config}/conf.d
+%{__install} -d -m 0775 %{buildroot}%{tomcat_home}/.deegree
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}
 %{__install} -m 0775 hoot-services/target/hoot-services*.war %{buildroot}%{tomcat_webapps}/hoot-services.war
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id/data
-%{__cp} -R hoot-ui/dist/ %{buildroot}%{tomcat_webapps}/%{name}-id/
-%{__cp} hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{tomcat_webapps}/%{name}-id/data
-%{__cp} hoot-ui/data/tdsv61_field_values.json %{buildroot}%{tomcat_webapps}/%{name}-id/data
+%{__cp} -pr hoot-ui/dist/ %{buildroot}%{tomcat_webapps}/%{name}-id/
+%{__install} -m 0644 hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{tomcat_webapps}/%{name}-id/data
+%{__install} -m 0644 hoot-ui/data/tdsv61_field_values.json %{buildroot}%{tomcat_webapps}/%{name}-id/data
 
-%{__install} -d -m 0755 %{buildroot}%{_unitdir}
-%{__install} -d -m 0755 %{buildroot}%{hoot_home}
+# Tomcat environment settings for Hootenanny.
+%{__cat} >> %{buildroot}%{tomcat_config}/conf.d/hoot.conf << EOF
+export GDAL_DATA=%(gdal-config --datadir)
+export HOOT_HOME=%{hoot_home}
+export HOOT_WORKING_NAME=hoot
+EOF
 
 # node-export
 %{__install} -d -m 0775 %{buildroot}%{hoot_home}/node-export-server
 %{__cp} -p node-export-server/*.{js,json} %{buildroot}%{hoot_home}/node-export-server
 %{__cp} -pr node-export-server/{node_modules,test} %{buildroot}%{hoot_home}/node-export-server
-%{__install} -m 0644 node-export-server/systemd/node-export.service %{buildroot}%{_unitdir}/node-export.service
+%{__cat} >> %{buildroot}%{_unitdir}/node-export.service <<EOF
+[Unit]
+Description=Node Export Server
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=tomcat
+Group=tomcat
+WorkingDirectory=%{hoot_home}/node-export-server
+ExecStart=/usr/bin/npm start
+ExecStop=/usr/bin/kill -HUP \$MAINPID
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+EOF
 
 # node-mapnik
 %{__install} -d -m 0775 %{buildroot}%{hoot_home}/node-mapnik-server
 %{__cp} -p node-mapnik-server/*.{js,json,xml,svg} %{buildroot}%{hoot_home}/node-mapnik-server
 %{__cp} -pr node-mapnik-server/{node_modules,utils} %{buildroot}%{hoot_home}/node-mapnik-server
-%{__install} -m 0644 node-mapnik-server/systemd/node-mapnik.service %{buildroot}%{_unitdir}/node-mapnik.service
+%{__cat} >> %{buildroot}%{_unitdir}/node-mapnik.service <<EOF
+[Unit]
+Description=Node Mapnik Server
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=tomcat
+Group=tomcat
+WorkingDirectory=%{hoot_home}/node-mapnik-server
+ExecStartPre=/usr/bin/cd %{hoot_home} && source bin/HootEnv.sh && source conf/database/DatabaseConfig.sh
+ExecStart=/usr/bin/node app.js hoot_style.xml 8000
+ExecStop=/usr/bin/kill -HUP \$MAINPID
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+EOF
 
 # install into the buildroot
 %{__make} install
@@ -206,6 +262,8 @@ echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hoot
 # already provided by hoot-words.
 %exclude %{_bindir}/*.war
 %exclude %{hoot_home}/conf/dictionary/words*.sqlite
+# These filters will cause tests to fail.
+%exclude %{_sysconfdir}/asciidoc/filters/mpl
 
 %package services-ui
 Summary:   Hootenanny UI and Services
@@ -239,8 +297,14 @@ This package contains the UI and web services.
 %{hoot_home}/node-mapnik-server
 %{hoot_home}/test-files
 %{hoot_home}/test-output
+%{tomcat_config}/conf.d/hoot.conf
 %{tomcat_webapps}/hoot-services.war
 %{tomcat_webapps}/%{name}-id
+
+%defattr(-, tomcat, tomcat, 0775)
+%{hoot_home}/tmp
+%{hoot_home}/userfiles
+%{tomcat_home}/.deegree
 
 #the order of operations during an upgrade is:
 #
@@ -253,165 +317,93 @@ This package contains the UI and web services.
 
 %pre services-ui
 
-if test -f /.dockerenv; then exit 0; fi
-
 if [ "$1" = "2" ]; then
     # Perform whatever maintenance must occur before the upgrade
 
     # Remove exploded hoot-services war remnants
-    SERVICES_HOME=/var/lib/tomcat8/webapps/hoot-services
+    SERVICES_HOME=%{tomcat_webapps}/hoot-services
     if [ -d $SERVICES_HOME ]; then
-        sudo rm -rf $SERVICES_HOME
+        rm -rf $SERVICES_HOME
     fi
 fi
+
+%preun
+
+%systemd_preun node-export.service
+%systemd_preun node-mapnik.service
 
 %post services-ui
 
 if test -f /.dockerenv; then exit 0; fi
 
+%systemd_post node-export.service
+%systemd_post node-mapnik.service
+
 function updateConfigFiles () {
     # Check for existing db config from previous install and move to right location
-    if [ -f /var/lib/hootenanny/conf/DatabaseConfigLocal.sh ]; then
-        mv /var/lib/hootenanny/conf/DatabaseConfigLocal.sh /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh
+    if [ -f %{hoot_home}/conf/DatabaseConfigLocal.sh ]; then
+        mv %{hoot_home}/conf/DatabaseConfigLocal.sh %{hoot_home}/conf/database/DatabaseConfigLocal.sh
     fi
     # Update the db password in hoot-services war
-    source /var/lib/hootenanny/conf/database/DatabaseConfig.sh
-
-    # Fix gdal2tiles path (can be removed once reference fixed in hoot code)
-    if [ ! -h /usr/local/bin/gdal2tiles.py ]; then
-        ln -s /usr/bin/gdal2tiles.py /usr/local/bin/gdal2tiles.py
-    fi
+    source %{hoot_home}/conf/database/DatabaseConfig.sh
 
     # Configure tomcat for hoot
     # We move this here to run on install and upgrade since these commands
     # are wrapped in conditionals that allow them to skip already completed steps
 
     # Create Tomcat context path for tile images
-    TOMCAT_SRV=/etc/tomcat8/server.xml
+    TOMCAT_SRV=%{tomcat_config}/server.xml
 
     # First make sure to remove the old Context entry if it exists
-    sudo sed -i '/<Context docBase=\"\/var\/lib\/hootenanny\/ingest\/processed\" path=\"\/static\" \/>/d' $TOMCAT_SRV
+    sed -i '/<Context docBase=\"'${HOOT_HOME//\//\\\/}'\/ingest\/processed\" path=\"\/static\" \/>/d' $TOMCAT_SRV
 
     if ! grep -i --quiet 'userfiles/ingest/processed' $TOMCAT_SRV; then
         echo "Adding Tomcat context path for tile images"
-        sudo sed -i "s@<\/Host>@      <Context docBase=\"\/var\/lib\/hootenanny\/userfiles\/ingest\/processed\" path=\"\/static\" \/>\n      &@" $TOMCAT_SRV
+        sed -i "s@<\/Host>@      <Context docBase=\""${HOOT_HOME//\//\\\/}"\/userfiles\/ingest\/processed\" path=\"\/static\" \/>\n      &@" $TOMCAT_SRV
     fi
 
     # Allow linking in Tomcat context
-    TOMCAT_CTX=/etc/tomcat8/context.xml
+    TOMCAT_CTX=%{tomcat_config}/context.xml
 
     # First, fix potential pre-existing setting of 'allowLinking' that doesn't work on tomcat8
-    sudo sed -i "s@^<Context allowLinking=\"true\">@<Context>@" $TOMCAT_CTX
+    sed -i "s@^<Context allowLinking=\"true\">@<Context>@" $TOMCAT_CTX
 
     # Now, set allowLinking if needed
     if ! grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
         echo "Set allowLinking to true in Tomcat context"
-        sudo sed -i "/<Context>/a \    <Resources allowLinking=\"true\" />" $TOMCAT_CTX
+        sed -i "/<Context>/a \    <Resources allowLinking=\"true\" />" $TOMCAT_CTX
     fi
 
     # Increase the Tomcat java heap size
-    TOMCAT_CONF=/etc/tomcat8/tomcat8.conf
+    TOMCAT_CONF=%{tomcat_config}/tomcat8.conf
     if ! grep -i --quiet 'Xmx2048m' $TOMCAT_CONF; then
         echo "Increase the Tomcat java heap size"
-        sudo bash -c "cat >> $TOMCAT_CONF" <<EOT
+        bash -c "cat >> $TOMCAT_CONF" <<EOT
 #--------------
 # Hoot increase java heap size
 #--------------
 JAVA_OPTS="$JAVA_OPTS -Xms512m -Xmx2048m"
-
 EOT
     fi
 
-    # Create directories for webapp
-    TOMCAT_HOME=/usr/share/tomcat8
-    if [ ! -d $TOMCAT_HOME/.deegree ]; then
-        echo "Creating .deegree directory for webapp"
-        sudo mkdir $TOMCAT_HOME/.deegree
-        sudo chown tomcat:tomcat $TOMCAT_HOME/.deegree
-    fi
+    # Update database credentials in various locations.
+    sed -i s/password\:\ hoottest/password\:\ $DB_PASSWORD/ %{tomcat_webapps}/hoot-services/WEB-INF/classes/db/liquibase.properties
+    sed -i s/DB_PASSWORD=hoottest/DB_PASSWORD=$DB_PASSWORD/ %{tomcat_webapps}/hoot-services/WEB-INF/classes/db/db.properties
+    sed -i s/\<Password\>hoottest\<\\/Password\>/\<Password\>$DB_PASSWORD\<\\/Password\>/ %{tomcat_webapps}/hoot-services/WEB-INF/workspace/jdbc/WFS_Connection.xml
 
-    # Directory that now hosts several folders used by the Services code.
-    USER_FILES_HOME=/var/lib/hootenanny/userfiles
-    if [ ! -d $USER_FILES_HOME ]; then
-        echo "Creating userfiles directory"
-        sudo mkdir -p $USER_FILES_HOME
-    fi
-
-    # Tomcat needs this directory to exist for the server to start.
-    # Tomcat's server.xml has a docBase reference to this folder.
-    BASEMAP_UPLOAD_HOME=$USER_FILES_HOME/ingest/upload
-    if [ ! -d $BASEMAP_UPLOAD_HOME ]; then
-        echo "Creating $BASEMAP_UPLOAD_HOME directory"
-        sudo mkdir -p $BASEMAP_UPLOAD_HOME
-    fi
-
-    migrateFiles
-
-    # make sure everything undedr $HOOT_HOME/userfiles is owned by tomcat:tomcat
-    sudo chown -R tomcat:tomcat $HOOT_HOME/userfiles
-
-    sudo service tomcat8 restart
-
-    while [ ! -f /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/db/db.properties ]; do
-        echo "Waiting for hoot-services.war to deploy"
-        sleep 1
-    done
-
-    sudo sed -i s/password\:\ hoottest/password\:\ $DB_PASSWORD/ /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/db/liquibase.properties
-    sudo sed -i s/DB_PASSWORD=hoottest/DB_PASSWORD=$DB_PASSWORD/ /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/db/db.properties
-    sudo sed -i s/\<Password\>hoottest\<\\/Password\>/\<Password\>$DB_PASSWORD\<\\/Password\>/ /var/lib/tomcat8/webapps/hoot-services/WEB-INF/workspace/jdbc/WFS_Connection.xml
-
-    # make sure tomcat is using correct Java
-    sudo sed -i '/.*JAVA_HOME=.*/c\JAVA_HOME=\/usr\/java\/jdk1.8.0_144' /etc/tomcat8/tomcat8.conf
-
-    sudo service tomcat8 restart
-}
-
-function migrateFiles() {
-    if [ ! -d "$HOOT_HOME/userfiles/ingest/processed" ]; then
-        mkdir -p $HOOT_HOME/userfiles/ingest/processed
-    fi
-
-    # tmp and upload will now reside under $HOOT_HOME/userfiles/
-    # The folders will be automatically created under $HOOT_HOME/userfiles by hoot-services webapp during Tomcat startup
-    rm -rf $HOOT_HOME/upload
-    rm -rf $HOOT_HOME/tmp
-
-    if [ -d "$HOOT_HOME/data/reports" ]; then
-        echo "Moving contents of $HOOT_HOME/data/reports to $HOOT_HOME/userfiles/"
-        cp -R $HOOT_HOME/data/reports $HOOT_HOME/userfiles/
-        rm -rf $HOOT_HOME/data/reports
-    fi
-
-    if [ -d "$HOOT_HOME/customscript" ]; then
-        echo "Moving contents of $HOOT_HOME/customscript to $HOOT_HOME/userfiles/"
-        cp -R $HOOT_HOME/customscript $HOOT_HOME/userfiles/
-        rm -rf $HOOT_HOME/customscript
-    fi
-
-    if [ -d "$HOOT_HOME/ingest" ]; then
-        echo "Moving contents of $HOOT_HOME/ingest to $HOOT_HOME/userfiles/"
-        cp -R $HOOT_HOME/ingest $HOOT_HOME/userfiles/
-        rm -rf $HOOT_HOME/ingest
-    fi
-
-    rm -rf $HOOT_HOME/data
-
-    # Always start with a clean $HOOT_HOME/userfiles/tmp
-    rm -rf $HOOT_HOME/userfiles/tmp
+    systemctl restart tomcat8
 }
 
 function updateLiquibase () {
 
     # Add hostname alias to 127.0.0.1 to avoid liquibase unknown hostname error
     if ! grep --quiet $(hostname) /etc/hosts; then
-        sudo sed -i "1 s/$/ $(hostname)/" /etc/hosts
+        sed -i "1 s/$/ $(hostname)/" /etc/hosts
     fi
 
     # Apply any database schema changes
-    source /var/lib/hootenanny/conf/database/DatabaseConfig.sh
-    TOMCAT_HOME=/usr/share/tomcat8
-    source /var/lib/hootenanny/conf/database/DatabaseConfig.sh
+    TOMCAT_HOME=%{tomcat_home}
+    source %{hoot_home}/conf/database/DatabaseConfig.sh
     cd $TOMCAT_HOME/webapps/hoot-services/WEB-INF
     liquibase --contexts=default,production \
         --changeLogFile=classes/db/db.changelog-master.xml \
@@ -429,104 +421,101 @@ if [ "$1" = "1" ]; then
     # Perform tasks to prepare for the initial installation
     source /etc/profile.d/hootenanny.sh
 
-    # init and start Postgres
-    PG_SERVICE=$(ls /etc/init.d | grep postgresql- | sort | tail -1)
-    sudo service $PG_SERVICE initdb
-    sudo service $PG_SERVICE start
-    while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
+    # start tomcat
+    systemctl start tomcat8
+
+    # init and start postgres
+    if [ ! -e /var/lib/pgsql/%{pg_version}/data/PG_VERSION ]; then
+        PGSETUP_INITDB_OPTIONS="-E UTF-8 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8" \
+                              /usr/pgsql-%{pg_version}/bin/postgresql%{pg_dotless}-setup initdb
+    fi
+
+    systemctl start postgresql-%{pg_version}
+
+    while ! /usr/pgsql-%{pg_version}/bin/pg_isready; do
         echo "Waiting for postgres to start"
         sleep 1
     done
 
-    sudo service tomcat8 start
-
     # create Hoot services db
-    if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw hoot; then
+    if ! su -l postgres -c "psql -lqt | cut -d \| -f 1 | grep -qw hoot"; then
         RAND_PW=$(pwgen -s 16 1)
-        sudo -u postgres createuser --superuser hoot || true
-        sudo -u postgres psql -c "alter user hoot with password '$RAND_PW';"
-        if [ -f /var/lib/hootenanny/conf/database/DatabaseConfigDefault.sh ]; then
-            echo "export DB_PASSWORD=$RAND_PW" | sudo tee /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh > /dev/null
-            echo "export DB_PASSWORD_OSMAPI=$RAND_PW" | sudo tee --append /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh > /dev/null
-            sudo chmod a+x /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh
+        su -l postgres -c "createuser --superuser hoot || true"
+        su -l postgres -c "psql -c \"ALTER USER hoot with password '${RAND_PW}';\""
+        if [ -f %{hoot_home}/conf/database/DatabaseConfigDefault.sh ]; then
+            echo "export DB_PASSWORD=${RAND_PW}" | tee %{hoot_home}/conf/database/DatabaseConfigLocal.sh > /dev/null
+            echo "export DB_PASSWORD_OSMAPI=${RAND_PW}" | tee --append %{hoot_home}/conf/database/DatabaseConfigLocal.sh > /dev/null
+            chmod a+x %{hoot_home}/conf/database/DatabaseConfigLocal.sh
         else
-        sudo sed -i s/DB_PASSWORD=.*/DB_PASSWORD=$RAND_PW/ /var/lib/hootenanny/conf/database/DatabaseConfig.sh
+            sed -i s/DB_PASSWORD=.*/DB_PASSWORD=$RAND_PW/ %{hoot_home}/conf/database/DatabaseConfig.sh
         fi
-        sudo -u postgres createdb hoot --owner=hoot
-        sudo -u postgres createdb wfsstoredb --owner=hoot
-        sudo -u postgres psql -d hoot -c 'create extension hstore;'
-        sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='wfsstoredb'"
-        sudo -u postgres psql -d wfsstoredb -c 'create extension postgis;'
+        su -l postgres -c "createdb hoot --owner=hoot"
+        su -l postgres -c "createdb wfsstoredb --owner=hoot"
+        su -l postgres -c "psql -d hoot -c \"CREATE EXTENSION hstore;\""
+        su -l postgres -c "psql -d wfsstoredb -c \"CREATE EXTENSION postgis; GRANT ALL ON geography_columns, geometry_columns, spatial_ref_sys TO PUBLIC;\""
+        su -l postgres -c "psql -d postgres -c \"UPDATE pg_database SET datistemplate='true' WHERE datname='wfsstoredb';\""
     fi
 
     # restore saved db config file settings if present
-    if [ -f /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave ]; then
-        if [ -f /var/lib/hootenanny/conf/database/DatabaseConfigDefault.sh ]; then
-            grep DB_PASSWORD /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh > /dev/null
-            sudo chmod a+x /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh
+    if [ -f %{hoot_home}/conf/database/DatabaseConfig.sh.rpmsave ]; then
+        if [ -f %{hoot_home}/conf/database/DatabaseConfigDefault.sh ]; then
+            grep DB_PASSWORD %{hoot_home}/conf/database/DatabaseConfig.sh.rpmsave | tee %{hoot_home}/conf/database/DatabaseConfigLocal.sh > /dev/null
+            chmod a+x %{hoot_home}/conf/database/DatabaseConfigLocal.sh
         else
-        sudo mv /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/database/DatabaseConfig.sh
-    fi
+            mv %{hoot_home}/conf/database/DatabaseConfig.sh.rpmsave %{hoot_home}/conf/database/DatabaseConfig.sh
+        fi
     fi
 
     # configure Postgres settings
     PG_HB_CONF=/var/lib/pgsql/%{pg_version}/data/pg_hba.conf
-    if ! sudo grep -i --quiet hoot $PG_HB_CONF; then
-        sudo -u postgres sed -i '1ihost    all            hoot            127.0.0.1/32            md5' $PG_HB_CONF
-        sudo -u postgres sed -i '1ihost    all            hoot            ::1/128                 md5' $PG_HB_CONF
+    if ! grep -i --quiet hoot $PG_HB_CONF; then
+        sed -i '1ihost    all            hoot            127.0.0.1/32            md5' $PG_HB_CONF
+        sed -i '1ihost    all            hoot            ::1/128                 md5' $PG_HB_CONF
     fi
     POSTGRES_CONF=/var/lib/pgsql/%{pg_version}/data/postgresql.conf
-    if ! grep -i --quiet HOOT $POSTGRES_CONF; then
-        sudo -u postgres sed -i s/^max_connections/\#max_connections/ $POSTGRES_CONF
-        sudo -u postgres sed -i s/^shared_buffers/\#shared_buffers/ $POSTGRES_CONF
-        sudo -u postgres bash -c "cat >> $POSTGRES_CONF" <<EOT
+    if ! grep -i --quiet hoot $POSTGRES_CONF; then
+        sed -i s/^max_connections/\#max_connections/ $POSTGRES_CONF
+        sed -i s/^shared_buffers/\#shared_buffers/ $POSTGRES_CONF
+        cat >> $POSTGRES_CONF <<EOT
+
 #--------------
 # Hoot Settings
 #--------------
+listen_addresses = '127.0.0.1'
 max_connections = 1000
 shared_buffers = 1024MB
 max_files_per_process = 1000
 work_mem = 16MB
 maintenance_work_mem = 256MB
-checkpoint_segments = 20
 autovacuum = off
 EOT
     fi
-    sudo service postgresql-%{pg_version} restart
+    systemctl restart postgresql-%{pg_version}
 
     # create the osm api test db
-    /var/lib/hootenanny/scripts/database/SetupOsmApiDB.sh
+    %{hoot_home}/scripts/database/SetupOsmApiDB.sh
+    rm -f /tmp/osmapidb.log
+
+    systemctl start node-export.service
+    systemctl start node-mapnik.service
 
     updateConfigFiles
     updateLiquibase
-
-    # Configuring firewall
-    if ! sudo iptables --list-rules | grep -i --quiet 'dport 80'; then
-        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
-        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
-        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8000 -j ACCEPT
-        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8094 -j ACCEPT
-        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8096 -j ACCEPT
-        sudo iptables -I PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080
-        sudo iptables -I OUTPUT -t nat -s 0/0 -d 127/8 -p tcp --dport 80 -j REDIRECT --to-ports 8080
-        sudo service iptables save
-        sudo service iptables restart
-    fi
 elif [ "$1" = "2" ]; then
     # Perform whatever maintenance must occur after the upgrade
 
     # copy values from saved db config file, if present
-    if [ -f /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave ]; then
-        if [ -f /var/lib/hootenanny/conf/database/DatabaseConfigDefault.sh ]; then
-            grep DB_PASSWORD /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh > /dev/null
-            sudo chmod a+x /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh
+    if [ -f %{hoot_home}/conf/database/DatabaseConfig.sh.rpmsave ]; then
+        if [ -f %{hoot_home}/conf/database/DatabaseConfigDefault.sh ]; then
+            grep DB_PASSWORD %{hoot_home}/conf/database/DatabaseConfig.sh.rpmsave | tee %{hoot_home}/conf/database/DatabaseConfigLocal.sh > /dev/null
+            chmod a+x %{hoot_home}/conf/database/DatabaseConfigLocal.sh
         else
-            sudo mv /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/database/DatabaseConfig.sh
+            mv %{hoot_home}/conf/database/DatabaseConfig.sh.rpmsave %{hoot_home}/conf/database/DatabaseConfig.sh
         fi
     fi
 
     source /etc/profile.d/hootenanny.sh
-    source /var/lib/hootenanny/conf/database/DatabaseConfig.sh
+    source %{hoot_home}/conf/database/DatabaseConfig.sh
 
     updateConfigFiles
     updateLiquibase
@@ -536,42 +525,35 @@ fi
 
 if test -f /.dockerenv; then exit 0; fi
 
+%systemd_postun node-export.service
+%systemd_postun node-mapnik.service
+
 if [ "$1" = "0" ]; then
     # Perform tasks to clean up after uninstallation
 
     # Stop tomcat
-    sudo service tomcat8 stop
+    systemctl stop tomcat8
+
     # Ensure Postgres is started
-    sudo service postgresql-%{pg_version} start
-    while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
+    systemctl start postgresql-%{pg_version}
+    while ! /usr/pgsql-%{pg_version}/bin/pg_isready; do
         echo "Waiting for postgres to start"
         sleep 1
     done
 
     # Remove .deegree directory
-    TOMCAT_HOME=/usr/share/tomcat8
+    TOMCAT_HOME=%{tomcat_home}
     if [ -d $TOMCAT_HOME/.deegree ]; then
-        sudo rm -rf $TOMCAT_HOME/.deegree
+        rm -rf $TOMCAT_HOME/.deegree
     fi
-    # Remove exploded hoot-services war remnants
-    SERVICES_HOME=/var/lib/tomcat8/webapps/hoot-services
-    if [ -d $SERVICES_HOME ]; then
-        sudo rm -rf $SERVICES_HOME
-    fi
-    sudo service tomcat8 start
 
-    # Configuring firewall
-    if sudo iptables --list-rules | grep -i --quiet 'dport 80'; then
-        sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
-        sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
-        sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8000 -j ACCEPT
-        sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8094 -j ACCEPT
-        sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8096 -j ACCEPT
-        sudo iptables -D PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080
-        sudo iptables -D OUTPUT -t nat -s 0/0 -d 127/8 -p tcp --dport 80 -j REDIRECT --to-ports 8080
-        sudo service iptables save
-        sudo service iptables restart
+    # Remove exploded hoot-services war remnants
+    SERVICES_HOME=%{tomcat_webapps}/hoot-services
+    if [ -d $SERVICES_HOME ]; then
+        rm -rf $SERVICES_HOME
     fi
+
+    systemctl start tomcat8
 fi
 
 
@@ -599,35 +581,27 @@ to run Hootenanny.
 if test -f /.dockerenv; then exit 0; fi
 
 # set Postgres to autostart
-sudo systemctl enable postgresql-%{pg_version}
-
-# Turn off tomcat6 if installed
-if /sbin/chkconfig | grep --quiet tomcat6 ; then
-    sudo /sbin/chkconfig --del tomcat6
-fi
-
+systemctl enable postgresql-%{pg_version}
 # set Tomcat to autostart
-sudo systemctl enable tomcat8
-
-# set NodeJS node-mapnik-server to autostart
-sudo /sbin/chkconfig --add node-mapnik-server
-sudo /sbin/chkconfig node-mapnik-server on
+systemctl enable tomcat8
 # set NodeJS node-export-server to autostart
-sudo /sbin/chkconfig --add node-export-server
-sudo /sbin/chkconfig node-export-server on
+systemctl enable node-export
+# set NodeJS node-mapnik-server to autostart
+systemctl enable node-mapnik
+
 
 %postun autostart
 
 if test -f /.dockerenv; then exit 0; fi
 
 # set Postgres to NOT autostart
-sudo /sbin/chkconfig --del postgresql-%{pg_version}
+systemctl disable postgresql-%{pg_version}
 # set Tomcat to NOT autostart
-sudo /sbin/chkconfig --del tomcat8
+systemctl disable tomcat8
 # set NodeJS node-mapnik-server to NOT autostart
-sudo /sbin/chkconfig --del node-mapnik-server
+systemctl disable node-export
 # set NodeJS node-export-server to NOT autostart
-sudo /sbin/chkconfig --del node-export-server
+systemctl disable node-mapnik
 
 %package services-devel-deps
 Summary:   Development dependencies for Hootenanny Services
@@ -663,51 +637,57 @@ if test -f /.dockerenv; then exit 0; fi
 if [ "$1" = "1" ]; then
     # Perform tasks to prepare for the initial installation
 
-    # init and start Postgres
-    sudo service postgresql-%{pg_version} initdb
-    sudo service postgresql-%{pg_version} start
-    while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
+    # init and start postgres
+    if [ ! -e /var/lib/pgsql/%{pg_version}/data/PG_VERSION ]; then
+        PGSETUP_INITDB_OPTIONS="-E UTF-8 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8" \
+                              /usr/pgsql-%{pg_version}/bin/postgresql%{pg_dotless}-setup initdb
+    fi
+
+    systemctl start postgresql-%{pg_version}
+
+    while ! /usr/pgsql-%{pg_version}/bin/pg_isready; do
         echo "Waiting for postgres to start"
         sleep 1
     done
 
-    sudo service tomcat8 start
+    systemctl start tomcat8
 
     # create Hoot services db
-    if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw hoot; then
-        sudo -u postgres createuser --superuser hoot || true
-        sudo -u postgres psql -c "alter user hoot with password 'hoottest';"
-        sudo -u postgres createdb hoot --owner=hoot
-        sudo -u postgres createdb wfsstoredb --owner=hoot
-        sudo -u postgres psql -d hoot -c 'create extension hstore;'
-        sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='wfsstoredb'"
-        sudo -u postgres psql -d wfsstoredb -c 'create extension postgis;'
+    if ! su -l postgres -c "psql -lqt | cut -d \| -f 1 | grep -qw hoot"; then
+        su -l postgres -c "createuser --superuser hoot || true"
+        su -l postgres -c "psql -c \"ALTER USER hoot WITH PASSWORD 'hoottest';\""
+        su -l postgres -c "createdb hoot --owner=hoot"
+        su -l postgres -c "createdb wfsstoredb --owner=hoot"
+        su -l postgres -c "psql -d hoot -c \"CREATE EXTENSION hstore;\""
+        su -l postgres -c "psql -d wfsstoredb -c \"CREATE EXTENSION postgis; GRANT ALL ON geography_columns, geometry_columns, spatial_ref_sys TO PUBLIC;\""
+        su -l postgres -c "psql -d postgres -c \"UPDATE pg_database SET datistemplate='true' WHERE datname='wfsstoredb'\";"
     fi
 
     # configure Postgres settings
     PG_HB_CONF=/var/lib/pgsql/%{pg_version}/data/pg_hba.conf
-    if ! sudo grep -i --quiet hoot $PG_HB_CONF; then
-        sudo -u postgres sed -i '1ihost    all            hoot            127.0.0.1/32            md5' $PG_HB_CONF
-        sudo -u postgres sed -i '1ihost    all            hoot            ::1/128                 md5' $PG_HB_CONF
+    if ! grep -i --quiet hoot $PG_HB_CONF; then
+        sed -i '1ihost    all            hoot            127.0.0.1/32            md5' $PG_HB_CONF
+        sed -i '1ihost    all            hoot            ::1/128                 md5' $PG_HB_CONF
     fi
     POSTGRES_CONF=/var/lib/pgsql/%{pg_version}/data/postgresql.conf
     if ! grep -i --quiet HOOT $POSTGRES_CONF; then
-        sudo -u postgres sed -i s/^max_connections/\#max_connections/ $POSTGRES_CONF
-        sudo -u postgres sed -i s/^shared_buffers/\#shared_buffers/ $POSTGRES_CONF
-        sudo -u postgres bash -c "cat >> $POSTGRES_CONF" <<EOT
+        sed -i s/^max_connections/\#max_connections/ $POSTGRES_CONF
+        sed -i s/^shared_buffers/\#shared_buffers/ $POSTGRES_CONF
+        cat >> $POSTGRES_CONF <<EOT
+
 #--------------
 # Hoot Settings
 #--------------
+listen_addresses = '127.0.0.1'
 max_connections = 1000
 shared_buffers = 1024MB
 max_files_per_process = 1000
 work_mem = 16MB
 maintenance_work_mem = 256MB
-checkpoint_segments = 20
 autovacuum = off
 EOT
     fi
-    sudo service postgresql-%{pg_version} restart
+    systemctl restart postgresql-%{pg_version}
 fi
 
 %postun services-devel-deps
@@ -718,8 +698,8 @@ if [ "$1" = "0" ]; then
     # Perform tasks to clean up after uninstallation
 
     # Ensure Postgres is started
-    sudo service postgresql-%{pg_version} start
-    while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
+    systemctl start postgresql-%{pg_version}
+    while ! /usr/pgsql-%{pg_version}/bin/pg_isready; do
         echo "Waiting for postgres to start"
         sleep 1
     done
@@ -800,6 +780,7 @@ Requires:  perl-libwww-perl
 Requires:  perl-XML-LibXML
 Requires:  postgresql%{pg_dotless}-libs
 Requires:  protobuf
+Requires:  python-matplotlib
 Requires:  qt
 Requires:  qt-postgresql
 Requires:  qt-x11
