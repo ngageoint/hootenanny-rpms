@@ -715,7 +715,7 @@ Requires:  boost-devel
 Requires:  cppunit-devel
 Requires:  gcc-c++
 Requires:  gdb
-Requires:  geos-devel = %{geos_version}
+Requires:  geos-devel
 Requires:  git
 Requires:  glpk-devel
 Requires:  hoot-words
