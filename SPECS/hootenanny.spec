@@ -159,7 +159,7 @@ popd
 %{__cat} >> %{buildroot}%{tomcat_config}/conf.d/hoot.conf << EOF
 export GDAL_DATA=%(gdal-config --datadir)
 export HOOT_HOME=%{hoot_home}
-export HOOT_WORKING_NAME=hoot
+export HOOT_WORKING_NAME=%{name}
 EOF
 
 # node-export
@@ -267,15 +267,17 @@ echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hoot
 
 %package services-ui
 Summary:   Hootenanny UI and Services
+Group:     Applications/Engineering
 Requires:  %{name}-core = %{version}-%{release}
+Requires:  hoot-postgis23_%{pg_dotless}
 Requires:  java-1.8.0-openjdk
 Requires:  liquibase
+Requires:  osmosis
 Requires:  postgresql%{pg_dotless}-contrib
 Requires:  postgresql%{pg_dotless}-server
-Requires:  hoot-postgis23_%{pg_dotless}
 Requires:  pwgen
 Requires:  tomcat8 = %{tomcat_version}
-Group:     Applications/Engineering
+
 
 %description services-ui
 Hootenanny was developed to provide an open source, standards-based approach to
