@@ -1,13 +1,14 @@
 #!/bin/bash
 set -euo pipefail
-GIT_COMMIT="${GIT_COMMIT:-develop}"
-HOOT_REPO="${HOOT_REPO:-${HOME}/hootenanny}"
+GIT_COMMIT="${1:-develop}"
+HOOT_DEST=${HOOT_DEST:-$HOME/hootenanny}
+HOOT_REPO=${HOOT_REPO:-https://github.com/ngageoint/hootenanny.git}
 
-if [ ! -d $HOOT_REPO/.git ]; then
-    git clone https://github.com/ngageoint/hootenanny.git $HOOT_REPO
+if [ ! -d $HOOT_DEST/.git ]; then
+    git clone $HOOT_REPO $HOOT_DEST
 fi
 
-pushd $HOOT_REPO
+pushd $HOOT_DEST
 git clean -q -f -d -x
 git pull
 git checkout $GIT_COMMIT
