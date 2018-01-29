@@ -7,26 +7,33 @@ Group:      Applications/Engineering
 License:    GPLv3
 URL:        https://github.com/ngageoint/hootenanny
 
-BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRequires:  asciidoc
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  boost-devel
 BuildRequires:  cppunit-devel
+BuildRequires:  dblatex
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
 BuildRequires:  gdb
-BuildRequires:  geos-devel >= %{geos_min_version}
+BuildRequires:  geos-devel
 BuildRequires:  git
 BuildRequires:  glpk-devel
+BuildRequires:  gnuplot
 BuildRequires:  graphviz
-BuildRequires:  hoot-gdal-devel >= %{gdal_min_version}
-BuildRequires:  hoot-gdal-python >= %{gdal_min_version}
-BuildRequires:  hoot-words >= 1.0.0
+BuildRequires:  hoot-gdal
+BuildRequires:  hoot-gdal-devel
+BuildRequires:  hoot-gdal-python
+BuildRequires:  hoot-postgis23_%{pg_dotless}
+BuildRequires:  hoot-postgis23_%{pg_dotless}-devel
+BuildRequires:  hoot-postgis23_%{pg_dotless}-utils
+BuildRequires:  hoot-words
 BuildRequires:  java-1.8.0-openjdk
 BuildRequires:  libicu-devel
 BuildRequires:  libspatialite-devel
 BuildRequires:  libxslt
 BuildRequires:  log4cxx-devel
+BuildRequires:  maven
 BuildRequires:  nodejs-devel
 BuildRequires:  opencv-devel
 BuildRequires:  postgresql%{pg_dotless}-devel
@@ -36,7 +43,8 @@ BuildRequires:  python-argparse
 BuildRequires:  python-devel
 BuildRequires:  qt-devel
 BuildRequires:  texlive
-BuildRequires:  gnuplot
+BuildRequires:  texlive-collection-fontsrecommended
+BuildRequires:  texlive-collection-langcyrillic
 BuildRequires:  unzip
 BuildRequires:  v8-devel
 BuildRequires:  w3m
@@ -80,10 +88,6 @@ This package contains the core algorithms and command line interface.
 
 %build
 source ./SetupEnv.sh
-
-# Sort out the postgres version. We can't rely on having pg_config in our path
-PG_VERSION=$(psql --version | egrep -o '[0-9]{1,}\.[0-9]{1,}')
-
 
 # The dir configurations set the install directory to work with EL's dir structure
 # aclocal && autoconf && autoheader && automake --add-missing --copy && \
@@ -130,7 +134,7 @@ cp -R node-export-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-export-server
 make install
 echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
 
-chmod 755 $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
+chmod 0755 $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
 cp -R test-files/ $RPM_BUILD_ROOT/var/lib/hootenanny/
 ln -s /usr/lib64 $RPM_BUILD_ROOT/var/lib/hootenanny/lib
 rm $RPM_BUILD_ROOT/usr/bin/HootEnv.sh
@@ -173,7 +177,7 @@ Requires:  tomcat8
 Requires:  %{name}-core = %{version}-%{release}
 Requires:  postgresql%{pg_dotless}-server
 Requires:  postgresql%{pg_dotless}-contrib
-Requires:  hoot-postgis
+Requires:  hoot-postgis23_%{pg_dotless}
 Requires:  java-1.8.0-openjdk
 Requires:  liquibase
 Requires:  npm
@@ -192,8 +196,8 @@ content, geometry and attributes, to transfer to the output map.
 This package contains the UI and web services.
 
 %files services-ui
-%attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hoot-services.war
-%attr(755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hootenanny-id
+%attr(0755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hoot-services.war
+%attr(0755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hootenanny-id
 /etc/init.d/node-mapnik-server
 /etc/init.d/node-export-server
 
@@ -441,20 +445,6 @@ checkpoint_segments = 20
 autovacuum = off
 EOT
     fi
-    # configure kernel parameters
-    SYSCTL_CONF=/etc/sysctl.conf
-    if ! grep --quiet 1173741824 $SYSCTL_CONF; then
-        echo "Setting kernel.shmmax"
-        sudo sysctl -w kernel.shmmax=1173741824
-        sudo sh -c "echo 'kernel.shmmax=1173741824' >> $SYSCTL_CONF"
-        #                 kernel.shmmax=68719476736
-    fi
-    if ! grep --quiet 2097152 $SYSCTL_CONF; then
-        echo "Setting kernel.shmall"
-        sudo sysctl -w kernel.shmall=2097152
-        sudo sh -c "echo 'kernel.shmall=2097152' >> $SYSCTL_CONF"
-        #                 kernel.shmall=4294967296
-    fi
     sudo service postgresql-%{pg_version} restart
 
     # create the osm api test db
@@ -593,8 +583,8 @@ Requires:   nodejs
 Requires:   npm
 Requires:   postgresql%{pg_dotless}-server
 Requires:   postgresql%{pg_dotless}-contrib
-Requires:   hoot-postgis
-Requires:   hoot-postgis-utils
+Requires:   hoot-postgis23_%{pg_dotless}
+Requires:   hoot-postgis23_%{pg_dotless}-utils
 Requires:   liquibase
 
 %description services-devel-deps
@@ -658,20 +648,6 @@ maintenance_work_mem = 256MB
 checkpoint_segments = 20
 autovacuum = off
 EOT
-    fi
-    # configure kernel parameters
-    SYSCTL_CONF=/etc/sysctl.conf
-    if ! grep --quiet 1173741824 $SYSCTL_CONF; then
-        echo "Setting kernel.shmmax"
-        sudo sysctl -w kernel.shmmax=1173741824
-        sudo sh -c "echo 'kernel.shmmax=1173741824' >> $SYSCTL_CONF"
-        #                 kernel.shmmax=68719476736
-    fi
-    if ! grep --quiet 2097152 $SYSCTL_CONF; then
-        echo "Setting kernel.shmall"
-        sudo sysctl -w kernel.shmall=2097152
-        sudo sh -c "echo 'kernel.shmall=2097152' >> $SYSCTL_CONF"
-        #                 kernel.shmall=4294967296
     fi
     sudo service postgresql-%{pg_version} restart
 fi

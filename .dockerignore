@@ -2,5 +2,8 @@
 .vagrant/*
 el7/*
 el7-src/*
-src/SOURCES
-src/SRPMS
+BUILD
+BUILDROOT
+RPMS/noarch
+SOURCES
+SRPMS

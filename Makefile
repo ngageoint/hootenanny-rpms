@@ -1,77 +1,44 @@
-
-# Default branch of hoot to build
-GIT_COMMIT?=origin/develop
-
-TARBALLS := $(wildcard src/SOURCES/hootenanny*.tar.gz)
-DOCBALLS := $(wildcard src/SOURCES/hootenanny*-documentation.tar.gz)
+TARBALLS := $(wildcard SOURCES/hootenanny*.tar.gz)
+DOCBALLS := $(wildcard SOURCES/hootenanny*-documentation.tar.gz)
 HOOTBALL := $(filter-out $(DOCBALLS), $(TARBALLS))
 
-all: copy-rpms
+# Synchronizing the make build with rpmbuild parallel flags causes problems. This way we
+# spawn at most nproc processes per sub-job and if the load is above nproc + 2 no more
+# jobs will be spawned. This is a poor man parallelism, but should avoid killing the
+# host.
+RPMBUILD_OPTS=--define '%_topdir %(pwd)' --define '%_smp_mflags -j%(nproc) -l%(expr %(nproc) + 2)'
 
-# a convenience target for building hoot RPMs and no others.
-hoot-rpms:
-	cd src; $(MAKE) hoot
+#Trying this
+RPM_OPT_FLAGS=--std=c++11
 
-force:
+hoottarball=$(lastword $(sort $(HOOTBALL)))
 
-# Clean out all the RPMs
+hootversion=$(patsubst SOURCES/hootenanny-%.tar.gz,%,$(hoottarball))
+
+HOOT_RPM=RPMS/x86_64/hootenanny-core-$(hootversion).el7.x86_64.rpm
+
+all: hoot
+
 clean: clean-hoot
-	cd src; $(MAKE) clean
+	rm -rf tmp BUILD/* BUILDROOT/* SRPMS/* RPMS/*
 
-# Clean out everything
-clean-all: vagrant-clean clean
-
-# Cleans out the RPM el7 stash, archive hoot, and all the hoot source/rpms
+# Clean out all hoot specific RPMs and build files.
 clean-hoot:
-	rm -rf el7
-	rm -rf tmp/hootenanny
-	cd src; $(MAKE) clean-hoot
+	rm -rf BUILD/hoot* BUILDROOT/hoot* SRPMS/hoot* RPMS/x86_64/hoot*
+# touch was sometimes cropping down to second resolution
+	echo > $@
 
-ValidHootTarball:
-	test $(words $(HOOTBALL)) != 1 && (echo "Did not find exactly one hoot tarball in SOURCES. Too many? Do you need to download one? https://github.com/ngageoint/hootenanny/releases"; exit -1) || true
+hoot: $(HOOT_RPM)
 
-vagrant-build-up:
-	vagrant up
+# Just run the install part.
+hoot-test-install: $(HOOTBALL)
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) --short-circuit -bi SPECS/hootenanny.spec
 
-vagrant-build: vagrant-build-up vagrant-build-deps vagrant-build-archive
-	vagrant ssh -c "cd hootenanny-rpms && make -j$$((`nproc` + 2))"
+# Just run the binary package part.
+hoot-test-package: $(HOOTBALL)
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) --short-circuit -bb SPECS/hootenanny.spec
 
-vagrant-build-deps: vagrant-build-up
-	vagrant ssh -c "cd hootenanny-rpms && ./BuildDeps.sh"
-
-vagrant-build-archive: vagrant-build-up
-	vagrant ssh -c "export GIT_COMMIT=$(GIT_COMMIT) ; cd hootenanny-rpms && ./BuildArchive.sh"
-
-vagrant-clean:
-	vagrant halt
-	vagrant destroy -f
-	mkdir -p el7
-	cd test && vagrant halt && vagrant destroy -f
-	rmdir --ignore-fail-on-non-empty el7 || true
-	rm -f src/tmp/*-install
-
-vagrant-test:
-	# Adding this in so we always have a clean test VM.
-	cd test && vagrant halt && vagrant destroy -f
-	cd test; vagrant up
-	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --diff --slow"
-
-# This spawns a small VM to update the main repo so we can copy it to S3
-vagrant-repo:
-	cd update-repo; vagrant up
-	cd update-repo; vagrant destroy -f
-
-#el7: el7-src/* custom-rpms
-el7: custom-rpms
-
-copy-rpms: el7
-	rm -rf el7
-	mkdir -p el7
-	#cp -l el7-src/* el7/
-	cp src/RPMS/noarch/* el7/
-	cp src/RPMS/x86_64/* el7/
-	createrepo el7
-
-custom-rpms:
-	cd src; $(MAKE)
-
+$(HOOT_RPM): $(HOOTBALL)
+	test $(words $(HOOTBALL)) == 0 && (echo "Did not find a hoot tarball in SOURCES. Do you need to download one? https://github.com/ngageoint/hootenanny/releases"; exit 1) || true
+	test $(words $(HOOTBALL)) == 1 || (echo "Found more than 1 hoot tarball please remove the extra tarballs. $(HOOTBALL)"; exit 1)
+	MAKEFLAGS= rpmbuild $(RPMBUILD_OPTS) -ba SPECS/hootenanny.spec

@@ -1,0 +1,29 @@
+FROM hoot/rpmbuild:latest
+LABEL \
+  description="Container for managing the Hootenanny Yum Repository" \
+  maintainer="justin.bronn@digitalglobe.com" \
+  name="Hootenanny Yum Repository Image" \
+  vendor="Radiant Solutions"
+
+ARG gpg_name="Hootenanny Packaging"
+
+# Install
+RUN yum install -q -y createrepo rpm-sign
+
+# Use unprivleged RPM build user and work directory by default.
+USER ${RPMBUILD_USER}
+WORKDIR ${RPMBUILD_HOME}
+
+# Add RPM signing macros to ~/.rpmmacros, specifying:
+#  * The signing digest algorithm (defaulting to sha256)
+#  * The GPG identity (defaults to "Hootenanny Packaging")
+#  * The GPG signing command (the complex `printf` output) for forcing the use
+#    of v3 signatures (which are backwards compatible with old rpm tools) as
+#    well as the digest algorithm.  For additional details see:
+#    https://fedoraproject.org/wiki/RPM_file_format_changes_to_support_SHA-256
+RUN echo "%_signature gpg" >> $RPMBUILD_HOME/.rpmmacros && \
+    echo "%_gpg_digest_algo sha256" >> $RPMBUILD_HOME/.rpmmacros && \
+    echo "%_gpg_name ${gpg_name}" >> $RPMBUILD_HOME/.rpmmacros && \
+    echo "%_gpg_path ${RPMBUILD_HOME}/.gnupg" >> $RPMBUILD_HOME/.rpmmacros && \
+    printf '%%__gpg_sign_cmd %%{__gpg} \\\n        gpg --force-v3-sigs --batch --no-verbose --no-armor --passphrase-fd 3 \\\n        %%{?_gpg_digest_algo:--digest-algo %%{_gpg_digest_algo}} \\\n        --no-secmem-warning \\\n        -u "%%{_gpg_name}" -sbo %%{__signature_filename} %%{__plaintext_filename}\n' >> $RPMBUILD_HOME/.rpmmacros && \
+    mkdir -p ${RPMBUILD_HOME}/.gnupg

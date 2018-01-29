@@ -1,0 +1,46 @@
+# The base image depends on the version of PosgreSQL from PGDG.
+ARG pg_version
+FROM hoot/rpmbuild-pgdg:${pg_version}
+
+LABEL \
+  description="Container for building Hootenanny RPMs" \
+  maintainer="justin.bronn@digitalglobe.com" \
+  name="Hootenanny Release RPM Build Image" \
+  vendor="Radiant Solutions"
+
+ARG node_version
+ARG packages
+ARG pg_version
+ARG pg_data=/var/lib/pgsql/${pg_version}/data
+
+# Have PostgreSQL data directory persist in environment variable.
+ENV PGDATA=${pg_data}
+
+# Switch back to root.
+USER root
+
+# Install NodeJS and pin to desired version.
+COPY scripts/nodejs-install.sh scripts/nodesource-repo.sh /tmp/
+RUN /tmp/nodesource-repo.sh ${node_version} && \
+    rm -f /tmp/nodesource-repo.sh && \
+    /tmp/nodejs-install.sh ${node_version} && \
+    rm -f /tmp/nodejs-install.sh
+
+# Install Hootenanny release repository and dependencies.
+COPY scripts/hoot-repo.sh /tmp/
+RUN /tmp/hoot-repo.sh && \
+    rm /tmp/hoot-repo.sh && \
+    yum install -y -q su-exec && \
+    if [ ! -z "${packages}" ] ; then yum -y -q install ${packages}; fi
+
+# Install PostgreSQL server at desired version, and setup the Hoot databases.
+COPY scripts/hoot-db-setup.sh scripts/postgresql-install.sh /tmp/
+RUN /tmp/postgresql-install.sh && \
+    rm -f /tmp/postgresql-install.sh && \
+    /tmp/hoot-db-setup.sh && \
+    rm -f /tmp/hoot-db-setup.sh
+
+# Copy in the entrypoint.
+COPY scripts/hoot-entrypoint.sh /
+ENTRYPOINT ["/hoot-entrypoint.sh"]
+CMD ["/bin/bash"]
