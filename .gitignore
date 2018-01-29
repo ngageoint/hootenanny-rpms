@@ -2,6 +2,9 @@
 .vagrant
 el6
 el7
+hootenanny
+m2
+npm
 tmp
 BUILD
 BUILDROOT
@@ -9,7 +12,7 @@ RPMS
 SRPMS
 SOURCES/hoot*.tar.gz
 SOURCES/hoot*.war
-SOURCES/words1.sqlite
+SOURCES/words1.sqlite.bz2
 el6-src/jdk-8*
 el7-src/jdk-8*
 **VagrantfileLocal

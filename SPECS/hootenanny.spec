@@ -1,3 +1,11 @@
+# Default variables for Hootenanny and Tomcat.
+%{!?hoot_home: %global hoot_home %{_sharedstatedir}/%{name}}
+%{!?hoot_release: %global hoot_release 1}
+%{!?tomcat_basedir: %global tomcat_basedir %{_sharedstatedir}/tomcat8}
+%{!?tomcat_config: %global tomcat_config %{_sysconfdir}/tomcat8}
+%{!?tomcat_home: %global tomcat_home %{_datadir}/tomcat8}
+%global tomcat_webapps %{tomcat_basedir}/webapps
+
 Name:       hootenanny
 Version:    %{hoot_version}
 Release:    %{hoot_release}%{?dist}
@@ -16,6 +24,7 @@ BuildRequires:  dblatex
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
 BuildRequires:  gdb
+BuildRequires:  geos
 BuildRequires:  geos-devel
 BuildRequires:  git
 BuildRequires:  glpk-devel
@@ -30,10 +39,10 @@ BuildRequires:  hoot-postgis23_%{pg_dotless}-utils
 BuildRequires:  hoot-words
 BuildRequires:  java-1.8.0-openjdk
 BuildRequires:  libicu-devel
-BuildRequires:  libspatialite-devel
 BuildRequires:  libxslt
 BuildRequires:  log4cxx-devel
 BuildRequires:  maven
+BuildRequires:  nodejs
 BuildRequires:  nodejs-devel
 BuildRequires:  opencv-devel
 BuildRequires:  postgresql%{pg_dotless}-devel
@@ -42,6 +51,9 @@ BuildRequires:  protobuf-devel
 BuildRequires:  python-argparse
 BuildRequires:  python-devel
 BuildRequires:  qt-devel
+BuildRequires:  qt-postgresql
+BuildRequires:  stxxl
+BuildRequires:  stxxl-devel
 BuildRequires:  texlive
 BuildRequires:  texlive-collection-fontsrecommended
 BuildRequires:  texlive-collection-langcyrillic
@@ -51,7 +63,6 @@ BuildRequires:  w3m
 BuildRequires:  wget
 BuildRequires:  words
 BuildRequires:  zip
-
 Source0:        %{name}-%{version}.tar.gz
 
 %description
@@ -65,11 +76,10 @@ content, geometry and attributes, to transfer to the output map.
 
 %package core
 Summary:   Hootenanny Core
+Requires:  %{name}-core-deps = %{version}-%{release}
+Requires:  nodejs = %{nodejs_version}
 Requires:  postgresql%{pg_dotless}-libs
 %global __requires_exclude ^libpq\\.so
-Requires:  %{name}-core-deps = %{version}-%{release}
-
-
 Group:      Applications/Engineering
 
 %description core
@@ -89,100 +99,185 @@ This package contains the core algorithms and command line interface.
 %build
 source ./SetupEnv.sh
 
-# The dir configurations set the install directory to work with EL's dir structure
-# aclocal && autoconf && autoheader && automake --add-missing --copy && \
+# Link in the dictionary file.
+ln -s %{hoot_home}/conf/dictionary/words1.sqlite conf/dictionary/words.sqlite
+ln -s %{hoot_home}/conf/dictionary/words1.sqlite conf/dictionary/words1.sqlite
 
-./configure -q --with-rnd --with-services \
-    --with-postgresql=/usr/pgsql-%{pg_version}/bin/pg_config      \
-    --prefix=$RPM_BUILD_ROOT/usr/ \
-    --datarootdir=$RPM_BUILD_ROOT/usr/share/hootenanny/ \
-    --docdir=$RPM_BUILD_ROOT/usr/share/doc/hootenanny/ \
-    --localstatedir=$RPM_BUILD_ROOT/var/lib/hootenanny/ \
-    --libdir=$RPM_BUILD_ROOT/usr/lib64 \
-    --sysconfdir=$RPM_BUILD_ROOT/etc/
+# The dir configurations set the install directory to work with EL's dir structure
+./configure -q --with-rnd --with-services --with-postgresql \
+    --prefix=%{buildroot}%{_prefix} \
+    --datarootdir=%{buildroot}%{_datarootdir}/%{name} \
+    --docdir=%{buildroot}%{_docdir}/%{name} \
+    --localstatedir=%{buildroot}%{hoot_home} \
+    --libdir=%{buildroot}%{_libdir} \
+    --sysconfdir=%{buildroot}%{_sysconfdir}
 
 # Use ccache if it is available
-cp LocalConfig.pri.orig LocalConfig.pri
+%{__cp} LocalConfig.pri.orig LocalConfig.pri
 command -v ccache >/dev/null 2>&1 && echo "QMAKE_CXX=ccache g++" >> LocalConfig.pri
 
-make -s %{?_smp_mflags}
+%make_build
 
-# This may be causing failure due to node-mapnik dependency on
-# Requires: libc.so.6(GLIBC_2.14)(64bit)
-cd node-mapnik-server
+pushd node-mapnik-server
 npm install --production
+popd
 
-cd node-export-server
+pushd node-export-server
 npm install --production
+popd
 
 %install
 
-# UI stuff
-mkdir -p $RPM_BUILD_ROOT/var/lib/tomcat8/webapps
-cp hoot-services/target/hoot-services*.war $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hoot-services.war
-cp -R hoot-ui/dist $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hootenanny-id
-mkdir -p $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hootenanny-id/data
-cp hoot-ui/data/osm-plus-taginfo.csv $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hootenanny-id/data
-cp hoot-ui/data/tdsv61_field_values.json $RPM_BUILD_ROOT/var/lib/tomcat8/webapps/hootenanny-id/data
-mkdir -p $RPM_BUILD_ROOT/etc/systemd
-cp node-mapnik-server/systemd/node-mapnik.service $RPM_BUILD_ROOT/etc/systemd/system/node-mapnik.service
-cp node-export-server/systemd/node-export.service $RPM_BUILD_ROOT/etc/systemd/system/node-export.service
-mkdir -p $RPM_BUILD_ROOT/var/lib/hootenanny
-cp -R node-mapnik-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-mapnik-server
-cp -R node-export-server/ $RPM_BUILD_ROOT/var/lib/hootenanny/node-export-server
+# Start with $HOOT_HOME and systemd unit directories.
+%{__install} -d -m 0755 %{buildroot}%{_unitdir}
+%{__install} -d -m 0755 %{buildroot}%{hoot_home}
 
-make install
-echo "export HOOT_HOME=/var/lib/hootenanny" > $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
+# User data directories, make directories group-writable.
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/tmp
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/customscript
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/ingest
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/ingest/processed
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/ingest/upload
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/reports
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/tmp
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/upload
 
-chmod 0755 $RPM_BUILD_ROOT/etc/profile.d/hootenanny.sh
-cp -R test-files/ $RPM_BUILD_ROOT/var/lib/hootenanny/
-ln -s /usr/lib64 $RPM_BUILD_ROOT/var/lib/hootenanny/lib
-rm $RPM_BUILD_ROOT/usr/bin/HootEnv.sh
+# Services (UI) files and directories.
+%{__install} -d -m 0775 %{buildroot}%{tomcat_config}/conf.d
+%{__install} -d -m 0775 %{buildroot}%{tomcat_home}/.deegree
+%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}
+%{__install} -m 0775 hoot-services/target/hoot-services*.war %{buildroot}%{tomcat_webapps}/hoot-services.war
+%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}
+%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id
+%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id/data
+%{__cp} -pr hoot-ui/dist/ %{buildroot}%{tomcat_webapps}/%{name}-id/
+%{__install} -m 0644 hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{tomcat_webapps}/%{name}-id/data
+%{__install} -m 0644 hoot-ui/data/tdsv61_field_values.json %{buildroot}%{tomcat_webapps}/%{name}-id/data
+
+# Tomcat environment settings for Hootenanny.
+%{__cat} >> %{buildroot}%{tomcat_config}/conf.d/hoot.conf << EOF
+export GDAL_DATA=%(gdal-config --datadir)
+export HOOT_HOME=%{hoot_home}
+export HOOT_WORKING_NAME=%{name}
+EOF
+
+# node-export
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/node-export-server
+%{__cp} -p node-export-server/*.{js,json} %{buildroot}%{hoot_home}/node-export-server
+%{__cp} -pr node-export-server/{node_modules,test} %{buildroot}%{hoot_home}/node-export-server
+%{__cat} >> %{buildroot}%{_unitdir}/node-export.service <<EOF
+[Unit]
+Description=Node Export Server
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=tomcat
+Group=tomcat
+WorkingDirectory=%{hoot_home}/node-export-server
+ExecStart=/usr/bin/npm start
+ExecStop=/usr/bin/kill -HUP \$MAINPID
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# node-mapnik
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/node-mapnik-server
+%{__cp} -p node-mapnik-server/*.{js,json,xml,svg} %{buildroot}%{hoot_home}/node-mapnik-server
+%{__cp} -pr node-mapnik-server/{node_modules,utils} %{buildroot}%{hoot_home}/node-mapnik-server
+%{__cat} >> %{buildroot}%{_unitdir}/node-mapnik.service <<EOF
+[Unit]
+Description=Node Mapnik Server
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=tomcat
+Group=tomcat
+WorkingDirectory=%{hoot_home}/node-mapnik-server
+ExecStartPre=/usr/bin/cd %{hoot_home} && source bin/HootEnv.sh && source conf/database/DatabaseConfig.sh
+ExecStart=/usr/bin/node app.js hoot_style.xml 8000
+ExecStop=/usr/bin/kill -HUP \$MAINPID
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# install into the buildroot
+%{__make} install
+
+echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
+%{__chmod} 0755 %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
+
+# testing files.
+%{__cp} -pr test-files %{buildroot}%{hoot_home}
+%{__install} -m 0775 -d %{buildroot}%{hoot_home}/test-output
+
+%{__ln_s} %{_libdir} %{buildroot}%{hoot_home}/lib
+%{__rm} %{buildroot}%{_bindir}/HootEnv.sh
+
 # This allows all the tests to run.
-mkdir -p $RPM_BUILD_ROOT/var/lib/hootenanny/hoot-core-test/src/test/
-ln -s /var/lib/hootenanny/test-files/ $RPM_BUILD_ROOT/var/lib/hootenanny/hoot-core-test/src/test/resources
-# This makes it so HootEnv.sh resolves hoot home properly.
-ln -s /var/lib/hootenanny/bin/HootEnv.sh $RPM_BUILD_ROOT/usr/bin/HootEnv.sh
+%{__install} -m 0775 -d %{buildroot}%{hoot_home}/hoot-core-test/src/test
+%{__ln_s} %{hoot_home}/test-files %{buildroot}%{hoot_home}/hoot-core-test/src/test/resources
+
+# This makes it so HootEnv.sh resolves `$HOOT_HOME` properly.
+%{__ln_s} %{hoot_home}/bin/HootEnv.sh %{buildroot}%{_bindir}/HootEnv.sh
+
 # Fix the docs for the UI
-ln -s /usr/share/doc/hootenanny  $RPM_BUILD_ROOT/var/lib/hootenanny/docs
+%{__ln_s} %{_docdir}/%{name} %{buildroot}%{hoot_home}/docs
 
 
 %check
-source ./SetupEnv.sh
-# The excluded tests are failing on CentOS now and waiting on a fix
-# HootTest --exclude=.*RubberSheetConflateTest.sh \
-HootTest --slow --diff
-
-cd hoot-services
-make test -s
+# TODO: Determine if tests should be done here, or saved for a
+#       a separate container?
 
 %clean
-rm -rf %{buildroot}
+%{__rm} -rf %{buildroot}
 
 %files core
 %{_includedir}/hoot
 %{_libdir}/*
-%docdir /usr/share/doc/%{name}
-%{_datarootdir}/doc/%{name}
+%docdir %{_docdir}/%{name}
+%{_docdir}/%{name}
 %{_bindir}/*
-%config %{_sharedstatedir}/%{name}/conf/hoot.json
-%{_sharedstatedir}/%{name}
-%{_sysconfdir}/profile.d/hootenanny.sh
-%{_sysconfdir}/asciidoc/filters/
+%config %{hoot_home}/conf/hoot.json
+%{hoot_home}/bin
+%{hoot_home}/conf
+%{hoot_home}/docs
+%{hoot_home}/hoot-core-test
+%{hoot_home}/lib
+%{hoot_home}/plugins
+%{hoot_home}/report
+%{hoot_home}/rules
+%{hoot_home}/scripts
 
+%{hoot_home}/translations
+%{_sysconfdir}/profile.d/hootenanny.sh
+%{_sysconfdir}/asciidoc/filters
+# No need to double-include the services WAR and the dictionary file
+# already provided by hoot-words.
+%exclude %{_bindir}/*.war
+%exclude %{hoot_home}/conf/dictionary/words*.sqlite
+# These filters will cause tests to fail.
+%exclude %{_sysconfdir}/asciidoc/filters/mpl
 
 %package services-ui
 Summary:   Hootenanny UI and Services
-Requires:  tomcat8
+Group:     Applications/Engineering
 Requires:  %{name}-core = %{version}-%{release}
-Requires:  postgresql%{pg_dotless}-server
-Requires:  postgresql%{pg_dotless}-contrib
 Requires:  hoot-postgis23_%{pg_dotless}
 Requires:  java-1.8.0-openjdk
 Requires:  liquibase
-Requires:  npm
+Requires:  osmosis
+Requires:  postgresql%{pg_dotless}-contrib
+Requires:  postgresql%{pg_dotless}-server
 Requires:  pwgen
-Group:     Applications/Engineering
+Requires:  tomcat8 = %{tomcat_version}
+
 
 %description services-ui
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -196,10 +291,22 @@ content, geometry and attributes, to transfer to the output map.
 This package contains the UI and web services.
 
 %files services-ui
-%attr(0755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hoot-services.war
-%attr(0755, tomcat, tomcat) %{_sharedstatedir}/tomcat8/webapps/hootenanny-id
-/etc/init.d/node-mapnik-server
-/etc/init.d/node-export-server
+%{_unitdir}/node-export.service
+%{_unitdir}/node-mapnik.service
+
+%defattr(-, root, tomcat, 0775)
+%{hoot_home}/node-export-server
+%{hoot_home}/node-mapnik-server
+%{hoot_home}/test-files
+%{hoot_home}/test-output
+%{tomcat_config}/conf.d/hoot.conf
+%{tomcat_webapps}/hoot-services.war
+%{tomcat_webapps}/%{name}-id
+
+%defattr(-, tomcat, tomcat, 0775)
+%{hoot_home}/tmp
+%{hoot_home}/userfiles
+%{tomcat_home}/.deegree
 
 #the order of operations during an upgrade is:
 #
@@ -211,160 +318,94 @@ This package contains the UI and web services.
 #    6. Run the %postun hook of the old package.
 
 %pre services-ui
+
 if [ "$1" = "2" ]; then
     # Perform whatever maintenance must occur before the upgrade
 
     # Remove exploded hoot-services war remnants
-    SERVICES_HOME=/var/lib/tomcat8/webapps/hoot-services
+    SERVICES_HOME=%{tomcat_webapps}/hoot-services
     if [ -d $SERVICES_HOME ]; then
-        sudo rm -rf $SERVICES_HOME
+        rm -rf $SERVICES_HOME
     fi
 fi
 
+%preun
+
+%systemd_preun node-export.service
+%systemd_preun node-mapnik.service
+
 %post services-ui
+
+if test -f /.dockerenv; then exit 0; fi
+
+%systemd_post node-export.service
+%systemd_post node-mapnik.service
+
 function updateConfigFiles () {
     # Check for existing db config from previous install and move to right location
-    if [ -f /var/lib/hootenanny/conf/DatabaseConfigLocal.sh ]; then
-        mv /var/lib/hootenanny/conf/DatabaseConfigLocal.sh /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh
+    if [ -f %{hoot_home}/conf/DatabaseConfigLocal.sh ]; then
+        mv %{hoot_home}/conf/DatabaseConfigLocal.sh %{hoot_home}/conf/database/DatabaseConfigLocal.sh
     fi
     # Update the db password in hoot-services war
-    source /var/lib/hootenanny/conf/database/DatabaseConfig.sh
-
-    # Fix gdal2tiles path (can be removed once reference fixed in hoot code)
-    if [ ! -h /usr/local/bin/gdal2tiles.py ]; then
-        ln -s /usr/bin/gdal2tiles.py /usr/local/bin/gdal2tiles.py
-    fi
+    source %{hoot_home}/conf/database/DatabaseConfig.sh
 
     # Configure tomcat for hoot
     # We move this here to run on install and upgrade since these commands
     # are wrapped in conditionals that allow them to skip already completed steps
 
     # Create Tomcat context path for tile images
-    TOMCAT_SRV=/etc/tomcat8/server.xml
+    TOMCAT_SRV=%{tomcat_config}/server.xml
 
     # First make sure to remove the old Context entry if it exists
-    sudo sed -i '/<Context docBase=\"\/var\/lib\/hootenanny\/ingest\/processed\" path=\"\/static\" \/>/d' $TOMCAT_SRV
+    sed -i '/<Context docBase=\"'${HOOT_HOME//\//\\\/}'\/ingest\/processed\" path=\"\/static\" \/>/d' $TOMCAT_SRV
 
     if ! grep -i --quiet 'userfiles/ingest/processed' $TOMCAT_SRV; then
         echo "Adding Tomcat context path for tile images"
-        sudo sed -i "s@<\/Host>@      <Context docBase=\"\/var\/lib\/hootenanny\/userfiles\/ingest\/processed\" path=\"\/static\" \/>\n      &@" $TOMCAT_SRV
+        sed -i "s@<\/Host>@      <Context docBase=\""${HOOT_HOME//\//\\\/}"\/userfiles\/ingest\/processed\" path=\"\/static\" \/>\n      &@" $TOMCAT_SRV
     fi
 
     # Allow linking in Tomcat context
-    TOMCAT_CTX=/etc/tomcat8/context.xml
+    TOMCAT_CTX=%{tomcat_config}/context.xml
 
     # First, fix potential pre-existing setting of 'allowLinking' that doesn't work on tomcat8
-    sudo sed -i "s@^<Context allowLinking=\"true\">@<Context>@" $TOMCAT_CTX
+    sed -i "s@^<Context allowLinking=\"true\">@<Context>@" $TOMCAT_CTX
 
     # Now, set allowLinking if needed
     if ! grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
         echo "Set allowLinking to true in Tomcat context"
-        sudo sed -i "/<Context>/a \    <Resources allowLinking=\"true\" />" $TOMCAT_CTX
+        sed -i "/<Context>/a \    <Resources allowLinking=\"true\" />" $TOMCAT_CTX
     fi
 
     # Increase the Tomcat java heap size
-    TOMCAT_CONF=/etc/tomcat8/tomcat8.conf
+    TOMCAT_CONF=%{tomcat_config}/tomcat8.conf
     if ! grep -i --quiet 'Xmx2048m' $TOMCAT_CONF; then
         echo "Increase the Tomcat java heap size"
-        sudo bash -c "cat >> $TOMCAT_CONF" <<EOT
+        bash -c "cat >> $TOMCAT_CONF" <<EOT
 #--------------
 # Hoot increase java heap size
 #--------------
 JAVA_OPTS="$JAVA_OPTS -Xms512m -Xmx2048m"
-
 EOT
     fi
 
-    # Create directories for webapp
-    TOMCAT_HOME=/usr/share/tomcat8
-    if [ ! -d $TOMCAT_HOME/.deegree ]; then
-        echo "Creating .deegree directory for webapp"
-        sudo mkdir $TOMCAT_HOME/.deegree
-        sudo chown tomcat:tomcat $TOMCAT_HOME/.deegree
-    fi
+    # Update database credentials in various locations.
+    sed -i s/password\:\ hoottest/password\:\ $DB_PASSWORD/ %{tomcat_webapps}/hoot-services/WEB-INF/classes/db/liquibase.properties
+    sed -i s/DB_PASSWORD=hoottest/DB_PASSWORD=$DB_PASSWORD/ %{tomcat_webapps}/hoot-services/WEB-INF/classes/db/db.properties
+    sed -i s/\<Password\>hoottest\<\\/Password\>/\<Password\>$DB_PASSWORD\<\\/Password\>/ %{tomcat_webapps}/hoot-services/WEB-INF/workspace/jdbc/WFS_Connection.xml
 
-    # Directory that now hosts several folders used by the Services code.
-    USER_FILES_HOME=/var/lib/hootenanny/userfiles
-    if [ ! -d $USER_FILES_HOME ]; then
-        echo "Creating userfiles directory"
-        sudo mkdir -p $USER_FILES_HOME
-    fi
-
-    # Tomcat needs this directory to exist for the server to start.
-    # Tomcat's server.xml has a docBase reference to this folder.
-    BASEMAP_UPLOAD_HOME=$USER_FILES_HOME/ingest/upload
-    if [ ! -d $BASEMAP_UPLOAD_HOME ]; then
-        echo "Creating $BASEMAP_UPLOAD_HOME directory"
-        sudo mkdir -p $BASEMAP_UPLOAD_HOME
-    fi
-
-    migrateFiles
-
-    # make sure everything undedr $HOOT_HOME/userfiles is owned by tomcat:tomcat
-    sudo chown -R tomcat:tomcat $HOOT_HOME/userfiles
-
-    sudo service tomcat8 restart
-
-    while [ ! -f /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/db/db.properties ]; do
-        echo "Waiting for hoot-services.war to deploy"
-        sleep 1
-    done
-
-    sudo sed -i s/password\:\ hoottest/password\:\ $DB_PASSWORD/ /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/db/liquibase.properties
-    sudo sed -i s/DB_PASSWORD=hoottest/DB_PASSWORD=$DB_PASSWORD/ /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/db/db.properties
-    sudo sed -i s/\<Password\>hoottest\<\\/Password\>/\<Password\>$DB_PASSWORD\<\\/Password\>/ /var/lib/tomcat8/webapps/hoot-services/WEB-INF/workspace/jdbc/WFS_Connection.xml
-
-    # make sure tomcat is using correct Java
-    sudo sed -i '/.*JAVA_HOME=.*/c\JAVA_HOME=\/usr\/java\/jdk1.8.0_144' /etc/tomcat8/tomcat8.conf
-
-    sudo service tomcat8 restart
-}
-
-function migrateFiles() {
-    if [ ! -d "$HOOT_HOME/userfiles/ingest/processed" ]; then
-        mkdir -p $HOOT_HOME/userfiles/ingest/processed
-    fi
-
-    # tmp and upload will now reside under $HOOT_HOME/userfiles/
-    # The folders will be automatically created under $HOOT_HOME/userfiles by hoot-services webapp during Tomcat startup
-    rm -rf $HOOT_HOME/upload
-    rm -rf $HOOT_HOME/tmp
-
-    if [ -d "$HOOT_HOME/data/reports" ]; then
-        echo "Moving contents of $HOOT_HOME/data/reports to $HOOT_HOME/userfiles/"
-        cp -R $HOOT_HOME/data/reports $HOOT_HOME/userfiles/
-        rm -rf $HOOT_HOME/data/reports
-    fi
-
-    if [ -d "$HOOT_HOME/customscript" ]; then
-        echo "Moving contents of $HOOT_HOME/customscript to $HOOT_HOME/userfiles/"
-        cp -R $HOOT_HOME/customscript $HOOT_HOME/userfiles/
-        rm -rf $HOOT_HOME/customscript
-    fi
-
-    if [ -d "$HOOT_HOME/ingest" ]; then
-        echo "Moving contents of $HOOT_HOME/ingest to $HOOT_HOME/userfiles/"
-        cp -R $HOOT_HOME/ingest $HOOT_HOME/userfiles/
-        rm -rf $HOOT_HOME/ingest
-    fi
-
-    rm -rf $HOOT_HOME/data
-
-    # Always start with a clean $HOOT_HOME/userfiles/tmp
-    rm -rf $HOOT_HOME/userfiles/tmp
+    systemctl restart tomcat8
 }
 
 function updateLiquibase () {
 
     # Add hostname alias to 127.0.0.1 to avoid liquibase unknown hostname error
     if ! grep --quiet $(hostname) /etc/hosts; then
-        sudo sed -i "1 s/$/ $(hostname)/" /etc/hosts
+        sed -i "1 s/$/ $(hostname)/" /etc/hosts
     fi
 
     # Apply any database schema changes
-    source /var/lib/hootenanny/conf/database/DatabaseConfig.sh
-    TOMCAT_HOME=/usr/share/tomcat8
-    source /var/lib/hootenanny/conf/database/DatabaseConfig.sh
+    TOMCAT_HOME=%{tomcat_home}
+    source %{hoot_home}/conf/database/DatabaseConfig.sh
     cd $TOMCAT_HOME/webapps/hoot-services/WEB-INF
     liquibase --contexts=default,production \
         --changeLogFile=classes/db/db.changelog-master.xml \
@@ -382,154 +423,146 @@ if [ "$1" = "1" ]; then
     # Perform tasks to prepare for the initial installation
     source /etc/profile.d/hootenanny.sh
 
-    # init and start Postgres
-    PG_SERVICE=$(ls /etc/init.d | grep postgresql- | sort | tail -1)
-    sudo service $PG_SERVICE initdb
-    sudo service $PG_SERVICE start
-    while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
+    # start tomcat
+    systemctl start tomcat8
+
+    # init and start postgres
+    if [ ! -e /var/lib/pgsql/%{pg_version}/data/PG_VERSION ]; then
+        PGSETUP_INITDB_OPTIONS="-E UTF-8 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8" \
+                              /usr/pgsql-%{pg_version}/bin/postgresql%{pg_dotless}-setup initdb
+    fi
+
+    systemctl start postgresql-%{pg_version}
+
+    while ! /usr/pgsql-%{pg_version}/bin/pg_isready; do
         echo "Waiting for postgres to start"
         sleep 1
     done
 
-    sudo service tomcat8 start
-
     # create Hoot services db
-    if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw hoot; then
+    if ! su -l postgres -c "psql -lqt | cut -d \| -f 1 | grep -qw hoot"; then
         RAND_PW=$(pwgen -s 16 1)
-        sudo -u postgres createuser --superuser hoot || true
-        sudo -u postgres psql -c "alter user hoot with password '$RAND_PW';"
-        if [ -f /var/lib/hootenanny/conf/database/DatabaseConfigDefault.sh ]; then
-            echo "export DB_PASSWORD=$RAND_PW" | sudo tee /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh > /dev/null
-            echo "export DB_PASSWORD_OSMAPI=$RAND_PW" | sudo tee --append /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh > /dev/null
-            sudo chmod a+x /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh
+        su -l postgres -c "createuser --superuser hoot || true"
+        su -l postgres -c "psql -c \"ALTER USER hoot with password '${RAND_PW}';\""
+        if [ -f %{hoot_home}/conf/database/DatabaseConfigDefault.sh ]; then
+            echo "export DB_PASSWORD=${RAND_PW}" | tee %{hoot_home}/conf/database/DatabaseConfigLocal.sh > /dev/null
+            echo "export DB_PASSWORD_OSMAPI=${RAND_PW}" | tee --append %{hoot_home}/conf/database/DatabaseConfigLocal.sh > /dev/null
+            chmod a+x %{hoot_home}/conf/database/DatabaseConfigLocal.sh
         else
-        sudo sed -i s/DB_PASSWORD=.*/DB_PASSWORD=$RAND_PW/ /var/lib/hootenanny/conf/database/DatabaseConfig.sh
+            sed -i s/DB_PASSWORD=.*/DB_PASSWORD=$RAND_PW/ %{hoot_home}/conf/database/DatabaseConfig.sh
         fi
-        sudo -u postgres createdb hoot --owner=hoot
-        sudo -u postgres createdb wfsstoredb --owner=hoot
-        sudo -u postgres psql -d hoot -c 'create extension hstore;'
-        sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='wfsstoredb'"
-        sudo -u postgres psql -d wfsstoredb -c 'create extension postgis;'
+        su -l postgres -c "createdb hoot --owner=hoot"
+        su -l postgres -c "createdb wfsstoredb --owner=hoot"
+        su -l postgres -c "psql -d hoot -c \"CREATE EXTENSION hstore;\""
+        su -l postgres -c "psql -d wfsstoredb -c \"CREATE EXTENSION postgis; GRANT ALL ON geography_columns, geometry_columns, spatial_ref_sys TO PUBLIC;\""
+        su -l postgres -c "psql -d postgres -c \"UPDATE pg_database SET datistemplate='true' WHERE datname='wfsstoredb';\""
     fi
 
     # restore saved db config file settings if present
-    if [ -f /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave ]; then
-        if [ -f /var/lib/hootenanny/conf/database/DatabaseConfigDefault.sh ]; then
-            grep DB_PASSWORD /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh > /dev/null
-            sudo chmod a+x /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh
+    if [ -f %{hoot_home}/conf/database/DatabaseConfig.sh.rpmsave ]; then
+        if [ -f %{hoot_home}/conf/database/DatabaseConfigDefault.sh ]; then
+            grep DB_PASSWORD %{hoot_home}/conf/database/DatabaseConfig.sh.rpmsave | tee %{hoot_home}/conf/database/DatabaseConfigLocal.sh > /dev/null
+            chmod a+x %{hoot_home}/conf/database/DatabaseConfigLocal.sh
         else
-        sudo mv /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/database/DatabaseConfig.sh
-    fi
+            mv %{hoot_home}/conf/database/DatabaseConfig.sh.rpmsave %{hoot_home}/conf/database/DatabaseConfig.sh
+        fi
     fi
 
     # configure Postgres settings
     PG_HB_CONF=/var/lib/pgsql/%{pg_version}/data/pg_hba.conf
-    if ! sudo grep -i --quiet hoot $PG_HB_CONF; then
-        sudo -u postgres sed -i '1ihost    all            hoot            127.0.0.1/32            md5' $PG_HB_CONF
-        sudo -u postgres sed -i '1ihost    all            hoot            ::1/128                 md5' $PG_HB_CONF
+    if ! grep -i --quiet hoot $PG_HB_CONF; then
+        sed -i '1ihost    all            hoot            127.0.0.1/32            md5' $PG_HB_CONF
+        sed -i '1ihost    all            hoot            ::1/128                 md5' $PG_HB_CONF
     fi
     POSTGRES_CONF=/var/lib/pgsql/%{pg_version}/data/postgresql.conf
-    if ! grep -i --quiet HOOT $POSTGRES_CONF; then
-        sudo -u postgres sed -i s/^max_connections/\#max_connections/ $POSTGRES_CONF
-        sudo -u postgres sed -i s/^shared_buffers/\#shared_buffers/ $POSTGRES_CONF
-        sudo -u postgres bash -c "cat >> $POSTGRES_CONF" <<EOT
+    if ! grep -i --quiet hoot $POSTGRES_CONF; then
+        sed -i s/^max_connections/\#max_connections/ $POSTGRES_CONF
+        sed -i s/^shared_buffers/\#shared_buffers/ $POSTGRES_CONF
+        cat >> $POSTGRES_CONF <<EOT
+
 #--------------
 # Hoot Settings
 #--------------
+listen_addresses = '127.0.0.1'
 max_connections = 1000
 shared_buffers = 1024MB
 max_files_per_process = 1000
 work_mem = 16MB
 maintenance_work_mem = 256MB
-checkpoint_segments = 20
 autovacuum = off
 EOT
     fi
-    sudo service postgresql-%{pg_version} restart
+    systemctl restart postgresql-%{pg_version}
 
     # create the osm api test db
-    /var/lib/hootenanny/scripts/database/SetupOsmApiDB.sh
+    %{hoot_home}/scripts/database/SetupOsmApiDB.sh
+    rm -f /tmp/osmapidb.log
+
+    systemctl start node-export.service
+    systemctl start node-mapnik.service
 
     updateConfigFiles
     updateLiquibase
-
-    # Configuring firewall
-    if ! sudo iptables --list-rules | grep -i --quiet 'dport 80'; then
-        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
-        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
-        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8000 -j ACCEPT
-        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8094 -j ACCEPT
-        sudo iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8096 -j ACCEPT
-        sudo iptables -I PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080
-        sudo iptables -I OUTPUT -t nat -s 0/0 -d 127/8 -p tcp --dport 80 -j REDIRECT --to-ports 8080
-        sudo service iptables save
-        sudo service iptables restart
-    fi
 elif [ "$1" = "2" ]; then
     # Perform whatever maintenance must occur after the upgrade
 
     # copy values from saved db config file, if present
-    if [ -f /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave ]; then
-        if [ -f /var/lib/hootenanny/conf/database/DatabaseConfigDefault.sh ]; then
-            grep DB_PASSWORD /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave | sudo tee /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh > /dev/null
-            sudo chmod a+x /var/lib/hootenanny/conf/database/DatabaseConfigLocal.sh
+    if [ -f %{hoot_home}/conf/database/DatabaseConfig.sh.rpmsave ]; then
+        if [ -f %{hoot_home}/conf/database/DatabaseConfigDefault.sh ]; then
+            grep DB_PASSWORD %{hoot_home}/conf/database/DatabaseConfig.sh.rpmsave | tee %{hoot_home}/conf/database/DatabaseConfigLocal.sh > /dev/null
+            chmod a+x %{hoot_home}/conf/database/DatabaseConfigLocal.sh
         else
-            sudo mv /var/lib/hootenanny/conf/database/DatabaseConfig.sh.rpmsave /var/lib/hootenanny/conf/database/DatabaseConfig.sh
+            mv %{hoot_home}/conf/database/DatabaseConfig.sh.rpmsave %{hoot_home}/conf/database/DatabaseConfig.sh
         fi
     fi
 
     source /etc/profile.d/hootenanny.sh
-    source /var/lib/hootenanny/conf/database/DatabaseConfig.sh
+    source %{hoot_home}/conf/database/DatabaseConfig.sh
 
     updateConfigFiles
     updateLiquibase
 fi
 
 %postun services-ui
+
+if test -f /.dockerenv; then exit 0; fi
+
+%systemd_postun node-export.service
+%systemd_postun node-mapnik.service
+
 if [ "$1" = "0" ]; then
     # Perform tasks to clean up after uninstallation
 
     # Stop tomcat
-    sudo service tomcat8 stop
+    systemctl stop tomcat8
+
     # Ensure Postgres is started
-    sudo service postgresql-%{pg_version} start
-    while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
+    systemctl start postgresql-%{pg_version}
+    while ! /usr/pgsql-%{pg_version}/bin/pg_isready; do
         echo "Waiting for postgres to start"
         sleep 1
     done
 
     # Remove .deegree directory
-    TOMCAT_HOME=/usr/share/tomcat8
+    TOMCAT_HOME=%{tomcat_home}
     if [ -d $TOMCAT_HOME/.deegree ]; then
-        sudo rm -rf $TOMCAT_HOME/.deegree
+        rm -rf $TOMCAT_HOME/.deegree
     fi
-    # Remove exploded hoot-services war remnants
-    SERVICES_HOME=/var/lib/tomcat8/webapps/hoot-services
-    if [ -d $SERVICES_HOME ]; then
-        sudo rm -rf $SERVICES_HOME
-    fi
-    sudo service tomcat8 start
 
-    # Configuring firewall
-    if sudo iptables --list-rules | grep -i --quiet 'dport 80'; then
-        sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
-        sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
-        sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8000 -j ACCEPT
-        sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8094 -j ACCEPT
-        sudo iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport 8096 -j ACCEPT
-        sudo iptables -D PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080
-        sudo iptables -D OUTPUT -t nat -s 0/0 -d 127/8 -p tcp --dport 80 -j REDIRECT --to-ports 8080
-        sudo service iptables save
-        sudo service iptables restart
+    # Remove exploded hoot-services war remnants
+    SERVICES_HOME=%{tomcat_webapps}/hoot-services
+    if [ -d $SERVICES_HOME ]; then
+        rm -rf $SERVICES_HOME
     fi
+
+    systemctl start tomcat8
 fi
 
 
-
-%package    autostart
-Summary:    Hootenanny Autostart
-Requires:   %{name}-services-ui = %{version}-%{release}
-Group:      Applications/Engineering
+%package   autostart
+Summary:   Hootenanny Autostart
+Requires:  %{name}-services-ui = %{version}-%{release}
+Group:     Applications/Engineering
 
 %description autostart
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -546,46 +579,44 @@ to run Hootenanny.
 %files autostart
 
 %post autostart
+
+if test -f /.dockerenv; then exit 0; fi
+
 # set Postgres to autostart
-sudo systemctl enable postgresql-%{pg_version}
-
-# Turn off tomcat6 if installed
-if /sbin/chkconfig | grep --quiet tomcat6 ; then
-    sudo /sbin/chkconfig --del tomcat6
-fi
-
+systemctl enable postgresql-%{pg_version}
 # set Tomcat to autostart
-sudo systemctl enable tomcat8
-
-# set NodeJS node-mapnik-server to autostart
-sudo /sbin/chkconfig --add node-mapnik-server
-sudo /sbin/chkconfig node-mapnik-server on
+systemctl enable tomcat8
 # set NodeJS node-export-server to autostart
-sudo /sbin/chkconfig --add node-export-server
-sudo /sbin/chkconfig node-export-server on
+systemctl enable node-export
+# set NodeJS node-mapnik-server to autostart
+systemctl enable node-mapnik
+
 
 %postun autostart
+
+if test -f /.dockerenv; then exit 0; fi
+
 # set Postgres to NOT autostart
-sudo /sbin/chkconfig --del postgresql-%{pg_version}
+systemctl disable postgresql-%{pg_version}
 # set Tomcat to NOT autostart
-sudo /sbin/chkconfig --del tomcat8
+systemctl disable tomcat8
 # set NodeJS node-mapnik-server to NOT autostart
-sudo /sbin/chkconfig --del node-mapnik-server
+systemctl disable node-export
 # set NodeJS node-export-server to NOT autostart
-sudo /sbin/chkconfig --del node-export-server
+systemctl disable node-mapnik
 
 %package services-devel-deps
-Summary:    Development dependencies for Hootenanny Services
-Group:      Development/Libraries
-Requires:   %{name}-core-devel-deps = %{version}-%{release}
-Requires:   apache-maven
-Requires:   nodejs
-Requires:   npm
-Requires:   postgresql%{pg_dotless}-server
-Requires:   postgresql%{pg_dotless}-contrib
-Requires:   hoot-postgis23_%{pg_dotless}
-Requires:   hoot-postgis23_%{pg_dotless}-utils
-Requires:   liquibase
+Summary:   Development dependencies for Hootenanny Services
+Group:     Development/Libraries
+Requires:  %{name}-core-devel-deps = %{version}-%{release}
+Requires:  hoot-postgis23_%{pg_dotless}
+Requires:  hoot-postgis23_%{pg_dotless}-utils
+Requires:  liquibase
+Requires:  maven
+Requires:  nodejs-devel = %{nodejs_version}
+Requires:  postgresql%{pg_dotless}-devel
+Requires:  postgresql%{pg_dotless}-server
+Requires:  postgresql%{pg_dotless}-contrib
 
 %description services-devel-deps
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -602,71 +633,83 @@ services. Use this if you want to build and test from github.
 %files services-devel-deps
 
 %post services-devel-deps
+
+if test -f /.dockerenv; then exit 0; fi
+
 if [ "$1" = "1" ]; then
     # Perform tasks to prepare for the initial installation
 
-    # init and start Postgres
-    sudo service postgresql-%{pg_version} initdb
-    sudo service postgresql-%{pg_version} start
-    while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
+    # init and start postgres
+    if [ ! -e /var/lib/pgsql/%{pg_version}/data/PG_VERSION ]; then
+        PGSETUP_INITDB_OPTIONS="-E UTF-8 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8" \
+                              /usr/pgsql-%{pg_version}/bin/postgresql%{pg_dotless}-setup initdb
+    fi
+
+    systemctl start postgresql-%{pg_version}
+
+    while ! /usr/pgsql-%{pg_version}/bin/pg_isready; do
         echo "Waiting for postgres to start"
         sleep 1
     done
 
-    sudo service tomcat8 start
+    systemctl start tomcat8
 
     # create Hoot services db
-    if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw hoot; then
-        sudo -u postgres createuser --superuser hoot || true
-        sudo -u postgres psql -c "alter user hoot with password 'hoottest';"
-        sudo -u postgres createdb hoot --owner=hoot
-        sudo -u postgres createdb wfsstoredb --owner=hoot
-        sudo -u postgres psql -d hoot -c 'create extension hstore;'
-        sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='wfsstoredb'"
-        sudo -u postgres psql -d wfsstoredb -c 'create extension postgis;'
+    if ! su -l postgres -c "psql -lqt | cut -d \| -f 1 | grep -qw hoot"; then
+        su -l postgres -c "createuser --superuser hoot || true"
+        su -l postgres -c "psql -c \"ALTER USER hoot WITH PASSWORD 'hoottest';\""
+        su -l postgres -c "createdb hoot --owner=hoot"
+        su -l postgres -c "createdb wfsstoredb --owner=hoot"
+        su -l postgres -c "psql -d hoot -c \"CREATE EXTENSION hstore;\""
+        su -l postgres -c "psql -d wfsstoredb -c \"CREATE EXTENSION postgis; GRANT ALL ON geography_columns, geometry_columns, spatial_ref_sys TO PUBLIC;\""
+        su -l postgres -c "psql -d postgres -c \"UPDATE pg_database SET datistemplate='true' WHERE datname='wfsstoredb'\";"
     fi
 
     # configure Postgres settings
     PG_HB_CONF=/var/lib/pgsql/%{pg_version}/data/pg_hba.conf
-    if ! sudo grep -i --quiet hoot $PG_HB_CONF; then
-        sudo -u postgres sed -i '1ihost    all            hoot            127.0.0.1/32            md5' $PG_HB_CONF
-        sudo -u postgres sed -i '1ihost    all            hoot            ::1/128                 md5' $PG_HB_CONF
+    if ! grep -i --quiet hoot $PG_HB_CONF; then
+        sed -i '1ihost    all            hoot            127.0.0.1/32            md5' $PG_HB_CONF
+        sed -i '1ihost    all            hoot            ::1/128                 md5' $PG_HB_CONF
     fi
     POSTGRES_CONF=/var/lib/pgsql/%{pg_version}/data/postgresql.conf
     if ! grep -i --quiet HOOT $POSTGRES_CONF; then
-        sudo -u postgres sed -i s/^max_connections/\#max_connections/ $POSTGRES_CONF
-        sudo -u postgres sed -i s/^shared_buffers/\#shared_buffers/ $POSTGRES_CONF
-        sudo -u postgres bash -c "cat >> $POSTGRES_CONF" <<EOT
+        sed -i s/^max_connections/\#max_connections/ $POSTGRES_CONF
+        sed -i s/^shared_buffers/\#shared_buffers/ $POSTGRES_CONF
+        cat >> $POSTGRES_CONF <<EOT
+
 #--------------
 # Hoot Settings
 #--------------
+listen_addresses = '127.0.0.1'
 max_connections = 1000
 shared_buffers = 1024MB
 max_files_per_process = 1000
 work_mem = 16MB
 maintenance_work_mem = 256MB
-checkpoint_segments = 20
 autovacuum = off
 EOT
     fi
-    sudo service postgresql-%{pg_version} restart
+    systemctl restart postgresql-%{pg_version}
 fi
 
 %postun services-devel-deps
+
+if test -f /.dockerenv; then exit 0; fi
+
 if [ "$1" = "0" ]; then
     # Perform tasks to clean up after uninstallation
 
     # Ensure Postgres is started
-    sudo service postgresql-%{pg_version} start
-    while ! PG_VERSION=$(sudo -u postgres psql -c 'SHOW SERVER_VERSION;' | egrep -o '[0-9]{1,}\.[0-9]{1,}'); do
+    systemctl start postgresql-%{pg_version}
+    while ! /usr/pgsql-%{pg_version}/bin/pg_isready; do
         echo "Waiting for postgres to start"
         sleep 1
     done
 fi
 
 %package core-devel-deps
-Summary:    Development dependencies for Hootenanny Core
-Group:      Development/Libraries
+Summary:   Development dependencies for Hootenanny Core
+Group:     Development/Libraries
 Requires:  %{name}-core-deps = %{version}-%{release}
 Requires:  autoconf
 Requires:  automake
@@ -674,14 +717,13 @@ Requires:  boost-devel
 Requires:  cppunit-devel
 Requires:  gcc-c++
 Requires:  gdb
-Requires:  geos-devel >= %{geos_min_version}
+Requires:  geos-devel
 Requires:  git
 Requires:  glpk-devel
+Requires:  hoot-words
 Requires:  libicu-devel
-Requires:  hoot-words >= 1.0.0
-Requires:  libspatialite-devel
 Requires:  log4cxx-devel
-Requires:  nodejs-devel
+Requires:  nodejs-devel = %{nodejs_version}
 Requires:  opencv-devel
 Requires:  postgresql%{pg_dotless}-devel
 Requires:  proj-devel
@@ -689,9 +731,16 @@ Requires:  protobuf-devel
 Requires:  python-argparse
 Requires:  python-devel
 Requires:  qt-devel
-Requires:  stxxl-devel
+Requires:  stxxl-devel = %{stxxl_version}
 Requires:  v8-devel
+# Documentation and report-related dependencies.
+Requires:  doxygen
+Requires:  liberation-fonts-common
+Requires:  liberation-sans-fonts
+Requires:  libxslt
 Requires:  texlive
+Requires:  texlive-collection-fontsrecommended
+Requires:  texlive-collection-langcyrillic
 
 %description core-devel-deps
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -708,34 +757,38 @@ core. Use this if you want to build from github.
 %files core-devel-deps
 
 %package core-deps
-Summary:    Dependencies for Hootenanny Core
-Group:      Development/Libraries
+Summary:   Dependencies for Hootenanny Core
+Group:     Development/Libraries
+
 Requires:  asciidoc
+Requires:  boost-iostreams
+Requires:  boost-system
 Requires:  cppunit
 Requires:  dblatex
-Requires:  doxygen
 Requires:  FileGDBAPI
-Requires:  geos >= %{geos_min_version}
+Requires:  geos
+Requires:  glpk
 Requires:  gnuplot
 Requires:  graphviz
-Requires:  hoot-gdal-devel >= %{gdal_min_version}
-Requires:  hoot-gdal-python >= %{gdal_min_version}
-Requires:  hoot-words >= 1.0.0
-# Needed by gnuplot for report generation
-Requires:  liberation-fonts-common
-Requires:  liberation-sans-fonts
-Requires:  libxslt
+Requires:  hoot-gdal = %{gdal_version}
+Requires:  hoot-gdal-devel = %{gdal_version}
+Requires:  hoot-gdal-python = %{gdal_version}
+Requires:  hoot-words
+Requires:  libicu
 Requires:  log4cxx
-Requires:  nodejs
+Requires:  nodejs = %{nodejs_version}
 Requires:  opencv
+Requires:  perl-libwww-perl
+Requires:  perl-XML-LibXML
+Requires:  postgresql%{pg_dotless}-libs
 Requires:  protobuf
-Requires:  proj
-Requires:  proj-devel
+Requires:  python-matplotlib
 Requires:  qt
 Requires:  qt-postgresql
-Requires:  stxxl
-Requires:  texlive
+Requires:  qt-x11
+Requires:  stxxl = %{stxxl_version}
 Requires:  unzip
+Requires:  v8
 Requires:  w3m
 Requires:  wget
 Requires:  words

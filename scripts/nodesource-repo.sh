@@ -1,9 +1,9 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-NODE_VERSION="${1:-0.10.46}"
+NODE_VERSION=$1
 NODESOURCE_DIR=$(echo $NODE_VERSION | awk -F. '{ if ($1 == '0') { print "pub_" $1 "." $2 } else { print "pub_" $1 ".x" } }')
-NODESOURCE_BASEURL="${NODESOURCE_BASEURL:-https://rpm.nodesource.com/${NODESOURCE_DIR}/el}"
+NODESOURCE_BASEURL=${NODESOURCE_BASEURL:-https://rpm.nodesource.com/$NODESOURCE_DIR/el}
 NODESOURCE_KEY=/etc/pki/rpm-gpg/NODESOURCE-GPG-SIGNING-KEY-EL
 
 cat > $NODESOURCE_KEY <<EOF

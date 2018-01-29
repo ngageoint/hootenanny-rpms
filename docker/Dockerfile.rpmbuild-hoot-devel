@@ -8,17 +8,22 @@ LABEL \
   name="Hootenanny Development RPM Build Image" \
   vendor="Radiant Solutions"
 
+ARG dumbinit_version
 ARG filegdbapi_version
 ARG gdal_version
 ARG geos_version
 ARG libgeotiff_version
 ARG libkml_version
+ARG mocha_version
 ARG node_version
 ARG packages
 ARG postgis_version
 ARG pg_version
 ARG pg_data=/var/lib/pgsql/${pg_version}/data
+ARG stxxl_version
 ARG suexec_version
+ARG tomcat8_version
+ARG words_version
 
 # Have PostgreSQL data directory persist in environment variable.
 ENV PGDATA=${pg_data}
@@ -31,10 +36,12 @@ COPY scripts/nodejs-install.sh scripts/nodesource-repo.sh /tmp/
 RUN /tmp/nodesource-repo.sh ${node_version} && \
     rm -f /tmp/nodesource-repo.sh && \
     /tmp/nodejs-install.sh ${node_version} && \
-    rm -f /tmp/nodejs-install.sh
+    rm -f /tmp/nodejs-install.sh && \
+    npm install --silent -g mocha@${mocha_version}
 
 # Copy in development RPMs at the desired versions.
-COPY RPMS/x86_64/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
+COPY RPMS/x86_64/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/geos-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/geos-devel-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/hoot-gdal-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
@@ -44,15 +51,19 @@ COPY RPMS/x86_64/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/hoot-postgis23_95-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/hoot-postgis23_95-devel-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/hoot-postgis23_95-utils-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/noarch/hoot-words-${words_version}${RPMBUILD_DIST}.noarch.rpm \
      RPMS/x86_64/libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/stxxl-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/su-exec-${suexec_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/noarch/tomcat8-${tomcat8_version}${RPMBUILD_DIST}.noarch.rpm \
      /tmp/
 
 # Install Hootenanny dependencies.
 RUN yum install -y \
+    /tmp/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/geos-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/geos-devel-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
@@ -63,11 +74,14 @@ RUN yum install -y \
     /tmp/hoot-postgis23_95-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/hoot-postgis23_95-devel-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/hoot-postgis23_95-utils-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-words-${words_version}${RPMBUILD_DIST}.noarch.rpm \
     /tmp/libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/stxxl-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/su-exec-${suexec_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/tomcat8-${tomcat8_version}${RPMBUILD_DIST}.noarch.rpm \
     && \
     rm -f /*.rpm && \
     if [ ! -z "${packages}" ] ; then yum -y install ${packages}; fi
@@ -80,6 +94,6 @@ RUN /tmp/postgresql-install.sh && \
     rm -f /tmp/hoot-db-setup.sh
 
 # Copy in the entrypoint.
-COPY scripts/hoot-entrypoint.sh /
-ENTRYPOINT ["/hoot-entrypoint.sh"]
+COPY scripts/hoot-entrypoint.sh /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/bin/bash"]

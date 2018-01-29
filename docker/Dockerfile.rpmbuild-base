@@ -23,6 +23,8 @@ RUN yum -q -y update && \
         redhat-lsb-core \
         redhat-rpm-config \
         rpm-build \
+        rpmdevtools \
+        rpmlint \
         unzip \
         vim \
         wget \

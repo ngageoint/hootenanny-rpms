@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 POSTGRES_CONF=$PGDATA/postgresql.conf
 POSTGRES_HBA=$PGDATA/pg_hba.conf
@@ -49,7 +49,7 @@ psql --username postgres --dbname $DB_NAME --command \
 # Create hoot WFS database template, with PostGIS.
 createdb --username postgres $WFS_DB_NAME --owner $DB_USER
 psql --username postgres --dbname $WFS_DB_NAME --command \
-     "CREATE EXTENSION postgis;"
+     "CREATE EXTENSION postgis; GRANT ALL ON geography_columns, geometry_columns, spatial_ref_sys TO PUBLIC;"
 psql --username postgres --dbname postgres --command \
      "UPDATE pg_database SET datistemplate='true' WHERE datname='${WFS_DB_NAME}';"
 

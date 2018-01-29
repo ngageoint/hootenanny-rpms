@@ -1,7 +1,7 @@
 Name:		su-exec
 Version:	0.2
 Release:	1%{?dist}
-Summary:	Simple tool to execute as another user and group.
+Summary:	Simple tool to execute as another user and group
 Group:		Applications/System
 License:	MIT
 URL:		https://github.com/ncopa/su-exec
@@ -16,10 +16,10 @@ we work around TTY and signal issues.  C implementation of tianon/gosu.
 %setup -q
 
 %build
-make
+%{__make}
 
 %install
-install -p -D -m 0755 su-exec %{buildroot}%{_sbindir}/su-exec
+%{__install} -p -D -m 0755 su-exec %{buildroot}%{_sbindir}/su-exec
 
 %files
 %{_sbindir}/su-exec

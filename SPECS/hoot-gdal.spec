@@ -27,22 +27,21 @@
 %global testversion 2.1.4
 %global run_tests 0
 
+# Set to 1 to enable spatialite support; disabled by default.
 %global with_spatialite 0
-%global spatialite "--with-spatialite"
 
 # No ppc64 build for spatialite in EL6
 # https://bugzilla.redhat.com/show_bug.cgi?id=663938
 %if 0%{?rhel} == 6
 %ifnarch ppc64
 %global with_spatialite 0
-%global spatialite "--without-spatialite"
 %endif
 %endif
 
 
 Name:		hoot-gdal
 Version:	2.1.4
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	GIS file format library
 Group:		System Environment/Libraries
 License:	MIT
@@ -104,7 +103,10 @@ BuildRequires:	libpng-devel
 BuildRequires:	libkml-devel
 
 %if %{with_spatialite}
+%global spatialite "--with-spatialite"
 BuildRequires:	libspatialite-devel
+%else
+%global spatialite "--without-spatialite"
 %endif
 
 BuildRequires:	libtiff-devel
@@ -391,53 +393,53 @@ export CPPFLAGS="$CPPFLAGS $(pkg-config FileGDBAPI --cflags) -I%{_includedir}/li
 # Building without pgeo driver, because it drags in Java
 
 %configure \
-	LIBS=-lgrib2c \
-	--with-autoload=%{_libdir}/gdalplugins \
-	--datadir=%{_datadir}/gdal/ \
-	--includedir=%{_includedir}/gdal/ \
-	--prefix=%{_prefix}	\
-	--without-bsb		\
-	--with-armadillo	\
-	--with-curl		\
-	--with-cfitsio=%{_prefix}	\
-	--with-dods-root=%{_prefix}	\
-	--with-expat		\
+        LIBS=-lgrib2c \
+        --with-autoload=%{_libdir}/gdalplugins \
+        --datadir=%{_datadir}/gdal/ \
+        --includedir=%{_includedir}/gdal/ \
+        --prefix=%{_prefix}	\
+        --without-bsb		\
+        --with-armadillo	\
+        --with-curl		\
+        --with-cfitsio=%{_prefix}	\
+        --with-dods-root=%{_prefix}	\
+        --with-expat		\
         --with-fgdb		\
-	--with-freexl		\
-	--with-geos		\
-	--with-geotiff=external	\
-	--with-gif		\
-	--with-gta		\
-	--with-hdf4		\
-	--with-hdf5		\
-	--with-jasper		\
-	--with-java		\
-	--with-jpeg		\
-	--with-libjson-c	\
-	--without-jpeg12	\
-	--with-liblzma		\
-	--with-libtiff=external	\
-	--with-libz		\
-	--without-mdb		\
-	--with-mysql		\
-	--with-netcdf		\
-	--with-odbc		\
-	--with-ogdi		\
-	--without-msg		\
-	--with-openjpeg		\
-	--with-pcraster		\
+        --with-freexl		\
+        --with-geos		\
+        --with-geotiff=external	\
+        --with-gif		\
+        --with-gta		\
+        --with-hdf4		\
+        --with-hdf5		\
+        --with-jasper		\
+        --with-java		\
+        --with-jpeg		\
+        --with-libjson-c	\
+        --without-jpeg12	\
+        --with-liblzma		\
+        --with-libtiff=external	\
+        --with-libz		\
+        --without-mdb		\
+        --with-mysql		\
+        --with-netcdf		\
+        --with-odbc		\
+        --with-ogdi		\
+        --without-msg		\
+        --with-openjpeg		\
+        --with-pcraster		\
         --with-pg=%{pginstdir}/bin/pg_config		\
-	--with-png		\
-	--with-poppler		\
-	%{spatialite}		\
-	--with-sqlite3		\
-	--with-threads		\
-	--with-webp		\
-	--with-xerces		\
-	--enable-shared		\
-	--with-perl		\
-	--with-python		\
-	--with-libkml
+        --with-png		\
+        --with-poppler		\
+        %{spatialite}		\
+        --with-sqlite3		\
+        --with-threads		\
+        --with-webp		\
+        --with-xerces		\
+        --enable-shared		\
+        --with-perl		\
+        --with-python		\
+        --with-libkml
 
 # {?_smp_mflags} doesn't work; Or it does -- who knows!
 #make %{?_smp_mflags}
@@ -502,10 +504,10 @@ for docdir in %{docdirs}; do
 
     %if %{build_refman}
       pushd latex
-	sed -i -e '/rfoot\[/d' -e '/lfoot\[/d' doxygen.sty
-	sed -i -e '/small/d' -e '/large/d' refman.tex
-	sed -i -e 's|pdflatex|pdflatex -interaction nonstopmode |g' Makefile
-	make -s refman.pdf || true
+        sed -i -e '/rfoot\[/d' -e '/lfoot\[/d' doxygen.sty
+        sed -i -e '/small/d' -e '/large/d' refman.tex
+        sed -i -e 's|pdflatex|pdflatex -interaction nonstopmode |g' Makefile
+        make -s refman.pdf || true
       popd
     %endif
   popd
@@ -522,8 +524,8 @@ pushd swig/python
 popd
 
 make -s	DESTDIR=%{buildroot}	\
-	install	\
-	install-man
+        install	\
+        install-man
 
 install -pm 755 ogr/ogrsf_frmts/s57/s57dump %{buildroot}%{_bindir}
 install -pm 755 frmts/iso8211/8211createfromxml %{buildroot}%{_bindir}
@@ -581,10 +583,10 @@ for docdir in %{docdirs}; do
 
     # Install all Refmans
     %if %{build_refman}
-	if [ -f latex/refman.pdf ]; then
-		mkdir -p $path/pdf/$docdir
-		cp latex/refman.pdf $path/pdf/$docdir
-	fi
+        if [ -f latex/refman.pdf ]; then
+                mkdir -p $path/pdf/$docdir
+                cp latex/refman.pdf $path/pdf/$docdir
+        fi
     %endif
   popd
 done
@@ -827,5 +829,7 @@ popd
 %doc gdal_frmts ogrsf_frmts refman
 
 %changelog
+* Wed Jan 24 2018 Justin Bronn <justin.bronn@digitalglobe.com> - 2.1.4-2
+- Link to latest libraries in EPEL, including libarmadillo.so.8
 * Wed Nov 15 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 2.1.4-1
 - Initial Release

@@ -49,8 +49,3 @@ RUN if [ ! -z "${packages}" ] ; then yum -y install ${packages}; fi
 
 # Switch back to RPM build user.
 USER ${RPMBUILD_USER}
-
-# Add in RPM macros necessary for creating the GDAL package.
-RUN echo "%pg_version ${PG_VERSION}" >> $RPMBUILD_HOME/.rpmmacros && \
-    echo "%pg_dotless %(echo %{pg_version} | tr -d '.')" >> $RPMBUILD_HOME/.rpmmacros && \
-    echo "%pginstdir /usr/pgsql-%{pg_version}" >> $RPMBUILD_HOME/.rpmmacros

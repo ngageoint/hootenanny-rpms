@@ -1,53 +1,49 @@
+# Enable fetch of the source by rpmbuild, as it's too big to keep in VCS.
+%undefine _disable_source_fetch
+%{!?hoot_home: %global hoot_home %{_sharedstatedir}/hootenanny}
+%global hoot_dict %{hoot_home}/conf/dictionary
+%global words_checksum ac1c4597c7e1efc4c16979d0c92def1d523bbb75f26294026086ee9820a03ee2
+%global words_file words1.sqlite
+
 Name:		hoot-words
-Version:	1.0.0
+Version:	1.0.1
 Release:	1%{?dist}
-Summary:	Hootenanny words dictionary
-BuildArch:	noarch
-BuildRequires:	wget
-
-%define words_filename	words1.sqlite
-%define words_compress	%{words_filename}.bz2
-%define deploy_dir /var/lib/hootenanny/conf
-%define words_url  https://s3.amazonaws.com/hoot-rpms/support-files/%{words_compress}
-
 Group:		Applications/Engineering
+Summary:	Hootenanny words dictionary
 License:	GPLv3
 URL:		https://github.com/ngageoint/hootenanny
-Source0:	%{words_url}
-
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Source0:	https://s3.amazonaws.com/hoot-rpms/support-files/%{words_file}.bz2
+BuildArch:	noarch
+BuildRequires:	bzip2
+BuildRequires:	coreutils
 
 %description
 
 %prep
-pwd
-export BUILD_DIR=%{_builddir}/%{name}-%{version}-%{release}.%{_arch}
-# Only download if the remote file is newer or a different size
-wget -P %{_sourcedir} -N -nv %{words_url}
-# Is there a shortcut for this?
-mkdir -p $BUILD_DIR
-cd $BUILD_DIR
-bzcat %{_sourcedir}/%{words_compress} > %{words_filename}
-/bin/chmod -Rf a+rX,u+w,g-w,o-w .
 
 %build
+# Verify checksum of the downloaded source dictionary file and extract.
+%{_bindir}/echo '%{words_checksum}  %{SOURCE0}' | %{_bindir}/sha256sum -c -
+%{_bindir}/bzcat %{SOURCE0} > %{words_file}
 
 %install
-export BUILD_DIR=%{_builddir}/%{name}-%{version}-%{release}.%{_arch}
-install -m 0755 -d $RPM_BUILD_ROOT%{deploy_dir}
-install -m 0644 $BUILD_DIR/%{words_filename} $RPM_BUILD_ROOT%{deploy_dir}
-cd $RPM_BUILD_ROOT%{deploy_dir}; ln -s %{words_filename} words.sqlite
+%{__install} -m 0755 -d %{buildroot}%{hoot_dict}
+%{__install} -m 0644 %{words_file} %{buildroot}%{hoot_dict}
+pushd %{buildroot}%{hoot_dict}
+%{__ln_s} %{words_file} words.sqlite
+popd
 
 %clean
-rm -rf $RPM_BUILD_ROOT
-[ -e %{_topdir}/SOURCES/%{words_compress} ] && rm %{_topdir}/SOURCES/%{words_compress}
-[ -e %{_topdir}/BUILD/%{words_filename} ] && rm %{_topdir}/BUILD/%{words_filename}
+%{__rm} -rf %{buildroot}
 
 %files
-%{deploy_dir}/%{words_filename}
-%{deploy_dir}/words.sqlite
+%{hoot_dict}/%{words_file}
+%{hoot_dict}/words.sqlite
 
 %changelog
+* Mon Jan 22 2018 Justin Bronn <justin.bronn@digitalglobe.com> - 1.0.1-1
+- Fix the directory of the dictionary file.
+- Verify dictionary file download with sha256 checksum.
 * Wed Nov 15 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 1.0.0-1
 - Changed package name to hoot-words.
 * Wed Feb 10 2016 Benjamin Marchant <benjamin.marchant@digitalglobe.com> - 1.0.0+
