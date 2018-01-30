@@ -68,28 +68,20 @@ if [ ! -f $RPM_X86_64/$LIBKML_RPM ]; then
 fi
 
 # NodeJS
-if [ ! -f $RPM_X86_64/$NODEJS_RPM ]; then
+if [ ! -f $RPM_X86_64/$NODE_RPM ]; then
     echo "#### Building RPM: NodeJS"
 
     # Build image for building NodeJS.
     docker build \
-           --build-arg "packages=$( get_requires nodejs )" \
+           --build-arg "packages=$( spec_requires nodejs )" \
            -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic \
            -t hoot/rpmbuild-nodejs \
            $SCRIPT_HOME
 
     # Generate NodeJS RPM.
-    docker run \
-           -v "${SCRIPT_HOME}/src/SOURCES":/rpmbuild/SOURCES:ro \
-           -v "${SCRIPT_HOME}/src/SPECS":/rpmbuild/SPECS:ro \
-           -v "${SCRIPT_HOME}/src/RPMS":/rpmbuild/RPMS:rw \
-           -it --rm \
-           hoot/rpmbuild-nodejs \
-           /bin/bash -c \
-           "rpmbuild \
-              --buildroot '/rpmbuild/BUILDROOT/nodejs-${NODEJS_VERSION}-${NODEJS_RELEASE}-unshared' \
-              -bi SPECS/nodejs.spec && \
-            rpmbuild --define 'shared 1' -bb SPECS/nodejs.spec"
+    run_dep_image \
+        -i hoot/rpmbuild-nodejs \
+        rpmbuild -bb SPECS/nodejs.spec
 fi
 
 

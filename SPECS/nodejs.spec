@@ -1,3 +1,5 @@
+# By default, build shared library support.
+%{!?with_shared: %global with_shared 1}
 %global with_debug 0
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
@@ -101,13 +103,14 @@ Patch2: nodejs-0002-Fix-aarch64-debug.patch
 Patch3: nodejs-0003-hoot-value-json-object.patch
 
 BuildRequires: ccache
-BuildRequires: python2-devel
-BuildRequires: zlib-devel
+BuildRequires: http-parser-devel >= 2.7.0
 BuildRequires: gcc
 BuildRequires: gcc-c++
-BuildRequires: systemtap-sdt-devel
-BuildRequires: http-parser-devel >= 2.7.0
 BuildRequires: openssl-devel <= 1:1.1.0
+BuildRequires: python2-devel
+BuildRequires: systemtap-sdt-devel
+BuildRequires: zlib-devel
+
 
 Requires: http-parser >= 2.7.0
 # we need the system certificate store when Patch2 is applied
@@ -227,11 +230,31 @@ export CXXFLAGS='%{optflags} -g \
 export CFLAGS="$(echo ${CFLAGS} | tr '\n\\' '  ')"
 export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
 
+%if 0%{?with_shared} == 1
 ./configure \
   --prefix=%{_prefix} \
-%if 0%{?shared} == 1
   --shared \
+  --shared-openssl \
+  --shared-zlib \
+  --shared-http-parser \
+  --with-dtrace \
+  --debug-http2 \
+  --debug-nghttp2 \
+  --openssl-use-def-ca-store
+
+%if 0%{?with_debug} == 1
+# Setting BUILDTYPE=Debug builds both release and debug binaries
+make BUILDTYPE=Debug %{?_smp_mflags}
+%else
+make BUILDTYPE=Release %{?_smp_mflags}
 %endif
+# Install into a subdirectory of the build, and copy the shared libraries
+# into the final build.
+./tools/install.py install shared %{_prefix}
+%endif
+
+./configure \
+  --prefix=%{_prefix} \
   --shared-openssl \
   --shared-zlib \
   --shared-http-parser \
@@ -249,21 +272,16 @@ make BUILDTYPE=Release %{?_smp_mflags}
 
 
 %install
-rm -rf %{buildroot}
-
 ./tools/install.py install %{buildroot} %{_prefix}
 
-%if 0%{?shared} == 1
+%if 0%{?with_shared} == 1
 # Move shared library to /usr/lib64 (since NodeJS's non-standard ./configure
 # doesn't support specifying the right library directory for the platform).
 mkdir -p %{buildroot}%{_libdir}
-mv %{buildroot}%{_usr}/lib/libnode.so.%{nodejs_somaj} %{buildroot}%{_libdir}
+cp -p shared%{_usr}/lib/libnode.so.%{nodejs_somaj} %{buildroot}%{_libdir}
 pushd %{buildroot}%{_libdir}
 ln -s libnode.so.%{nodejs_somaj} libnode.so
 popd
-
-# Copy in the NPM binary from previous build.
-cp %{_buildrootdir}/%{name}-%{nodejs_version}-%{nodejs_release}-unshared%{_bindir}/node %{buildroot}%{_bindir}/node
 %endif
 
 # Set the binary permissions properly
@@ -299,39 +317,14 @@ cp -p common.gypi %{buildroot}%{_datadir}/node
 # Install the GDB init tool into the documentation directory
 mv %{buildroot}/%{_datadir}/doc/node/gdbinit %{buildroot}/%{_pkgdocdir}/gdbinit
 
-# Since the old version of NPM was unbundled, there are a lot of symlinks in
-# it's node_modules directory. We need to keep these as symlinks to ensure we
-# can backtrack on this if we decide to.
-
-# Rename the npm node_modules directory to node_modules.bundled
-mv %{buildroot}/%{_prefix}/lib/node_modules/npm/node_modules \
-   %{buildroot}/%{_prefix}/lib/node_modules/npm/node_modules.bundled
-
-# Recreate all the symlinks
-mkdir -p %{buildroot}/%{_prefix}/lib/node_modules/npm/node_modules
-FILES=%{buildroot}/%{_prefix}/lib/node_modules/npm/node_modules.bundled/*
-for f in $FILES
-do
-  module=`basename $f`
-  ln -s ../node_modules.bundled/$module %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/$module
-done
-
-# install NPM docs to mandir
-mkdir -p %{buildroot}%{_mandir} \
-         %{buildroot}%{_pkgdocdir}/npm
-
+# Move NPM manpages to the right location.
+mkdir -p %{buildroot}%{_mandir}
 cp -pr deps/npm/man/* %{buildroot}%{_mandir}/
 rm -rf %{buildroot}%{_prefix}/lib/node_modules/npm/man
-ln -sf %{_mandir}  %{buildroot}%{_prefix}/lib/node_modules/npm/man
 
-# Install Markdown and HTML documentation to %{_pkgdocdir}
-cp -pr deps/npm/html deps/npm/doc %{buildroot}%{_pkgdocdir}/npm/
+# Jettison Markdown and HTML documentation.
 rm -rf %{buildroot}%{_prefix}/lib/node_modules/npm/html \
        %{buildroot}%{_prefix}/lib/node_modules/npm/doc
-
-ln -sf %{_pkgdocdir} %{buildroot}%{_prefix}/lib/node_modules/npm/html
-ln -sf %{_pkgdocdir}/npm/html %{buildroot}%{_prefix}/lib/node_modules/npm/doc
-
 
 # Node tries to install some python files into a documentation directory
 # (and not the proper one). Remove them for now until we figure out what to
@@ -358,7 +351,7 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_bindir}/npm
 %{_bindir}/npx
 %{_bindir}/node
-%if 0%{?shared} == 1
+%if 0%{?with_shared} == 1
 %{_libdir}/libnode.so.%{nodejs_somaj}
 %endif
 %dir %{_prefix}/lib/node_modules
@@ -392,7 +385,7 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %if 0%{?with_debug} == 1
 %{_bindir}/node_g
 %endif
-%if 0%{?shared} == 1
+%if 0%{?with_shared} == 1
 %{_libdir}/libnode.so
 %endif
 %{_includedir}/node
@@ -404,9 +397,7 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %files docs
 %dir %{_pkgdocdir}
 %{_pkgdocdir}/html
-%{_pkgdocdir}/npm/html
-%{_pkgdocdir}/npm/doc
 
 %changelog
-* Thu Dec 14 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 8.9.3-1
+* Tue Jan 30 2018 Justin Bronn <justin.bronn@digitalglobe.com> - 8.9.3-1
 - Initial Release, includes shared library and bundled NPM.
