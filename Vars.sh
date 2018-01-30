@@ -22,6 +22,18 @@ NODE_VERSION=0.10.48
 PG_VERSION=9.5
 PG_DOTLESS=$(echo $PG_VERSION | tr -d '.')
 
+## Utility functions.
+
+function latest_hoot_archive() {
+    echo $(ls -1t $SOURCES/hootenanny-[0-9]*.tar.gz | head -n1)
+}
+
+function latest_hoot_archive_version() {
+    local hoot_archive=$( latest_hoot_archive )
+    local hoot_version=${hoot_archive##$SOURCES/hootenanny-}
+    echo ${hoot_version%%.tar.gz}
+}
+
 # Get version from spec file.
 function spec_version() {
     rpm -q --specfile --qf='%{version}\n' \
