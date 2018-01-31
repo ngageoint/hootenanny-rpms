@@ -563,6 +563,7 @@ fi
 Summary:   Hootenanny Autostart
 Requires:  %{name}-services-ui = %{version}-%{release}
 Group:     Applications/Engineering
+BuildArch: noarch
 
 %description autostart
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -608,6 +609,7 @@ systemctl disable node-mapnik
 %package services-devel-deps
 Summary:   Development dependencies for Hootenanny Services
 Group:     Development/Libraries
+BuildArch: noarch
 Requires:  %{name}-core-devel-deps = %{version}-%{release}
 Requires:  hoot-postgis23_%{pg_dotless}
 Requires:  hoot-postgis23_%{pg_dotless}-utils
@@ -710,6 +712,7 @@ fi
 %package core-devel-deps
 Summary:   Development dependencies for Hootenanny Core
 Group:     Development/Libraries
+BuildArch: noarch
 Requires:  %{name}-core-deps = %{version}-%{release}
 Requires:  autoconf
 Requires:  automake
@@ -759,7 +762,7 @@ core. Use this if you want to build from github.
 %package core-deps
 Summary:   Dependencies for Hootenanny Core
 Group:     Development/Libraries
-
+BuildArch: noarch
 Requires:  asciidoc
 Requires:  boost-iostreams
 Requires:  boost-system
