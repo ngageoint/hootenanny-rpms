@@ -10,7 +10,8 @@ fi
 
 pushd $HOOT_DEST
 git clean -q -f -d -x
-git pull
+git fetch --tags
 git checkout $GIT_COMMIT
+git pull
 git submodule update --init --recursive
 popd
