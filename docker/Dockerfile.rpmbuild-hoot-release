@@ -20,19 +20,16 @@ ENV PGDATA=${pg_data}
 # Switch back to root.
 USER root
 
-# Install NodeJS and pin to desired version.
-COPY scripts/nodejs-install.sh scripts/nodesource-repo.sh /tmp/
-RUN /tmp/nodesource-repo.sh ${node_version} && \
-    rm -f /tmp/nodesource-repo.sh && \
+# Install Hootenanny release repository, NodeJS and pin to desired version.
+COPY scripts/hoot-repo.sh scripts/nodejs-install.sh /tmp/
+RUN /tmp/hoot-repo.sh && \
+    rm /tmp/hoot-repo.sh && \
     /tmp/nodejs-install.sh ${node_version} && \
     rm -f /tmp/nodejs-install.sh && \
     npm install --silent -g mocha@${mocha_version}
 
-# Install Hootenanny release repository and dependencies.
-COPY scripts/hoot-repo.sh /tmp/
-RUN /tmp/hoot-repo.sh && \
-    rm /tmp/hoot-repo.sh && \
-    yum install -y -q dumb-init su-exec tomcat8 && \
+# Install Hootenanny dependencies.
+RUN yum install -y -q dumb-init su-exec tomcat8 && \
     if [ ! -z "${packages}" ] ; then yum -y -q install ${packages}; fi
 
 # Install PostgreSQL server at desired version, and setup the Hoot databases.
