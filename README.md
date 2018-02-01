@@ -1,48 +1,40 @@
+# Hootenanny RPMs
 
-This repository contains both 3rd-party RPMs that are required by Hootenanny as
-well as source RPMs that are custom built for Hootenanny.
+This repository houses the RPM building specifications for Hootenanny and its
+third-party dependencies.
 
-The easiest and quickest way to install and run Hootenanny is by installing from RPMs in CentOS 6.7.  A public facing repository exists that includes the latest stable release as well as many previous versions.  To install from RPMs, perform the following steps:
+## Requirements
 
-* Create the following file: ```/etc/yum.repos.d/hoot.repo```
-* Add the following content to that file:
+* `rpm`
+* Docker
+
+RPMs are built in minimal, ephemeral CentOS 7 Docker containers.  Invoking programs
+use `spec` files as the source of truth for version information and require `rpm`
+itself in order to parse.  On Ubuntu platforms you can install RPM with:
+
 ```
-[hoot]
-name=hoot
-baseurl=https://s3.amazonaws.com/hoot-rpms/stable/el6/
-gpgcheck=0
-```
-* Run ```sudo yum update```
-* Then run ```sudo yum install hootenanny-autostart```
-
-Once installed, the UI can be accessed via a browser at ```http://localhost:8080/hootenanny-id/```.  NOTE: If accessing from a remote computer, use the hostname in place of 'localhost'.
-
-It is also possible to build RPMs from source code by performing the following steps:
-```
-# As of 2016-02-12 the develop branch works for building RPMs.
-# a different compatible branch/tag/revision can be specified.
-export GIT_COMMIT=develop
-
-# Install local deps for running vagrant
-sudo apt-get install nfs-kernel-server vagrant
-git clone https://github.com/ngageoint/hootenanny-rpms.git
-cd hootenanny-rpms
-
-# Clean out any old vagrant machine that is laying around from a previous
-# attempt. You should run this before building if you try a build and it
-# fails.
-make vagrant-clean
-# Build the Hoot RPMs and all supporting RPMs
-make vagrant-build
-# Test the new Hoot RPMs
-make vagrant-test
+sudo apt-get -y install rpm
 ```
 
-* You'll have a new set of RPMS built in `hootenanny-rpms/el6`
-* The RPMs can be served out using your favorite web server and accessed via
-  yum.
-* After yum is configured properly, to install hootenanny:
+## Quickstart
+
+Build Hootenanny RPM build container using release dependencies (those that are already
+available):
+
 ```
-sudo yum install hootenanny-core
+./BuildHootImages
 ```
 
+Once that's complete you can build a Hootenanny archive tarball with:
+
+```
+./BuildArchive.sh
+```
+
+And the RPMs may be built with:
+
+```
+./BuildHoot.sh
+```
+
+Note: dependency-only packages will be in `RPMS/noarch`, and Hootenanny packages will be placed in `RPMS/x86_64`.
