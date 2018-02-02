@@ -1,6 +1,25 @@
+# The one required macro parameter is `hoot_version_gen`, from which
+# the RPM's version and release will be determined automatically.
+%global hoot_version_tag %(echo %{hoot_version_gen} | %{__awk} -F_ '{ print $1 }')
+%global hoot_extra_version %(echo %{hoot_version_gen} | %{__awk} -F_ '{ print $2 }')
+
+%if 0%{hoot_extra_version} == 0
+  # If this is a tagged release, then we want the RPM release to be
+  # greater than 0 (defaults to 1).
+  %{!?hoot_release: %global hoot_release 1}
+  %{!?hoot_version: %global hoot_version %{hoot_version_tag}}
+%else
+  # If this is a development release, then create a release with
+  # extra information that indicates it's a snapshot prerelease
+  # of the next version.
+  %global hoot_git_revision %(echo %{hoot_version_gen} | %{__awk} -F_ '{ print substr($3, 2) }')
+  %global hoot_release 0.%{hoot_extra_version}.%(%{_bindir}/date -u +%%Y%%m%%d).%{hoot_git_revision}
+  # Assuming the next version is the patch release + 1.
+  %global hoot_version %(echo %{hoot_version_tag} | %{__awk} -F. '{ print $1 "." $2 "." ($3 + 1) }')
+%endif
+
 # Default variables for Hootenanny and Tomcat.
 %{!?hoot_home: %global hoot_home %{_sharedstatedir}/%{name}}
-%{!?hoot_release: %global hoot_release 1}
 %{!?tomcat_basedir: %global tomcat_basedir %{_sharedstatedir}/tomcat8}
 %{!?tomcat_config: %global tomcat_config %{_sysconfdir}/tomcat8}
 %{!?tomcat_home: %global tomcat_home %{_datadir}/tomcat8}
@@ -63,7 +82,7 @@ BuildRequires:  w3m
 BuildRequires:  wget
 BuildRequires:  words
 BuildRequires:  zip
-Source0:        %{name}-%{version}.tar.gz
+Source0:        %{name}-%{hoot_version_gen}.tar.gz
 
 %description
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -94,7 +113,7 @@ content, geometry and attributes, to transfer to the output map.
 This package contains the core algorithms and command line interface.
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q -n %{name}-%{hoot_version_gen}
 
 %build
 source ./SetupEnv.sh
