@@ -1,7 +1,7 @@
 FROM hoot/rpmbuild:latest
 LABEL \
   description="Container for managing the Hootenanny Yum Repository" \
-  maintainer="justin.bronn@digitalglobe.com" \
+  maintainer="justin.bronn@radiantsolutions.com" \
   name="Hootenanny Yum Repository Image" \
   vendor="Radiant Solutions"
 

@@ -1,7 +1,7 @@
 FROM hoot/rpmbuild:latest
 LABEL \
   description="Base container for building Hootenanny RPMs" \
-  maintainer="justin.bronn@digitalglobe.com" \
+  maintainer="justin.bronn@radiantsolutions.com" \
   name="Hootenanny Base RPM Build Image" \
   vendor="Radiant Solutions"
 

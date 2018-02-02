@@ -1,7 +1,7 @@
 FROM centos:7
 LABEL \
   description="Container with user for building Hootenanny RPMs" \
-  maintainer="justin.bronn@digitalglobe.com" \
+  maintainer="justin.bronn@radiantsolutions.com" \
   name="Hootenanny RPM Build User Image" \
   vendor="Radiant Solutions"
 

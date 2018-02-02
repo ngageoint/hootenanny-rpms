@@ -7,7 +7,7 @@ ARG packages
 
 LABEL \
   description="Container for building Hootenanny PostGIS RPMs with GDAL ${gdal_version}" \
-  maintainer="justin.bronn@digitalglobe.com" \
+  maintainer="justin.bronn@radiantsolutions.com" \
   name="Hootenanny PostGIS RPM Build Image" \
   vendor="Radiant Solutions"
 
