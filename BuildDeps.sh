@@ -33,6 +33,23 @@ if [ ! -f $RPM_X86_64/$GEOS_RPM ]; then
         rpmbuild -bb SPECS/geos.spec
 fi
 
+# glpk
+if [ ! -f $RPM_X86_64/$GLPK_RPM ]; then
+    echo "#### Building RPM: glpk"
+
+    # Build image for glpk.
+    docker build \
+           --build-arg "packages=$( spec_requires glpk )" \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic \
+           -t hoot/rpmbuild-glpk \
+           $SCRIPT_HOME
+
+    # Generate glpk RPM.
+    run_dep_image \
+        -i hoot/rpmbuild-glpk \
+        rpmbuild --define '_hardened_build 1' -bb SPECS/glpk.spec
+fi
+
 # libgeotiff
 if [ ! -f $RPM_X86_64/$LIBGEOTIFF_RPM ]; then
     echo "#### Building RPM: libgeotiff"

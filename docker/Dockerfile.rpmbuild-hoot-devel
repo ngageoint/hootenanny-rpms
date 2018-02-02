@@ -12,6 +12,7 @@ ARG dumbinit_version
 ARG filegdbapi_version
 ARG gdal_version
 ARG geos_version
+ARG glpk_version
 ARG libgeotiff_version
 ARG libkml_version
 ARG mocha_version
@@ -44,6 +45,8 @@ COPY RPMS/x86_64/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/geos-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/geos-devel-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/glpk-${glpk_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/glpk-devel-${glpk_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/hoot-gdal-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/hoot-gdal-devel-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/hoot-gdal-libs-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
@@ -67,6 +70,8 @@ RUN yum install -y \
     /tmp/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/geos-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/geos-devel-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/glpk-${glpk_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/glpk-devel-${glpk_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/hoot-gdal-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/hoot-gdal-devel-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/hoot-gdal-libs-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
