@@ -11,6 +11,6 @@ source $SCRIPT_HOME/Vars.sh
 # The container used to build Hootenanny archive.
 BUILD_IMAGE=${BUILD_IMAGE:-hoot/rpmbuild-hoot-release}
 
-run_hoot_image \
+run_hoot_build_image \
     -i $BUILD_IMAGE -s rw \
     /bin/bash -c "/rpmbuild/scripts/hoot-checkout.sh ${GIT_COMMIT} && /rpmbuild/scripts/hoot-archive.sh"

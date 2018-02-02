@@ -28,10 +28,12 @@ function latest_hoot_archive() {
     echo $(ls -1t $SOURCES/hootenanny-[0-9]*.tar.gz | head -n1)
 }
 
-function latest_hoot_archive_version() {
+# Returns the output of Hootenanny's `HOOT_VERSION_GEN`, embedded
+# in the archive's filename.
+function latest_hoot_version_gen() {
     local hoot_archive=$( latest_hoot_archive )
-    local hoot_version=${hoot_archive##$SOURCES/hootenanny-}
-    echo ${hoot_version%%.tar.gz}
+    local hoot_version_gen=${hoot_archive##$SOURCES/hootenanny-}
+    echo ${hoot_version_gen%%.tar.gz}
 }
 
 # Get version from spec file.
@@ -210,7 +212,7 @@ function run_dep_image() {
 }
 
 # Runs a hootenanny build image.
-function run_hoot_image() {
+function run_hoot_build_image() {
     local OPTIND opt
     local entrypoint=/docker-entrypoint.sh
     local image=hoot/rpmbuild-hoot-release
@@ -240,7 +242,7 @@ function run_hoot_image() {
     shift $((OPTIND-1))
 
     if [ "${usage}" = "yes" ]; then
-        echo "run_hoot_image: [-e <entrypoint>] [-i <image>] [-u <user>]"
+        echo "run_hoot_build_image: [-e <entrypoint>] [-i <image>] [-u <user>]"
     else
         mkdir -p $SCRIPT_HOME/hootenanny $SCRIPT_HOME/m2 $SCRIPT_HOME/npm
         docker run \
