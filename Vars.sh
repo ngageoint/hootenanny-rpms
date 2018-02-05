@@ -39,14 +39,14 @@ function latest_hoot_version_gen() {
 # Get version from spec file.
 function spec_version() {
     rpm -q --specfile --qf='%{version}\n' \
-        --define "%_topdir ${SCRIPT_HOME}" \
+        --define "_topdir ${SCRIPT_HOME}" \
         $SPECS/$1.spec | head -n 1
 }
 
 # Get release number from spec file.
 function spec_release() {
     rpm -q --specfile --qf='%{release}\n' \
-        --define "%_topdir ${SCRIPT_HOME}" \
+        --define "_topdir ${SCRIPT_HOME}" \
         $SPECS/$1.spec | head -n 1
 }
 
@@ -55,8 +55,9 @@ function spec_requires() {
     # Parse the spec file with `rpmspec` so that conditional packages won't
     # be included in the build containers.
     rpmspec \
-        --define "%_topdir ${SCRIPT_HOME}" \
-        --define "%pg_dotless ${PG_DOTLESS}" \
+        --define "_topdir ${SCRIPT_HOME}" \
+        --define 'hoot_version_gen 0.0.0' \
+        --define "pg_dotless ${PG_DOTLESS}" \
         -P $SPECS/$1.spec | \
         grep '^BuildRequires:' | \
         awk '{ for (i = 2; i <= NF; ++i) if ($i ~ /^[[:alpha:]]/) print $i }' ORS=' '
