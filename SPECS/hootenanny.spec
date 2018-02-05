@@ -19,6 +19,7 @@
 %endif
 
 # Default variables for Hootenanny and Tomcat.
+%{!?gdal_data: %global gdal_data %{_datadir}/gdal}
 %{!?hoot_home: %global hoot_home %{_sharedstatedir}/%{name}}
 %{!?tomcat_basedir: %global tomcat_basedir %{_sharedstatedir}/tomcat8}
 %{!?tomcat_config: %global tomcat_config %{_sysconfdir}/tomcat8}
@@ -182,7 +183,7 @@ popd
 
 # Tomcat environment settings for Hootenanny.
 %{__cat} >> %{buildroot}%{tomcat_config}/conf.d/hoot.conf << EOF
-export GDAL_DATA=%(gdal-config --datadir)
+export GDAL_DATA=%{gdal_data}
 export HOOT_HOME=%{hoot_home}
 export HOOT_WORKING_NAME=%{name}
 EOF
