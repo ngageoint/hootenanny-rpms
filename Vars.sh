@@ -58,9 +58,8 @@ function spec_requires() {
         --define "_topdir ${SCRIPT_HOME}" \
         --define 'hoot_version_gen 0.0.0' \
         --define "pg_dotless ${PG_DOTLESS}" \
-        -P $SPECS/$1.spec | \
-        grep '^BuildRequires:' | \
-        awk '{ for (i = 2; i <= NF; ++i) if ($i ~ /^[[:alpha:]]/) print $i }' ORS=' '
+        -q --buildrequires $SPECS/$1.spec | \
+        awk '{ for (i = 1; i <= NF; ++i) if ($i ~ /^[[:alpha:]]/) print $i }' ORS=' '
 }
 
 ## Package versioning variables.
