@@ -25,6 +25,13 @@
 %{!?tomcat_home: %global tomcat_home %{_datadir}/tomcat8}
 %global tomcat_webapps %{tomcat_basedir}/webapps
 
+# Prevents services-ui from being marked that it provides GDAL or Mapnik.
+%global __provides_exclude ^lib(gdal|mapnik)\\.so.*$
+
+# Use explicit requirements for libgdal and libpq, and Mapnik library
+# is included as part of NPM install.
+%global __requires_exclude ^lib(gdal|mapnik|pq)\\.so.*$
+
 Name:       hootenanny
 Version:    %{hoot_version}
 Release:    %{hoot_release}%{?dist}
@@ -98,7 +105,6 @@ Summary:   Hootenanny Core
 Requires:  %{name}-core-deps = %{version}-%{release}
 Requires:  nodejs = %{nodejs_version}
 Requires:  postgresql%{pg_dotless}-libs
-%global __requires_exclude ^libpq\\.so
 Group:      Applications/Engineering
 
 %description core
@@ -830,10 +836,13 @@ This packages contains the dependencies to run the Hootenanny core.
 %files core-deps
 
 %changelog
-* Wed Nov 08 2017 Matt Jackson <matthew.jacksondigitalglobe.com> - 0.2.36+
+* Tue Jan 30 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 0.2.38-1
+- Initial CentOS 7 release.
+
+* Wed Nov 08 2017 Matt Jackson <matthew.jackson@digitalglobe.com> - 0.2.36+
 - Many Centos7 fixes
 
-* Fri May 12 2017 Matt Jackson <matthew.jacksondigitalglobe.com> - 0.2.33+
+* Fri May 12 2017 Matt Jackson <matthew.jackson@digitalglobe.com> - 0.2.33+
 - Fix libpq issues
 
 * Wed Feb 22 2017 Brandon Witham <brandon.witham@digitalglobe.com> - 0.2.32+
