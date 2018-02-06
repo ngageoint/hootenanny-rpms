@@ -1,0 +1,37 @@
+FROM hoot/run-base:latest
+
+ARG hoot_release
+ARG hoot_version
+ARG hoot_dist=.el7
+
+LABEL \
+  description="Runtime container for Hootenanny ${hoot_version}-${hoot_release}" \
+  maintainer="justin.bronn@radiantsolutions.com" \
+  name="Hootenanny Runtime Image" \
+  vendor="Radiant Solutions"
+
+# Copy in GDAL dependency RPMs.
+COPY RPMS/x86_64/hootenanny-core-${hoot_version}-${hoot_release}${hoot_dist}.x86_64.rpm \
+     RPMS/noarch/hootenanny-core-deps-${hoot_version}-${hoot_release}${hoot_dist}.noarch.rpm \
+     RPMS/x86_64/hootenanny-services-ui-${hoot_version}-${hoot_release}${hoot_dist}.x86_64.rpm \
+     /tmp/
+
+# Install Hootenanny core dependencies.
+RUN yum install -y \
+    /tmp/hootenanny-core-${hoot_version}-${hoot_release}${hoot_dist}.x86_64.rpm \
+    /tmp/hootenanny-core-deps-${hoot_version}-${hoot_release}${hoot_dist}.noarch.rpm \
+    /tmp/hootenanny-services-ui-${hoot_version}-${hoot_release}${hoot_dist}.x86_64.rpm \
+    && \
+    rm -f /tmp/*.rpm
+
+# Setting up the database, as the RPM scripts don't run in containers.
+# Also 
+COPY scripts/hoot-db-setup.sh /tmp/
+RUN /tmp/hoot-db-setup.sh && \
+    rm -f /tmp/hoot-db-setup.sh 
+
+# Copy in the entrypoint.
+COPY scripts/runtime-entrypoint.sh /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["/bin/bash"]
+WORKDIR ${HOOT_HOME}

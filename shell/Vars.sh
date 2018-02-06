@@ -174,6 +174,15 @@ function build_repo_images() {
            $SCRIPT_HOME
 }
 
+function build_run_images() {
+    docker build \
+           --build-arg hoot_uid=$(id -u) \
+           --build-arg node_version=$NODE_VERSION \
+           --build-arg pg_version=$PG_VERSION \
+           -f $SCRIPT_HOME/docker/Dockerfile.run-base \
+           -t hoot/run-base \
+           $SCRIPT_HOME
+}
 
 # Runs a dependency build image.
 function run_dep_image() {
