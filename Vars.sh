@@ -14,11 +14,10 @@ SPECS=$SCRIPT_HOME/SPECS
 SOURCES=$SCRIPT_HOME/SOURCES
 RPMS=$SCRIPT_HOME/RPMS
 
-# Mocha/NodeJS versions
+# Mocha version
 MOCHA_VERSION=3.5.3
-NODE_VERSION=0.10.48
 
-# PostgreSQL
+# PostgreSQL version
 PG_VERSION=9.5
 PG_DOTLESS=$(echo $PG_VERSION | tr -d '.')
 
@@ -96,6 +95,11 @@ LIBKML_VERSION=$( spec_version libkml )
 LIBKML_RELEASE=$( spec_release libkml )
 LIBKML_RPM=libkml-$LIBKML_VERSION-$LIBKML_RELEASE$RPMBUILD_DIST.x86_64.rpm
 LIBKML_DEVEL_RPM=libkml-devel-$LIBKML_VERSION-$LIBKML_RELEASE$RPMBUILD_DIST.x86_64.rpm
+
+NODE_VERSION=$( spec_version nodejs )
+NODE_RELEASE=$( spec_release nodejs )
+NODE_RPM=nodejs-$NODE_VERSION-$NODE_RELEASE$RPMBUILD_DIST.x86_64.rpm
+NODE_DEVEL_RPM=nodejs-devel-$NODE_VERSION-$NODE_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
 OSMOSIS_VERSION=$( spec_version osmosis )
 OSMOSIS_RELEASE=$( spec_release osmosis )
