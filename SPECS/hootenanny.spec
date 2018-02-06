@@ -177,7 +177,7 @@ popd
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id/data
-%{__cp} -pr hoot-ui/dist/ %{buildroot}%{tomcat_webapps}/%{name}-id/
+%{__cp} -pr hoot-ui/dist/* %{buildroot}%{tomcat_webapps}/%{name}-id/
 %{__install} -m 0644 hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{tomcat_webapps}/%{name}-id/data
 %{__install} -m 0644 hoot-ui/data/tdsv61_field_values.json %{buildroot}%{tomcat_webapps}/%{name}-id/data
 
