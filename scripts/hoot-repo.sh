@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-HOOT_BASEURL=${HOOT_BASEURL:-https://s3.amazonaws.com/hoot-repo/el7}
+HOOT_BASEURL=${HOOT_BASEURL:-https://s3.amazonaws.com/hoot-repo/el7/deps/release}
 HOOT_KEY=/etc/pki/rpm-gpg/RPM-GPG-KEY-Hoot
 
 cat > $HOOT_KEY <<EOF
@@ -38,9 +38,9 @@ cJ3vkuvY+aLVXEx8/oQL3d8NJgHmBQsuoZlIva+Gf1tSh42capi/Zuk8Ahhp5BRn
 EOF
 
 cat > /etc/yum.repos.d/hoot.repo <<EOF
-[hoot]
-name = Hootenanny Enterprise Linux
-baseurl = ${HOOT_BASEURL}/\$basearch
+[hoot-deps]
+name = Hootenanny Dependencies
+baseurl = ${HOOT_BASEURL}
 enable = 1
 gpgcheck = 1
 repo_gpgcheck = 1
