@@ -36,6 +36,6 @@ automake --add-missing --copy
 make -j$(nproc) clean
 make -j$(nproc) archive
 
-# Copy in source archive and WAR file to sources.
-cp -v hootenanny-[0-9]*.tar.gz hootenanny-services*.war $HOME/SOURCES
+# Copy in source archive to RPM sources.
+cp -v hootenanny-[0-9]*.tar.gz $HOME/SOURCES
 popd
