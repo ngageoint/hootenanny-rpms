@@ -748,7 +748,7 @@ Requires:  gcc-c++
 Requires:  gdb
 Requires:  geos-devel
 Requires:  git
-Requires:  glpk-devel
+Requires:  glpk-devel = %{glpk_version}
 Requires:  hoot-words
 Requires:  libicu-devel
 Requires:  log4cxx-devel
@@ -796,7 +796,7 @@ Requires:  cppunit
 Requires:  dblatex
 Requires:  FileGDBAPI
 Requires:  geos
-Requires:  glpk
+Requires:  glpk = %{glpk_version}
 Requires:  gnuplot
 Requires:  graphviz
 Requires:  hoot-gdal = %{gdal_version}
