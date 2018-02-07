@@ -9,9 +9,18 @@ if [ ! -d $HOOT_DEST/.git ]; then
 fi
 
 pushd $HOOT_DEST
+# Clean out any untracked files.
 git clean -q -f -d -x
+
+# Update tags.
 git fetch --tags
+
+# Checkout desired commit; pull latest when on a branch.
 git checkout $GIT_COMMIT
-git pull
+if git symbolic-ref --short HEAD; then
+    git pull
+fi
+
+# Update submodules.
 git submodule update --init --recursive
 popd

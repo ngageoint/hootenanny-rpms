@@ -6,9 +6,11 @@ LABEL \
   vendor="Radiant Solutions"
 
 # Arguments for setting:
+#  * RedHat Hardened Build compilation/linking flags.
 #  * Language and locale.
 #  * RPM distribution.
 #  * RPM building user and home.
+ARG hardened_build=1
 ARG lang=en_US.UTF-8
 ARG locale=en_US.UTF-8
 ARG rpmbuild_dist=.el7
@@ -27,6 +29,7 @@ ENV RPMBUILD_HOME=${rpmbuild_home}
 
 # Create unprivileged user for building RPMs, and setup basic macros.
 RUN useradd -d ${rpmbuild_home} -m -s /bin/bash -u ${rpmbuild_uid} ${rpmbuild_user} && \
+    echo "%_hardened_build ${hardened_build}" >> ${rpmbuild_home}/.rpmmacros && \
     echo "%_smp_mflags -j%(nproc) -l%(expr %(nproc) + 2)" >> ${rpmbuild_home}/.rpmmacros && \
     echo "%_topdir ${rpmbuild_home}" >> ${rpmbuild_home}/.rpmmacros && \
     echo "%debug_package %{nil}" >> ${rpmbuild_home}/.rpmmacros && \

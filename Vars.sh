@@ -14,11 +14,10 @@ SPECS=$SCRIPT_HOME/SPECS
 SOURCES=$SCRIPT_HOME/SOURCES
 RPMS=$SCRIPT_HOME/RPMS
 
-# Mocha/NodeJS versions
+# Mocha version
 MOCHA_VERSION=3.5.3
-NODE_VERSION=0.10.48
 
-# PostgreSQL
+# PostgreSQL version
 PG_VERSION=9.5
 PG_DOTLESS=$(echo $PG_VERSION | tr -d '.')
 
@@ -39,14 +38,14 @@ function latest_hoot_version_gen() {
 # Get version from spec file.
 function spec_version() {
     rpm -q --specfile --qf='%{version}\n' \
-        --define "%_topdir ${SCRIPT_HOME}" \
+        --define "_topdir ${SCRIPT_HOME}" \
         $SPECS/$1.spec | head -n 1
 }
 
 # Get release number from spec file.
 function spec_release() {
     rpm -q --specfile --qf='%{release}\n' \
-        --define "%_topdir ${SCRIPT_HOME}" \
+        --define "_topdir ${SCRIPT_HOME}" \
         $SPECS/$1.spec | head -n 1
 }
 
@@ -55,11 +54,11 @@ function spec_requires() {
     # Parse the spec file with `rpmspec` so that conditional packages won't
     # be included in the build containers.
     rpmspec \
-        --define "%_topdir ${SCRIPT_HOME}" \
-        --define "%pg_dotless ${PG_DOTLESS}" \
-        -P $SPECS/$1.spec | \
-        grep '^BuildRequires:' | \
-        awk '{ for (i = 2; i <= NF; ++i) if ($i ~ /^[[:alpha:]]/) print $i }' ORS=' '
+        --define "_topdir ${SCRIPT_HOME}" \
+        --define 'hoot_version_gen 0.0.0' \
+        --define "pg_dotless ${PG_DOTLESS}" \
+        -q --buildrequires $SPECS/$1.spec | \
+        awk '{ for (i = 1; i <= NF; ++i) if ($i ~ /^[[:alpha:]]/) print $i }' ORS=' '
 }
 
 ## Package versioning variables.
@@ -101,6 +100,11 @@ LIBKML_VERSION=$( spec_version libkml )
 LIBKML_RELEASE=$( spec_release libkml )
 LIBKML_RPM=libkml-$LIBKML_VERSION-$LIBKML_RELEASE$RPMBUILD_DIST.x86_64.rpm
 LIBKML_DEVEL_RPM=libkml-devel-$LIBKML_VERSION-$LIBKML_RELEASE$RPMBUILD_DIST.x86_64.rpm
+
+NODE_VERSION=$( spec_version nodejs )
+NODE_RELEASE=$( spec_release nodejs )
+NODE_RPM=nodejs-$NODE_VERSION-$NODE_RELEASE$RPMBUILD_DIST.x86_64.rpm
+NODE_DEVEL_RPM=nodejs-devel-$NODE_VERSION-$NODE_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
 OSMOSIS_VERSION=$( spec_version osmosis )
 OSMOSIS_RELEASE=$( spec_release osmosis )
