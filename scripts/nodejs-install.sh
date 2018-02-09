@@ -9,4 +9,4 @@ yum install -q -y \
     yum-plugin-versionlock
 
 # Version lock the NodeJS version to prevent inadvertent upgrades.
-yum versionlock nodejs*
+yum versionlock nodejs nodejs-devel
