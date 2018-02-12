@@ -51,7 +51,6 @@ BuildRequires:  dblatex
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
 BuildRequires:  gdb
-BuildRequires:  geos
 BuildRequires:  geos-devel
 BuildRequires:  git
 BuildRequires:  glpk-devel
@@ -60,7 +59,6 @@ BuildRequires:  graphviz
 BuildRequires:  hoot-gdal
 BuildRequires:  hoot-gdal-devel
 BuildRequires:  hoot-gdal-python
-BuildRequires:  hoot-postgis23_%{pg_dotless}
 BuildRequires:  hoot-postgis23_%{pg_dotless}-devel
 BuildRequires:  hoot-postgis23_%{pg_dotless}-utils
 BuildRequires:  hoot-words
@@ -69,7 +67,6 @@ BuildRequires:  libicu-devel
 BuildRequires:  libxslt
 BuildRequires:  log4cxx-devel
 BuildRequires:  maven
-BuildRequires:  nodejs
 BuildRequires:  nodejs-devel
 BuildRequires:  opencv-devel
 BuildRequires:  postgresql%{pg_dotless}-devel
@@ -79,7 +76,6 @@ BuildRequires:  python-argparse
 BuildRequires:  python-devel
 BuildRequires:  qt-devel
 BuildRequires:  qt-postgresql
-BuildRequires:  stxxl
 BuildRequires:  stxxl-devel
 BuildRequires:  texlive
 BuildRequires:  texlive-collection-fontsrecommended
@@ -101,6 +97,7 @@ points-of-interest (POI's) (points). Conflation happens at the dataset level,
 where the user's workflow determines the best reference dataset and source
 content, geometry and attributes, to transfer to the output map.
 
+
 %package core
 Summary:   Hootenanny Core
 Requires:  %{name}-core-deps = %{version}-%{release}
@@ -119,8 +116,10 @@ content, geometry and attributes, to transfer to the output map.
 
 This package contains the core algorithms and command line interface.
 
+
 %prep
 %setup -q -n %{name}-%{hoot_version_gen}
+
 
 %build
 source ./SetupEnv.sh
@@ -151,6 +150,7 @@ popd
 pushd node-export-server
 npm install --production
 popd
+
 
 %install
 
@@ -261,8 +261,10 @@ echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hoot
 # TODO: Determine if tests should be done here, or saved for a
 #       a separate container?
 
+
 %clean
 %{__rm} -rf %{buildroot}
+
 
 %files core
 %{_includedir}/hoot
@@ -291,6 +293,7 @@ echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hoot
 # These filters will cause tests to fail.
 %exclude %{_sysconfdir}/asciidoc/filters/mpl
 
+
 %package services-ui
 Summary:   Hootenanny UI and Services
 Group:     Applications/Engineering
@@ -303,7 +306,6 @@ Requires:  postgresql%{pg_dotless}-contrib
 Requires:  postgresql%{pg_dotless}-server
 Requires:  pwgen
 Requires:  tomcat8 = %{tomcat_version}
-
 
 %description services-ui
 Hootenanny was developed to provide an open source, standards-based approach to
@@ -632,6 +634,7 @@ systemctl disable node-export
 # set NodeJS node-export-server to NOT autostart
 systemctl disable node-mapnik
 
+
 %package services-devel-deps
 Summary:   Development dependencies for Hootenanny Services
 Group:     Development/Libraries
@@ -679,8 +682,6 @@ if [ "$1" = "1" ]; then
         echo "Waiting for postgres to start"
         sleep 1
     done
-
-    systemctl start tomcat8
 
     # create Hoot services db
     if ! su -l postgres -c "psql -lqt | cut -d \| -f 1 | grep -qw hoot"; then
@@ -735,6 +736,7 @@ if [ "$1" = "0" ]; then
     done
 fi
 
+
 %package core-devel-deps
 Summary:   Development dependencies for Hootenanny Core
 Group:     Development/Libraries
@@ -784,6 +786,7 @@ This packages contains the dependencies to build and develop the Hootenanny
 core. Use this if you want to build from github.
 
 %files core-devel-deps
+
 
 %package core-deps
 Summary:   Dependencies for Hootenanny Core
@@ -835,6 +838,7 @@ content, geometry and attributes, to transfer to the output map.
 This packages contains the dependencies to run the Hootenanny core.
 
 %files core-deps
+
 
 %changelog
 * Tue Jan 30 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 0.2.38-1
