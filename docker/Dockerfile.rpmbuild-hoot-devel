@@ -1,6 +1,6 @@
 # The base image depends on the version of PosgreSQL from PGDG.
 ARG pg_version
-FROM hoot/rpmbuild-pgdg:${pg_version}
+FROM hootenanny/rpmbuild-pgdg:${pg_version}
 
 LABEL \
   description="Container for building Hootenanny RPMs using development dependencies." \

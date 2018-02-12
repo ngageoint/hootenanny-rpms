@@ -2,8 +2,8 @@
 %global debug_package %{nil}
 
 Name:		FileGDBAPI
-Version:	1.5.1
-Release:	1%{?dist}
+Version:	%{getenv:RPMBUILD_VERSION}
+Release:	%{getenv:RPMBUILD_RELEASE}%{?dist}
 Summary:	ESRI FileGDB API
 Group:		System Environment/Libraries
 License:	ASL 2.0

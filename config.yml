@@ -1,0 +1,45 @@
+---
+mocha_version: &mocha_version '3.5.3'
+pg_version: &pg_version '9.5'
+
+
+versions:
+  dumb-init:
+    version: &dumbinit_version '1.2.1-1'
+  FileGDBAPI:
+    version: &filegdbapi_version '1.5.1-1'
+  node:
+    version: &node_version '8.9.3-1'
+  osmosis:
+    version: &osmosis_version '0.46-1'
+  su-exec:
+    version: &suexec_version '0.2-1'
+
+
+base_images: !!omap
+  - rpmbuild:
+      args:
+        rpmbuild_dist: .el7
+        rpmbuild_uid: 1000
+  - rpmbuild-base: {}
+  - rpmbuild-generic: {}
+  - rpmbuild-pgdg:
+      args:
+        pg_version: *pg_version
+      tags: [*pg_version]
+  - rpmbuild-repo: {}
+
+
+rpms:
+  dumb-init:
+    image: rpmbuild-generic
+    version: *dumbinit_version
+  FileGDBAPI:
+    image: rpmbuild-generic
+    version: *filegdbapi_version
+  osmosis:
+    image: rpmbuild-generic
+    version: *osmosis_version
+  su-exec:
+    image: rpmbuild-generic
+    version: *suexec_version

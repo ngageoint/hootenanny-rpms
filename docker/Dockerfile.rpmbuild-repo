@@ -1,4 +1,4 @@
-FROM hoot/rpmbuild:latest
+FROM hootenanny/rpmbuild:latest
 LABEL \
   description="Container for managing the Hootenanny Yum Repository" \
   maintainer="justin.bronn@radiantsolutions.com" \

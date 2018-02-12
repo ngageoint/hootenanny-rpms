@@ -1,4 +1,4 @@
-FROM hoot/rpmbuild-gdal:latest
+FROM hootenanny/rpmbuild-gdal:latest
 
 # GDAL version, including release iteration (e.g., '2.1.4-1') is
 # a required argument.

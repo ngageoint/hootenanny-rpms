@@ -1,4 +1,4 @@
-FROM hoot/rpmbuild-base:latest
+FROM hootenanny/rpmbuild-base:latest
 LABEL \
   description="Generic container for building Hootenanny RPMs" \
   maintainer="justin.bronn@radiantsolutions.com" \

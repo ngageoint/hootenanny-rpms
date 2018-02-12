@@ -1,6 +1,6 @@
 # The base image depends on the version of PosgreSQL from PGDG.
 ARG pg_version
-FROM hoot/rpmbuild-pgdg:${pg_version}
+FROM hootenanny/rpmbuild-pgdg:${pg_version}
 
 # Our GDAL package depends on RPMs we build; the desired package
 # versions, *including* the release iteration (e.g, '1.0.0-1') are

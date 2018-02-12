@@ -1,6 +1,6 @@
 Name:		su-exec
-Version:	0.2
-Release:	1%{?dist}
+Version:	%{getenv:RPMBUILD_VERSION}
+Release:	%{getenv:RPMBUILD_RELEASE}%{?dist}
 Summary:	Simple tool to execute as another user and group
 Group:		Applications/System
 License:	MIT

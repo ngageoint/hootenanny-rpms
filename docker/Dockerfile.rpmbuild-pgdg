@@ -1,4 +1,4 @@
-FROM hoot/rpmbuild-generic:latest
+FROM hootenanny/rpmbuild-generic:latest
 
 ARG packages
 ARG pg_version
