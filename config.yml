@@ -12,8 +12,12 @@ versions:
     version: &node_version '8.9.3-1'
   osmosis:
     version: &osmosis_version '0.46-1'
+  stxxl:
+    version: &stxxl_version '1.3.1-1'
   su-exec:
     version: &suexec_version '0.2-1'
+  tomcat8:
+    version: &tomcat8_version '8.5.24-1'
 
 
 base_images: !!omap
@@ -28,6 +32,14 @@ base_images: !!omap
         pg_version: *pg_version
       tags: [*pg_version]
   - rpmbuild-repo: {}
+  - rpmbuild-geos:
+      dockerfile: 'docker/Dockerfile.rpmbuild-generic'
+      args:
+        packages: 'doxygen gcc-c++ libtool'
+  - rpmbuild-libgeotiff:
+      dockerfile: 'docker/Dockerfile.rpmbuild-generic'
+      args:
+        packages: 'libjpeg-devel libtiff-devel proj-devel zlib-devel'
 
 
 rpms:
@@ -43,3 +55,9 @@ rpms:
   su-exec:
     image: rpmbuild-generic
     version: *suexec_version
+  stxxl:
+    image: rpmbuild-generic
+    version: *stxxl_version
+  tomcat8:
+    image: rpmbuild-generic
+    version: *tomcat8_version

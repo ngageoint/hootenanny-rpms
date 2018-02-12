@@ -1,6 +1,6 @@
 Name:		stxxl
-Version:	1.3.1
-Release:	1%{?dist}
+Version:	%{rpmbuild_version}
+Release:	%{rpmbuild_release}%{?dist}
 Summary:	C++ STL drop-in replacement for extremely large datasets
 
 Group:		Development/Libraries

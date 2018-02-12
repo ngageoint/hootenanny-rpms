@@ -65,19 +65,19 @@ Vagrant.configure(2) do |config|
 
         build_cmd = ['rpmbuild']
 
+        # Pass in the RPM version/release information via CLI define statements.
         version, release = options['version'].split('-')
-        d.env = options.fetch(
-          'env', {
-            'RPMBUILD_VERSION' => version,
-            'RPMBUILD_RELEASE' => release,
+        defines = options.fetch('defines', {})
+        defines.update(
+          {
+            'rpmbuild_version' => version,
+            'rpmbuild_release' => release,
           }
         )
-
-        # Very difficult to pass in defines on CLI.
-        #defines = options.fetch('defines', {})
-        #defines.each do |macro, expr|
-        #  build_cmd << "--define='#{macro} #{expr}'"
-        #end
+        defines.each do |macro, expr|
+          build_cmd << '--define'
+          build_cmd << "#{macro} #{expr}"
+        end
 
         options.fetch('undefines', []).each do |macro|
           build_cmd << '--undefine'

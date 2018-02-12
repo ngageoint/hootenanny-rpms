@@ -1,9 +1,7 @@
 ## ESRI File Geodatabase API Library
-%global debug_package %{nil}
-
 Name:		FileGDBAPI
-Version:	%{getenv:RPMBUILD_VERSION}
-Release:	%{getenv:RPMBUILD_RELEASE}%{?dist}
+Version:	%{rpmbuild_version}
+Release:	%{rpmbuild_release}%{?dist}
 Summary:	ESRI FileGDB API
 Group:		System Environment/Libraries
 License:	ASL 2.0

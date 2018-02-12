@@ -1,6 +1,6 @@
 Name:		osmosis
-Version:	%{getenv:RPMBUILD_VERSION}
-Release:	%{getenv:RPMBUILD_RELEASE}%{?dist}
+Version:	%{rpmbuild_version}
+Release:	%{rpmbuild_release}%{?dist}
 Summary:	Command line Java application for processing OpenStreetMap (OSM) data
 
 Group:		Applications/Internet
