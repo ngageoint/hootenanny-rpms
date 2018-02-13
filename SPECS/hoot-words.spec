@@ -6,8 +6,8 @@
 %global words_file words1.sqlite
 
 Name:		hoot-words
-Version:	1.0.1
-Release:	1%{?dist}
+Version:	%{rpmbuild_version}
+Release:	%{rpmbuild_release}%{?dist}
 Group:		Applications/Engineering
 Summary:	Hootenanny words dictionary
 License:	GPLv3

@@ -1,6 +1,6 @@
 Name:		geos
-Version:	3.6.2
-Release:	1%{?dist}
+Version:	%{rpmbuild_version}
+Release:	%{rpmbuild_release}%{?dist}
 Summary:	GEOS is a C++ port of the Java Topology Suite
 
 Group:		Applications/Engineering

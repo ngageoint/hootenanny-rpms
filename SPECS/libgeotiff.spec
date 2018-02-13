@@ -1,6 +1,6 @@
 Name:		libgeotiff
-Version:	1.4.2
-Release:	1%{?dist}
+Version:	%{rpmbuild_version}
+Release:	%{rpmbuild_release}%{?dist}
 Summary:	GeoTIFF format library
 Group:		System Environment/Libraries
 License:	MIT

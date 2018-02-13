@@ -1,6 +1,6 @@
 Name:		wamerican-insane
-Version:	7.1
-Release:	1%{?dist}
+Version:	%{rpmbuild_version}
+Release:	%{rpmbuild_release}%{?dist}
 Summary:	American English dictionary words for /usr/share/dict
 
 Group:		System Environment/Libraries

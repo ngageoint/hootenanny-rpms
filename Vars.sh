@@ -36,8 +36,12 @@ function latest_hoot_version_gen() {
 }
 
 # Get version from YAML file.
-function spec_version() {
-    $SCRIPT_HOME/rpmversion $1
+function config_version() {
+    $SCRIPT_HOME/rpmversion --version-only $1
+}
+
+function config_release() {
+    $SCRIPT_HOME/rpmversion --release-only $1
 }
 
 # Get build requirement packages from spec file.
@@ -59,53 +63,67 @@ RPMBUILD_DIST=.el7
 RPM_X86_64=$RPMS/x86_64
 RPM_NOARCH=$RPMS/noarch
 
-DUMBINIT_VERSION=$( spec_version dumb-init )
-DUMBINIT_RPM=dumb-init-$DUMBINIT_VERSION$RPMBUILD_DIST.x86_64.rpm
+DUMBINIT_VERSION=$( config_version dumb-init )
+DUMBINIT_RELEASE=$( config_release dumb-init )
+DUMBINIT_RPM=dumb-init-$DUMBINIT_VERSION-$DUMBINIT_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
-FILEGDBAPI_VERSION=$( spec_version FileGDBAPI )
-FILEGDBAPI_RPM=FileGDBAPI-$FILEGDBAPI_VERSION$RPMBUILD_DIST.x86_64.rpm
+FILEGDBAPI_VERSION=$( config_version FileGDBAPI )
+FILEGDBAPI_RELEASE=$( config_release FileGDBAPI )
+FILEGDBAPI_RPM=FileGDBAPI-$FILEGDBAPI_VERSION-$FILEGDBAPI_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
-GDAL_VERSION=$( spec_version hoot-gdal )
-GDAL_RPM_SUFFIX=$GDAL_VERSION$RPMBUILD_DIST.x86_64.rpm
+GDAL_VERSION=$( config_version hoot-gdal )
+GDAL_RELEASE=$( config_release hoot-gdal )
+GDAL_RPM_SUFFIX=$GDAL_VERSION-$GDAL_RELEASE$RPMBUILD_DIST.x86_64.rpm
 GDAL_RPM=hoot-gdal-$GDAL_RPM_SUFFIX
 
-GEOS_VERSION=$( spec_version geos )
-GEOS_RPM=geos-$GEOS_VERSION$RPMBUILD_DIST.x86_64.rpm
-GEOS_DEVEL_RPM=geos-devel-$GEOS_VERSION$RPMBUILD_DIST.x86_64.rpm
+GEOS_VERSION=$( config_version geos )
+GEOS_RELEASE=$( config_release geos )
+GEOS_RPM=geos-$GEOS_VERSION-$GEOS_RELEASE$RPMBUILD_DIST.x86_64.rpm
+GEOS_DEVEL_RPM=geos-devel-$GEOS_VERSION-$GEOS_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
-LIBGEOTIFF_VERSION=$( spec_version libgeotiff )
-LIBGEOTIFF_RPM=libgeotiff-$LIBGEOTIFF_VERSION$RPMBUILD_DIST.x86_64.rpm
-LIBGEOTIFF_DEVEL_RPM=libgeotiff-devel-$LIBGEOTIFF_VERSION$RPMBUILD_DIST.x86_64.rpm
+LIBGEOTIFF_VERSION=$( config_version libgeotiff )
+LIBGEOTIFF_RELEASE=$( config_release libgeotiff )
+LIBGEOTIFF_RPM=libgeotiff-$LIBGEOTIFF_VERSION-$LIBGEOTIFF_RELEASE$RPMBUILD_DIST.x86_64.rpm
+LIBGEOTIFF_DEVEL_RPM=libgeotiff-devel-$LIBGEOTIFF_VERSION-$LIBGEOTIFF_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
-LIBKML_VERSION=$( spec_version libkml )
-LIBKML_RPM=libkml-$LIBKML_VERSION$RPMBUILD_DIST.x86_64.rpm
-LIBKML_DEVEL_RPM=libkml-devel-$LIBKML_VERSION$RPMBUILD_DIST.x86_64.rpm
+LIBKML_VERSION=$( config_version libkml )
+LIBKML_RELEASE=$( config_release libkml )
+LIBKML_RPM=libkml-$LIBKML_VERSION-$LIBKML_RELEASE$RPMBUILD_DIST.x86_64.rpm
+LIBKML_DEVEL_RPM=libkml-devel-$LIBKML_VERSION-$LIBKML_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
-NODE_VERSION=$( spec_version node )
-NODE_RPM=nodejs-$NODE_VERSION$RPMBUILD_DIST.x86_64.rpm
-NODE_DEVEL_RPM=nodejs-devel-$NODE_VERSION$RPMBUILD_DIST.x86_64.rpm
+NODE_VERSION=$( config_version nodejs )
+NODE_RELEASE=$( config_release nodejs )
+NODE_RPM=nodejs-$NODE_VERSION-$NODE_RELEASE$RPMBUILD_DIST.x86_64.rpm
+NODE_DEVEL_RPM=nodejs-devel-$NODE_VERSION-$NODE_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
-OSMOSIS_VERSION=$( spec_version osmosis )
-OSMOSIS_RPM=osmosis-$OSMOSIS_VERSION$RPMBUILD_DIST.noarch.rpm
+OSMOSIS_VERSION=$( config_version osmosis )
+OSMOSIS_RELEASE=$( config_release osmosis )
+OSMOSIS_RPM=osmosis-$OSMOSIS_VERSION-$OSMOSIS_RELEASE$RPMBUILD_DIST.noarch.rpm
 
-POSTGIS_VERSION=$( spec_version postgis )
-POSTGIS_RPM=hoot-postgis23_$PG_DOTLESS-$POSTGIS_VERSION$RPMBUILD_DIST.x86_64.rpm
+POSTGIS_VERSION=$( config_version postgis )
+POSTGIS_RELEASE=$( config_release postgis )
+POSTGIS_RPM=hoot-postgis23_$PG_DOTLESS-$POSTGIS_VERSION-$POSTGIS_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
-STXXL_VERSION=$( spec_version stxxl )
-STXXL_RPM=stxxl-$STXXL_VERSION$RPMBUILD_DIST.x86_64.rpm
-STXXL_DEVEL_RPM=stxxl-devel-$STXXL_VERSION$RPMBUILD_DIST.x86_64.rpm
+STXXL_VERSION=$( config_version stxxl )
+STXXL_RELEASE=$( config_release stxxl )
+STXXL_RPM=stxxl-$STXXL_VERSION-$STXXL_RELEASE$RPMBUILD_DIST.x86_64.rpm
+STXXL_DEVEL_RPM=stxxl-devel-$STXXL_VERSION-$STXXL_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
-SUEXEC_VERSION=$( spec_version su-exec )
-SUEXEC_RPM=su-exec-$SUEXEC_VERSION$RPMBUILD_DIST.x86_64.rpm
+SUEXEC_VERSION=$( config_version su-exec )
+SUEXEC_RELEASE=$( config_release su-exec )
+SUEXEC_RPM=su-exec-$SUEXEC_VERSION-$SUEXEC_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
-TOMCAT8_VERSION=$( spec_version tomcat8 )
-TOMCAT8_RPM=tomcat8-$TOMCAT8_VERSION$RPMBUILD_DIST.noarch.rpm
+TOMCAT8_VERSION=$( config_version tomcat8 )
+TOMCAT8_RELEASE=$( config_release tomcat8 )
+TOMCAT8_RPM=tomcat8-$TOMCAT8_VERSION-$TOMCAT8_RELEASE$RPMBUILD_DIST.noarch.rpm
 
-WAMERICAN_VERSION=$( spec_version wamerican-insane )
-WAMERICAN_RPM=wamerican-insane-$WAMERICAN_VERSION$RPMBUILD_DIST.noarch.rpm
+WAMERICAN_VERSION=$( config_version wamerican-insane )
+WAMERICAN_RELEASE=$( config_release wamerican-insane )
+WAMERICAN_RPM=wamerican-insane-$WAMERICAN_VERSION-$WAMERICAN_RELEASE$RPMBUILD_DIST.noarch.rpm
 
-WORDS_VERSION=$( spec_version hoot-words )
-WORDS_RPM=hoot-words-$WORDS_VERSION$RPMBUILD_DIST.noarch.rpm
+WORDS_VERSION=$( config_version hoot-words )
+WORDS_RELEASE=$( config_release hoot-words )
+WORDS_RPM=hoot-words-$WORDS_VERSION-$WORDS_RELEASE$RPMBUILD_DIST.noarch.rpm
 
 
 ## Docker build functions.

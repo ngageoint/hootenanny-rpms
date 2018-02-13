@@ -1,7 +1,5 @@
 ---
-mocha_version: &mocha_version '3.5.3'
 pg_version: &pg_version '9.5'
-
 
 versions:
   dumb-init: &dumbinit_version '1.2.1-1'
@@ -11,7 +9,8 @@ versions:
   FileGDBAPI: &filegdbapi_version '1.5.1-1'
   libgeotiff: &libgeotiff_version '1.4.2-1'
   libkml: &libkml_version '1.3.0-1'
-  node: &node_version '8.9.3-1'
+  mocha: &mocha_version '3.5.3'
+  nodejs: &node_version '8.9.3-1'
   osmosis: &osmosis_version '0.46-1'
   postgis: &postgis_version '2.3.5-1'
   stxxl: &stxxl_version '1.3.1-1'
@@ -33,13 +32,32 @@ base_images: !!omap
       tags: [*pg_version]
   - rpmbuild-repo: {}
   - rpmbuild-geos:
+      buildrequires: true
       dockerfile: 'docker/Dockerfile.rpmbuild-generic'
-      args:
-        packages: 'doxygen gcc-c++ libtool'
   - rpmbuild-libgeotiff:
+      buildrequires: true
       dockerfile: 'docker/Dockerfile.rpmbuild-generic'
-      args:
-        packages: 'libjpeg-devel libtiff-devel proj-devel zlib-devel'
+  - rpmbuild-libkml:
+      buildrequires: true
+      dockerfile: 'docker/Dockerfile.rpmbuild-generic'
+  - rpmbuild-nodejs:
+      buildrequires: true
+      dockerfile: 'docker/Dockerfile.rpmbuild-generic'
+
+# - rpmbuild-gdal:
+#     args:
+#       filegdbapi_version: *filegdbapi_version
+#       geos_version: *geos_version
+#       libgeotiff_version: *libgeotiff_version
+#       libkml_version: *libkml_version
+#       pg_version: *pg_version
+#     buildrequires: true
+#     spec_file: 'SPECS/hoot-gdal.spec'
+# - rpmbuild-postgis:
+#     args:
+#       gdal_version: *gdal_version
+#     buildrequires: true
+#     spec_file: 'SPECS/hoot-postgis23.spec'
 
 
 rpms:

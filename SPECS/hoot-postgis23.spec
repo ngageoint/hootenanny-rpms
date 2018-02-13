@@ -1,4 +1,7 @@
-%global postgismajorversion 2.3
+%global postgis_major %(echo %{rpmbuild_version} | awk -F. '{ print $1 }')
+%global postgis_minor %(echo %{rpmbuild_version} | awk -F. '{ print $2 }')
+%global postgis_micro %(echo %{rpmbuild_version} | awk -F. '{ print $3 }')
+%global postgismajorversion %{postgis_major}.%{postgis_minor}
 %global postgiscurrmajorversion %(echo %{postgismajorversion}|tr -d '.')
 %global postgisprevmajorversion 2.2
 %global postgisprevversion %{postgisprevmajorversion}.6
@@ -24,8 +27,8 @@
 
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		%{sname}%{postgiscurrmajorversion}_%{pg_dotless}
-Version:	%{postgismajorversion}.5
-Release:	1%{?dist}
+Version:	%{rpmbuild_version}
+Release:	%{rpmbuild_release}%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
 Source0:	http://download.osgeo.org/postgis/source/postgis-%{version}.tar.gz
@@ -35,7 +38,6 @@ Source4:	postgis-filter-requires-perl-Pg.sh
 Patch0:		postgis-gdalfpic.patch
 
 URL:		http://www.postgis.net/
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:	postgresql%{pg_dotless}-devel
 BuildRequires:	geos-devel >= 3.5.0
