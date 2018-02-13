@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source $SCRIPT_HOME/Vars.sh
 
-BUILD_IMAGE=${BUILD_IMAGE:-hoot/rpmbuild-hoot-release}
+BUILD_IMAGE=${BUILD_IMAGE:-hootenanny/rpmbuild-hoot-release}
 
 set +u
 if [ -z $1 ]; then

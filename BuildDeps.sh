@@ -95,10 +95,10 @@ if [ ! -f $RPM_X86_64/$GDAL_RPM ]; then
     # need to install.
     docker build \
            --build-arg "packages=$( spec_requires hoot-gdal )" \
-           --build-arg filegdbapi_version=$FILEGDBAPI_VERSION-$FILEGDBAPI_RELEASE \
-           --build-arg geos_version=$GEOS_VERSION-$GEOS_RELEASE \
-           --build-arg libgeotiff_version=$LIBGEOTIFF_VERSION-$LIBGEOTIFF_RELEASE \
-           --build-arg libkml_version=$LIBKML_VERSION-$LIBKML_RELEASE \
+           --build-arg filegdbapi_version=$FILEGDBAPI_VERSION \
+           --build-arg geos_version=$GEOS_VERSION \
+           --build-arg libgeotiff_version=$LIBGEOTIFF_VERSION \
+           --build-arg libkml_version=$LIBKML_VERSION \
            --build-arg pg_version=$PG_VERSION \
            -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-gdal \
            -t hoot/rpmbuild-gdal \
@@ -116,7 +116,7 @@ if [ ! -f $RPM_X86_64/$POSTGIS_RPM ]; then
 
     docker build \
            --build-arg "packages=$( spec_requires hoot-postgis23 )" \
-           --build-arg gdal_version=$GDAL_VERSION-$GDAL_RELEASE \
+           --build-arg gdal_version=$GDAL_VERSION \
            -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-postgis \
            -t hoot/rpmbuild-postgis \
            $SCRIPT_HOME

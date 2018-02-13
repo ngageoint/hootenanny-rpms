@@ -33,7 +33,7 @@ case "${BUILD_IMAGE}" in
                --build-arg tomcat8_version=$TOMCAT8_VERSION-$TOMCAT8_RELEASE \
                --build-arg words_version=$WORDS_VERSION-$WORDS_RELEASE \
                -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-hoot-devel \
-               -t hoot/rpmbuild-hoot-devel \
+               -t hootenanny/rpmbuild-hoot-devel \
                $SCRIPT_HOME
         ;;
     # The "release" image, built with latest signed images in the hootenanny
@@ -45,7 +45,7 @@ case "${BUILD_IMAGE}" in
                --build-arg node_version=$NODE_VERSION \
                --build-arg pg_version=$PG_VERSION \
                -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-hoot-release \
-               -t hoot/rpmbuild-hoot-release \
+               -t hootenanny/rpmbuild-hoot-release \
                $SCRIPT_HOME
         ;;
     *)
