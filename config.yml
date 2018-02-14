@@ -72,6 +72,13 @@ rpms:
   hoot-gdal:
     image: rpmbuild-gdal
     version: *gdal_version
+  hoot-postgis23:
+    image: rpmbuild-postgis
+    version: *postgis_version
+  hoot-words:
+    image: rpmbuild-generic
+    version: *words_version
+    arch: noarch
   FileGDBAPI:
     image: rpmbuild-generic
     version: *filegdbapi_version
@@ -97,4 +104,8 @@ rpms:
   tomcat8:
     image: rpmbuild-generic
     version: *tomcat8_version
+    arch: noarch
+  wamerican-insane:
+    image: rpmbuild-generic
+    version: *wamerican_version
     arch: noarch

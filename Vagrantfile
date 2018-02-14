@@ -122,11 +122,12 @@ def rpmbuild(config, name, options)
 end
 
 
-def collect_rpms(images)
+def collect_rpms(filters)
   collected = {}
-  images.each do |image|
+  filters.each do |filter|
     $rpms.each do |name, options|
-      if options.fetch('image', nil) == image
+      if (name == filter or
+          options.fetch('image', nil) == filter)
         collected[name] = options
       end
     end
@@ -142,9 +143,13 @@ Vagrant.configure(2) do |config|
     build_container(config, name, options)
   end
 
-  # GDAL dependency RPMS need to be built first
+  # Generic, NodeJS, and GDAL dependency RPMS are built first.
   collect_rpms(
-    ['rpmbuild-geos', 'rpmbuild-libgeotiff', 'rpmbuild-libkml']
+    ['rpmbuild-generic',
+     'rpmbuild-geos',
+     'rpmbuild-libgeotiff',
+     'rpmbuild-libkml',
+     'rpmbuild-nodejs']
   ).each do |name, options|
     rpmbuild(config, name, options)
   end
@@ -163,10 +168,7 @@ Vagrant.configure(2) do |config|
     build_container(config, name, options)
   end
 
-  # Finally, finish with PostGIS, NodeJS and all of the other RPMs.
-  collect_rpms(
-    ['rpmbuild-generic', 'rpmbuild-nodejs', 'rpmbuild-postgis']
-  ).each do |name, options|
+  collect_rpms(['rpmbuild-postgis']).each do |name, options|
     rpmbuild(config, name, options)
   end
 end
