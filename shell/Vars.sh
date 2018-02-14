@@ -14,13 +14,6 @@ SPECS=$SCRIPT_HOME/SPECS
 SOURCES=$SCRIPT_HOME/SOURCES
 RPMS=$SCRIPT_HOME/RPMS
 
-# Mocha version
-MOCHA_VERSION=3.5.3
-
-# PostgreSQL version
-PG_VERSION=9.5
-PG_DOTLESS=$(echo $PG_VERSION | tr -d '.')
-
 ## Utility functions.
 
 function latest_hoot_archive() {
@@ -57,6 +50,13 @@ function spec_requires() {
         -q --buildrequires $SPECS/$1.spec | \
         awk '{ for (i = 1; i <= NF; ++i) if ($i ~ /^[[:alpha:]]/) print $i }' ORS=' '
 }
+
+# Mocha version
+MOCHA_VERSION=$( config_version mocha )
+
+# PostgreSQL version
+PG_VERSION=$( config_version pg )
+PG_DOTLESS=$(echo $PG_VERSION | tr -d '.')
 
 ## Package versioning variables.
 RPMBUILD_DIST=.el7
