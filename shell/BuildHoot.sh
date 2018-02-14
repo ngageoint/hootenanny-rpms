@@ -2,8 +2,7 @@
 set -euo pipefail
 
 ## Get variables.
-SCRIPT_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source $SCRIPT_HOME/Vars.sh
+source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/Vars.sh
 
 BUILD_IMAGE=${BUILD_IMAGE:-hootenanny/rpmbuild-hoot-release}
 

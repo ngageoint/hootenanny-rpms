@@ -7,6 +7,7 @@ $rpms = settings.fetch('rpms', {})
 $pg_version = settings.fetch('pg_version')
 $pg_dotless = $pg_version.gsub('.', '')
 
+
 ## Functions used by Vagrant containers.
 
 def build_container(config, name, options)
@@ -73,7 +74,6 @@ def build_container(config, name, options)
   end
 end
 
-
 # Configure container for being used to run rpmbuild.
 def rpmbuild(config, name, options)
   arch = options.fetch('arch', 'x86_64')
@@ -121,7 +121,6 @@ def rpmbuild(config, name, options)
   end
 end
 
-
 def collect_rpms(filters)
   collected = {}
   filters.each do |filter|
@@ -134,6 +133,7 @@ def collect_rpms(filters)
   end
   return collected
 end
+
 
 ## Vagrant configuration
 

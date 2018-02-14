@@ -7,7 +7,7 @@ if ! test -x /usr/bin/rpm; then
 fi
 
 ## Important variables needed for functions.
-SCRIPT_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPT_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 
 # Directories used in RPM process.
 SPECS=$SCRIPT_HOME/SPECS
@@ -37,11 +37,11 @@ function latest_hoot_version_gen() {
 
 # Get version from YAML file.
 function config_version() {
-    $SCRIPT_HOME/rpmversion --version-only $1
+    cat $SCRIPT_HOME/config.yml | grep "\\&${1}" | awk '{ print $3 }' | tr -d "'" | awk -F- '{ print $1 }'
 }
 
 function config_release() {
-    $SCRIPT_HOME/rpmversion --release-only $1
+    cat $SCRIPT_HOME/config.yml | grep "\\&${1}" | awk '{ print $3 }' | tr -d "'" | awk -F- '{ print $2 }'
 }
 
 # Get build requirement packages from spec file.
@@ -52,6 +52,8 @@ function spec_requires() {
         --define "_topdir ${SCRIPT_HOME}" \
         --define 'hoot_version_gen 0.0.0' \
         --define "pg_dotless ${PG_DOTLESS}" \
+        --define 'rpmbuild_version 0.0.0' \
+        --define 'rpmbuild_release 1' \
         -q --buildrequires $SPECS/$1.spec | \
         awk '{ for (i = 1; i <= NF; ++i) if ($i ~ /^[[:alpha:]]/) print $i }' ORS=' '
 }
@@ -63,16 +65,16 @@ RPMBUILD_DIST=.el7
 RPM_X86_64=$RPMS/x86_64
 RPM_NOARCH=$RPMS/noarch
 
-DUMBINIT_VERSION=$( config_version dumb-init )
-DUMBINIT_RELEASE=$( config_release dumb-init )
+DUMBINIT_VERSION=$( config_version dumbinit )
+DUMBINIT_RELEASE=$( config_release dumbinit )
 DUMBINIT_RPM=dumb-init-$DUMBINIT_VERSION-$DUMBINIT_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
-FILEGDBAPI_VERSION=$( config_version FileGDBAPI )
-FILEGDBAPI_RELEASE=$( config_release FileGDBAPI )
+FILEGDBAPI_VERSION=$( config_version filegdbapi )
+FILEGDBAPI_RELEASE=$( config_release filegdbapi )
 FILEGDBAPI_RPM=FileGDBAPI-$FILEGDBAPI_VERSION-$FILEGDBAPI_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
-GDAL_VERSION=$( config_version hoot-gdal )
-GDAL_RELEASE=$( config_release hoot-gdal )
+GDAL_VERSION=$( config_version gdal )
+GDAL_RELEASE=$( config_release gdal )
 GDAL_RPM_SUFFIX=$GDAL_VERSION-$GDAL_RELEASE$RPMBUILD_DIST.x86_64.rpm
 GDAL_RPM=hoot-gdal-$GDAL_RPM_SUFFIX
 
@@ -91,8 +93,8 @@ LIBKML_RELEASE=$( config_release libkml )
 LIBKML_RPM=libkml-$LIBKML_VERSION-$LIBKML_RELEASE$RPMBUILD_DIST.x86_64.rpm
 LIBKML_DEVEL_RPM=libkml-devel-$LIBKML_VERSION-$LIBKML_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
-NODE_VERSION=$( config_version nodejs )
-NODE_RELEASE=$( config_release nodejs )
+NODE_VERSION=$( config_version node )
+NODE_RELEASE=$( config_release node )
 NODE_RPM=nodejs-$NODE_VERSION-$NODE_RELEASE$RPMBUILD_DIST.x86_64.rpm
 NODE_DEVEL_RPM=nodejs-devel-$NODE_VERSION-$NODE_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
@@ -109,20 +111,20 @@ STXXL_RELEASE=$( config_release stxxl )
 STXXL_RPM=stxxl-$STXXL_VERSION-$STXXL_RELEASE$RPMBUILD_DIST.x86_64.rpm
 STXXL_DEVEL_RPM=stxxl-devel-$STXXL_VERSION-$STXXL_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
-SUEXEC_VERSION=$( config_version su-exec )
-SUEXEC_RELEASE=$( config_release su-exec )
+SUEXEC_VERSION=$( config_version suexec )
+SUEXEC_RELEASE=$( config_release suexec )
 SUEXEC_RPM=su-exec-$SUEXEC_VERSION-$SUEXEC_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
 TOMCAT8_VERSION=$( config_version tomcat8 )
 TOMCAT8_RELEASE=$( config_release tomcat8 )
 TOMCAT8_RPM=tomcat8-$TOMCAT8_VERSION-$TOMCAT8_RELEASE$RPMBUILD_DIST.noarch.rpm
 
-WAMERICAN_VERSION=$( config_version wamerican-insane )
-WAMERICAN_RELEASE=$( config_release wamerican-insane )
+WAMERICAN_VERSION=$( config_version wamerican )
+WAMERICAN_RELEASE=$( config_release wamerican )
 WAMERICAN_RPM=wamerican-insane-$WAMERICAN_VERSION-$WAMERICAN_RELEASE$RPMBUILD_DIST.noarch.rpm
 
-WORDS_VERSION=$( config_version hoot-words )
-WORDS_RELEASE=$( config_release hoot-words )
+WORDS_VERSION=$( config_version words )
+WORDS_RELEASE=$( config_release words )
 WORDS_RPM=hoot-words-$WORDS_VERSION-$WORDS_RELEASE$RPMBUILD_DIST.noarch.rpm
 
 
