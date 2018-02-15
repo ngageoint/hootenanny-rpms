@@ -140,6 +140,7 @@ rpmbuild-repo: \
 	rpmbuild \
 	.vagrant/machines/rpmbuild-repo/docker/id
 
+
 ## RPM targets.
 
 dumb-init: rpmbuild-generic $(DUMBINIT_RPM)
@@ -152,9 +153,11 @@ hoot-gdal: rpmbuild-gdal $(GDAL_RPM)
 hoot-words: rpmbuild-generic $(WORDS_RPM)
 hoot-postgis23_$(PG_DOTLESS): rpmbuild-postgis $(POSTGIS_RPM)
 osmosis: rpmbuild-generic $(OSMOSIS_RPM)
+stxxl: rpmbuild-generic $(STXXL_RPM)
 su-exec: rpmbuild-generic $(SUEXEC_RPM)
 tomcat8: rpmbuild-generic $(TOMCAT8_RPM)
 wamerican-insane: rpmbuild-generic $(WAMERICAN_RPM)
+
 
 ## Build patterns.
 
