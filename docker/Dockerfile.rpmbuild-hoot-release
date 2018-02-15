@@ -9,7 +9,7 @@ LABEL \
   vendor="Radiant Solutions"
 
 ARG mocha_version
-ARG node_version
+ARG nodejs_version
 ARG packages
 ARG pg_version
 ARG pg_data=/var/lib/pgsql/${pg_version}/data
@@ -24,7 +24,7 @@ USER root
 COPY scripts/hoot-repo.sh scripts/nodejs-install.sh /tmp/
 RUN /tmp/hoot-repo.sh && \
     rm /tmp/hoot-repo.sh && \
-    /tmp/nodejs-install.sh ${node_version} && \
+    /tmp/nodejs-install.sh ${nodejs_version} && \
     rm -f /tmp/nodejs-install.sh && \
     npm install --silent -g mocha@${mocha_version}
 

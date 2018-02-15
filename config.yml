@@ -4,11 +4,11 @@ versions:
   geos: &geos_version '3.6.2-1'
   hoot-gdal: &gdal_version '2.1.4-2'
   hoot-words: &words_version '1.0.1-1'
-  FileGDBAPI: &filegdbapi_version '1.5.1-1'
+  FileGDBAPI: &FileGDBAPI_version '1.5.1-1'
   libgeotiff: &libgeotiff_version '1.4.2-1'
   libkml: &libkml_version '1.3.0-1'
   mocha: &mocha_version '3.5.3'
-  nodejs: &node_version '8.9.3-1'
+  nodejs: &nodejs_version '8.9.3-1'
   osmosis: &osmosis_version '0.46-1'
   postgis: &postgis_version '2.3.5-1'
   postgresql: &pg_version '9.5'
@@ -46,7 +46,7 @@ images:
   gdal: !!omap
     - rpmbuild-gdal:
         args:
-          filegdbapi_version: *filegdbapi_version
+          filegdbapi_version: *FileGDBAPI_version
           geos_version: *geos_version
           libgeotiff_version: *libgeotiff_version
           libkml_version: *libkml_version
@@ -80,7 +80,7 @@ rpms:
     arch: noarch
   FileGDBAPI:
     image: rpmbuild-generic
-    version: *filegdbapi_version
+    version: *FileGDBAPI_version
   libgeotiff:
     image: rpmbuild-libgeotiff
     version: *libgeotiff_version
@@ -89,7 +89,7 @@ rpms:
     version: *libkml_version
   nodejs:
     image: rpmbuild-nodejs
-    version: *node_version
+    version: *nodejs_version
   osmosis:
     image: rpmbuild-generic
     version: *osmosis_version

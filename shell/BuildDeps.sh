@@ -80,7 +80,7 @@ if [ ! -f $RPM_X86_64/$LIBKML_RPM ]; then
 fi
 
 # NodeJS
-if [ ! -f $RPM_X86_64/$NODE_RPM ]; then
+if [ ! -f $RPM_X86_64/$NODEJS_RPM ]; then
     echo "#### Building RPM: NodeJS"
 
     # Build image for building NodeJS.
@@ -94,8 +94,8 @@ if [ ! -f $RPM_X86_64/$NODE_RPM ]; then
     run_dep_image \
         -i hootenanny/rpmbuild-nodejs \
         rpmbuild \
-        --define "rpmbuild_version ${NODE_VERSION}" \
-        --define "rpmbuild_release ${NODE_RELEASE}" \
+        --define "rpmbuild_version ${NODEJS_VERSION}" \
+        --define "rpmbuild_release ${NODEJS_RELEASE}" \
         -bb SPECS/nodejs.spec
 fi
 

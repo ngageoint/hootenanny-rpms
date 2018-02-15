@@ -69,8 +69,8 @@ DUMBINIT_VERSION=$( config_version dumbinit )
 DUMBINIT_RELEASE=$( config_release dumbinit )
 DUMBINIT_RPM=dumb-init-$DUMBINIT_VERSION-$DUMBINIT_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
-FILEGDBAPI_VERSION=$( config_version filegdbapi )
-FILEGDBAPI_RELEASE=$( config_release filegdbapi )
+FILEGDBAPI_VERSION=$( config_version FileGDBAPI )
+FILEGDBAPI_RELEASE=$( config_release FileGDBAPI )
 FILEGDBAPI_RPM=FileGDBAPI-$FILEGDBAPI_VERSION-$FILEGDBAPI_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
 GDAL_VERSION=$( config_version gdal )
@@ -93,10 +93,10 @@ LIBKML_RELEASE=$( config_release libkml )
 LIBKML_RPM=libkml-$LIBKML_VERSION-$LIBKML_RELEASE$RPMBUILD_DIST.x86_64.rpm
 LIBKML_DEVEL_RPM=libkml-devel-$LIBKML_VERSION-$LIBKML_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
-NODE_VERSION=$( config_version node )
-NODE_RELEASE=$( config_release node )
-NODE_RPM=nodejs-$NODE_VERSION-$NODE_RELEASE$RPMBUILD_DIST.x86_64.rpm
-NODE_DEVEL_RPM=nodejs-devel-$NODE_VERSION-$NODE_RELEASE$RPMBUILD_DIST.x86_64.rpm
+NODEJS_VERSION=$( config_version nodejs )
+NODEJS_RELEASE=$( config_release nodejs )
+NODEJS_RPM=nodejs-$NODEJS_VERSION-$NODEJS_RELEASE$RPMBUILD_DIST.x86_64.rpm
+NODEJS_DEVEL_RPM=nodejs-devel-$NODEJS_VERSION-$NODEJS_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
 OSMOSIS_VERSION=$( config_version osmosis )
 OSMOSIS_RELEASE=$( config_release osmosis )
