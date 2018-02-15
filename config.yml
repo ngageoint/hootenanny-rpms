@@ -71,9 +71,10 @@ rpms:
   hoot-gdal:
     image: rpmbuild-gdal
     version: *gdal_version
-  hoot-postgis23:
+  hoot-postgis23_95:
     image: rpmbuild-postgis
     version: *postgis_version
+    spec_file: 'SPECS/hoot-postgis23.spec'
   hoot-words:
     image: rpmbuild-generic
     version: *words_version

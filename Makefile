@@ -32,102 +32,113 @@ TOMCAT8_RPM := $(call rpm_file,tomcat8,noarch)
 WAMERICAN_RPM := $(call rpm_file2,wamerican-insane,wamerican,noarch)
 WORDS_RPM := $(call rpm_file2,hoot-words,words,noarch)
 
+BASE_CONTAINERS := \
+	rpmbuild \
+	rpmbuild-base \
+	rpmbuild-generic \
+	rpmbuild-pgdg
+
+DEPENDENCY_CONTAINERS := \
+	$(BASE_CONTAINERS) \
+	rpmbuild-gdal \
+	rpmbuild-geos \
+	rpmbuild-libgeotiff \
+	rpmbuild-libkml \
+	rpmbuild-postgis \
+	rpmbuild-nodejs
+
+REPO_CONTAINERS := \
+	rpmbuild-repo
+
+DEPENDENCY_RPMS := \
+		dumb-init \
+		FileGDBAPI \
+		geos \
+		libgeotiff \
+		libkml \
+		hoot-gdal \
+		hoot-postgis23_$(PG_DOTLESS) \
+		hoot-words \
+		nodejs \
+		osmosis \
+		stxxl \
+		su-exec \
+		tomcat8 \
+		wamerican-insane
+
 
 ## Main targets.
 
-.PHONY: all base deps clean
-
+.PHONY: \
+	all \
+	base \
+	deps \
+	clean \
+	$(DEPENDENCY_CONTAINERS) \
+	$(DEPENDENCY_RPMS) \
+	$(REPO_CONTAINERS)
 
 all: base
 
-
-base: \
-	rpmbuild-generic \
-	rpmbuild-pgdg \
-	rpmbuild-repo
-
+base: $(BASE_CONTAINERS)
 
 deps: \
-	$(DUMBINIT_RPM) \
-	$(GEOS_RPM) \
-	$(GDAL_RPM) \
-	$(FILEGDBAPI_RPM) \
-	$(LIBGEOTIFF_RPM) \
-	$(LIBKML_RPM) \
-	$(NODEJS_RPM) \
-	$(OSMOSIS_RPM) \
-	$(POSTGIS_RPM) \
-	$(STXXL_RPM) \
-	$(SUEXEC_RPM) \
-	$(TOMCAT8_RPM) \
-	$(WAMERICAN_RPM) \
-	$(WORDS_RPM)
-
+	$(DEPENDENCY_CONTAINERS) \
+	$(DEPENDENCY_RPMS)
 
 clean:
 	$(VAGRANT) destroy -f --no-parallel || true
-	rm -fr RPMS/{noarch,x86_64}
-
+	rm -fr RPMS/noarch RPMS/x86_64
 
 ## Container targets.
 
 rpmbuild: .vagrant/machines/rpmbuild/docker/id
 
-
 rpmbuild-base: \
 	rpmbuild \
 	.vagrant/machines/rpmbuild-base/docker/id
-
 
 rpmbuild-generic: \
 	rpmbuild-base \
 	.vagrant/machines/rpmbuild-generic/docker/id
 
+# GDAL container requires GEOS, FileGDBAPI, libgeotiff, and libkml RPMs.
+rpmbuild-gdal: \
+	rpmbuild-pgdg \
+	FileGDBAPI \
+	geos \
+	libgeotiff \
+	libkml \
+	.vagrant/machines/rpmbuild-gdal/docker/id
 
 rpmbuild-geos: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-geos/docker/id
 
-
 rpmbuild-libgeotiff: \
 	rpmbuild-generic \
-	.vagrant/machines/rpmbuild-gdal/docker/id
-
+	.vagrant/machines/rpmbuild-libgeotiff/docker/id
 
 rpmbuild-libkml: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-libkml/docker/id
 
-
 rpmbuild-nodejs: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-nodejs/docker/id
-
 
 rpmbuild-pgdg: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-pgdg/docker/id
 
-
-# GDAL container requires GEOS, FileGDBAPI, libgeotiff, and libkml RPMs.
-rpmbuild-gdal: \
-	geos \
-	FileGDBAPI \
-	libgeotiff \
-	libkml \
-	.vagrant/machines/rpmbuild-gdal/docker/id
-
-
 # PostGIS container requires GDAL RPMs.
 rpmbuild-postgis: \
-	rpmbuild-pgdg \
-	hoot-gdal
-
+	hoot-gdal \
+	.vagrant/machines/rpmbuild-postgis/docker/id
 
 rpmbuild-repo: \
 	rpmbuild \
 	.vagrant/machines/rpmbuild-repo/docker/id
-
 
 ## RPM targets.
 
@@ -145,13 +156,11 @@ su-exec: rpmbuild-generic $(SUEXEC_RPM)
 tomcat8: rpmbuild-generic $(TOMCAT8_RPM)
 wamerican-insane: rpmbuild-generic $(WAMERICAN_RPM)
 
-
-## Build targets.
+## Build patterns.
 
 # Vagrant creates a file with the Docker UUID in it.
 .vagrant/machines/%/docker/id:
 	$(VAGRANT) up $*
-
 
 # Runs container and follow logs until it completes.
 RPMS/x86_64/%.rpm RPMS/noarch/%.rpm:

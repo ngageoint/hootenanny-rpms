@@ -98,8 +98,11 @@ def rpmbuild(config, name, options)
 
     container.vm.provider :docker do |d|
       d.image = image_name
+
+      # Add `--rm` to the creation args so we don't need to keep the container
+      # (it's image is just ran to compile the RPM).
       d.create_args = options.fetch(
-        'create_args', ['-it', '--rm']
+        'create_args', ['--rm']
       )
       d.remains_running = options.fetch(
         'remains_running', true
@@ -130,7 +133,7 @@ def rpmbuild(config, name, options)
 
       # Default to using `rpmbuild -bb`.
       rpmbuild_cmd << options.fetch('build_type', '-bb')
-      rpmbuild_cmd << "SPECS/#{name}.spec"
+      rpmbuild_cmd << options.fetch('spec_file', "SPECS/#{name}.spec")
 
       d.cmd = rpmbuild_cmd
     end
