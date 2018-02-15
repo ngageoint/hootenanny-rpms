@@ -79,7 +79,7 @@ RUN yum install -y \
     /tmp/su-exec-${suexec_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/tomcat8-${tomcat8_version}${RPMBUILD_DIST}.noarch.rpm \
     && \
-    rm -f /*.rpm && \
+    rm -f /tmp/*.rpm && \
     npm install --silent -g mocha@${mocha_version} \
     if [ ! -z "${packages}" ] ; then yum -y install ${packages}; fi
 

@@ -42,7 +42,7 @@ RUN yum install -y \
     /tmp/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
     && \
-    rm -f /*.rpm
+    rm -f /tmp/*.rpm
 
 # Install any additionally requested packages.
 RUN if [ ! -z "${packages}" ] ; then yum -y install ${packages}; fi
