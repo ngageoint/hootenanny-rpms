@@ -80,7 +80,7 @@ RUN yum install -y \
     /tmp/tomcat8-${tomcat8_version}${RPMBUILD_DIST}.noarch.rpm \
     && \
     rm -f /tmp/*.rpm && \
-    npm install --silent -g mocha@${mocha_version} \
+    npm install --silent -g mocha@${mocha_version} && \
     if [ ! -z "${packages}" ] ; then yum -y install ${packages}; fi
 
 # Install PostgreSQL server at desired version, and setup the Hoot databases.
