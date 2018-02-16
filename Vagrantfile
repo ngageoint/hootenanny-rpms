@@ -24,6 +24,15 @@ def collect_rpms(filters)
 end
 
 
+def make_hoot_dirs
+  ['hootenanny', 'RPMS', 'cache', 'cache/m2', 'cache/npm'].each do |directory|
+    if ! File.directory?(directory)
+      Dir.mkdir(directory, 0755)
+    end
+  end
+end
+
+
 def rpm_file(name, options)
   arch = options.fetch('arch', 'x86_64')
   dist = options.fetch('dist', '.el7')
@@ -31,22 +40,24 @@ def rpm_file(name, options)
 end
 
 
-def shared_folders(container, name, options)
-    container.vm.synced_folder '.', '/vagrant', disabled: true
+def shared_folders(container, name, options, rpmbuild: false)
+  container.vm.synced_folder '.', '/vagrant', disabled: true
 
-    if options.fetch('rpmbuild', false)
-      # Container needs to be able to write RPMs via bind mounts.
-      container.vm.synced_folder 'RPMS', '/rpmbuild/RPMS'
-      container.vm.synced_folder 'SPECS', '/rpmbuild/SPECS'
-      container.vm.synced_folder 'SOURCES', '/rpmbuild/SOURCES'
+  if options.fetch('rpmbuild', rpmbuild)
+    make_hoot_dirs()
 
-      # Additional directories need to be shared for Hootenanny builds.
-      if options.fetch('spec_file', '') == 'SPECS/hootenanny.spec'
-        container.vm.synced_folder 'cache/m2', '/rpmbuild/.m2'
-        container.vm.synced_folder 'cache/npm', '/rpmbuild/.npm'
-        container.vm.synced_folder 'scripts', '/rpmbuild/scripts'
-      end
+    # Container needs to be able to write RPMs via bind mounts.
+    container.vm.synced_folder 'RPMS', '/rpmbuild/RPMS'
+    container.vm.synced_folder 'SPECS', '/rpmbuild/SPECS'
+    container.vm.synced_folder 'SOURCES', '/rpmbuild/SOURCES'
+
+    # Additional directories need to be shared for Hootenanny builds.
+    if options.fetch('spec_file', '') == 'SPECS/hootenanny.spec'
+      container.vm.synced_folder 'cache/m2', '/rpmbuild/.m2'
+      container.vm.synced_folder 'cache/npm', '/rpmbuild/.npm'
+      container.vm.synced_folder 'scripts', '/rpmbuild/scripts'
     end
+  end
 end
 
 
@@ -121,7 +132,7 @@ end
 def rpmbuild(config, name, options)
   autostart = options.fetch('autostart', false)
   config.vm.define name, autostart: autostart do |container|
-    shared_folders(container, name, options)
+    shared_folders(container, name, options, rpmbuild: true)
 
     image_name = "hootenanny/#{options['image']}"
 

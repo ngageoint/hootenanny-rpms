@@ -36,6 +36,7 @@ images:
           nodejs_version: *nodejs_version
           pg_version: *pg_version
         buildrequires: true
+        rpmbuild: true
         spec_file: 'SPECS/hootenanny.spec'
     - rpmbuild-repo: {}
     - rpmbuild-geos:
