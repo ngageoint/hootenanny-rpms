@@ -102,7 +102,7 @@ deps: \
 	$(DEPENDENCY_CONTAINERS) \
 	$(DEPENDENCY_RPMS)
 
-hoot-archive: $(BUILD_IMAGE) \
+hoot-archive: $(BUILD_IMAGE)
 	vagrant docker-run $(BUILD_IMAGE) -- /bin/bash -c "/rpmbuild/scripts/hoot-checkout.sh $(GIT_COMMIT) && /rpmbuild/scripts/hoot-archive.sh"
 
 
