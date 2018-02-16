@@ -84,7 +84,7 @@ DEPENDENCY_RPMS := \
 	$(DEPENDENCY_RPMS) \
 	$(REPO_CONTAINERS)
 
-all: base
+all: base rpmbuild-hoot-release
 
 base: $(BASE_CONTAINERS)
 
@@ -100,15 +100,14 @@ hoot-build: $(BUILD_CONTAINERS)
 
 ## Container targets.
 
-rpmbuild: .vagrant/machines/rpmbuild/docker/id
+rpmbuild:
+	$(VAGRANT) up $@
 
-rpmbuild-base: \
-	rpmbuild \
-	.vagrant/machines/rpmbuild-base/docker/id
+rpmbuild-base: rpmbuild
+	$(VAGRANT) up $@
 
-rpmbuild-generic: \
-	rpmbuild-base \
-	.vagrant/machines/rpmbuild-generic/docker/id
+rpmbuild-generic: rpmbuild-base
+	$(VAGRANT) up $@
 
 # GDAL container requires GEOS, FileGDBAPI, libgeotiff, and libkml RPMs.
 rpmbuild-gdal: \
@@ -116,12 +115,11 @@ rpmbuild-gdal: \
 	FileGDBAPI \
 	geos \
 	libgeotiff \
-	libkml \
-	.vagrant/machines/rpmbuild-gdal/docker/id
+	libkml
+	$(VAGRANT) up $@
 
-rpmbuild-geos: \
-	rpmbuild-generic \
-	.vagrant/machines/rpmbuild-geos/docker/id
+rpmbuild-geos: rpmbuild-generic
+	$(VAGRANT) up $@
 
 rpmbuild-hoot-devel: \
 	rpmbuild-pgdg \
@@ -137,35 +135,29 @@ rpmbuild-hoot-devel: \
 	stxxl \
 	su-exec \
 	tomcat8
-	$(VAGRANT) up rpmbuild-hoot-devel
+	$(VAGRANT) up $@
 
 rpmbuild-hoot-release: rpmbuild-pgdg
-	$(VAGRANT) up rpmbuild-hoot-release
+	$(VAGRANT) up $@
 
-rpmbuild-libgeotiff: \
-	rpmbuild-generic \
-	.vagrant/machines/rpmbuild-libgeotiff/docker/id
+rpmbuild-libgeotiff: rpmbuild-generic
+	$(VAGRANT) up $@
 
-rpmbuild-libkml: \
-	rpmbuild-generic \
-	.vagrant/machines/rpmbuild-libkml/docker/id
+rpmbuild-libkml: rpmbuild-generic
+	$(VAGRANT) up $@
 
-rpmbuild-nodejs: \
-	rpmbuild-generic \
-	.vagrant/machines/rpmbuild-nodejs/docker/id
+rpmbuild-nodejs: rpmbuild-generic
+	$(VAGRANT) up $@
 
-rpmbuild-pgdg: \
-	rpmbuild-generic \
-	.vagrant/machines/rpmbuild-pgdg/docker/id
+rpmbuild-pgdg: rpmbuild-generic
+	$(VAGRANT) up $@
 
 # PostGIS container requires GDAL RPMs.
-rpmbuild-postgis: \
-	hoot-gdal \
-	.vagrant/machines/rpmbuild-postgis/docker/id
+rpmbuild-postgis: hoot-gdal
+	$(VAGRANT) up $@
 
-rpmbuild-repo: \
-	rpmbuild \
-	.vagrant/machines/rpmbuild-repo/docker/id
+rpmbuild-repo: rpmbuild
+	$(VAGRANT) up $@
 
 
 ## RPM targets.
@@ -187,10 +179,6 @@ wamerican-insane: rpmbuild-generic $(WAMERICAN_RPM)
 
 
 ## Build patterns.
-
-# Vagrant creates a file with the Docker UUID in it.
-.vagrant/machines/%/docker/id:
-	$(VAGRANT) up $*
 
 # Runs container and follow logs until it completes.
 RPMS/x86_64/%.rpm RPMS/noarch/%.rpm:
