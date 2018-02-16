@@ -94,6 +94,14 @@ def rpmbuild(config, name, options)
     container.vm.synced_folder 'SPECS', '/rpmbuild/SPECS'
     container.vm.synced_folder 'SOURCES', '/rpmbuild/SOURCES'
 
+    # Additional directories need to be shared for Hootenanny builds.
+    spec_file = options.fetch('spec_file', "SPECS/#{name}.spec")
+    if spec_file == 'SPECS/hootenanny.spec'
+      container.vm.synced_folder 'cache/m2', '/rpmbuild/.m2'
+      container.vm.synced_folder 'cache/npm', '/rpmbuild/.npm'
+      container.vm.synced_folder 'scripts', '/rpmbuild/scripts'
+    end
+
     image_name = "hootenanny/#{options['image']}"
 
     container.vm.provider :docker do |d|
@@ -133,7 +141,7 @@ def rpmbuild(config, name, options)
 
       # Default to using `rpmbuild -bb`.
       rpmbuild_cmd << options.fetch('build_type', '-bb')
-      rpmbuild_cmd << options.fetch('spec_file', "SPECS/#{name}.spec")
+      rpmbuild_cmd << spec_file
 
       d.cmd = rpmbuild_cmd
     end

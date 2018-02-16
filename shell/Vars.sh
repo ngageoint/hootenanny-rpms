@@ -14,6 +14,9 @@ SPECS=$SCRIPT_HOME/SPECS
 SOURCES=$SCRIPT_HOME/SOURCES
 RPMS=$SCRIPT_HOME/RPMS
 
+CACHE=$SCRIPT_HOME/cache
+HOOT=$SCRIPT_HOME/hootenanny
+
 ## Utility functions.
 
 function latest_hoot_archive() {
@@ -245,14 +248,14 @@ function run_hoot_build_image() {
     if [ "${usage}" = "yes" ]; then
         echo "run_hoot_build_image: [-e <entrypoint>] [-i <image>] [-u <user>]"
     else
-        mkdir -p $SCRIPT_HOME/hootenanny $SCRIPT_HOME/m2 $SCRIPT_HOME/npm
+        mkdir -p $SCRIPT_HOME/hootenanny $CACHE/m2 $CACHE/npm
         docker run \
                -v $SOURCES:/rpmbuild/SOURCES:$sources_mode \
                -v $SPECS:/rpmbuild/SPECS:ro \
                -v $RPMS:/rpmbuild/RPMS:rw \
                -v $SCRIPT_HOME/hootenanny:/rpmbuild/hootenanny:rw \
-               -v $SCRIPT_HOME/m2:/rpmbuild/.m2:rw \
-               -v $SCRIPT_HOME/npm:/rpmbuild/.npm:rw \
+               -v $CACHE/m2:/rpmbuild/.m2:rw \
+               -v $CACHE/npm:/rpmbuild/.npm:rw \
                -v $SCRIPT_HOME/scripts:/rpmbuild/scripts:ro \
                --entrypoint $entrypoint \
                -u $user \

@@ -38,10 +38,6 @@ BASE_CONTAINERS := \
 	rpmbuild-generic \
 	rpmbuild-pgdg
 
-BUILD_CONTAINERS := \
-	rpmbuild-hoot-devel \
-	rpmbuild-hoot-release
-
 DEPENDENCY_CONTAINERS := \
 	$(BASE_CONTAINERS) \
 	rpmbuild-gdal \
@@ -70,6 +66,16 @@ DEPENDENCY_RPMS := \
 		tomcat8 \
 		wamerican-insane
 
+# Hootenanny RPM variables.
+
+BUILD_CONTAINERS := \
+	rpmbuild-hoot-devel \
+	rpmbuild-hoot-release
+
+# These may be overridden with environment variables.
+BUILD_IMAGE ?= rpmbuild-hoot-release
+GIT_COMMIT ?= develop
+
 
 ## Main targets.
 
@@ -95,6 +101,9 @@ clean:
 deps: \
 	$(DEPENDENCY_CONTAINERS) \
 	$(DEPENDENCY_RPMS)
+
+hoot-archive: $(BUILD_IMAGE) \
+	vagrant docker-run $(BUILD_IMAGE) -- /bin/bash -c "/rpmbuild/scripts/hoot-checkout.sh $(GIT_COMMIT) && /rpmbuild/scripts/hoot-archive.sh"
 
 
 ## Container targets.
