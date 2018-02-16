@@ -76,15 +76,15 @@ DEPENDENCY_RPMS := \
 .PHONY: \
 	all \
 	base \
+	clean \
 	deps \
 	hoot-build \
-	clean \
 	$(BUILD_CONTAINERS) \
 	$(DEPENDENCY_CONTAINERS) \
 	$(DEPENDENCY_RPMS) \
 	$(REPO_CONTAINERS)
 
-all: base rpmbuild-hoot-release
+all: $(BUILD_CONTAINERS)
 
 base: $(BASE_CONTAINERS)
 
@@ -96,7 +96,6 @@ deps: \
 	$(DEPENDENCY_CONTAINERS) \
 	$(DEPENDENCY_RPMS)
 
-hoot-build: $(BUILD_CONTAINERS)
 
 ## Container targets.
 
