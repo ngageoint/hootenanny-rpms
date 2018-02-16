@@ -38,6 +38,10 @@ BASE_CONTAINERS := \
 	rpmbuild-generic \
 	rpmbuild-pgdg
 
+BUILD_CONTAINERS := \
+	rpmbuild-hoot-devel \
+	rpmbuild-hoot-release
+
 DEPENDENCY_CONTAINERS := \
 	$(BASE_CONTAINERS) \
 	rpmbuild-gdal \
@@ -73,7 +77,9 @@ DEPENDENCY_RPMS := \
 	all \
 	base \
 	deps \
+	hoot-build \
 	clean \
+	$(BUILD_CONTAINERS) \
 	$(DEPENDENCY_CONTAINERS) \
 	$(DEPENDENCY_RPMS) \
 	$(REPO_CONTAINERS)
@@ -82,13 +88,15 @@ all: base
 
 base: $(BASE_CONTAINERS)
 
+clean:
+	$(VAGRANT) destroy -f --no-parallel || true
+	rm -fr RPMS/noarch RPMS/x86_64
+
 deps: \
 	$(DEPENDENCY_CONTAINERS) \
 	$(DEPENDENCY_RPMS)
 
-clean:
-	$(VAGRANT) destroy -f --no-parallel || true
-	rm -fr RPMS/noarch RPMS/x86_64
+hoot-build: $(BUILD_CONTAINERS)
 
 ## Container targets.
 
@@ -114,6 +122,25 @@ rpmbuild-gdal: \
 rpmbuild-geos: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-geos/docker/id
+
+rpmbuild-hoot-devel: \
+	rpmbuild-pgdg \
+	dumb-init \
+	FileGDBAPI \
+	geos \
+	hoot-gdal \
+	hoot-postgis23_$(PG_DOTLESS) \
+	hoot-words \
+	libgeotiff \
+	libkml \
+	nodejs \
+	stxxl \
+	su-exec \
+	tomcat8
+	$(VAGRANT) up rpmbuild-hoot-devel
+
+rpmbuild-hoot-release: rpmbuild-pgdg
+	$(VAGRANT) up rpmbuild-hoot-release
 
 rpmbuild-libgeotiff: \
 	rpmbuild-generic \

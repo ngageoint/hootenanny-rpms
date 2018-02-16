@@ -157,7 +157,9 @@ end
 ## Vagrant configuration
 
 Vagrant.configure(2) do |config|
-  # Build base images and those needed for GDAL and NodeJS.
+  # Base images, including one for building Hootenanny, based on
+  # stable released dependencies, as well as those needed for
+  # GDAL (FileGDBAPI, libgeotiff, libkml) and NodeJS.
   $images['base'].each do |name, options|
     build_container(config, name, options)
   end
@@ -189,5 +191,11 @@ Vagrant.configure(2) do |config|
 
   collect_rpms(['rpmbuild-postgis']).each do |name, options|
     rpmbuild(config, name, options)
+  end
+
+  # The development containers are last because they all depend
+  # on RPMS built previously.
+  $images['hoot'].each do |name, options|
+    build_container(config, name, options)
   end
 end
