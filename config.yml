@@ -78,6 +78,7 @@ images:
           tomcat8_version: *tomcat8_version
           words_version: *words_version
         buildrequires: true
+        rpmbuild: true
         spec_file: 'SPECS/hootenanny.spec'
   postgis: !!omap
     - rpmbuild-postgis:

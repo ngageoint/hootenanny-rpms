@@ -10,9 +10,49 @@ $pg_dotless = $pg_version.gsub('.', '')
 
 ## Functions used by Vagrant containers.
 
+def collect_rpms(filters)
+  collected = {}
+  filters.each do |filter|
+    $rpms.each do |name, options|
+      if (name == filter or
+          options.fetch('image', nil) == filter)
+        collected[name] = options
+      end
+    end
+  end
+  return collected
+end
+
+
+def rpm_file(name, options)
+  arch = options.fetch('arch', 'x86_64')
+  dist = options.fetch('dist', '.el7')
+  return "RPMS/#{arch}/#{name}-#{options['version']}#{dist}.#{arch}.rpm"
+end
+
+
+def shared_folders(container, name, options)
+    container.vm.synced_folder '.', '/vagrant', disabled: true
+
+    if options.fetch('rpmbuild', false)
+      # Container needs to be able to write RPMs via bind mounts.
+      container.vm.synced_folder 'RPMS', '/rpmbuild/RPMS'
+      container.vm.synced_folder 'SPECS', '/rpmbuild/SPECS'
+      container.vm.synced_folder 'SOURCES', '/rpmbuild/SOURCES'
+
+      # Additional directories need to be shared for Hootenanny builds.
+      if options.fetch('spec_file', '') == 'SPECS/hootenanny.spec'
+        container.vm.synced_folder 'cache/m2', '/rpmbuild/.m2'
+        container.vm.synced_folder 'cache/npm', '/rpmbuild/.npm'
+        container.vm.synced_folder 'scripts', '/rpmbuild/scripts'
+      end
+    end
+end
+
+
 def build_container(config, name, options)
   config.vm.define name do |container|
-    container.vm.synced_folder '.', '/vagrant', disabled: true
+    shared_folders(container, name, options)
 
     container.vm.provider :docker do |d|
       # On the containers we're building don't actually run anything.
@@ -42,7 +82,6 @@ def build_container(config, name, options)
           # raw command.
           rpmspec_cmd << "'#{macro} #{expr}'"
         end
-
         rpmspec_cmd << options.fetch(
           'spec_file', "SPECS/#{name.gsub('rpmbuild-', '')}.spec"
         )
@@ -77,30 +116,12 @@ def build_container(config, name, options)
   end
 end
 
-def rpm_file(name, options)
-  arch = options.fetch('arch', 'x86_64')
-  dist = options.fetch('dist', '.el7')
-  return "RPMS/#{arch}/#{name}-#{options['version']}#{dist}.#{arch}.rpm"
-end
 
 # Configure a container to be run from another image to execute `rpmbuild`.
 def rpmbuild(config, name, options)
   autostart = options.fetch('autostart', false)
   config.vm.define name, autostart: autostart do |container|
-    container.vm.synced_folder '.', '/vagrant', disabled: true
-
-    # Container needs to be able to write RPMs via bind mounts.
-    container.vm.synced_folder 'RPMS', '/rpmbuild/RPMS'
-    container.vm.synced_folder 'SPECS', '/rpmbuild/SPECS'
-    container.vm.synced_folder 'SOURCES', '/rpmbuild/SOURCES'
-
-    # Additional directories need to be shared for Hootenanny builds.
-    spec_file = options.fetch('spec_file', "SPECS/#{name}.spec")
-    if spec_file == 'SPECS/hootenanny.spec'
-      container.vm.synced_folder 'cache/m2', '/rpmbuild/.m2'
-      container.vm.synced_folder 'cache/npm', '/rpmbuild/.npm'
-      container.vm.synced_folder 'scripts', '/rpmbuild/scripts'
-    end
+    shared_folders(container, name, options)
 
     image_name = "hootenanny/#{options['image']}"
 
@@ -141,26 +162,12 @@ def rpmbuild(config, name, options)
 
       # Default to using `rpmbuild -bb`.
       rpmbuild_cmd << options.fetch('build_type', '-bb')
-      rpmbuild_cmd << spec_file
+      rpmbuild_cmd << options.fetch('spec_file', "SPECS/#{name}.spec")
 
       d.cmd = rpmbuild_cmd
     end
   end
 end
-
-def collect_rpms(filters)
-  collected = {}
-  filters.each do |filter|
-    $rpms.each do |name, options|
-      if (name == filter or
-          options.fetch('image', nil) == filter)
-        collected[name] = options
-      end
-    end
-  end
-  return collected
-end
-
 
 ## Vagrant configuration
 
