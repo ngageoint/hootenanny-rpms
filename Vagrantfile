@@ -55,6 +55,7 @@ def shared_folders(container, name, options, rpmbuild: false)
     if options.fetch('spec_file', '') == 'SPECS/hootenanny.spec'
       container.vm.synced_folder 'cache/m2', '/rpmbuild/.m2'
       container.vm.synced_folder 'cache/npm', '/rpmbuild/.npm'
+      container.vm.synced_folder 'hootenanny', '/rpmbuild/hootenanny'
       container.vm.synced_folder 'scripts', '/rpmbuild/scripts'
     end
   end
