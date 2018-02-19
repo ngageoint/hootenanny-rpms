@@ -27,6 +27,7 @@ case "${BUILD_IMAGE}" in
                --build-arg pg_version=$PG_VERSION \
                --build-arg postgis_version=$POSTGIS_VERSION-$POSTGIS_RELEASE \
                --build-arg nodejs_version=$NODEJS_VERSION-$NODEJS_RELEASE \
+               --build-arg osmosis_version=$OSMOSIS_VERSION-$OSMOSIS_RELEASE \
                --build-arg stxxl_version=$STXXL_VERSION-$STXXL_RELEASE \
                --build-arg suexec_version=$SUEXEC_VERSION-$SUEXEC_RELEASE \
                --build-arg tomcat8_version=$TOMCAT8_VERSION-$TOMCAT8_RELEASE \

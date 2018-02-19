@@ -16,6 +16,7 @@ ARG libgeotiff_version
 ARG libkml_version
 ARG mocha_version
 ARG nodejs_version
+ARG osmosis_version
 ARG packages
 ARG postgis_version
 ARG pg_version
@@ -50,6 +51,7 @@ COPY RPMS/x86_64/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/nodejs-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/nodejs-devel-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/noarch/osmosis-${osmosis_version}${RPMBUILD_DIST}.noarch.rpm \
      RPMS/x86_64/stxxl-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/stxxl-devel-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/su-exec-${suexec_version}${RPMBUILD_DIST}.x86_64.rpm \
@@ -76,6 +78,7 @@ RUN yum install -y \
     /tmp/libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/nodejs-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/nodejs-devel-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/osmosis-${osmosis_version}${RPMBUILD_DIST}.noarch.rpm \
     /tmp/stxxl-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/stxxl-devel-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/su-exec-${suexec_version}${RPMBUILD_DIST}.x86_64.rpm \

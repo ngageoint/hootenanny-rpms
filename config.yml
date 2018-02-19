@@ -80,6 +80,7 @@ images:
           libkml_version: *libkml_version
           mocha_version: *mocha_version
           nodejs_version: *nodejs_version
+          osmosis_version: *osmosis_version
           pg_version: *pg_version
           postgis_version: *postgis_version
           stxxl_version: *stxxl_version
