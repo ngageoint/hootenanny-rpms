@@ -51,6 +51,14 @@ images:
     - rpmbuild-nodejs:
         buildrequires: true
         dockerfile: 'docker/Dockerfile.rpmbuild-generic'
+    - run-base:
+        args:
+          pg_version: *pg_version
+    - run-base-release:
+        args:
+          mocha_version: *mocha_version
+          nodejs_version: *nodejs_version
+          pg_version: *pg_version
   gdal: !!omap
     - rpmbuild-gdal:
         args:

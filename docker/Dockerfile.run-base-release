@@ -6,40 +6,62 @@ LABEL \
   name="Hootenanny Base Runtime Image" \
   vendor="Radiant Solutions"
 
+ARG hoot_uid=1000
+ARG hoot_user=hoot
 ARG lang=en_US.UTF-8
 ARG locale=en_US.UTF-8
+ARG node_version
+ARG packages
 ARG pg_version
 
 # Ensure proper language/locale environment settings.
 ENV LANG ${lang}
 ENV LC_ALL ${locale}
 
-# Ensure PostgreSQL version and data directory are available via env vars.
+# Put some key arguments in environment to allow access in child containers.
+ENV HOOT_HOME=/var/lib/hootenanny
 ENV PGDATA=/var/lib/pgsql/${pg_version}/data
 ENV PG_VERSION=${pg_version}
 
+COPY scripts/hoot-repo.sh \
+     scripts/nodesource-repo.sh \
+     scripts/pgdg-repo.sh \
+     /tmp/
+
+RUN /tmp/nodesource-repo.sh ${node_version} && \
+    /tmp/pgdg-repo.sh ${pg_version} && \
+    /tmp/hoot-repo.sh && \
+    rm -f /tmp/*.sh
+
 RUN yum -q -y update && \
     yum -q -y install \
+        dumb-init \
+        su-exec \
         asciidoc \
         boost-iostreams \
         boost-system \
         cppunit \
         cpptest \
         dblatex \
+        dumb-init \
         epel-release \
         less \
+        glpk \
         gnuplot \
         graphviz \
         hdf5 \
+        hoot-words \
         htop \
         java-1.8.0-openjdk \
         libicu \
         log4cxx \
         openblas-openmp \
         opencv \
+        osmosis \
         perl-libwww-perl \
         perl-XML-LibXML \
         proj \
+        postgresql$(echo ${pg_version} | tr -d '.')-libs \
         protobuf \
         python-matplotlib \
         qt \
@@ -50,9 +72,11 @@ RUN yum -q -y update && \
         w3m \
         wget \
         words \
-        zip
+        zip \
+    && \
+    if [ ! -z "${packages}" ] ; then yum -y -q install ${packages}; fi
 
-# Install basic PostgreSQL server.
+# Install basic PostgreSQL server and setup data directory.
 COPY scripts/postgresql-install.sh /tmp/
 RUN /tmp/postgresql-install.sh && \
     rm -f /tmp/postgresql-install.sh

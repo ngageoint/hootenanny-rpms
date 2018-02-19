@@ -84,9 +84,14 @@ BUILD_CONTAINERS := \
 	rpmbuild-hoot-devel \
 	rpmbuild-hoot-release
 
+RUN_CONTAINERS := \
+	run-base \
+	run-base-release
+
 # These may be overridden with environment variables.
 BUILD_IMAGE ?= rpmbuild-hoot-release
 GIT_COMMIT ?= develop
+RUN_IMAGE ?= run-base-release
 
 HOOT_VERSION_GEN ?= $(call latest_hoot_version_gen)
 HOOT_ARCHIVE := SOURCES/hootenanny-$(HOOT_VERSION_GEN).tar.gz
@@ -103,7 +108,8 @@ HOOT_ARCHIVE := SOURCES/hootenanny-$(HOOT_VERSION_GEN).tar.gz
 	$(BUILD_CONTAINERS) \
 	$(DEPENDENCY_CONTAINERS) \
 	$(DEPENDENCY_RPMS) \
-	$(REPO_CONTAINERS)
+	$(REPO_CONTAINERS) \
+	$(RUN_CONTAINERS)
 
 all: $(BUILD_CONTAINERS)
 
@@ -203,6 +209,13 @@ rpmbuild-postgis: \
 rpmbuild-repo: \
 	rpmbuild \
 	.vagrant/machines/rpmbuild-repo/docker/id
+
+# Runtime containers
+run-base: .vagrant/machines/run-base/docker/id
+
+run-base-release: \
+	run-base \
+	.vagrant/machines/rpmbuild-base-release/docker/id
 
 
 ## RPM targets.
