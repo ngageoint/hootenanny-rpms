@@ -195,6 +195,7 @@ Vagrant.configure(2) do |config|
   collect_rpms(
     ['rpmbuild-generic',
      'rpmbuild-geos',
+     'rpmbuild-glpk',
      'rpmbuild-libgeotiff',
      'rpmbuild-libkml',
      'rpmbuild-nodejs']
