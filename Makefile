@@ -33,6 +33,7 @@ PG_DOTLESS := $(shell echo $(call config_version,pg) | tr -d '.')
 DUMBINIT_RPM := $(call rpm_file2,dumb-init,dumbinit,x86_64)
 GEOS_RPM := $(call rpm_file,geos,x86_64)
 GDAL_RPM := $(call rpm_file2,hoot-gdal,gdal,x86_64)
+GLPK_RPM := $(call rpm_file,glpk,x86_64)
 FILEGDBAPI_RPM := $(call rpm_file,FileGDBAPI,x86_64)
 LIBGEOTIFF_RPM := $(call rpm_file,libgeotiff,x86_64)
 LIBKML_RPM := $(call rpm_file,libkml,x86_64)
@@ -55,6 +56,7 @@ DEPENDENCY_CONTAINERS := \
 	$(BASE_CONTAINERS) \
 	rpmbuild-gdal \
 	rpmbuild-geos \
+	rpmbuild-glpk \
 	rpmbuild-libgeotiff \
 	rpmbuild-libkml \
 	rpmbuild-postgis \
@@ -64,20 +66,21 @@ REPO_CONTAINERS := \
 	rpmbuild-repo
 
 DEPENDENCY_RPMS := \
-		dumb-init \
-		FileGDBAPI \
-		geos \
-		libgeotiff \
-		libkml \
-		hoot-gdal \
-		hoot-postgis23_$(PG_DOTLESS) \
-		hoot-words \
-		nodejs \
-		osmosis \
-		stxxl \
-		su-exec \
-		tomcat8 \
-		wamerican-insane
+	dumb-init \
+	FileGDBAPI \
+	geos \
+	glpk \
+	libgeotiff \
+	libkml \
+	hoot-gdal \
+	hoot-postgis23_$(PG_DOTLESS) \
+	hoot-words \
+	nodejs \
+	osmosis \
+	stxxl \
+	su-exec \
+	tomcat8 \
+	wamerican-insane
 
 # Hootenanny RPM variables.
 BUILD_CONTAINERS := \
@@ -159,11 +162,16 @@ rpmbuild-geos: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-geos/docker/id
 
+rpmbuild-glpk: \
+	rpmbuild-generic \
+	.vagrant/machines/rpmbuild-glpk/docker/id
+
 rpmbuild-hoot-devel: \
 	rpmbuild-pgdg \
 	dumb-init \
 	FileGDBAPI \
 	geos \
+	glpk \
 	hoot-gdal \
 	hoot-postgis23_$(PG_DOTLESS) \
 	hoot-words \
@@ -213,6 +221,7 @@ FileGDBAPI: rpmbuild-generic $(FILEGDBAPI_RPM)
 libgeotiff: rpmbuild-libgeotiff $(LIBGEOTIFF_RPM)
 libkml: rpmbuild-libkml $(LIBKML_RPM)
 nodejs: rpmbuild-nodejs $(NODEJS_RPM)
+glpk: rpmbuild-glpk $(GLPK_RPM)
 hoot-gdal: rpmbuild-gdal $(GDAL_RPM)
 hoot-words: rpmbuild-generic $(WORDS_RPM)
 hoot-postgis23_$(PG_DOTLESS): rpmbuild-postgis $(POSTGIS_RPM)
