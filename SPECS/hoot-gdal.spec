@@ -24,7 +24,7 @@
 %global proj_somaj 0
 
 # Tests can be of a different version
-%global testversion 2.1.4
+%global testversion %{rpmbuild_version}
 %global run_tests 0
 
 # Set to 1 to enable spatialite support; disabled by default.
@@ -40,8 +40,8 @@
 
 
 Name:		hoot-gdal
-Version:	2.1.4
-Release:	2%{?dist}
+Version:	%{rpmbuild_version}
+Release:	%{rpmbuild_release}%{?dist}
 Summary:	GIS file format library
 Group:		System Environment/Libraries
 License:	MIT

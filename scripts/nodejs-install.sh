@@ -1,7 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-NODE_VERSION=$1
+# Ensure the release is stripped from version.
+NODE_VERSION=$(echo $1 | awk -F- '{ print $1 }')
 
 # Install the specific version of NodeJS and the yum version locking plugin.
 yum install -q -y \
@@ -9,4 +10,4 @@ yum install -q -y \
     yum-plugin-versionlock
 
 # Version lock the NodeJS version to prevent inadvertent upgrades.
-yum versionlock nodejs*
+yum versionlock nodejs nodejs-devel

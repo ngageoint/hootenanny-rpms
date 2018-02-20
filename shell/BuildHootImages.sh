@@ -6,8 +6,7 @@ BUILD_IMAGE="${1:-release}"
 set -u
 
 ## Get variables.
-SCRIPT_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source $SCRIPT_HOME/Vars.sh
+source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/Vars.sh
 
 # Build base images.
 build_base_images
@@ -28,13 +27,13 @@ case "${BUILD_IMAGE}" in
                --build-arg mocha_version=$MOCHA_VERSION \
                --build-arg pg_version=$PG_VERSION \
                --build-arg postgis_version=$POSTGIS_VERSION-$POSTGIS_RELEASE \
-               --build-arg node_version=$NODE_VERSION \
+               --build-arg nodejs_version=$NODEJS_VERSION-$NODEJS_RELEASE \
                --build-arg stxxl_version=$STXXL_VERSION-$STXXL_RELEASE \
                --build-arg suexec_version=$SUEXEC_VERSION-$SUEXEC_RELEASE \
                --build-arg tomcat8_version=$TOMCAT8_VERSION-$TOMCAT8_RELEASE \
                --build-arg words_version=$WORDS_VERSION-$WORDS_RELEASE \
                -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-hoot-devel \
-               -t hoot/rpmbuild-hoot-devel \
+               -t hootenanny/rpmbuild-hoot-devel \
                $SCRIPT_HOME
         ;;
     # The "release" image, built with latest signed images in the hootenanny
@@ -43,10 +42,10 @@ case "${BUILD_IMAGE}" in
         docker build \
                --build-arg "packages=$( spec_requires hootenanny )" \
                --build-arg mocha_version=$MOCHA_VERSION \
-               --build-arg node_version=$NODE_VERSION \
+               --build-arg nodejs_version=$NODEJS_VERSION-$NODEJS_RELEASE \
                --build-arg pg_version=$PG_VERSION \
                -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-hoot-release \
-               -t hoot/rpmbuild-hoot-release \
+               -t hootenanny/rpmbuild-hoot-release \
                $SCRIPT_HOME
         ;;
     *)

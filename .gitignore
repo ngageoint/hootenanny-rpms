@@ -1,10 +1,9 @@
 .*.swp
 .vagrant
+cache
 el6
 el7
 hootenanny
-m2
-npm
 tmp
 BUILD
 BUILDROOT

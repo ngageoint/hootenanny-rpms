@@ -1,6 +1,6 @@
 Name:		su-exec
-Version:	0.2
-Release:	1%{?dist}
+Version:	%{rpmbuild_version}
+Release:	%{rpmbuild_release}%{?dist}
 Summary:	Simple tool to execute as another user and group
 Group:		Applications/System
 License:	MIT

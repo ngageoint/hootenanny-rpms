@@ -3,9 +3,9 @@
 # sudo yum -y install rpmdevtools && rpmdev-setuptree
 # rpmbuild -bb ./SPECS/tomcat8.spec
 %define __jar_repack %{nil}
-%global major_version 8
-%global minor_version 5
-%global micro_version 24
+%global major_version %(echo %{rpmbuild_version} | awk -F. '{ print $1 }')
+%global minor_version %(echo %{rpmbuild_version} | awk -F. '{ print $2 }')
+%global micro_version %(echo %{rpmbuild_version} | awk -F. '{ print $3 }')
 %global tomcat_group tomcat
 %global tomcat_user tomcat
 %global tomcat_uid 91
@@ -19,7 +19,7 @@
 Summary:    Apache Servlet/JSP Engine, RI for Servlet 3.1/JSP 2.3 API
 Name:       tomcat8
 Version:    %{major_version}.%{minor_version}.%{micro_version}
-Release:    1%{?dist}
+Release:    %{rpmbuild_release}%{?dist}
 License:    ASL 2.0
 Group:      Networking/Daemons
 URL:        http://tomcat.apache.org/

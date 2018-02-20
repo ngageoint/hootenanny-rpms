@@ -1,4 +1,4 @@
-FROM hoot/rpmbuild-gdal:latest
+FROM hootenanny/rpmbuild-gdal:latest
 
 # GDAL version, including release iteration (e.g., '2.1.4-1') is
 # a required argument.
@@ -27,7 +27,7 @@ RUN yum install -y \
     /tmp/hoot-gdal-devel-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/hoot-gdal-libs-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
     && \
-    rm -f /*.rpm
+    rm -f /tmp/*.rpm
 
 # Install any other extra packages.
 RUN if [ ! -z "${packages}" ] ; then yum -q -y install ${packages}; fi

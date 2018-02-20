@@ -1,6 +1,6 @@
 Name:		dumb-init
-Version:	1.2.1
-Release:	1%{?dist}
+Version:	%{rpmbuild_version}
+Release:	%{rpmbuild_release}%{?dist}
 Summary:	Simple process supervisor and init system for containers
 Group:		Applications/System
 License:	MIT

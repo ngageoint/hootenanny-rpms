@@ -1,6 +1,6 @@
 # The base image depends on the version of PosgreSQL from PGDG.
 ARG pg_version
-FROM hoot/rpmbuild-pgdg:${pg_version}
+FROM hootenanny/rpmbuild-pgdg:${pg_version}
 
 LABEL \
   description="Container for building Hootenanny RPMs using development dependencies." \
@@ -16,7 +16,7 @@ ARG glpk_version
 ARG libgeotiff_version
 ARG libkml_version
 ARG mocha_version
-ARG node_version
+ARG nodejs_version
 ARG packages
 ARG postgis_version
 ARG pg_version
@@ -51,8 +51,8 @@ COPY RPMS/x86_64/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/nodejs-${node_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/nodejs-devel-${node_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/nodejs-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/nodejs-devel-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/stxxl-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/su-exec-${suexec_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/noarch/tomcat8-${tomcat8_version}${RPMBUILD_DIST}.noarch.rpm \
@@ -78,14 +78,14 @@ RUN yum install -y \
     /tmp/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/nodejs-${node_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/nodejs-devel-${node_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/nodejs-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/nodejs-devel-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/stxxl-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/su-exec-${suexec_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/tomcat8-${tomcat8_version}${RPMBUILD_DIST}.noarch.rpm \
     && \
-    rm -f /*.rpm && \
-    npm install --silent -g mocha@${mocha_version} \
+    rm -f /tmp/*.rpm && \
+    npm install --silent -g mocha@${mocha_version} && \
     if [ ! -z "${packages}" ] ; then yum -y install ${packages}; fi
 
 # Install PostgreSQL server at desired version, and setup the Hoot databases.

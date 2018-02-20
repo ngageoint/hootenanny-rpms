@@ -5,11 +5,10 @@ set -euo pipefail
 set +u
 GIT_COMMIT="${1:-develop}"
 set -u
-SCRIPT_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source $SCRIPT_HOME/Vars.sh
+source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/Vars.sh
 
 # The container used to build Hootenanny archive.
-BUILD_IMAGE=${BUILD_IMAGE:-hoot/rpmbuild-hoot-release}
+BUILD_IMAGE=${BUILD_IMAGE:-hootenanny/rpmbuild-hoot-release}
 
 run_hoot_build_image \
     -i $BUILD_IMAGE -s rw \
