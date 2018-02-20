@@ -9,7 +9,7 @@ LABEL \
 ARG lang=en_US.UTF-8
 ARG locale=en_US.UTF-8
 ARG mocha_version
-ARG node_version
+ARG nodejs_version
 ARG packages
 
 # Install Hootenanny dependency release repository and NodeJS.
