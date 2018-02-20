@@ -2,7 +2,7 @@
 versions:
   dumb-init: &dumbinit_version '1.2.1-1'
   geos: &geos_version '3.6.2-1'
-  glpk: &glpk_version: '4.64-1'
+  glpk: &glpk_version '4.64-1'
   hoot-gdal: &gdal_version '2.1.4-2'
   hoot-words: &words_version '1.0.1-1'
   FileGDBAPI: &FileGDBAPI_version '1.5.1-1'
