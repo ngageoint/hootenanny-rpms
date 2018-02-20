@@ -1,0 +1,268 @@
+diff --git a/doc/glpk11.tex b/doc/glpk11.tex
+index ff731fb..daabf90 100644
+--- a/doc/glpk11.tex
++++ b/doc/glpk11.tex
+@@ -8,115 +8,6 @@ are used with GLPK and included in the distribution.
+ 
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+-\section{AMD}
+-
+-\noindent
+-AMD Version 2.2, Copyright {\copyright} 2007 by Timothy A. Davis,
+-Patrick R. Amestoy, and Iain S. Duff.  All Rights Reserved.
+-
+-\para{Description}
+-
+-AMD is a set of routines for pre-ordering sparse matrices prior to
+-Cholesky or LU factorization, using the approximate minimum degree
+-ordering algorithm.
+-
+-\para{License}
+-
+-This library is free software; you can redistribute it and/or
+-modify it under the terms of the GNU Lesser General Public License
+-as published by the Free Software Foundation; either version 2.1 of
+-the License, or (at your option) any later version.
+-
+-This library is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-Lesser General Public License for more details.
+-
+-You should have received a copy of the GNU Lesser General Public
+-License along with this library; if not, write to the Free Software
+-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
+-USA.
+-
+-Permission is hereby granted to use or copy this program under the
+-terms of the GNU LGPL, provided that the Copyright, this License,
+-and the Availability of the original version is retained on all
+-copies.  User documentation of any code that uses this code or any
+-modified version of this code must cite the Copyright, this License,
+-the Availability note, and ``Used by permission.''  Permission to
+-modify the code and to distribute modified code is granted, provided
+-the Copyright, this License, and the Availability note are retained,
+-and a notice that the code was modified is included.
+-
+-AMD is available under alternate licences; contact T. Davis for
+-details.
+-
+-\para{Availability}
+-
+-\noindent
+-\url{http://www.cise.ufl.edu/research/sparse/amd}
+-
+-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-
+-\section{COLAMD/SYMAMD}
+-
+-\noindent
+-COLAMD/SYMAMD Version 2.7, Copyright {\copyright} 1998-2007, Timothy A.
+-Davis, All Rights Reserved.
+-
+-\para{Description}
+-
+-colamd: an approximate minimum degree column ordering algorithm, for
+-LU factorization of symmetric or unsymmetric matrices, QR factorization,
+-least squares, interior point methods for linear programming problems,
+-and other related problems.
+-
+-symamd: an approximate minimum degree ordering algorithm for Cholesky
+-factorization of symmetric matrices.
+-
+-\para{Authors}
+-
+-The authors of the code itself are Stefan I. Larimore and Timothy A.
+-Davis (davis at cise.ufl.edu), University of Florida.  The algorithm
+-was developed in collaboration with John Gilbert, Xerox PARC, and
+-Esmond Ng, Oak Ridge National Laboratory.
+-
+-\para{License}
+-
+-This library is free software; you can redistribute it and/or
+-modify it under the terms of the GNU Lesser General Public License
+-as published by the Free Software Foundation; either version 2.1 of
+-the License, or (at your option) any later version.
+-
+-This library is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-Lesser General Public License for more details.
+-
+-You should have received a copy of the GNU Lesser General Public
+-License along with this library; if not, write to the Free Software
+-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
+-USA.
+-
+-Permission is hereby granted to use or copy this program under the
+-terms of the GNU LGPL, provided that the Copyright, this License,
+-and the Availability of the original version is retained on all
+-copies.  User documentation of any code that uses this code or any
+-modified version of this code must cite the Copyright, this License,
+-the Availability note, and ``Used by permission.''  Permission to
+-modify the code and to distribute modified code is granted, provided
+-the Copyright, this License, and the Availability note are retained,
+-and a notice that the code was modified is included.
+-
+-COLAMD is also available under alternate licenses, contact T. Davis for
+-details.
+-
+-\para{Availability}
+-
+-\noindent
+-\url{http://www.cise.ufl.edu/research/sparse/colamd}
+-
+-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-
+ %\newpage
+ 
+ \section{MiniSat}
+@@ -158,50 +49,4 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ \noindent
+ \url{http://www.cs.chalmers.se/Cs/Research/FormalMethods/MiniSat}
+ 
+-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-
+-\section{zlib}
+-
+-\noindent
+-zlib version 1.2.5, Copyright {\copyright} 1995--2010 Jean-loup Gailly
+-and Mark Adler.
+-
+-\para{Description}
+-
+-zlib is a general purpose data compression library. All the code is
+-thread safe. The data format used by the zlib library is described by
+-RFCs (Request for Comments) 1950 to 1952 in the files
+-\verb|rfc1950.txt| (zlib format), \verb|rfc1951.txt| (deflate format)
+-and \verb|rfc1952.txt| (gzip format).
+-
+-\para{License}
+-
+-This software is provided 'as-is', without any express or implied
+-warranty. In no event will the authors be held liable for any damages
+-arising from the use of this software.
+-
+-Permission is granted to anyone to use this software for any purpose,
+-including commercial applications, and to alter it and redistribute it
+-freely, subject to the following restrictions:
+-
+-1. The origin of this software must not be misrepresented; you must not
+-   claim that you wrote the original software. If you use this software
+-   in a product, an acknowledgment in the product documentation would
+-   be appreciated but is not required.
+-
+-2. Altered source versions must be plainly marked as such, and must not
+-   be misrepresented as being the original software.
+-
+-3. This notice may not be removed or altered from any source
+-   distribution.
+-
+-\hfill Jean-loup Gailly
+-
+-\hfill Mark Adler
+-
+-\para{Availability}
+-
+-\noindent
+-\url{http://www.zlib.net/}
+-
+ %* eof *%
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 232bc8c..8bb7143 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -6,11 +6,9 @@ lib_LTLIBRARIES = libglpk.la
+ 
+ libglpk_la_CPPFLAGS = \
+ -I$(srcdir) \
+--I$(srcdir)/amd \
+ -I$(srcdir)/api \
+ -I$(srcdir)/bflib \
+ -I$(srcdir)/cglib \
+--I$(srcdir)/colamd \
+ -I$(srcdir)/draft \
+ -I$(srcdir)/env \
+ -I$(srcdir)/minisat \
+@@ -25,19 +23,9 @@ libglpk_la_LDFLAGS = \
+ -export-symbols-regex '^glp_*' \
+ ${NOUNDEFINED}
+ 
++libglpk_la_LIBADD = -lamd -lcolamd -lz
++
+ libglpk_la_SOURCES = \
+-amd/amd_1.c \
+-amd/amd_2.c \
+-amd/amd_aat.c \
+-amd/amd_control.c \
+-amd/amd_defaults.c \
+-amd/amd_dump.c \
+-amd/amd_info.c \
+-amd/amd_order.c \
+-amd/amd_post_tree.c \
+-amd/amd_postorder.c \
+-amd/amd_preprocess.c \
+-amd/amd_valid.c \
+ api/advbas.c \
+ api/asnhall.c \
+ api/asnlp.c \
+@@ -111,7 +99,6 @@ cglib/gmicut.c \
+ cglib/gmigen.c \
+ cglib/mirgen.c \
+ cglib/spv.c \
+-colamd/colamd.c \
+ draft/bfd.c \
+ draft/bfx.c \
+ draft/glpapi06.c \
+@@ -197,21 +184,6 @@ simplex/spxprim.c \
+ simplex/spxprob.c \
+ simplex/spychuzc.c \
+ simplex/spychuzr.c \
+-simplex/spydual.c \
+-zlib/adler32.c \
+-zlib/compress.c \
+-zlib/crc32.c \
+-zlib/deflate.c \
+-zlib/gzclose.c \
+-zlib/gzlib.c \
+-zlib/gzread.c \
+-zlib/gzwrite.c \
+-zlib/inffast.c \
+-zlib/inflate.c \
+-zlib/inftrees.c \
+-zlib/trees.c \
+-zlib/uncompr.c \
+-zlib/zio.c \
+-zlib/zutil.c
++simplex/spydual.c
+ 
+ ## eof ##
+diff --git a/src/draft/glpmat.c b/src/draft/glpmat.c
+index 97d1c65..9ea454d 100644
+--- a/src/draft/glpmat.c
++++ b/src/draft/glpmat.c
+@@ -25,8 +25,8 @@
+ #include "env.h"
+ #include "glpmat.h"
+ #include "qmd.h"
+-#include "amd.h"
+-#include "colamd.h"
++#include <suitesparse/amd.h>
++#include <suitesparse/colamd.h>
+ 
+ /*----------------------------------------------------------------------
+ -- check_fvs - check sparse vector in full-vector storage format.
+diff --git a/src/env/stream.c b/src/env/stream.c
+index 906e5b0..3937701 100644
+--- a/src/env/stream.c
++++ b/src/env/stream.c
+@@ -22,7 +22,7 @@
+ ***********************************************************************/
+ 
+ #include "env.h"
+-#include "zlib.h"
++#include <zlib.h>
+ 
+ struct glp_file
+ {     /* sequential stream descriptor */

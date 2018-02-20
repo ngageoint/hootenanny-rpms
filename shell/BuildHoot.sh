@@ -18,6 +18,7 @@ set -u
 run_hoot_build_image \
     -i $BUILD_IMAGE \
     rpmbuild \
+      --define "glpk_version %(rpm -q --queryformat '%%{version}' glpk)" \
       --define "gdal_version %(gdal-config --version)" \
       --define "hoot_version_gen ${HOOT_VERSION_GEN}" \
       --define "nodejs_version %(rpm -q --queryformat '%%{version}' nodejs)" \
