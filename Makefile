@@ -215,7 +215,7 @@ run-base: .vagrant/machines/run-base/docker/id
 
 run-base-release: \
 	run-base \
-	.vagrant/machines/rpmbuild-base-release/docker/id
+	.vagrant/machines/run-base-release/docker/id
 
 
 ## RPM targets.

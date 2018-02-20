@@ -52,7 +52,10 @@ RUN yum -q -y update && \
         words \
         zip
 
-# Install basic PostgreSQL server.
-COPY scripts/postgresql-install.sh /tmp/
-RUN /tmp/postgresql-install.sh && \
-    rm -f /tmp/postgresql-install.sh
+# Install basic PostgreSQL repo and base packages.
+COPY scripts/pgdg-repo.sh /tmp/pgdg-repo.sh
+RUN /tmp/pgdg-repo.sh ${pg_version} && \
+    rm /tmp/pgdg-repo.sh && \
+    yum -q -y install \
+        postgresql$(echo ${pg_version} | tr -d '.') \
+        postgresql$(echo ${pg_version} | tr -d '.')-libs

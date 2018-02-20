@@ -1,82 +1,23 @@
-FROM centos:7
+FROM hootenanny/run-base:latest
 
 LABEL \
-  description="Base container for running Hootenanny" \
+  description="Base container for running Hootenanny from release dependencies." \
   maintainer="justin.bronn@radiantsolutions.com" \
-  name="Hootenanny Base Runtime Image" \
+  name="Hootenanny Base Release Dependency Runtime Image" \
   vendor="Radiant Solutions"
 
-ARG hoot_uid=1000
-ARG hoot_user=hoot
 ARG lang=en_US.UTF-8
 ARG locale=en_US.UTF-8
+ARG mocha_version
 ARG node_version
 ARG packages
-ARG pg_version
 
-# Ensure proper language/locale environment settings.
-ENV LANG ${lang}
-ENV LC_ALL ${locale}
-
-# Put some key arguments in environment to allow access in child containers.
-ENV HOOT_HOME=/var/lib/hootenanny
-ENV PGDATA=/var/lib/pgsql/${pg_version}/data
-ENV PG_VERSION=${pg_version}
-
+# Install Hootenanny dependency release repository and NodeJS.
 COPY scripts/hoot-repo.sh \
-     scripts/nodesource-repo.sh \
-     scripts/pgdg-repo.sh \
+     scripts/nodejs-install.sh \
      /tmp/
-
-RUN /tmp/nodesource-repo.sh ${node_version} && \
-    /tmp/pgdg-repo.sh ${pg_version} && \
-    /tmp/hoot-repo.sh && \
-    rm -f /tmp/*.sh
-
-RUN yum -q -y update && \
-    yum -q -y install \
-        dumb-init \
-        su-exec \
-        asciidoc \
-        boost-iostreams \
-        boost-system \
-        cppunit \
-        cpptest \
-        dblatex \
-        dumb-init \
-        epel-release \
-        less \
-        glpk \
-        gnuplot \
-        graphviz \
-        hdf5 \
-        hoot-words \
-        htop \
-        java-1.8.0-openjdk \
-        libicu \
-        log4cxx \
-        openblas-openmp \
-        opencv \
-        osmosis \
-        perl-libwww-perl \
-        perl-XML-LibXML \
-        proj \
-        postgresql$(echo ${pg_version} | tr -d '.')-libs \
-        protobuf \
-        python-matplotlib \
-        qt \
-        qt-postgresql \
-        qt-x11 \
-        unzip \
-        v8 \
-        w3m \
-        wget \
-        words \
-        zip \
-    && \
-    if [ ! -z "${packages}" ] ; then yum -y -q install ${packages}; fi
-
-# Install basic PostgreSQL server and setup data directory.
-COPY scripts/postgresql-install.sh /tmp/
-RUN /tmp/postgresql-install.sh && \
-    rm -f /tmp/postgresql-install.sh
+RUN /tmp/hoot-repo.sh && \
+    rm /tmp/hoot-repo.sh && \
+    /tmp/nodejs-install.sh ${nodejs_version} && \
+    rm -f /tmp/nodejs-install.sh && \
+    npm install --silent -g mocha@${mocha_version}
