@@ -19,6 +19,10 @@ docker_logs = $(DOCKER) logs --follow $$(cat $(call container_id,$(1)))
 latest_hoot_archive = $(shell ls -1t SOURCES/hootenanny-[0-9]*.tar.gz | head -n1)
 latest_hoot_version_gen = $(subst SOURCES/hootenanny-,,$(subst .tar.gz,,$(call latest_hoot_archive)))
 
+# Gets the latest Hootenanny RPM.
+latest_hoot_rpm = $(shell ls -1t RPMS/x86_64/hootenanny-core-[0-9]*.rpm | head -n1)
+latest_hoot_rpm_version = $(subst RPMS/x86_64/hootenanny-core-,,$(subst $(RPMBUILD_DIST).x86_64.rpm,,$(call latest_hoot_rpm)))
+
 # Variants for getting RPM file names.
 rpm_file = RPMS/$(2)/$(1)-$(call config_version,$(1))$(RPMBUILD_DIST).$(2).rpm
 rpm_file2 = RPMS/$(3)/$(1)-$(call config_version,$(2))$(RPMBUILD_DIST).$(3).rpm
@@ -99,6 +103,10 @@ RUN_IMAGE ?= run-base-release
 HOOT_VERSION_GEN ?= $(call latest_hoot_version_gen)
 HOOT_ARCHIVE := SOURCES/hootenanny-$(HOOT_VERSION_GEN).tar.gz
 
+HOOT_VERSION ?= $(call latest_hoot_rpm_version)
+HOOT_RPM := RPMS/x86_64/hootenanny-core-$(HOOT_VERSION)$(RPMBUILD_DIST).x86_64.rpm
+
+
 ## Main targets.
 
 .PHONY: \
@@ -142,7 +150,7 @@ hoot-rpm: $(BUILD_IMAGE)
 	  --define "tomcat_version %(rpm -q --queryformat '%%{version}' tomcat8)" \
 	  -bb SPECS/hootenanny.spec
 
-#$(call latest_hoot_archive)
+
 ## Container targets.
 
 rpmbuild: .vagrant/machines/rpmbuild/docker/id
@@ -225,6 +233,15 @@ run-base-release: \
 	run-base \
 	.vagrant/machines/run-base-release/docker/id
 
+run: $(RUN_IMAGE)
+	$(DOCKER) build \
+	--build-arg from_image=hootenanny/$(RUN_IMAGE) \
+	--build-arg hoot_version=$(HOOT_VERSION) \
+	--build-arg hoot_dist=$(RPMBUILD_DIST) \
+	-f docker/Dockerfile.run \
+	-t hootenanny/run:$(HOOT_VERSION) \
+	.
+
 
 ## RPM targets.
 
@@ -252,5 +269,6 @@ RPMS/x86_64/%.rpm RPMS/noarch/%.rpm:
 	$(VAGRANT) up $(call rpm_package,$*)
 	$(call docker_logs,$(call rpm_package,$*))
 
+# Builds a container with Vagrant.
 .vagrant/machines/%/docker/id:
 	$(VAGRANT) up $*
