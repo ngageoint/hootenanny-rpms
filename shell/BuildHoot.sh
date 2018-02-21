@@ -18,9 +18,10 @@ set -u
 run_hoot_build_image \
     -i $BUILD_IMAGE \
     rpmbuild \
-      --define "glpk_version %(rpm -q --queryformat '%%{version}' glpk)" \
-      --define "gdal_version %(gdal-config --version)" \
       --define "hoot_version_gen ${HOOT_VERSION_GEN}" \
+      --define "geos_version %(rpm -q --queryformat '%%{version}' geos)" \
+      --define "glpk_version %(rpm -q --queryformat '%%{version}' glpk)" \
+      --define "gdal_version %(rpm -q --queryformat '%%{version}' hoot-gdal)" \
       --define "nodejs_version %(rpm -q --queryformat '%%{version}' nodejs)" \
       --define "stxxl_version %(rpm -q --queryformat '%%{version}' stxxl)" \
       --define "tomcat_version %(rpm -q --queryformat '%%{version}' tomcat8)" \
