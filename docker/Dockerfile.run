@@ -32,7 +32,7 @@ RUN yum install -y \
 
 # Configure database for Hootenanny runtime use (after package dependencies,
 # especially PostGIS, are installed).
-COPY scripts/hoot-db-setup.sh
+COPY scripts/hoot-db-setup.sh /tmp/
 RUN /tmp/hoot-db-setup.sh && \
     rm -f /tmp/hoot-db-setup.sh
 
