@@ -763,7 +763,7 @@ Requires:  boost-devel
 Requires:  cppunit-devel
 Requires:  gcc-c++
 Requires:  gdb
-Requires:  geos-devel
+Requires:  geos-devel = %{geos_version}
 Requires:  git
 Requires:  glpk-devel = %{glpk_version}
 Requires:  hoot-words
@@ -813,7 +813,7 @@ Requires:  boost-system
 Requires:  cppunit
 Requires:  dblatex
 Requires:  FileGDBAPI
-Requires:  geos
+Requires:  geos = %{geos_version}
 Requires:  glpk = %{glpk_version}
 Requires:  gnuplot
 Requires:  graphviz

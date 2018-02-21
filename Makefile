@@ -128,7 +128,7 @@ hoot-rpm: $(BUILD_IMAGE)
 	$(VAGRANT) docker-run $(BUILD_IMAGE) -- \
 	rpmbuild \
 	  --define "hoot_version_gen $(HOOT_VERSION_GEN)" \
-	  --define "geos_version %(rpm -q --queryformatn '%%{version} geos)" \
+	  --define "geos_version %(rpm -q --queryformat '%%{version}' geos)" \
 	  --define "gdal_version %(rpm -q --queryformat '%%{version}' hoot-gdal)" \
 	  --define "glpk_version %(rpm -q --queryformat '%%{version}' glpk)" \
 	  --define "nodejs_version %(rpm -q --queryformat '%%{version}' nodejs)" \
