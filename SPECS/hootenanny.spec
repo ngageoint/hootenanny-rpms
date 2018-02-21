@@ -201,6 +201,7 @@ After=syslog.target network.target
 Type=simple
 User=tomcat
 Group=tomcat
+Environment='HOOT_HOME=%{hoot_home}'
 WorkingDirectory=%{hoot_home}/node-export-server
 ExecStart=/usr/bin/npm start
 ExecStop=/usr/bin/kill -HUP \$MAINPID
