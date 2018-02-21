@@ -80,6 +80,7 @@ images:
           filegdbapi_version: *FileGDBAPI_version
           geos_version: *geos_version
           gdal_version: *gdal_version
+          glpk_version: *glpk_version
           libgeotiff_version: *libgeotiff_version
           libkml_version: *libkml_version
           mocha_version: *mocha_version

@@ -53,7 +53,7 @@ if [ ! -f $RPM_X86_64/$GLPK_RPM ]; then
     # Generate glpk RPM.
     run_dep_image \
         -i hoot/rpmbuild-glpk \
-        rpmbuild --define '_hardened_build 1' -bb SPECS/glpk.spec
+        rpmbuild -bb SPECS/glpk.spec
 fi
 
 # libgeotiff
