@@ -3,6 +3,9 @@
 %global hoot_version_tag %(echo %{hoot_version_gen} | %{__awk} -F_ '{ print $1 }')
 %global hoot_extra_version %(echo %{hoot_version_gen} | %{__awk} -F_ '{ print $2 }')
 
+# The NodeJS Mapnik service is disabled until it can be fixed.
+%global with_node_mapnik 0
+
 %if 0%{hoot_extra_version} == 0
   # If this is a tagged release, then we want the RPM release to be
   # greater than 0 (defaults to 1).
@@ -143,17 +146,18 @@ command -v ccache >/dev/null 2>&1 && echo "QMAKE_CXX=ccache g++" >> LocalConfig.
 
 %make_build
 
-pushd node-mapnik-server
-npm install --production
-popd
-
 pushd node-export-server
 npm install --production
 popd
 
+%if 0%{with_node_mapnik} == 1
+pushd node-mapnik-server
+npm install --production
+popd
+%endif
+
 
 %install
-
 # Start with $HOOT_HOME and systemd unit directories.
 %{__install} -d -m 0755 %{buildroot}%{_unitdir}
 %{__install} -d -m 0755 %{buildroot}%{hoot_home}
@@ -201,6 +205,7 @@ After=syslog.target network.target
 Type=simple
 User=tomcat
 Group=tomcat
+Environment='HOOT_HOME=%{hoot_home}'
 WorkingDirectory=%{hoot_home}/node-export-server
 ExecStart=/usr/bin/npm start
 ExecStop=/usr/bin/kill -HUP \$MAINPID
@@ -210,6 +215,7 @@ Restart=on-abort
 WantedBy=multi-user.target
 EOF
 
+%if 0%{with_node_mapnik} == 1
 # node-mapnik
 %{__install} -d -m 0775 %{buildroot}%{hoot_home}/node-mapnik-server
 %{__cp} -p node-mapnik-server/*.{js,json,xml,svg} %{buildroot}%{hoot_home}/node-mapnik-server
@@ -232,6 +238,7 @@ Restart=on-abort
 [Install]
 WantedBy=multi-user.target
 EOF
+%endif
 
 # install into the buildroot
 %{__make} install
@@ -320,11 +327,15 @@ This package contains the UI and web services.
 
 %files services-ui
 %{_unitdir}/node-export.service
+%%if 0%{with_node_mapnik} == 1
 %{_unitdir}/node-mapnik.service
+%endif
 
 %defattr(-, root, tomcat, 0775)
 %{hoot_home}/node-export-server
+%%if 0%{with_node_mapnik} == 1
 %{hoot_home}/node-mapnik-server
+%endif
 %{hoot_home}/test-files
 %{hoot_home}/test-output
 %{tomcat_config}/conf.d/hoot.conf
@@ -360,14 +371,18 @@ fi
 %preun
 
 %systemd_preun node-export.service
+%%if 0%{with_node_mapnik} == 1
 %systemd_preun node-mapnik.service
+%endif
 
 %post services-ui
 
 if test -f /.dockerenv; then exit 0; fi
 
 %systemd_post node-export.service
+%%if 0%{with_node_mapnik} == 1
 %systemd_post node-mapnik.service
+%endif
 
 function updateConfigFiles () {
     # Check for existing db config from previous install and move to right location
@@ -748,7 +763,7 @@ Requires:  boost-devel
 Requires:  cppunit-devel
 Requires:  gcc-c++
 Requires:  gdb
-Requires:  geos-devel
+Requires:  geos-devel = %{geos_version}
 Requires:  git
 Requires:  glpk-devel = %{glpk_version}
 Requires:  hoot-words
@@ -798,7 +813,7 @@ Requires:  boost-system
 Requires:  cppunit
 Requires:  dblatex
 Requires:  FileGDBAPI
-Requires:  geos
+Requires:  geos = %{geos_version}
 Requires:  glpk = %{glpk_version}
 Requires:  gnuplot
 Requires:  graphviz
