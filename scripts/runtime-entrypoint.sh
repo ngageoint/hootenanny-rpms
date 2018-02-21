@@ -12,7 +12,9 @@ su-exec postgres pg_ctl -D $PGDATA -s start &> /dev/null
 su-exec tomcat /usr/libexec/tomcat8/server start &> /var/log/tomcat8.log &
 
 su-exec tomcat bash -c "cd /var/lib/hootenanny/node-export-server && npm start" &> /var/log/node-export.log &
-su-exec tomcat bash -c "cd /var/lib/hootenanny/node-mapnik-server && source ../bin/HootEnv.sh && source ../conf/database/DatabaseConfig.sh && npm start" &> /var/log/node-mapnik.log &
+
+# node-mapnik-server doesn't currently work.
+#su-exec tomcat bash -c "cd /var/lib/hootenanny/node-mapnik-server && source ../bin/HootEnv.sh && source ../conf/database/DatabaseConfig.sh && npm start" &> /var/log/node-mapnik.log &
 
 # Start command as the Tomcat user.
 exec su-exec tomcat $@

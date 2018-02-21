@@ -6,6 +6,7 @@ LABEL \
   name="Hootenanny Base Release Dependency Runtime Image" \
   vendor="Radiant Solutions"
 
+ARG packages
 ARG mocha_version
 ARG nodejs_version
 
@@ -18,3 +19,7 @@ RUN /tmp/hoot-repo.sh && \
     /tmp/nodejs-install.sh ${nodejs_version} && \
     rm -f /tmp/nodejs-install.sh && \
     npm install --silent -g mocha@${mocha_version}
+
+# Install Hootenanny dependencies.
+RUN yum install -y -q dumb-init su-exec tomcat8 && \
+    if [ ! -z "${packages}" ] ; then yum -y -q install ${packages}; fi

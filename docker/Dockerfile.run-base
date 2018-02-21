@@ -10,6 +10,9 @@ ARG lang=en_US.UTF-8
 ARG locale=en_US.UTF-8
 ARG pg_version
 
+# The `HOOT_HOME` environment variable must be set.
+ENV HOOT_HOME=/var/lib/hootenanny
+
 # Ensure proper language/locale environment settings.
 ENV LANG ${lang}
 ENV LC_ALL ${locale}
@@ -18,6 +21,10 @@ ENV LC_ALL ${locale}
 ENV PGDATA=/var/lib/pgsql/${pg_version}/data
 ENV PG_VERSION=${pg_version}
 
+# Preseed with common prerequisites of Hootenanny and its dependencies,
+# as well as with some CLI niceties (htop and less).  Avoid installing
+# dependencies we built, as we'll want to install those manually from
+# built RPMs for the development image.
 RUN yum -q -y update && \
     yum -q -y install \
         asciidoc \
