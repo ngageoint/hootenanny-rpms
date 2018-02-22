@@ -116,6 +116,7 @@ BUILD_CONTAINERS := \
 RUN_CONTAINERS := \
 	run \
 	run-base \
+	run-base-devel \
 	run-base-release
 
 # These may be overridden with environment variables.
@@ -220,19 +221,7 @@ rpmbuild-glpk: \
 
 rpmbuild-hoot-devel: \
 	rpmbuild-pgdg \
-	dumb-init \
-	FileGDBAPI \
-	geos \
-	glpk \
-	hoot-gdal \
-	hoot-postgis23_$(PG_DOTLESS) \
-	hoot-words \
-	libgeotiff \
-	libkml \
-	nodejs \
-	stxxl \
-	su-exec \
-	tomcat8 \
+	$(DEPENDENCY_RPMS) \
 	.vagrant/machines/rpmbuild-hoot-devel/docker/id
 
 rpmbuild-hoot-release: \
@@ -266,6 +255,11 @@ rpmbuild-repo: \
 
 # Runtime containers
 run-base: .vagrant/machines/run-base/docker/id
+
+run-base-devel: \
+	run-base \
+	$(DEPENDENCY_RPMS) \
+	.vagrant/machines/run-base-devel/docker/id
 
 run-base-release: \
 	run-base \

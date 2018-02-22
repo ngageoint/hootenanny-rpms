@@ -1,0 +1,67 @@
+FROM hootenanny/run-base:latest
+
+LABEL \
+  description="Base container for running Hootenanny from development dependencies." \
+  maintainer="justin.bronn@radiantsolutions.com" \
+  name="Hootenanny Base Development Dependency Runtime Image" \
+  vendor="Radiant Solutions"
+
+ARG dumbinit_version
+ARG filegdbapi_version
+ARG gdal_version
+ARG geos_version
+ARG glpk_version
+ARG libgeotiff_version
+ARG libkml_version
+ARG mocha_version
+ARG nodejs_version
+ARG osmosis_version
+ARG postgis_version
+ARG pg_version
+ARG stxxl_version
+ARG suexec_version
+ARG tomcat8_version
+ARG words_version
+
+# Copy in development RPMs at the desired versions.
+COPY RPMS/x86_64/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/geos-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/hoot-gdal-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/hoot-gdal-devel-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/hoot-gdal-libs-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/hoot-gdal-python-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/hoot-postgis23_95-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/hoot-postgis23_95-utils-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/noarch/hoot-words-${words_version}${RPMBUILD_DIST}.noarch.rpm \
+     RPMS/x86_64/libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/nodejs-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/noarch/osmosis-${osmosis_version}${RPMBUILD_DIST}.noarch.rpm \
+     RPMS/x86_64/stxxl-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/su-exec-${suexec_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/noarch/tomcat8-${tomcat8_version}${RPMBUILD_DIST}.noarch.rpm \
+     /tmp/
+
+# Install Hootenanny dependencies.
+RUN yum install -y \
+    /tmp/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/geos-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-gdal-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-gdal-devel-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-gdal-libs-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-gdal-python-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-postgis23_95-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-postgis23_95-utils-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-words-${words_version}${RPMBUILD_DIST}.noarch.rpm \
+    /tmp/libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/nodejs-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/osmosis-${osmosis_version}${RPMBUILD_DIST}.noarch.rpm \
+    /tmp/stxxl-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/su-exec-${suexec_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/tomcat8-${tomcat8_version}${RPMBUILD_DIST}.noarch.rpm \
+    && \
+    rm -f /tmp/*.rpm && \
+    npm install --silent -g mocha@${mocha_version}

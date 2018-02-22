@@ -95,6 +95,25 @@ images:
         buildrequires: true
         rpmbuild: true
         spec_file: 'SPECS/hootenanny.spec'
+    - run-base-devel:
+        args:
+          dumbinit_version: *dumbinit_version
+          filegdbapi_version: *FileGDBAPI_version
+          geos_version: *geos_version
+          gdal_version: *gdal_version
+          glpk_version: *glpk_version
+          libgeotiff_version: *libgeotiff_version
+          libkml_version: *libkml_version
+          mocha_version: *mocha_version
+          nodejs_version: *nodejs_version
+          osmosis_version: *osmosis_version
+          pg_version: *pg_version
+          postgis_version: *postgis_version
+          stxxl_version: *stxxl_version
+          suexec_version: *suexec_version
+          tomcat8_version: *tomcat8_version
+          words_version: *words_version
+        rpmbuild: true
   postgis: !!omap
     - rpmbuild-postgis:
         args:
