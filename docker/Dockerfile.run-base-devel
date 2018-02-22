@@ -18,10 +18,13 @@ ARG nodejs_version
 ARG osmosis_version
 ARG postgis_version
 ARG pg_version
+ARG rpmbuild_dist=.el7
 ARG stxxl_version
 ARG suexec_version
 ARG tomcat8_version
 ARG words_version
+
+ENV RPMBUILD_DIST=${rpmbuild_dist}
 
 # Copy in development RPMs at the desired versions.
 COPY RPMS/x86_64/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
