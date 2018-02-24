@@ -179,6 +179,13 @@ function build_repo_images() {
            $SCRIPT_HOME
 }
 
+function build_run_images() {
+    docker build \
+           --build-arg pg_version=$PG_VERSION \
+           -f $SCRIPT_HOME/docker/Dockerfile.run-base \
+           -t hootenanny/run-base \
+           $SCRIPT_HOME
+}
 
 # Runs a dependency build image.
 function run_dep_image() {

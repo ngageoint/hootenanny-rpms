@@ -1,5 +1,13 @@
-# The one required macro parameter is `hoot_version_gen`, from which
-# the RPM's version and release will be determined automatically.
+# Required macro parameters to build a Hootenanny RPM:
+#  * hoot_version_gen
+#  * geos_version
+#  * glpk_version
+#  * gdal_version
+#  * stxxl_version
+#  * tomcat_version
+
+# The `hoot_version_gen` parameter allows us to automatically generate
+# the version and release of the Hooteannny RPM.
 %global hoot_version_tag %(echo %{hoot_version_gen} | %{__awk} -F_ '{ print $1 }')
 %global hoot_extra_version %(echo %{hoot_version_gen} | %{__awk} -F_ '{ print $2 }')
 
@@ -28,6 +36,9 @@
 %{!?tomcat_config: %global tomcat_config %{_sysconfdir}/tomcat8}
 %{!?tomcat_home: %global tomcat_home %{_datadir}/tomcat8}
 %global tomcat_webapps %{tomcat_basedir}/webapps
+
+# NodeJS package includes an epoch that must be used for requirements.
+%{!?nodejs_epoch: %global nodejs_epoch 1}
 
 # Prevents services-ui from being marked that it provides GDAL or Mapnik.
 %global __provides_exclude ^lib(gdal|mapnik)\\.so.*$
@@ -104,7 +115,7 @@ content, geometry and attributes, to transfer to the output map.
 %package core
 Summary:   Hootenanny Core
 Requires:  %{name}-core-deps = %{version}-%{release}
-Requires:  nodejs = %{nodejs_version}
+Requires:  nodejs = %{nodejs_epoch}:%{nodejs_version}
 Requires:  postgresql%{pg_dotless}-libs
 Group:      Applications/Engineering
 
@@ -659,7 +670,7 @@ Requires:  hoot-postgis23_%{pg_dotless}
 Requires:  hoot-postgis23_%{pg_dotless}-utils
 Requires:  liquibase
 Requires:  maven
-Requires:  nodejs-devel = %{nodejs_version}
+Requires:  nodejs-devel = %{nodejs_epoch}:%{nodejs_version}
 Requires:  postgresql%{pg_dotless}-devel
 Requires:  postgresql%{pg_dotless}-server
 Requires:  postgresql%{pg_dotless}-contrib
@@ -769,7 +780,7 @@ Requires:  glpk-devel = %{glpk_version}
 Requires:  hoot-words
 Requires:  libicu-devel
 Requires:  log4cxx-devel
-Requires:  nodejs-devel = %{nodejs_version}
+Requires:  nodejs-devel = %{nodejs_epoch}:%{nodejs_version}
 Requires:  opencv-devel
 Requires:  postgresql%{pg_dotless}-devel
 Requires:  proj-devel
@@ -823,7 +834,7 @@ Requires:  hoot-gdal-python = %{gdal_version}
 Requires:  hoot-words
 Requires:  libicu
 Requires:  log4cxx
-Requires:  nodejs = %{nodejs_version}
+Requires:  nodejs = %{nodejs_epoch}:%{nodejs_version}
 Requires:  opencv
 Requires:  perl-libwww-perl
 Requires:  perl-XML-LibXML

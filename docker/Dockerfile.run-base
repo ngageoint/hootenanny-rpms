@@ -1,0 +1,68 @@
+FROM centos:7
+
+LABEL \
+  description="Base container for running Hootenanny" \
+  maintainer="justin.bronn@radiantsolutions.com" \
+  name="Hootenanny Base Runtime Image" \
+  vendor="Radiant Solutions"
+
+ARG lang=en_US.UTF-8
+ARG locale=en_US.UTF-8
+ARG pg_version
+
+# The `HOOT_HOME` environment variable must be set.
+ENV HOOT_HOME=/var/lib/hootenanny
+
+# Ensure proper language/locale environment settings.
+ENV LANG ${lang}
+ENV LC_ALL ${locale}
+
+# Ensure PostgreSQL version and data directory are available via env vars.
+ENV PGDATA=/var/lib/pgsql/${pg_version}/data
+ENV PG_VERSION=${pg_version}
+
+# Preseed with common prerequisites of Hootenanny and its dependencies,
+# as well as with some CLI niceties (htop and less).  Avoid installing
+# dependencies we built, as we'll want to install those manually from
+# built RPMs for the development image.
+RUN yum -q -y update && \
+    yum -q -y install \
+        asciidoc \
+        boost-iostreams \
+        boost-system \
+        cppunit \
+        cpptest \
+        dblatex \
+        epel-release \
+        less \
+        gnuplot \
+        graphviz \
+        hdf5 \
+        htop \
+        java-1.8.0-openjdk \
+        libicu \
+        log4cxx \
+        openblas-openmp \
+        opencv \
+        perl-libwww-perl \
+        perl-XML-LibXML \
+        proj \
+        protobuf \
+        python-matplotlib \
+        qt \
+        qt-postgresql \
+        qt-x11 \
+        unzip \
+        v8 \
+        w3m \
+        wget \
+        words \
+        zip
+
+# Install basic PostgreSQL repo and base packages.
+COPY scripts/pgdg-repo.sh /tmp/pgdg-repo.sh
+RUN /tmp/pgdg-repo.sh ${pg_version} && \
+    rm /tmp/pgdg-repo.sh && \
+    yum -q -y install \
+        postgresql$(echo ${pg_version} | tr -d '.') \
+        postgresql$(echo ${pg_version} | tr -d '.')-libs

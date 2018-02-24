@@ -9,14 +9,13 @@ set -u
 source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/Vars.sh
 
 # Build base images.
-build_base_images
+build_run_images
 
 case "${BUILD_IMAGE}" in
     # The development image is built entirely using local RPMs, built
     # with the `BuildDeps.sh` script.
     devel)
         docker build \
-               --build-arg "packages=$( spec_requires hootenanny )" \
                --build-arg dumbinit_version=$DUMBINIT_VERSION-$DUMBINIT_RELEASE \
                --build-arg filegdbapi_version=$FILEGDBAPI_VERSION-$FILEGDBAPI_RELEASE \
                --build-arg gdal_version=$GDAL_VERSION-$GDAL_RELEASE \
@@ -33,20 +32,19 @@ case "${BUILD_IMAGE}" in
                --build-arg suexec_version=$SUEXEC_VERSION-$SUEXEC_RELEASE \
                --build-arg tomcat8_version=$TOMCAT8_VERSION-$TOMCAT8_RELEASE \
                --build-arg words_version=$WORDS_VERSION-$WORDS_RELEASE \
-               -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-hoot-devel \
-               -t hootenanny/rpmbuild-hoot-devel \
+               -f $SCRIPT_HOME/docker/Dockerfile.run-base-devel \
+               -t hootenanny/run-base-devel \
                $SCRIPT_HOME
         ;;
     # The "release" image, built with latest signed dependencies in the hootenanny
     # public repository.
     release)
         docker build \
-               --build-arg "packages=$( spec_requires hootenanny )" \
                --build-arg mocha_version=$MOCHA_VERSION \
                --build-arg nodejs_version=$NODEJS_VERSION-$NODEJS_RELEASE \
                --build-arg pg_version=$PG_VERSION \
-               -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-hoot-release \
-               -t hootenanny/rpmbuild-hoot-release \
+               -f $SCRIPT_HOME/docker/Dockerfile.run-base-release \
+               -t hootenanny/run-base-release \
                $SCRIPT_HOME
         ;;
     *)
