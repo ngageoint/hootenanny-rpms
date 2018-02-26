@@ -191,8 +191,12 @@ getent passwd %{tomcat_user} 2>/dev/null || \
 %systemd_postun %{name}.service
 
 %changelog
-* Fri Jan 12 2018 Justin Bronn <justin.bronn@digitalglobe.com> - 8.5.24-1
-- Upgrade to 8.5.24.
-- Replaced init script with systemd units.
-* Wed Nov 15 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 8.5.23-1
-- Initial release.
+* Mon Feb 26 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 8.5.28-1
+- Upgrade to 8.5.28
+
+* Fri Jan 12 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 8.5.24-1
+- Upgrade to 8.5.24
+- Replaced init script with systemd units
+
+* Wed Nov 15 2017 Justin Bronn <justin.bronn@radiantsolutions.com> - 8.5.23-1
+- Initial release
