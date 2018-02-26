@@ -32,6 +32,9 @@ make hoot-archive
 make hoot-rpm
 ```
 
+Note: it's common for the `hoot-archive` target to fail the first time due to
+maven downloading outside dependencies.
+
 ## shell
 
 Scripts in the [`shell`](./shell) directory can be used to build the RPMs
