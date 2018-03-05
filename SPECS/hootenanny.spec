@@ -35,6 +35,7 @@
 %{!?tomcat_basedir: %global tomcat_basedir %{_sharedstatedir}/tomcat8}
 %{!?tomcat_config: %global tomcat_config %{_sysconfdir}/tomcat8}
 %{!?tomcat_home: %global tomcat_home %{_datadir}/tomcat8}
+%{!?tomcat_logs: %global tomcat_logs %{_var}/log/tomcat8}
 %global tomcat_webapps %{tomcat_basedir}/webapps
 
 # NodeJS package includes an epoch that must be used for requirements.
@@ -203,6 +204,14 @@ export HOOT_HOME=%{hoot_home}
 export HOOT_WORKING_NAME=%{name}
 EOF
 
+# Add a dummy Tomcat log file, `catalina.out`, to prevent error popup in UI.
+%{__install} -d -m 0775 %{buildroot}%{tomcat_logs}
+%{__cat} >> %{buildroot}%{tomcat_logs}/catalina.out <<EOF
+Please login to the host to view the logs:
+
+   sudo journalctl -u tomcat8
+EOF
+
 # node-export
 %{__install} -d -m 0775 %{buildroot}%{hoot_home}/node-export-server
 %{__cp} -p node-export-server/*.{js,json} %{buildroot}%{hoot_home}/node-export-server
@@ -357,6 +366,7 @@ This package contains the UI and web services.
 %{hoot_home}/tmp
 %{hoot_home}/userfiles
 %{tomcat_home}/.deegree
+%{tomcat_logs}/catalina.out
 
 #the order of operations during an upgrade is:
 #
