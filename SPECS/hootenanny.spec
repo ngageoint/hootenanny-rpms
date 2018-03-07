@@ -276,6 +276,7 @@ echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hoot
 # This allows all the tests to run.
 %{__install} -m 0775 -d %{buildroot}%{hoot_home}/hoot-core-test/src/test
 %{__ln_s} %{hoot_home}/test-files %{buildroot}%{hoot_home}/hoot-core-test/src/test/resources
+%{__chmod} 0664 %{buildroot}%{hoot_home}/test-files/DcTigerRoadsHighwayExactMatchInputs.osm
 
 # This makes it so HootEnv.sh resolves `$HOOT_HOME` properly.
 %{__ln_s} %{hoot_home}/bin/HootEnv.sh %{buildroot}%{_bindir}/HootEnv.sh
