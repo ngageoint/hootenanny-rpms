@@ -137,7 +137,8 @@ else
 HOOT_ARCHIVE := SOURCES/hootenanny-$(HOOT_VERSION_GEN).tar.gz
 ifeq ($(strip $(call hoot_extra_version,$(HOOT_VERSION_GEN))),)
 # Release version (HOOT_VERSION_GEN=0.2.38).
-HOOT_VERSION := $(call hoot_version_tag,$(HOOT_VERSION_GEN))
+HOOT_RELEASE ?= 1
+HOOT_VERSION := $(call hoot_version_tag,$(HOOT_VERSION_GEN))-$(HOOT_RELEASE)
 else
 # Development version (HOOT_VERSION_GEN=0.2.38_23_gdadada1)
 HOOT_VERSION := $(call hoot_devel_version,$(HOOT_VERSION_GEN))
