@@ -1,0 +1,43 @@
+ARG from_image=hootenanny/run-base-release:latest
+FROM ${from_image}
+
+ARG from_image
+ARG hoot_version
+ARG hoot_dist=.el7
+
+LABEL \
+  description="Runtime container for Hootenanny ${hoot_version} (using ${from_image})" \
+  maintainer="justin.bronn@radiantsolutions.com" \
+  name="Hootenanny Runtime Image" \
+  vendor="Radiant Solutions"
+
+# Install PostgreSQL server and initialize database.
+COPY scripts/postgresql-install.sh /tmp/
+RUN /tmp/postgresql-install.sh && \
+    rm -f /tmp/postgresql-install.sh
+
+# Copy in Hootenanny RPMs.
+COPY RPMS/x86_64/hootenanny-core-${hoot_version}${hoot_dist}.x86_64.rpm \
+     RPMS/noarch/hootenanny-core-deps-${hoot_version}${hoot_dist}.noarch.rpm \
+     RPMS/x86_64/hootenanny-services-ui-${hoot_version}${hoot_dist}.x86_64.rpm \
+     /tmp/
+
+# Install Hootenanny RPMs.
+RUN yum install -y \
+    /tmp/hootenanny-core-${hoot_version}${hoot_dist}.x86_64.rpm \
+    /tmp/hootenanny-core-deps-${hoot_version}${hoot_dist}.noarch.rpm \
+    /tmp/hootenanny-services-ui-${hoot_version}${hoot_dist}.x86_64.rpm \
+    && \
+    rm -f /tmp/*.rpm
+
+# Configure database for Hootenanny runtime use (after package dependencies,
+# especially PostGIS, are installed).
+COPY scripts/hoot-db-setup.sh /tmp/
+RUN /tmp/hoot-db-setup.sh && \
+    rm -f /tmp/hoot-db-setup.sh
+
+# Copy in the runtime entrypoint.
+COPY scripts/runtime-entrypoint.sh /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["/bin/bash"]
+WORKDIR ${HOOT_HOME}

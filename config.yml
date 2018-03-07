@@ -1,0 +1,175 @@
+---
+versions:
+  dumb-init: &dumbinit_version '1.2.1-1'
+  geos: &geos_version '3.6.2-1'
+  glpk: &glpk_version '4.64-1'
+  hoot-gdal: &gdal_version '2.1.4-2'
+  hoot-words: &words_version '1.0.1-1'
+  FileGDBAPI: &FileGDBAPI_version '1.5.1-1'
+  libgeotiff: &libgeotiff_version '1.4.2-1'
+  libkml: &libkml_version '1.3.0-1'
+  mocha: &mocha_version '3.5.3'
+  nodejs: &nodejs_version '8.9.3-1'
+  osmosis: &osmosis_version '0.46-1'
+  postgis: &postgis_version '2.3.5-1'
+  postgresql: &pg_version '9.5'
+  stxxl: &stxxl_version '1.3.1-1'
+  su-exec: &suexec_version '0.2-1'
+  tomcat8: &tomcat8_version '8.5.28-1'
+  wamerican-insane: &wamerican_version '7.1-1'
+
+
+images:
+  base: !!omap
+    - rpmbuild:
+        args:
+          rpmbuild_dist: .el7
+          rpmbuild_uid: 1000
+    - rpmbuild-base: {}
+    - rpmbuild-generic: {}
+    - rpmbuild-pgdg:
+        args:
+          pg_version: *pg_version
+        tags: [*pg_version]
+    - rpmbuild-hoot-release:
+        args:
+          mocha_version: *mocha_version
+          nodejs_version: *nodejs_version
+          pg_version: *pg_version
+        buildrequires: true
+        rpmbuild: true
+        spec_file: 'SPECS/hootenanny.spec'
+    - rpmbuild-repo: {}
+    - rpmbuild-geos:
+        buildrequires: true
+        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
+    - rpmbuild-glpk:
+        buildrequires: true
+        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
+    - rpmbuild-libgeotiff:
+        buildrequires: true
+        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
+    - rpmbuild-libkml:
+        buildrequires: true
+        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
+    - rpmbuild-nodejs:
+        buildrequires: true
+        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
+    - run-base:
+        args:
+          pg_version: *pg_version
+    - run-base-release:
+        args:
+          mocha_version: *mocha_version
+          nodejs_version: *nodejs_version
+          pg_version: *pg_version
+  gdal: !!omap
+    - rpmbuild-gdal:
+        args:
+          filegdbapi_version: *FileGDBAPI_version
+          geos_version: *geos_version
+          libgeotiff_version: *libgeotiff_version
+          libkml_version: *libkml_version
+          pg_version: *pg_version
+        buildrequires: true
+        spec_file: 'SPECS/hoot-gdal.spec'
+  hoot: !!omap
+    - rpmbuild-hoot-devel:
+        args:
+          dumbinit_version: *dumbinit_version
+          filegdbapi_version: *FileGDBAPI_version
+          geos_version: *geos_version
+          gdal_version: *gdal_version
+          glpk_version: *glpk_version
+          libgeotiff_version: *libgeotiff_version
+          libkml_version: *libkml_version
+          mocha_version: *mocha_version
+          nodejs_version: *nodejs_version
+          osmosis_version: *osmosis_version
+          pg_version: *pg_version
+          postgis_version: *postgis_version
+          stxxl_version: *stxxl_version
+          suexec_version: *suexec_version
+          tomcat8_version: *tomcat8_version
+          words_version: *words_version
+        buildrequires: true
+        rpmbuild: true
+        spec_file: 'SPECS/hootenanny.spec'
+    - run-base-devel:
+        args:
+          dumbinit_version: *dumbinit_version
+          filegdbapi_version: *FileGDBAPI_version
+          geos_version: *geos_version
+          gdal_version: *gdal_version
+          glpk_version: *glpk_version
+          libgeotiff_version: *libgeotiff_version
+          libkml_version: *libkml_version
+          mocha_version: *mocha_version
+          nodejs_version: *nodejs_version
+          osmosis_version: *osmosis_version
+          pg_version: *pg_version
+          postgis_version: *postgis_version
+          stxxl_version: *stxxl_version
+          suexec_version: *suexec_version
+          tomcat8_version: *tomcat8_version
+          words_version: *words_version
+        rpmbuild: true
+  postgis: !!omap
+    - rpmbuild-postgis:
+        args:
+          gdal_version: *gdal_version
+        buildrequires: true
+        spec_file: 'SPECS/hoot-postgis23.spec'
+
+
+rpms:
+  dumb-init:
+    image: rpmbuild-generic
+    version: *dumbinit_version
+  geos:
+    image: rpmbuild-geos
+    version: *geos_version
+  glpk:
+    image: rpmbuild-glpk
+    version: *glpk_version
+  hoot-gdal:
+    image: rpmbuild-gdal
+    version: *gdal_version
+  hoot-postgis23_95:
+    image: rpmbuild-postgis
+    version: *postgis_version
+    spec_file: 'SPECS/hoot-postgis23.spec'
+  hoot-words:
+    image: rpmbuild-generic
+    version: *words_version
+    arch: noarch
+  FileGDBAPI:
+    image: rpmbuild-generic
+    version: *FileGDBAPI_version
+  libgeotiff:
+    image: rpmbuild-libgeotiff
+    version: *libgeotiff_version
+  libkml:
+    image: rpmbuild-libkml
+    version: *libkml_version
+  nodejs:
+    image: rpmbuild-nodejs
+    version: *nodejs_version
+  osmosis:
+    image: rpmbuild-generic
+    version: *osmosis_version
+    arch: noarch
+  su-exec:
+    image: rpmbuild-generic
+    version: *suexec_version
+  stxxl:
+    image: rpmbuild-generic
+    version: *stxxl_version
+  tomcat8:
+    image: rpmbuild-generic
+    version: *tomcat8_version
+    arch: noarch
+  wamerican-insane:
+    image: rpmbuild-generic
+    version: *wamerican_version
+    arch: noarch

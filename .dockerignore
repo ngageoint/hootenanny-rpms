@@ -1,0 +1,11 @@
+.git/*
+.vagrant/*
+el7/*
+el7-src/*
+hootenanny
+m2
+npm
+BUILD
+BUILDROOT
+SOURCES
+SRPMS

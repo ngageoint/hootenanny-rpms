@@ -1,0 +1,25 @@
+FROM hootenanny/run-base:latest
+
+LABEL \
+  description="Base container for running Hootenanny from release dependencies." \
+  maintainer="justin.bronn@radiantsolutions.com" \
+  name="Hootenanny Base Release Dependency Runtime Image" \
+  vendor="Radiant Solutions"
+
+ARG packages
+ARG mocha_version
+ARG nodejs_version
+
+# Install Hootenanny dependency release repository and NodeJS.
+COPY scripts/hoot-repo.sh \
+     scripts/nodejs-install.sh \
+     /tmp/
+RUN /tmp/hoot-repo.sh && \
+    rm /tmp/hoot-repo.sh && \
+    /tmp/nodejs-install.sh ${nodejs_version} && \
+    rm -f /tmp/nodejs-install.sh && \
+    npm install --silent -g mocha@${mocha_version}
+
+# Install Hootenanny dependencies.
+RUN yum install -y -q dumb-init su-exec tomcat8 && \
+    if [ ! -z "${packages}" ] ; then yum -y -q install ${packages}; fi
