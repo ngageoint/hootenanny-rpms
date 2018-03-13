@@ -12,10 +12,23 @@ tar \
   -czvf ~/m2-cache.tar.gz repository
 ```
 
-Then uploaded as part of a `maven` directory to the `hoot-repo` S3 bucket:
+The resulting tar file is then uploaded to the `hoot-maven` S3 bucket,
+created with the following command:
 
 ```
-mkdir maven
-mv m2-cache.tar.gz maven
-aws s3 sync maven/ s3://hoot-repo/maven/ --acl public-read
+aws s3api create-bucket --bucket hoot-maven --acl public-read
+```
+
+Finally, copy the cache file to the bucket:
+
+```
+aws s3 cp m2-cache.tar.gz s3://hoot-maven/ --acl public-read
+```
+
+Please record the URL of the cache file and the SHA1 checksum in `config.yml`:
+
+```yaml
+maven:
+  cache_url: &maven_cache_url 'https://s3.amazonaws.com/hoot-maven/m2-cache.tar.gz'
+  cache_sha1: &maven_cache_sha1 'efbd6edd5a13bf3806780f144b4fe314c34eccfc'
 ```
