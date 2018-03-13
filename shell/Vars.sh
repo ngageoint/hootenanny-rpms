@@ -193,7 +193,7 @@ function build_run_images() {
 function maven_cache() {
     if ! test -d $CACHE/m2/repository; then
         curl -sSL -o /var/tmp/m2-cache.tar.gz $MAVEN_CACHE_URL
-        echo "${MAVEN_CACHE_SHA1}  /var/tmp/m2-cache.tar.gz" | shasum -c -
+        echo "${MAVEN_CACHE_SHA1}  /var/tmp/m2-cache.tar.gz" | sha1sum -c -
         tar -C $CACHE/m2 -xzf /var/tmp/m2-cache.tar.gz
     fi
 }
