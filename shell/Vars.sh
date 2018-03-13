@@ -33,7 +33,7 @@ function latest_hoot_version_gen() {
 
 # Get version from YAML file.
 function config_version() {
-    cat $SCRIPT_HOME/config.yml | grep "\\&${1}" | awk '{ print $3 }' | tr -d "'" | awk -F- '{ print $1 }'
+    cat $SCRIPT_HOME/config.yml | grep "\\&${1}" | awk '{ print $3 }' | tr -d "'" | awk -F"${2:--}" '{ print $1 }'
 }
 
 function config_release() {
@@ -53,6 +53,9 @@ function spec_requires() {
         -q --buildrequires $SPECS/$1.spec | \
         awk '{ for (i = 1; i <= NF; ++i) if ($i ~ /^[[:alpha:]]/) print $i }' ORS=' '
 }
+
+MAVEN_CACHE_URL=$( config_version maven_cache_url " ")
+MAVEN_CACHE_SHA1=$( config_version maven_cache_sha1 )
 
 # Mocha version
 MOCHA_VERSION=$( config_version mocha )
@@ -187,6 +190,14 @@ function build_run_images() {
            $SCRIPT_HOME
 }
 
+function maven_cache() {
+    if ! test -d $CACHE/m2/repository; then
+        curl -sSL -o /var/tmp/m2-cache.tar.gz $MAVEN_CACHE_URL
+        echo "${MAVEN_CACHE_SHA1}  /var/tmp/m2-cache.tar.gz" | shasum -c -
+        tar -C $CACHE/m2 -xzf /var/tmp/m2-cache.tar.gz
+    fi
+}
+
 # Runs a dependency build image.
 function run_dep_image() {
     local OPTIND opt
@@ -261,6 +272,7 @@ function run_hoot_build_image() {
         echo "run_hoot_build_image: [-e <entrypoint>] [-i <image>] [-u <user>]"
     else
         mkdir -p $SCRIPT_HOME/hootenanny $CACHE/m2 $CACHE/npm
+        maven_cache
         docker run \
                -v $SOURCES:/rpmbuild/SOURCES:$sources_mode \
                -v $SPECS:/rpmbuild/SPECS:ro \

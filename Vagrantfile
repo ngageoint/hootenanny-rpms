@@ -1,8 +1,13 @@
 require 'yaml'
+require 'vagrant/errors'
+require 'vagrant/ui'
+require 'vagrant/util/downloader'
+require 'vagrant/util/subprocess'
 
 # Setting up globals from YAML configuration file.
 settings = YAML::load_file('config.yml')
 $images = settings.fetch('images', {})
+$maven = settings.fetch('maven', {})
 $rpms = settings.fetch('rpms', {})
 $pg_version = settings.fetch('versions')['postgresql']
 $pg_dotless = $pg_version.gsub('.', '')
@@ -33,6 +38,39 @@ def make_hoot_dirs
 end
 
 
+# Use Vagrant utilities to download and extract the Maven cache.
+def maven_cache
+  if ! File.directory?('cache/m2/repository')
+    ui = Vagrant::UI::Basic.new()
+    ui.say('info', 'Downloading Maven cache')
+    tmp_file = '/var/tmp/m2-cache.tar.gz'
+
+    d = Vagrant::Util::Downloader.new(
+       $maven['cache_url'],
+       tmp_file,
+       {
+         :sha1 => $maven['cache_sha1'],
+         :ui => ui,
+       }
+    )
+
+    begin
+      d.download!
+    rescue Vagrant::Errors::VagrantError
+      raise Vagrant::Errors::VagrantError, output: 'Could not download maven cache!'
+    end
+
+    ui.say('info', 'Extracting Maven cache')
+    result = Vagrant::Util::Subprocess.execute(
+      'tar', '-C', 'cache/m2', '-xzf', tmp_file
+    )
+    if result.exit_code != 0
+      raise Vagrant::Errors::VagrantError, output: 'Could not extract Maven cache.'
+    end
+  end
+end
+
+
 def rpm_file(name, options)
   arch = options.fetch('arch', 'x86_64')
   dist = options.fetch('dist', '.el7')
@@ -53,6 +91,8 @@ def shared_folders(container, name, options, rpmbuild: false)
 
     # Additional directories need to be shared for Hootenanny builds.
     if options.fetch('spec_file', '') == 'SPECS/hootenanny.spec'
+      maven_cache()
+
       container.vm.synced_folder 'cache/m2', '/rpmbuild/.m2'
       container.vm.synced_folder 'cache/npm', '/rpmbuild/.npm'
       container.vm.synced_folder 'hootenanny', '/rpmbuild/hootenanny'
