@@ -19,6 +19,11 @@ versions:
   wamerican-insane: &wamerican_version '7.1-1'
 
 
+maven:
+  cache_url: &maven_cache_url 'https://s3.amazonaws.com/hoot-maven/m2-cache.tar.gz'
+  cache_sha1: &maven_cache_sha1 'efbd6edd5a13bf3806780f144b4fe314c34eccfc'
+
+
 images:
   base: !!omap
     - rpmbuild:

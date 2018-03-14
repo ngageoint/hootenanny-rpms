@@ -1,8 +1,8 @@
-# The rpm apt package is required when on Ubuntu because we treat the
+# The rpm-build apt package is required when on Ubuntu because we treat the
 # *.spec files as a source of truth for version information and
 # `rpm` and `rpmspec` are necessary to intrepret them from macros.
-if ! test -x /usr/bin/rpm; then
-    echo "This script requires the 'rpm' package."
+if ! test -x /usr/bin/rpmbuild; then
+    echo "This script requires the 'rpm' package (Ubuntu) or 'rpm-build' (CentOS)"
     exit 1
 fi
 
@@ -33,7 +33,7 @@ function latest_hoot_version_gen() {
 
 # Get version from YAML file.
 function config_version() {
-    cat $SCRIPT_HOME/config.yml | grep "\\&${1}" | awk '{ print $3 }' | tr -d "'" | awk -F- '{ print $1 }'
+    cat $SCRIPT_HOME/config.yml | grep "\\&${1}" | awk '{ print $3 }' | tr -d "'" | awk -F"${2:--}" '{ print $1 }'
 }
 
 function config_release() {
@@ -53,6 +53,9 @@ function spec_requires() {
         -q --buildrequires $SPECS/$1.spec | \
         awk '{ for (i = 1; i <= NF; ++i) if ($i ~ /^[[:alpha:]]/) print $i }' ORS=' '
 }
+
+MAVEN_CACHE_URL=$( config_version maven_cache_url " ")
+MAVEN_CACHE_SHA1=$( config_version maven_cache_sha1 )
 
 # Mocha version
 MOCHA_VERSION=$( config_version mocha )
@@ -187,6 +190,16 @@ function build_run_images() {
            $SCRIPT_HOME
 }
 
+function maven_cache() {
+    if ! test -d $CACHE/m2/repository; then
+        echo 'Downloading Maven cache'
+        curl -sSL -o /var/tmp/m2-cache.tar.gz $MAVEN_CACHE_URL
+        echo 'Extracting Maven cache'
+        echo "${MAVEN_CACHE_SHA1}  /var/tmp/m2-cache.tar.gz" | sha1sum -c -
+        tar -C $CACHE/m2 -xzf /var/tmp/m2-cache.tar.gz
+    fi
+}
+
 # Runs a dependency build image.
 function run_dep_image() {
     local OPTIND opt
@@ -260,7 +273,8 @@ function run_hoot_build_image() {
     if [ "${usage}" = "yes" ]; then
         echo "run_hoot_build_image: [-e <entrypoint>] [-i <image>] [-u <user>]"
     else
-        mkdir -p $SCRIPT_HOME/hootenanny $CACHE/m2 $CACHE/npm
+        mkdir -p $SCRIPT_HOME/hootenanny $RPMS $CACHE/m2 $CACHE/npm
+        maven_cache
         docker run \
                -v $SOURCES:/rpmbuild/SOURCES:$sources_mode \
                -v $SPECS:/rpmbuild/SPECS:ro \
