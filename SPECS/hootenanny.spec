@@ -390,7 +390,7 @@ if [ "$1" = "2" ]; then
     fi
 fi
 
-%preun
+%preun services-ui
 
 %systemd_preun node-export.service
 %if 0%{with_node_mapnik} == 1
