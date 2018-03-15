@@ -1,236 +1,325 @@
+DOCKER ?= docker
+VAGRANT ?= vagrant
 
-# Default branch of hoot to build
-GIT_COMMIT?=origin/develop
-
-TARBALLS := $(wildcard src/SOURCES/hootenanny*.tar.gz)
-DOCBALLS := $(wildcard src/SOURCES/hootenanny*-documentation.tar.gz)
-HOOTBALL := $(filter-out $(DOCBALLS), $(TARBALLS))
-
-# URL for downloading the Java8 JDK 
-JDKURL=http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
-
-all: copy-rpms
-
-# a convenience target for building hoot RPMs and no others.
-hoot-rpms:
-	cd src; $(MAKE) hoot
-
-force:
-
-# Clean out all the RPMs
-clean: clean-hoot
-	cd src; $(MAKE) clean
-
-# Clean out everything
-clean-all: vagrant-clean clean
-
-# Cleans out the RPM el6 stash, archive hoot, and all the hoot source/rpms
-clean-hoot:
-	rm -rf el6
-	rm -rf tmp/hootenanny
-	cd src; $(MAKE) clean-hoot
-
-ValidHootTarball:
-	test $(words $(HOOTBALL)) != 1 && (echo "Did not find exactly one hoot tarball in SOURCES. Too many? Do you need to download one? https://github.com/ngageoint/hootenanny/releases"; exit -1) || true
-
-vagrant-build-up: vagrant-plugins
-	vagrant up
-
-copy-words1: vagrant-build-up
-	# If we have words1.sqlite locally don't copy it down from github.
-	([ -e /tmp/words1.sqlite ] && cat /tmp/words1.sqlite | vagrant ssh -c "cat > /tmp/words1.sqlite") || true
-
-vagrant-plugins:
-	# Install the bindfs plugin if it doesn't exist
-	(vagrant plugin list | grep -q bindfs) || vagrant plugin install vagrant-bindfs
+# TODO: This needs to be retrieved from a setting in config.yml.
+RPMBUILD_DIST := .el7
 
 
-# NOTE: We grab a copy of the Oracle 8 JDK before installing the deps
-vagrant-build-deps: copy-words1 el6-src/jdk-8u131-linux-x64.rpm
-	vagrant ssh -c "cd hootenanny-rpms && make -j$$((`nproc` + 2)) deps"
+## Macro functions.
 
-vagrant-build: vagrant-build-rpms
+# All versions use a YAML reference so they only have to be defined once,
+# just grep for this reference and print it out.
+config_version = $(shell cat config.yml | grep '\&$(1)_version' | awk '{ print $$3 }' | tr -d "'")
 
-vagrant-build-rpms: vagrant-build-archive
-	vagrant up
-	vagrant ssh -c "cd hootenanny-rpms && ./fix_postgres.sh"
-	vagrant ssh -c "cd hootenanny-rpms && make -j$$((`nproc` + 2))"
+# Where Vagrant puts the Docker container id after it's been created.
+container_id = .vagrant/machines/$(1)/docker/id
 
-vagrant-build-archive: vagrant-build-deps
-	vagrant up
-	vagrant ssh -c "export GIT_COMMIT=$(GIT_COMMIT) ; cd hootenanny-rpms && ./BuildArchive.sh"
+# Follows the docker logs for the given container.
+docker_logs = $(DOCKER) logs --follow $$(cat $(call container_id,$(1)))
 
-vagrant-clean:
-	vagrant halt
-	vagrant destroy -f
-	mkdir -p el6
-	cd test && vagrant halt && vagrant destroy -f
-	rmdir --ignore-fail-on-non-empty el6 || true
-	rm -f src/tmp/*-install
+# Returns the version tag reference from HOOT_VERSION_GEN, for example:
+#  $(call hoot_version_tag,0.2.38_23_gdadada1) -> 0.2.38
+hoot_version_tag = $(shell echo $(1) | awk -F_ '{ print $$1 }')
 
-vagrant-test:
-	# Adding this in so we always have a clean test VM.
-	cd test && vagrant halt && vagrant destroy -f
-	cd test; vagrant up
-	cd test; vagrant ssh -c "cd /var/lib/hootenanny && sudo HootTest --diff --glacial --parallel 4 \
-		--exclude=.*NetworkConflateCmdTest.sh \
-		--exclude=.*ExactMatchInputsTest.sh \
-		--exclude=.*ConflateAverageTest.sh \
-		--exclude=.*ServiceMultiaryIngestCmdTest.sh \
-		--exclude=.*TileConflatorTest.* \
-		--exclude=.*Osm2OgrTranslation.sh"
+# Returns the extra version information from HOOT_VERSION_GEN, which indicates
+# how many commits away from the latest release tag the git commit is:
+#  $(call hoot_extra_version,0.2.38_23_gdadada1) -> 23
+hoot_extra_version = $(shell echo $(1) | awk -F_ '{ print $$2 }')
 
-# This spawns a small VM to update the main repo so we can copy it to S3
-vagrant-repo:
-	cd update-repo; vagrant up
-	cd update-repo; vagrant destroy -f
+# Returns git commit from HOOT_VERSION_GEN.  For example:
+#  $(call hoot_extra_version,0.2.38_23_gdadada1) -> dadada1
+hoot_git_revision = $(shell echo $(1) | awk -F_ '{ print substr($$3, 2) }')
 
+# Returns the full RPM version, including a release that's pre-release and
+# and includes Fedora-standard VCS snapshot information, for example:
+#   $(call hoot_devel_version,0.2.38_23_gdadada1) -> 0.2.39-0.23.20180222.dadada1
+hoot_devel_version = $(shell echo $(shell echo $(call hoot_version_tag,$(1)) | awk -F. '{ print $$1 "." $$2 "." ($$3 + 1) }')-0.$(call hoot_extra_version,$(1)).$(shell date -u +%Y%m%d).$(call hoot_git_revision,$(1)))
 
-# As of 11/29/2016, hootenanny-rpms project in Github supports files <= 100MB in size.  Everything over this size limit,
-# will is currently rejected by Github.  In order to workaround this limitation, we will download a desired JDK RPM
-# every time we build.
-jdk_rpm = jdk-8u131-linux-x64.rpm
-jdk_download_url = http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
+# Uses `find`, instead of `ls` (errors when no files are found) to get the
+# latest file from the directory in the first parameter and matches the
+# pattern in the second parameter.
+latest_file = $(shell find $(1) -type f -name $(2) -printf '%T+\t%p\n' | sort -r | awk '{ print $$2 }' | head -n 1)
 
-install-java:
-	(sudo yum list installed jdk1.8.0_131 > /dev/null 2>&1) || sudo wget --quiet --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" $(jdk_download_url) -P /tmp
-	(sudo yum list installed jdk1.8.0_131 > /dev/null 2>&1) || sudo rpm -Uvh --force /tmp/$(jdk_rpm)
+# Gets the latest Hootenanny archive.
+latest_hoot_archive = $(call latest_file,SOURCES,hootenanny-[0-9]\*.tar.gz)
+latest_hoot_version_gen = $(subst SOURCES/hootenanny-,,$(subst .tar.gz,,$(call latest_hoot_archive)))
 
-deps: force install-java
-	sudo cp repos/HootBuild.repo /etc/yum.repos.d
-	sudo cp repos/RPM-GPG-KEY-EPEL-6 /etc/pki/rpm-gpg/
-	sudo yum clean metadata
-	# Sometimes the yum update fails getting the metadata. Try several times and ignore
-	# the first two if they error
-	sudo yum update -y --exclude=puppet* || sleep 30
-	sudo yum update -y --exclude=puppet* || sleep 30
-	sudo yum update -y --exclude=puppet*
-	sudo true || true
-	sudo yum install -y \
-	  ant \
-	  apache-maven \
-	  apr-devel \
-	  apr-util-devel \
-	  armadillo-devel \
-	  automake \
-	  bison \
-	  bash-completion \
-	  boost-devel \
-	  cairo-devel \
-	  cfitsio-devel \
-	  CharLS-devel \
-	  chrpath \
-	  createrepo \
-	  ctags \
-	  curl-devel \
-	  doxygen \
-	  emacs \
-	  emacs-el \
-	  erlang \
-	  flex \
-	  freexl-devel \
-	  g2clib-static \
-	  gcc \
-	  gd-devel \
-	  giflib-devel \
-	  git \
-	  graphviz \
-	  hdf-devel \
-	  hdf5-devel \
-	  hdf-static \
-	  help2man \
-	  info \
-	  json-c-devel \
-	  libdap-devel \
-	  libgeotiff-devel \
-	  libgta-devel \
-	  libjpeg-turbo-devel \
-	  libotf \
-	  libpng-devel \
-	  librx-devel \
-	  libspatialite-devel \
-	  libtiff-devel \
-	  libwebp-devel \
-	  libX11-devel \
-	  libXt-devel \
-	  libxslt \
-	  lua-devel \
-	  m17n-lib* \
-	  m4 \
-	  netcdf-devel \
-	  nodejs \
-	  npm \
-	  openjpeg2-devel \
-	  pango-devel \
-	  pcre-devel \
-	  perl-generators \
-	  proj-devel \
-	  pygtk2 \
-	  python-devel \
-	  readline-devel \
-	  rpm-build \
-	  ruby-devel \
-	  source-highlight \
-	  sqlite-devel \
-	  tetex-tex4ht \
-	  tex* \
-	  transfig \
-	  xerces-c-devel \
-	  xz-devel \
-	  zlib-devel \
-	  wget \
-	  w3m \
-	  words \
-	  rpm-build \
-	  m4 \
-	  emacs \
-	  erlang \
-	  python-devel \
-	  libxslt \
-	  ImageMagick \
-	  expat-devel \
-	  fontconfig-devel \
-	  libtool \
-	  giflib-devel \
-	  mysql-devel \
-	  numpy \
-	  poppler-devel \
-	  ruby \
-	  swig \
-	  unixODBC-devel \
-	  gcc-c++ \
-	  php-devel \
-	  libicu-devel \
-	  cppunit-devel \
-	  python-argparse \
-	  libXfixes-devel \
-	  libXrandr-devel \
-	  libXrender-devel \
-	  libdrm-devel \
-	  el6-src/* \
+# Variants for getting RPM file names.
+rpm_file = RPMS/$(2)/$(1)-$(call config_version,$(1))$(RPMBUILD_DIST).$(2).rpm
+rpm_file2 = RPMS/$(3)/$(1)-$(call config_version,$(2))$(RPMBUILD_DIST).$(3).rpm
+
+# Gets the RPM package name from the filename.
+rpm_package = $(shell echo $(1) | awk '{ split($$0, a, "-"); l = length(a); pkg = a[1]; for (i=2; i<l-1; ++i) pkg = pkg "-" a[i]; print pkg }')
 
 
-el6: el6-src/* custom-rpms
+## RPM variables.
+
+PG_DOTLESS := $(shell echo $(call config_version,pg) | tr -d '.')
+
+DUMBINIT_RPM := $(call rpm_file2,dumb-init,dumbinit,x86_64)
+GEOS_RPM := $(call rpm_file,geos,x86_64)
+GDAL_RPM := $(call rpm_file2,hoot-gdal,gdal,x86_64)
+GLPK_RPM := $(call rpm_file,glpk,x86_64)
+FILEGDBAPI_RPM := $(call rpm_file,FileGDBAPI,x86_64)
+LIBGEOTIFF_RPM := $(call rpm_file,libgeotiff,x86_64)
+LIBKML_RPM := $(call rpm_file,libkml,x86_64)
+NODEJS_RPM := $(call rpm_file,nodejs,x86_64)
+OSMOSIS_RPM := $(call rpm_file,osmosis,noarch)
+POSTGIS_RPM := $(call rpm_file2,hoot-postgis23_$(PG_DOTLESS),postgis,x86_64)
+STXXL_RPM := $(call rpm_file,stxxl,x86_64)
+SUEXEC_RPM := $(call rpm_file2,su-exec,suexec,x86_64)
+TOMCAT8_RPM := $(call rpm_file,tomcat8,noarch)
+WAMERICAN_RPM := $(call rpm_file2,wamerican-insane,wamerican,noarch)
+WORDS_RPM := $(call rpm_file2,hoot-words,words,noarch)
+
+BASE_CONTAINERS := \
+	rpmbuild \
+	rpmbuild-base \
+	rpmbuild-generic \
+	rpmbuild-pgdg
+
+DEPENDENCY_CONTAINERS := \
+	$(BASE_CONTAINERS) \
+	rpmbuild-gdal \
+	rpmbuild-geos \
+	rpmbuild-glpk \
+	rpmbuild-libgeotiff \
+	rpmbuild-libkml \
+	rpmbuild-postgis \
+	rpmbuild-nodejs
+
+REPO_CONTAINERS := \
+	rpmbuild-repo
+
+DEPENDENCY_RPMS := \
+	dumb-init \
+	FileGDBAPI \
+	geos \
+	glpk \
+	libgeotiff \
+	libkml \
+	hoot-gdal \
+	hoot-postgis23_$(PG_DOTLESS) \
+	hoot-words \
+	nodejs \
+	osmosis \
+	stxxl \
+	su-exec \
+	tomcat8 \
+	wamerican-insane
+
+# Hootenanny RPM variables.
+BUILD_CONTAINERS := \
+	rpmbuild-hoot-devel \
+	rpmbuild-hoot-release
+
+RUN_CONTAINERS := \
+	run \
+	run-base \
+	run-base-devel \
+	run-base-release
+
+# These may be overridden with environment variables.
+BUILD_IMAGE ?= rpmbuild-hoot-release
+GIT_COMMIT ?= develop
+RUN_IMAGE ?= run-base-release
+
+# Are there any archives?
+HOOT_VERSION_GEN ?= $(call latest_hoot_version_gen)
+
+ifeq ($(strip $(HOOT_VERSION_GEN)),)
+# Setup a dummy archive file that will force making of an archive
+# from the revision specified in GIT_COMMIT.
+HOOT_ARCHIVE := SOURCES/hootenanny-archive.tar.gz
+# don't define `HOOT_VERSION`, or `HOOT_RPM`.
+$(warning HOOT_VERSION_GEN is not defined)
+else
+HOOT_ARCHIVE := SOURCES/hootenanny-$(HOOT_VERSION_GEN).tar.gz
+ifeq ($(strip $(call hoot_extra_version,$(HOOT_VERSION_GEN))),)
+# Release version (HOOT_VERSION_GEN=0.2.38).
+HOOT_RELEASE ?= 1
+HOOT_VERSION := $(call hoot_version_tag,$(HOOT_VERSION_GEN))-$(HOOT_RELEASE)
+else
+# Development version (HOOT_VERSION_GEN=0.2.38_23_gdadada1)
+HOOT_VERSION := $(call hoot_devel_version,$(HOOT_VERSION_GEN))
+endif
+HOOT_RPM := RPMS/x86_64/hootenanny-core-$(HOOT_VERSION)$(RPMBUILD_DIST).x86_64.rpm
+endif
 
 
-# Get a copy of the Oracle 8 JDK
-# As of 11/29/2016, the hootenanny-rpms project in Github supports files <= 100MB in size.  
-# Everything over this size gets rejected by Github.  In order to workaround this limitation, 
-# we download a copy of the 159Mb JDK and store it in the el6 directory. This ensures that it
-# is installed and is copied to the S3 repo.
-el6-src/jdk-8u131-linux-x64.rpm:
-	wget --quiet --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" $(JDKURL) -P el6-src
+## Main targets.
+
+.PHONY: \
+	all \
+	archive \
+	base \
+	clean \
+	deps \
+	hoot-archive \
+	hoot-rpm \
+	rpm \
+	$(BUILD_CONTAINERS) \
+	$(DEPENDENCY_CONTAINERS) \
+	$(DEPENDENCY_RPMS) \
+	$(REPO_CONTAINERS) \
+	$(RUN_CONTAINERS)
+
+all: $(BUILD_CONTAINERS)
+
+archive: hoot-archive
+
+base: $(BASE_CONTAINERS)
+
+clean:
+	$(VAGRANT) destroy -f --no-parallel || true
+	rm -fr RPMS/noarch RPMS/x86_64
+
+deps: \
+	$(DEPENDENCY_CONTAINERS) \
+	$(DEPENDENCY_RPMS)
+
+hoot-archive: $(BUILD_IMAGE) $(HOOT_ARCHIVE)
+
+# Only allow building an RPM when an archive already exists corresponding
+# to the HOOT_VERSION_GEN.
+ifdef HOOT_RPM
+hoot-rpm: $(BUILD_IMAGE) $(HOOT_RPM)
+else
+hoot-rpm:
+	$(error Cannot build RPM without an input archive.  Run 'make hoot-archive' first)
+endif
+
+rpm: hoot-rpm
+
+## Container targets.
+
+rpmbuild: .vagrant/machines/rpmbuild/docker/id
+
+rpmbuild-base: \
+	rpmbuild \
+	.vagrant/machines/rpmbuild-base/docker/id
+
+rpmbuild-generic: \
+	rpmbuild-base \
+	.vagrant/machines/rpmbuild-generic/docker/id
+
+# GDAL container requires GEOS, FileGDBAPI, libgeotiff, and libkml RPMs.
+rpmbuild-gdal: \
+	rpmbuild-pgdg \
+	FileGDBAPI \
+	geos \
+	libgeotiff \
+	libkml \
+	.vagrant/machines/rpmbuild-gdal/docker/id
+
+rpmbuild-geos: \
+	rpmbuild-generic \
+	.vagrant/machines/rpmbuild-geos/docker/id
+
+rpmbuild-glpk: \
+	rpmbuild-generic \
+	.vagrant/machines/rpmbuild-glpk/docker/id
+
+rpmbuild-hoot-devel: \
+	rpmbuild-pgdg \
+	$(DEPENDENCY_RPMS) \
+	.vagrant/machines/rpmbuild-hoot-devel/docker/id
+
+rpmbuild-hoot-release: \
+	rpmbuild-pgdg \
+	.vagrant/machines/rpmbuild-hoot-release/docker/id
+
+rpmbuild-libgeotiff: \
+	rpmbuild-generic \
+	.vagrant/machines/rpmbuild-libgeotiff/docker/id
+
+rpmbuild-libkml: \
+	rpmbuild-generic \
+	.vagrant/machines/rpmbuild-libkml/docker/id
+
+rpmbuild-nodejs: \
+	rpmbuild-generic \
+	.vagrant/machines/rpmbuild-nodejs/docker/id
+
+rpmbuild-pgdg: \
+	rpmbuild-generic \
+	.vagrant/machines/rpmbuild-pgdg/docker/id
+
+# PostGIS container requires GDAL RPMs.
+rpmbuild-postgis: \
+	hoot-gdal \
+	.vagrant/machines/rpmbuild-postgis/docker/id
+
+rpmbuild-repo: \
+	rpmbuild \
+	.vagrant/machines/rpmbuild-repo/docker/id
+
+# Runtime containers
+run-base: .vagrant/machines/run-base/docker/id
+
+run-base-devel: \
+	run-base \
+	$(DEPENDENCY_RPMS) \
+	.vagrant/machines/run-base-devel/docker/id
+
+run-base-release: \
+	run-base \
+	.vagrant/machines/run-base-release/docker/id
+
+run: $(RUN_IMAGE)
+	$(DOCKER) build \
+	--build-arg from_image=hootenanny/$(RUN_IMAGE) \
+	--build-arg hoot_version=$(HOOT_VERSION) \
+	--build-arg hoot_dist=$(RPMBUILD_DIST) \
+	-f docker/Dockerfile.run \
+	-t hootenanny/run:$(HOOT_VERSION) \
+	.
 
 
-copy-rpms: el6
-	rm -rf el6
-	mkdir -p el6
-	cp -l el6-src/* el6/
-	cp /tmp/$(jdk_rpm) el6/
-	cp src/RPMS/noarch/* el6/
-	cp src/RPMS/x86_64/* el6/
-	createrepo el6
+## RPM targets.
 
-custom-rpms:
-	cd src; $(MAKE)
+dumb-init: rpmbuild-generic $(DUMBINIT_RPM)
+geos: rpmbuild-geos $(GEOS_RPM)
+FileGDBAPI: rpmbuild-generic $(FILEGDBAPI_RPM)
+libgeotiff: rpmbuild-libgeotiff $(LIBGEOTIFF_RPM)
+libkml: rpmbuild-libkml $(LIBKML_RPM)
+nodejs: rpmbuild-nodejs $(NODEJS_RPM)
+glpk: rpmbuild-glpk $(GLPK_RPM)
+hoot-gdal: rpmbuild-gdal $(GDAL_RPM)
+hoot-words: rpmbuild-generic $(WORDS_RPM)
+hoot-postgis23_$(PG_DOTLESS): rpmbuild-postgis $(POSTGIS_RPM)
+osmosis: rpmbuild-generic $(OSMOSIS_RPM)
+stxxl: rpmbuild-generic $(STXXL_RPM)
+su-exec: rpmbuild-generic $(SUEXEC_RPM)
+tomcat8: rpmbuild-generic $(TOMCAT8_RPM)
+wamerican-insane: rpmbuild-generic $(WAMERICAN_RPM)
 
+
+## Build patterns.
+
+# Runs container and follow logs until it completes.
+RPMS/x86_64/%.rpm RPMS/noarch/%.rpm:
+	$(VAGRANT) up $(call rpm_package,$*)
+	$(call docker_logs,$(call rpm_package,$*))
+
+# Builds a container with Vagrant.
+.vagrant/machines/%/docker/id:
+	$(VAGRANT) up $*
+
+# Builds a Hootenanny RPM from the HOOT_ARCHIVE.
+RPMS/x86_64/hootenanny-%.rpm: $(HOOT_ARCHIVE)
+	$(VAGRANT) docker-run $(BUILD_IMAGE) -- \
+	rpmbuild \
+	  --define "hoot_version_gen $(HOOT_VERSION_GEN)" \
+	  --define "geos_version %(rpm -q --queryformat '%%{version}' geos)" \
+	  --define "gdal_version %(rpm -q --queryformat '%%{version}' hoot-gdal)" \
+	  --define "glpk_version %(rpm -q --queryformat '%%{version}' glpk)" \
+	  --define "nodejs_version %(rpm -q --queryformat '%%{version}' nodejs)" \
+	  --define "stxxl_version %(rpm -q --queryformat '%%{version}' stxxl)" \
+	  --define "tomcat_version %(rpm -q --queryformat '%%{version}' tomcat8)" \
+	  -bb SPECS/hootenanny.spec
+
+# Build an archive using the build image.
+SOURCES/hootenanny-%.tar.gz:
+	$(VAGRANT) docker-run $(BUILD_IMAGE) -- \
+	/bin/bash -c "/rpmbuild/scripts/hoot-checkout.sh $(GIT_COMMIT) && /rpmbuild/scripts/hoot-archive.sh"

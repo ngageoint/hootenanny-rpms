@@ -1,0 +1,32 @@
+--- bin/osmosis	2017-09-26 04:54:50.000000000 -0500
++++ bin/osmosis	2017-11-14 12:37:47.927596719 -0600
+@@ -5,8 +5,8 @@
+ # JAVACMD_OPTIONS - The options to append to the java command, typically used to modify jvm settings such as max memory.
+ # OSMOSIS_OPTIONS - The options to apply to all osmosis invocations, typically used to add plugins or make quiet operation the default.
+ 
+-if [ -f /etc/osmosis ] ; then
+-  . /etc/osmosis
++if [ -f /etc/osmosis/osmosis.conf ] ; then
++  . /etc/osmosis/osmosis.conf
+ fi
+ 
+ if [ -f "$HOME/.osmosis" ] ; then
+@@ -80,15 +80,12 @@
+ fi
+ 
+ # make it fully qualified
+-saveddir=`pwd`
+-MYAPP_HOME=`dirname "$PRG"`/..
+-MYAPP_HOME=`cd "$MYAPP_HOME" && pwd`
+-cd "$saveddir"
++MYAPP_HOME="/usr/share/java/osmosis"
+ 
+ # Build up the classpath of required jar files via classworlds launcher.
+-MYAPP_CLASSPATH=$MYAPP_HOME/lib/default/plexus-classworlds-*.jar
++MYAPP_CLASSPATH=$MYAPP_HOME/plexus-classworlds-*.jar
+ 
+ MAINCLASS=org.codehaus.classworlds.Launcher
+-EXEC="$JAVACMD $JAVACMD_OPTIONS -cp $MYAPP_CLASSPATH -Dapp.home=$MYAPP_HOME -Dclassworlds.conf=$MYAPP_HOME/config/plexus.conf  $MAINCLASS $OSMOSIS_OPTIONS"
++EXEC="$JAVACMD $JAVACMD_OPTIONS -cp $MYAPP_CLASSPATH -Dapp.home=$MYAPP_HOME -Dclassworlds.conf=/etc/osmosis/plexus.conf -Dlog4j.configuration=file:/etc/osmosis/log4j.properties $MAINCLASS $OSMOSIS_OPTIONS"
+ 
+ exec $EXEC "$@"

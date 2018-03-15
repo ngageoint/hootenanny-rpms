@@ -1,0 +1,8 @@
+/var/log/tomcat8/catalina.out {
+  copytruncate
+  daily
+  rotate 7
+  compress
+  missingok
+  create 0644 tomcat tomcat
+}

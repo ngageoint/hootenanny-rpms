@@ -1,0 +1,26 @@
+diff --git a/deps/v8/include/v8.h.orig b/deps/v8/include/v8.h
+index 931dd9a..676c571 100644
+--- a/deps/v8/include/v8.h
++++ b/deps/v8/include/v8.h
+@@ -1772,7 +1772,7 @@ class V8_EXPORT JSON {
+    * \return The corresponding string if successfully stringified.
+    */
+   static V8_WARN_UNUSED_RESULT MaybeLocal<String> Stringify(
+-      Local<Context> context, Local<Object> json_object,
++      Local<Context> context, Local<Value> json_object,
+       Local<String> gap = Local<String>());
+ };
+ 
+diff --git a/deps/v8/src/api.cc.orig b/deps/v8/src/api.cc
+index 2220e41..ea70c29 100644
+--- a/deps/v8/src/api.cc
++++ b/deps/v8/src/api.cc
+@@ -3213,7 +3213,7 @@ Local<Value> JSON::Parse(Local<String> json_string) {
+ }
+ 
+ MaybeLocal<String> JSON::Stringify(Local<Context> context,
+-                                   Local<Object> json_object,
++                                   Local<Value> json_object,
+                                    Local<String> gap) {
+   PREPARE_FOR_EXECUTION(context, JSON, Stringify, String);
+   i::Handle<i::Object> object = Utils::OpenHandle(*json_object);

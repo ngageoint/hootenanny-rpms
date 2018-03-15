@@ -1,0 +1,32 @@
+FROM hootenanny/rpmbuild-generic:latest
+
+ARG packages
+ARG pg_version
+
+LABEL \
+  description="PostgreSQL ${pg_version} (PGDG) container for building Hootenanny RPMs" \
+  maintainer="justin.bronn@radiantsolutions.com" \
+  name="Hootenanny PostgreSQL ${pg_version} RPM Build Image" \
+  vendor="Radiant Solutions"
+
+ENV PG_VERSION=${pg_version}
+
+# Switch to root to install PostgreSQL.
+USER root
+
+# Install PostgreSQL development files from PGDG for the desired version
+# as well as any additional packages.
+COPY scripts/pgdg-repo.sh /tmp/pgdg-repo.sh
+RUN /tmp/pgdg-repo.sh ${pg_version} && \
+    rm /tmp/pgdg-repo.sh && \
+    yum -q -y install postgresql$(echo ${pg_version} | tr -d '.')-devel && \
+    alternatives --install /usr/bin/pg_config pgsql-pg_config /usr/pgsql-${pg_version}/bin/pg_config 500 && \
+    if [ ! -z "${packages}" ] ; then yum -q -y install ${packages}; fi
+
+# Switch back to RPM build user.
+USER ${RPMBUILD_USER}
+
+# Add in RPM macros necessary for creating Hootenanny and GDAL packages.
+RUN echo "%pg_version ${PG_VERSION}" >> $RPMBUILD_HOME/.rpmmacros && \
+    echo "%pg_dotless %(echo %{pg_version} | tr -d '.')" >> $RPMBUILD_HOME/.rpmmacros && \
+    echo "%pginstdir /usr/pgsql-%{pg_version}" >> $RPMBUILD_HOME/.rpmmacros

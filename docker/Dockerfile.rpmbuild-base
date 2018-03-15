@@ -1,0 +1,31 @@
+FROM hootenanny/rpmbuild
+LABEL \
+  description="Base container for building Hootenanny RPMs" \
+  maintainer="justin.bronn@radiantsolutions.com" \
+  name="Hootenanny Base RPM Build Image" \
+  vendor="Radiant Solutions"
+
+# Install basic development and RPM authoring tools.
+RUN yum -q -y update && \
+    yum -q -y install \
+        autoconf \
+        automake \
+        bzip2 \
+        epel-release \
+        gcc \
+        gcc-c++ \
+        gdb \
+        git \
+        git-core \
+        libtool \
+        make \
+        m4 \
+        redhat-lsb-core \
+        redhat-rpm-config \
+        rpm-build \
+        rpmdevtools \
+        rpmlint \
+        unzip \
+        vim \
+        wget \
+        zip
