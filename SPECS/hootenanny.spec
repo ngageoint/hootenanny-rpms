@@ -468,10 +468,16 @@ function updateLiquibase () {
         sed -i "1 s/$/ $(hostname)/" /etc/hosts
     fi
 
+    # Ensure that tomcat has unpacked hoot-services.war prior to
+    # running liquibase.
+    echo -n 'Waiting for tomcat to start'
+    while ! test -d %{tomcat_webapps}/hoot-services/WEB-INF; do
+        sleep 1
+    done
+
     # Apply any database schema changes
-    TOMCAT_HOME=%{tomcat_home}
     source %{hoot_home}/conf/database/DatabaseConfig.sh
-    cd $TOMCAT_HOME/webapps/hoot-services/WEB-INF
+    cd %{tomcat_webapps}/hoot-services/WEB-INF
     liquibase --contexts=default,production \
         --changeLogFile=classes/db/db.changelog-master.xml \
         --promptForNonLocalDatabase=false \
