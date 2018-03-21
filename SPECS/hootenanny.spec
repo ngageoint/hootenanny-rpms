@@ -429,18 +429,6 @@ function updateConfigFiles () {
         sed -i "s@<\/Host>@      <Context docBase=\""${HOOT_HOME//\//\\\/}"\/userfiles\/ingest\/processed\" path=\"\/static\" \/>\n      &@" $TOMCAT_SRV
     fi
 
-    # Allow linking in Tomcat context
-    TOMCAT_CTX=%{tomcat_config}/context.xml
-
-    # First, fix potential pre-existing setting of 'allowLinking' that doesn't work on tomcat8
-    sed -i "s@^<Context allowLinking=\"true\">@<Context>@" $TOMCAT_CTX
-
-    # Now, set allowLinking if needed
-    if ! grep -i --quiet 'allowLinking="true"' $TOMCAT_CTX; then
-        echo "Set allowLinking to true in Tomcat context"
-        sed -i "/<Context>/a \    <Resources allowLinking=\"true\" />" $TOMCAT_CTX
-    fi
-
     # Increase the Tomcat java heap size
     TOMCAT_CONF=%{tomcat_config}/tomcat8.conf
     if ! grep -i --quiet 'Xmx2048m' $TOMCAT_CONF; then
