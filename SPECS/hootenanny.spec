@@ -37,6 +37,7 @@
 %{!?tomcat_home: %global tomcat_home %{_datadir}/tomcat8}
 %{!?tomcat_logs: %global tomcat_logs %{_var}/log/tomcat8}
 %global tomcat_webapps %{tomcat_basedir}/webapps
+%global services_home %{tomcat_webapps}/hoot-services
 
 # NodeJS package includes an epoch that must be used for requirements.
 %{!?nodejs_epoch: %global nodejs_epoch 1}
@@ -384,9 +385,8 @@ if [ "$1" = "2" ]; then
     # Perform whatever maintenance must occur before the upgrade
 
     # Remove exploded hoot-services war remnants
-    SERVICES_HOME=%{tomcat_webapps}/hoot-services
-    if [ -d $SERVICES_HOME ]; then
-        rm -rf $SERVICES_HOME
+    if [ -d %{services_home} ]; then
+        rm -rf %{services_home}
     fi
 fi
 
@@ -613,9 +613,8 @@ if [ "$1" = "0" ]; then
     fi
 
     # Remove exploded hoot-services war remnants
-    SERVICES_HOME=%{tomcat_webapps}/hoot-services
-    if [ -d $SERVICES_HOME ]; then
-        rm -rf $SERVICES_HOME
+    if [ -d %{services_home} ]; then
+        rm -rf %{services_home}
     fi
 
     systemctl start tomcat8
