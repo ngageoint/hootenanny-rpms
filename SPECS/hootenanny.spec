@@ -382,7 +382,8 @@ This package contains the UI and web services.
 %pre services-ui
 
 if [ "$1" = "2" ]; then
-    # Perform whatever maintenance must occur before the upgrade
+    # Stop tomcat8 service before removing the extracted war files.
+    systemctl stop tomcat8
 
     # Remove exploded hoot-services war remnants
     if [ -d %{services_home} ]; then
@@ -607,9 +608,8 @@ if [ "$1" = "0" ]; then
     done
 
     # Remove .deegree directory
-    TOMCAT_HOME=%{tomcat_home}
-    if [ -d $TOMCAT_HOME/.deegree ]; then
-        rm -rf $TOMCAT_HOME/.deegree
+    if [ -d %{tomcat_home}/.deegree ]; then
+        rm -rf %{tomcat_home}/.deegree
     fi
 
     # Remove exploded hoot-services war remnants
