@@ -411,7 +411,7 @@ function startTomcat() {
     local count=0
     local timeout=180
     local deploy_pattern='org\.apache\.catalina\.startup\.HostConfig\.deployWAR Deployment of web application archive \[%{tomcat_webapps}/hoot-services.war\] has finished'
-    local start_time=$(date -u +'%Y-%m-%d %H:%M:%S')
+    local start_time=$(date +'%%Y-%%m-%%d %%H:%%M:%%S')
 
     systemctl start tomcat8
 
