@@ -407,6 +407,26 @@ if test -f /.dockerenv; then exit 0; fi
 %systemd_post node-mapnik.service
 %endif
 
+function startTomcat() {
+    local count=0
+    local timeout=180
+    local deploy_pattern='org\.apache\.catalina\.startup\.HostConfig\.deployWAR Deployment of web application archive \[%{tomcat_webapps}/hoot-services.war\] has finished'
+    local start_time=$(date -u +'%Y-%m-%d %H:%M:%S')
+
+    systemctl start tomcat8
+
+    echo 'Waiting for Tomcat to start'
+    while ! journalctl --since "${start_time}" -u tomcat8 | grep -q -e "${deploy_pattern}"; do
+        sleep 1
+        count=$(expr $count + 1)
+        # Abort if we wait too long.
+        if [ "$(expr ${count} \>= ${timeout})" = "1" ]; then
+            echo "Timed out waiting for Tomcat to start."
+            break
+        fi
+    done
+}
+
 function updateConfigFiles () {
     # Check for existing db config from previous install and move to right location
     if [ -f %{hoot_home}/conf/DatabaseConfigLocal.sh ]; then
@@ -443,9 +463,9 @@ EOT
     fi
 
     # Update database credentials in various locations.
-    sed -i s/password\:\ hoottest/password\:\ $DB_PASSWORD/ %{tomcat_webapps}/hoot-services/WEB-INF/classes/db/liquibase.properties
-    sed -i s/DB_PASSWORD=hoottest/DB_PASSWORD=$DB_PASSWORD/ %{tomcat_webapps}/hoot-services/WEB-INF/classes/db/db.properties
-    sed -i s/\<Password\>hoottest\<\\/Password\>/\<Password\>$DB_PASSWORD\<\\/Password\>/ %{tomcat_webapps}/hoot-services/WEB-INF/workspace/jdbc/WFS_Connection.xml
+    sed -i s/password\:\ hoottest/password\:\ $DB_PASSWORD/ %{services_home}/WEB-INF/classes/db/liquibase.properties
+    sed -i s/DB_PASSWORD=hoottest/DB_PASSWORD=$DB_PASSWORD/ %{services_home}/WEB-INF/classes/db/db.properties
+    sed -i s/\<Password\>hoottest\<\\/Password\>/\<Password\>$DB_PASSWORD\<\\/Password\>/ %{services_home}/WEB-INF/workspace/jdbc/WFS_Connection.xml
 
     systemctl restart tomcat8
 }
@@ -457,16 +477,9 @@ function updateLiquibase () {
         sed -i "1 s/$/ $(hostname)/" /etc/hosts
     fi
 
-    # Ensure that tomcat has unpacked hoot-services.war prior to
-    # running liquibase.
-    echo -n 'Waiting for tomcat to start'
-    while ! test -d %{tomcat_webapps}/hoot-services/WEB-INF; do
-        sleep 1
-    done
-
     # Apply any database schema changes
     source %{hoot_home}/conf/database/DatabaseConfig.sh
-    cd %{tomcat_webapps}/hoot-services/WEB-INF
+    cd %{services_home}/WEB-INF
     liquibase --contexts=default,production \
         --changeLogFile=classes/db/db.changelog-master.xml \
         --promptForNonLocalDatabase=false \
@@ -484,7 +497,7 @@ if [ "$1" = "1" ]; then
     source /etc/profile.d/hootenanny.sh
 
     # start tomcat
-    systemctl start tomcat8
+    startTomcat
 
     # init and start postgres
     if [ ! -e /var/lib/pgsql/%{pg_version}/data/PG_VERSION ]; then
@@ -581,6 +594,7 @@ elif [ "$1" = "2" ]; then
     source /etc/profile.d/hootenanny.sh
     source %{hoot_home}/conf/database/DatabaseConfig.sh
 
+    startTomcat
     updateConfigFiles
     updateLiquibase
 fi
