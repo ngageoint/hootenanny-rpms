@@ -659,32 +659,37 @@ to run Hootenanny.
 
 if test -f /.dockerenv; then exit 0; fi
 
-# set Postgres to autostart
-systemctl enable postgresql-%{pg_version}
-# set Tomcat to autostart
-systemctl enable tomcat8
-# set NodeJS node-export-server to autostart
-systemctl enable node-export
+if [ "$1" = "1" ]; then
+    # set Postgres to autostart
+    systemctl enable postgresql-%{pg_version}
+    # set Tomcat to autostart
+    systemctl enable tomcat8
+    # set NodeJS node-export-server to autostart
+    systemctl enable node-export
 %if 0%{with_node_mapnik} == 1
-# set NodeJS node-mapnik-server to autostart
-systemctl enable node-mapnik
+    # set NodeJS node-mapnik-server to autostart
+    systemctl enable node-mapnik
 %endif
+fi
+
 
 
 %postun autostart
 
 if test -f /.dockerenv; then exit 0; fi
 
-# set Postgres to NOT autostart
-systemctl disable postgresql-%{pg_version}
-# set Tomcat to NOT autostart
-systemctl disable tomcat8
-# set NodeJS node-export-server to NOT autostart
-systemctl disable node-export
+if [ "$1" = "0" ]; then
+    # set Postgres to NOT autostart
+    systemctl disable postgresql-%{pg_version}
+    # set Tomcat to NOT autostart
+    systemctl disable tomcat8
+    # set NodeJS node-export-server to NOT autostart
+    systemctl disable node-export
 %if 0%{with_node_mapnik} == 1
-# set NodeJS node-mapnik-server to NOT autostart
-systemctl disable node-mapnik
+    # set NodeJS node-mapnik-server to NOT autostart
+    systemctl disable node-mapnik
 %endif
+fi
 
 
 %package services-devel-deps
