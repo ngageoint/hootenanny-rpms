@@ -10,16 +10,14 @@ ARG lang=en_US.UTF-8
 ARG locale=en_US.UTF-8
 ARG pg_version
 
-# The `HOOT_HOME` environment variable must be set.
-ENV HOOT_HOME=/var/lib/hootenanny
-
-# Ensure proper language/locale environment settings.
-ENV LANG ${lang}
-ENV LC_ALL ${locale}
-
-# Ensure PostgreSQL version and data directory are available via env vars.
-ENV PGDATA=/var/lib/pgsql/${pg_version}/data
-ENV PG_VERSION=${pg_version}
+# * `HOOT_HOME` environment variable must be set
+# * Ensure proper language/locale environment settings.
+# * Ensure PostgreSQL version and data directory are available via environment.
+ENV HOOT_HOME=/var/lib/hootenanny \
+    LANG=${lang} \
+    LC_ALL=${locale} \
+    PGDATA=/var/lib/pgsql/${pg_version}/data \
+    PG_VERSION=${pg_version}
 
 # Preseed with common prerequisites of Hootenanny and its dependencies,
 # as well as with some CLI niceties (htop and less).  Avoid installing
