@@ -18,14 +18,13 @@ ARG rpmbuild_uid=1000
 ARG rpmbuild_user=rpmbuild
 ARG rpmbuild_home=/${rpmbuild_user}
 
-# Ensure proper language/locale environment settings.
-ENV LANG ${lang}
-ENV LC_ALL ${locale}
-
-# Put some key arguments in environment to allow access in child containers.
-ENV RPMBUILD_DIST=${rpmbuild_dist}
-ENV RPMBUILD_USER=${rpmbuild_user}
-ENV RPMBUILD_HOME=${rpmbuild_home}
+# Ensure proper language/locale environment settings, and place key arguments
+# in environment to allow access in child containers.
+ENV LANG=${lang} \
+    LC_ALL=${locale} \
+    RPMBUILD_DIST=${rpmbuild_dist} \
+    RPMBUILD_USER=${rpmbuild_user} \
+    RPMBUILD_HOME=${rpmbuild_home}
 
 # Create unprivileged user for building RPMs, and setup basic macros.
 RUN useradd -d ${rpmbuild_home} -m -s /bin/bash -u ${rpmbuild_uid} ${rpmbuild_user} && \
