@@ -308,7 +308,6 @@ echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hoot
 %{hoot_home}/hoot-core-test
 %{hoot_home}/lib
 %{hoot_home}/plugins
-%{hoot_home}/report
 %{hoot_home}/rules
 %{hoot_home}/scripts
 
