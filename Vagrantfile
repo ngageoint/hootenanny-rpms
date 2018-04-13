@@ -125,10 +125,10 @@ def build_container(config, name, options)
         {
           '_topdir' => File.realpath(File.dirname(__FILE__)),
           'hoot_version_gen' => '0.0.0',
-          'rpmbuild_version' => '0.0.0',
-          'rpmbuild_release' => '0.0.0',
           'pg_dotless' => $pg_dotless,
-          'tomcat_version'   => '0.0.0',
+          'rpmbuild_version' => '0.0.0',
+          'rpmbuild_release' => '1',
+          'tomcat_version' => '0.0.0',
         }.each do |macro, expr|
           rpmspec_cmd << '--define'
           # Have to put in single quotes surrounding macro since this is a
