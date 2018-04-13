@@ -50,6 +50,7 @@ function spec_requires() {
         --define "pg_dotless ${PG_DOTLESS}" \
         --define 'rpmbuild_version 0.0.0' \
         --define 'rpmbuild_release 1' \
+        --define 'tomcat_version 0.0.0' \
         -q --buildrequires $SPECS/$1.spec | \
         awk '{ for (i = 1; i <= NF; ++i) if ($i ~ /^[[:alpha:]]/) print $i }' ORS=' '
 }
