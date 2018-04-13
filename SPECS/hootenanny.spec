@@ -36,6 +36,8 @@
 %{!?tomcat_config: %global tomcat_config %{_sysconfdir}/tomcat8}
 %{!?tomcat_home: %global tomcat_home %{_datadir}/tomcat8}
 %{!?tomcat_logs: %global tomcat_logs %{_var}/log/tomcat8}
+%global tomcat_version_max %(echo %{tomcat_version} | %{__awk} -F. '{ print $1 "." ($2 + 1) "." 0 }')
+%global tomcat_version_min %(echo %{tomcat_version} | %{__awk} -F. '{ print $1 "." $2 "." 0 }')
 %global tomcat_webapps %{tomcat_basedir}/webapps
 %global services_home %{tomcat_webapps}/hoot-services
 
@@ -333,7 +335,8 @@ Requires:  osmosis
 Requires:  postgresql%{pg_dotless}-contrib
 Requires:  postgresql%{pg_dotless}-server
 Requires:  pwgen
-Requires:  tomcat8 = %{tomcat_version}
+Requires:  tomcat8 < %{tomcat_version_max}
+Requires:  tomcat8 >= %{tomcat_version_min}
 
 %description services-ui
 Hootenanny was developed to provide an open source, standards-based approach to
