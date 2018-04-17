@@ -11,9 +11,18 @@ ARG gpg_name="Hootenanny Packaging"
 RUN yum install -q -y epel-release createrepo rpm-sign && \
     yum install -q -y awscli
 
+# Add in the `keepnewer` Python module plugin for awscli;
+# for `aws s3 sync --keep-newer` functionality.
+COPY scripts/keepnewer.py /usr/lib/python2.7/site-packages/
+
 # Use unprivleged RPM build user and work directory by default.
 USER ${RPMBUILD_USER}
 WORKDIR ${RPMBUILD_HOME}
+
+# Create stub awscli configuration and enable the keepnewer plugin.
+RUN mkdir -p $RPMBUILD_HOME/.aws && \
+    printf "[default]\nregion=${AWS_DEFAULT_REGION:-us-east-1}\n\n" > $RPMBUILD_HOME/.aws/config && \
+    printf "[plugins]\nkeepnewer=keepnewer\n\n" >> $RPMBUILD_HOME/.aws/config
 
 # Add RPM signing macros to ~/.rpmmacros, specifying:
 #  * The signing digest algorithm (defaulting to sha256)
