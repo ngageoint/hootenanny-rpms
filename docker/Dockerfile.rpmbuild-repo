@@ -8,7 +8,7 @@ LABEL \
 ARG gpg_name="Hootenanny Packaging"
 
 # Install RPM repository and AWS CLI tools (via pip for latest version)
-RUN yum install -q -y epel-release createrepo rpm-sign && \
+RUN yum install -q -y createrepo epel-release groff rpm-sign && \
     yum install -q -y python2-pip && \
     pip install -q --prefix /usr awscli
 
