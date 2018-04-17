@@ -241,6 +241,38 @@ function run_dep_image() {
     fi
 }
 
+function run_repo_image() {
+    local OPTIND opt
+    local image=hootenanny/rpmbuild-repo
+    local usage=no
+
+    while getopts ":i:" opt; do
+        case "${opt}" in
+            i)
+                image="${OPTARG}"
+                ;;
+            *)
+                usage=yes
+                ;;
+        esac
+    done
+    shift $((OPTIND-1))
+
+    if [ "${usage}" = "yes" ]; then
+        echo "run_repo_image: [-i <image>]"
+    else
+        mkdir -p $RPMS
+        docker run \
+               -e AWS_PROFILE=${AWS_PROFILE:-default} \
+               -e AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id) \
+               -e AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key) \
+               -v $RPMS:/rpmbuild/RPMS:ro \
+               -v $SCRIPT_HOME/scripts:/rpmbuild/scripts:ro \
+               -it --rm \
+               $image "$@"
+    fi
+}
+
 # Runs a hootenanny build image.
 function run_hoot_build_image() {
     local OPTIND opt
