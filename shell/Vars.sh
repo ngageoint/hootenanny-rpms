@@ -263,7 +263,6 @@ function run_repo_image() {
     else
         mkdir -p $RPMS
         docker run \
-               -e AWS_PROFILE=${AWS_PROFILE:-default} \
                -e AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id) \
                -e AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key) \
                -v $RPMS:/rpmbuild/RPMS:ro \
