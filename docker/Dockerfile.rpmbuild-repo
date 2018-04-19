@@ -6,6 +6,7 @@ LABEL \
   vendor="Radiant Solutions"
 
 ARG gpg_name="Hootenanny Packaging"
+ARG role_arn
 
 # Install RPM repository and AWS CLI tools (via pip for latest version)
 RUN yum install -q -y createrepo epel-release groff less rpm-sign && \
@@ -21,9 +22,13 @@ USER ${RPMBUILD_USER}
 WORKDIR ${RPMBUILD_HOME}
 
 # Create stub awscli configuration and enable the keepnewer plugin.
-RUN mkdir -p $RPMBUILD_HOME/.aws && \
-    printf "[default]\nregion=${AWS_DEFAULT_REGION:-us-east-1}\n\n" > $RPMBUILD_HOME/.aws/config && \
-    printf "[plugins]\nkeepnewer=keepnewer\n\n" >> $RPMBUILD_HOME/.aws/config
+RUN aws configure set plugins.keepnewer keepnewer && \
+    if [ ! -z "${role_arn}" ] ; then \
+       profile=$(basename ${role_arn}) && \
+       aws configure set credential_source Environment --profile ${profile} && \
+       aws configure set region ${AWS_DEFAULT_REGION:-us-east-1} --profile ${profile} && \
+       aws configure set role_arn ${role_arn} --profile ${profile}; \
+    fi
 
 # Add RPM signing macros to ~/.rpmmacros, specifying:
 #  * The signing digest algorithm (defaulting to sha256)
