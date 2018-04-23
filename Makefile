@@ -126,11 +126,12 @@ RUN_IMAGE ?= run-base-release
 
 # Are there any archives?
 HOOT_VERSION_GEN ?= $(call latest_hoot_version_gen)
+DEFAULT_ARCHIVE := SOURCES/hootenanny-archive.tar.gz
 
 ifeq ($(strip $(HOOT_VERSION_GEN)),)
 # Setup a dummy archive file that will force making of an archive
 # from the revision specified in GIT_COMMIT.
-HOOT_ARCHIVE := SOURCES/hootenanny-archive.tar.gz
+HOOT_ARCHIVE := $(DEFAULT_ARCHIVE)
 # don't define `HOOT_VERSION`, or `HOOT_RPM`.
 $(warning HOOT_VERSION_GEN is not defined)
 else
@@ -157,6 +158,7 @@ endif
 	deps \
 	hoot-archive \
 	hoot-rpm \
+	latest-archive \
 	rpm \
 	$(BUILD_CONTAINERS) \
 	$(DEPENDENCY_CONTAINERS) \
@@ -166,7 +168,7 @@ endif
 
 all: $(BUILD_CONTAINERS)
 
-archive: hoot-archive
+archive: $(BUILD_IMAGE) $(HOOT_ARCHIVE)
 
 base: $(BASE_CONTAINERS)
 
@@ -178,18 +180,20 @@ deps: \
 	$(DEPENDENCY_CONTAINERS) \
 	$(DEPENDENCY_RPMS)
 
-hoot-archive: $(BUILD_IMAGE) $(HOOT_ARCHIVE)
+hoot-archive: archive
+
+latest-archive: $(DEFAULT_ARCHIVE)
 
 # Only allow building an RPM when an archive already exists corresponding
 # to the HOOT_VERSION_GEN.
 ifdef HOOT_RPM
-hoot-rpm: $(BUILD_IMAGE) $(HOOT_RPM)
+rpm: $(BUILD_IMAGE) $(HOOT_RPM)
 else
-hoot-rpm:
+rpm:
 	$(error Cannot build RPM without an input archive.  Run 'make hoot-archive' first)
 endif
 
-rpm: hoot-rpm
+hoot-rpm: rpm
 
 ## Container targets.
 

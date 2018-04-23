@@ -6,14 +6,29 @@ LABEL \
   vendor="Radiant Solutions"
 
 ARG gpg_name="Hootenanny Packaging"
+ARG role_arn
 
-# Install RPM repository and AWS CLI tools.
-RUN yum install -q -y epel-release createrepo rpm-sign && \
-    yum install -q -y awscli
+# Install RPM repository and AWS CLI tools (via pip for latest version)
+RUN yum install -q -y createrepo epel-release groff less rpm-sign && \
+    yum install -q -y python2-pip && \
+    pip install -q --prefix /usr awscli
+
+# Add in the `keepnewer` Python (2.x on CentOS 7) module plugin for awscli;
+# enables `aws s3 sync --keep-newer` functionality.
+COPY scripts/keepnewer.py /usr/lib/python2.7/site-packages/
 
 # Use unprivleged RPM build user and work directory by default.
 USER ${RPMBUILD_USER}
 WORKDIR ${RPMBUILD_HOME}
+
+# Create stub awscli configuration and enable the keepnewer plugin.
+RUN aws configure set plugins.keepnewer keepnewer && \
+    if [ ! -z "${role_arn}" ] ; then \
+       profile=$(basename ${role_arn}) && \
+       aws configure set credential_source Environment --profile ${profile} && \
+       aws configure set region ${AWS_DEFAULT_REGION:-us-east-1} --profile ${profile} && \
+       aws configure set role_arn ${role_arn} --profile ${profile}; \
+    fi
 
 # Add RPM signing macros to ~/.rpmmacros, specifying:
 #  * The signing digest algorithm (defaulting to sha256)
@@ -27,4 +42,4 @@ RUN echo "%_signature gpg" >> $RPMBUILD_HOME/.rpmmacros && \
     echo "%_gpg_name ${gpg_name}" >> $RPMBUILD_HOME/.rpmmacros && \
     echo "%_gpg_path ${RPMBUILD_HOME}/.gnupg" >> $RPMBUILD_HOME/.rpmmacros && \
     printf '%%__gpg_sign_cmd %%{__gpg} \\\n        gpg --force-v3-sigs --batch --no-verbose --no-armor --passphrase-fd 3 \\\n        %%{?_gpg_digest_algo:--digest-algo %%{_gpg_digest_algo}} \\\n        --no-secmem-warning \\\n        -u "%%{_gpg_name}" -sbo %%{__signature_filename} %%{__plaintext_filename}\n' >> $RPMBUILD_HOME/.rpmmacros && \
-    mkdir -p ${RPMBUILD_HOME}/{.aws,.gnupg,el7,RPMS}
+    mkdir -p ${RPMBUILD_HOME}/{.gnupg,el7,RPMS}
