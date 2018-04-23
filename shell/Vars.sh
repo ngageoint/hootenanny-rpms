@@ -244,12 +244,16 @@ function run_dep_image() {
 function run_repo_image() {
     local OPTIND opt
     local image=hootenanny/rpmbuild-repo
+    local profile=default
     local usage=no
 
-    while getopts ":i:" opt; do
+    while getopts ":i:p:" opt; do
         case "${opt}" in
             i)
                 image="${OPTARG}"
+                ;;
+            p)
+                profile="${OPTARG}"
                 ;;
             *)
                 usage=yes
@@ -259,13 +263,14 @@ function run_repo_image() {
     shift $((OPTIND-1))
 
     if [ "${usage}" = "yes" ]; then
-        echo "run_repo_image: [-i <image>]"
+        echo "run_repo_image: [-i <image>] [-p <awscli profile>]"
     else
-        mkdir -p $RPMS
+        mkdir -p $RPMS $SCRIPT_HOME/el7
         docker run \
-               -e AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id) \
-               -e AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key) \
+               -e AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id --profile ${profile}) \
+               -e AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key --profile ${profile}) \
                -v $RPMS:/rpmbuild/RPMS:ro \
+               -v $SCRIPT_HOME/el7:/rpmbuild/el7:rw \
                -v $SCRIPT_HOME/scripts:/rpmbuild/scripts:ro \
                -it --rm \
                $image "$@"
