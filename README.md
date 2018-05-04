@@ -28,12 +28,9 @@ use [`config.yml`](./config.yml) as the source of truth for version information.
 This will build Hootenanny RPM from `develop`:
 
 ```
-make hoot-archive
-make hoot-rpm
+make archive
+make rpm
 ```
-
-Note: it's common for the `hoot-archive` target to fail the first time due to
-maven downloading outside dependencies.
 
 ## shell
 
