@@ -4,6 +4,9 @@ require 'vagrant/ui'
 require 'vagrant/util/downloader'
 require 'vagrant/util/subprocess'
 
+# Require Vagrant 2.0+.
+Vagrant.require_version '>= 2.0.0'
+
 # Setting up globals from YAML configuration file.
 settings = YAML::load_file('config.yml')
 $images = settings.fetch('images', {})
