@@ -20,7 +20,7 @@ use [`config.yml`](./config.yml) as the source of truth for version information.
     sudo apt-get -y install rpm
     ```
 * Docker
-* Vagrant
+* Vagrant 2.0+
 * `make`
 
 ## Quickstart
