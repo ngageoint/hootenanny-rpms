@@ -326,6 +326,6 @@ RPMS/x86_64/hootenanny-%.rpm: $(HOOT_ARCHIVE)
 	  -bb SPECS/hootenanny.spec
 
 # Build an archive using the build image.
-SOURCES/hootenanny-%.tar.gz:
+SOURCES/hootenanny-%.tar.gz: $(BUILD_IMAGE)
 	$(VAGRANT) docker-run $(BUILD_IMAGE) -- \
 	/bin/bash -c "/rpmbuild/scripts/hoot-checkout.sh $(GIT_COMMIT) && /rpmbuild/scripts/hoot-archive.sh"
