@@ -29,9 +29,6 @@ automake --add-missing --copy
 # Run configure, enable R&D, services, and PostgreSQL.
 ./configure --quiet --with-rnd --with-services --with-postgresql
 
-# Update the license headers.
-./scripts/copyright/UpdateAllCopyrightHeaders.sh
-
 # Make the archive.
 make -j$(nproc) clean
 make -j$(nproc) archive
