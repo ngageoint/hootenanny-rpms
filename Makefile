@@ -121,7 +121,6 @@ RUN_CONTAINERS := \
 
 # These may be overridden with environment variables.
 BUILD_IMAGE ?= rpmbuild-hoot-release
-GIT_COMMIT ?= develop
 RUN_IMAGE ?= run-base-release
 
 # Are there any archives?
@@ -143,10 +142,13 @@ HOOT_VERSION := $(call hoot_version_tag,$(HOOT_VERSION_GEN))-$(HOOT_RELEASE)
 else
 # Development version (HOOT_VERSION_GEN=0.2.38_23_gdadada1)
 HOOT_VERSION := $(call hoot_devel_version,$(HOOT_VERSION_GEN))
+GIT_COMMIT := $(call hoot_git_revision,$(HOOT_VERSION_GEN))
 endif
 HOOT_RPM := RPMS/x86_64/hootenanny-core-$(HOOT_VERSION)$(RPMBUILD_DIST).x86_64.rpm
 endif
 
+# Default to develop branch when making archive.
+GIT_COMMIT ?= develop
 
 ## Main targets.
 
@@ -324,6 +326,6 @@ RPMS/x86_64/hootenanny-%.rpm: $(HOOT_ARCHIVE)
 	  -bb SPECS/hootenanny.spec
 
 # Build an archive using the build image.
-SOURCES/hootenanny-%.tar.gz:
+SOURCES/hootenanny-%.tar.gz: $(BUILD_IMAGE)
 	$(VAGRANT) docker-run $(BUILD_IMAGE) -- \
 	/bin/bash -c "/rpmbuild/scripts/hoot-checkout.sh $(GIT_COMMIT) && /rpmbuild/scripts/hoot-archive.sh"
