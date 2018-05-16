@@ -175,6 +175,13 @@ function build_base_images() {
            $SCRIPT_HOME
 }
 
+function build_check_images() {
+    docker build \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-check \
+           -t hootenanny/rpmbuild-check \
+           $SCRIPT_HOME
+}
+
 # Build images for creating and signing the RPM repository.
 function build_repo_images() {
     docker build \

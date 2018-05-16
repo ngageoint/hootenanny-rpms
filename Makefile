@@ -205,6 +205,10 @@ rpmbuild-base: \
 	rpmbuild \
 	.vagrant/machines/rpmbuild-base/docker/id
 
+rpmbuild-check: \
+	rpmbuild \
+	.vagrant/machines/rpmbuild-check/docker/id
+
 rpmbuild-generic: \
 	rpmbuild-base \
 	.vagrant/machines/rpmbuild-generic/docker/id
