@@ -37,3 +37,5 @@ else
     make -j"$(nproc)" archive
     popd
 fi
+
+mv -v "$HOOT_REPO/hootenanny-[0-9]*.tar.gz" "$HOME/SOURCES"
