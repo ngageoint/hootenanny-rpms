@@ -303,11 +303,6 @@ wamerican-insane: rpmbuild-generic $(WAMERICAN_RPM)
 
 ## Build patterns.
 
-# Runs container and follow logs until it completes.
-RPMS/x86_64/%.rpm RPMS/noarch/%.rpm:
-	$(VAGRANT) up $(call rpm_package,$*)
-	$(call docker_logs,$(call rpm_package,$*))
-
 # Builds a container with Vagrant.
 .vagrant/machines/%/docker/id:
 	$(VAGRANT) up $*
@@ -324,6 +319,11 @@ RPMS/x86_64/hootenanny-%.rpm: $(BUILD_IMAGE)
 	  --define "stxxl_version %(rpm -q --queryformat '%%{version}' stxxl)" \
 	  --define "tomcat_version %(rpm -q --queryformat '%%{version}' tomcat8)" \
 	  -bb SPECS/hootenanny.spec
+
+# Runs container and follow logs until it completes.
+RPMS/x86_64/%.rpm RPMS/noarch/%.rpm:
+	$(VAGRANT) up $(call rpm_package,$*)
+	$(call docker_logs,$(call rpm_package,$*))
 
 # Build an archive using the build image.
 SOURCES/hootenanny-%.tar.gz: $(BUILD_IMAGE)
