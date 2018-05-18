@@ -284,7 +284,7 @@ run: $(RUN_IMAGE)
 	.
 
 
-## RPM targets.
+## Dependency RPM targets.
 
 dumb-init: rpmbuild-generic $(DUMBINIT_RPM)
 geos: rpmbuild-geos $(GEOS_RPM)
@@ -310,7 +310,7 @@ wamerican-insane: rpmbuild-generic $(WAMERICAN_RPM)
 	$(VAGRANT) up $*
 
 # Builds a Hootenanny RPM from the HOOT_ARCHIVE.
-RPMS/x86_64/hootenanny-%.rpm: $(BUILD_IMAGE)
+RPMS/x86_64/hootenanny-%.rpm: .vagrant/machines/$(BUILD_IMAGE)/docker/id
 	$(VAGRANT) docker-run $(BUILD_IMAGE) -- \
 	rpmbuild \
 	  --define "hoot_version_gen $(HOOT_VERSION_GEN)" \
