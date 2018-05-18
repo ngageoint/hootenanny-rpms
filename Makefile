@@ -313,7 +313,7 @@ RPMS/x86_64/%.rpm RPMS/noarch/%.rpm:
 	$(VAGRANT) up $*
 
 # Builds a Hootenanny RPM from the HOOT_ARCHIVE.
-RPMS/x86_64/hootenanny-%.rpm: $(HOOT_ARCHIVE)
+RPMS/x86_64/hootenanny-%.rpm: $(BUILD_IMAGE)
 	$(VAGRANT) docker-run $(BUILD_IMAGE) -- \
 	rpmbuild \
 	  --define "hoot_version_gen $(HOOT_VERSION_GEN)" \
