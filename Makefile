@@ -142,7 +142,9 @@ HOOT_VERSION := $(call hoot_version_tag,$(HOOT_VERSION_GEN))-$(HOOT_RELEASE)
 else
 # Development version (HOOT_VERSION_GEN=0.2.38_23_gdadada1)
 HOOT_VERSION := $(call hoot_devel_version,$(HOOT_VERSION_GEN))
+ifeq ($(origin HOOT_VERSION_GEN),environment)
 GIT_COMMIT := $(call hoot_git_revision,$(HOOT_VERSION_GEN))
+endif
 endif
 HOOT_RPM := RPMS/x86_64/hootenanny-core-$(HOOT_VERSION)$(RPMBUILD_DIST).x86_64.rpm
 endif
