@@ -177,8 +177,8 @@ function build_base_images() {
 
 function build_check_images() {
     docker build \
-           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-check \
-           -t hootenanny/rpmbuild-check \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-lint \
+           -t hootenanny/rpmbuild-lint \
            $SCRIPT_HOME
 }
 

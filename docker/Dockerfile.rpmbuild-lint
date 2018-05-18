@@ -1,8 +1,8 @@
 FROM hootenanny/rpmbuild:latest
 LABEL \
-  description="Container for checking Hootenanny RPMS Source Code" \
+  description="Container for linting Hootenanny RPMS Source Code" \
   maintainer="justin.bronn@radiantsolutions.com" \
-  name="Hootenanny RPMS Check Image" \
+  name="Hootenanny RPMS Lint Image" \
   vendor="Radiant Solutions"
 
 # Install EPEL, ShellCheck, and yamllint.
