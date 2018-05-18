@@ -192,7 +192,7 @@ ifdef HOOT_RPM
 rpm: $(BUILD_IMAGE) $(HOOT_RPM)
 else
 rpm:
-	$(error Cannot build RPM without an input archive.  Run 'make hoot-archive' first)
+	$(error Cannot build RPM without an input archive.  Run 'make archive' first)
 endif
 
 hoot-rpm: rpm
