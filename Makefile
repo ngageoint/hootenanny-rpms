@@ -178,7 +178,7 @@ base: $(BASE_CONTAINERS)
 
 clean:
 	$(VAGRANT) destroy -f --no-parallel || true
-	rm -fr RPMS/noarch RPMS/x86_64
+	rm -fr RPMS/noarch RPMS/x86_64 hootenanny-[0-9]*.tar.gz
 
 deps: \
 	$(DEPENDENCY_CONTAINERS) \
