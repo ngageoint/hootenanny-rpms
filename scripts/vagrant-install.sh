@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euxo pipefail
+set -euo pipefail
 
 # Allow overrides from environment for:
 #  * VAGRANT_VERSION
