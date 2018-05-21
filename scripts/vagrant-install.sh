@@ -17,7 +17,7 @@ if [ "$LSB_DIST" == 'centos' -o "$LSB_DIST" == 'fedora' -o "$LSB_DIST" == 'rhel'
     fi
     DOWNLOAD_COMMAND='curl -sSL -O'
     INSTALL_COMMAND='sudo yum install -y'
-    PACKAGE_SUFFIX=x86_64.rpm
+    PACKAGE_SUFFIX="$(arch).rpm"
 elif [ "$LSB_DIST" == 'debian' -o "$LSB_DIST" == 'ubuntu' ]; then
     # Debian-based.
     if [ "$(dpkg-query --showformat=\$\{Version\} --show vagrant)" == "1:$VAGRANT_VERSION" ]; then
@@ -26,7 +26,7 @@ elif [ "$LSB_DIST" == 'debian' -o "$LSB_DIST" == 'ubuntu' ]; then
     fi
     DOWNLOAD_COMMAND='wget -nv -L'
     INSTALL_COMMAND='sudo dpkg -i'
-    PACKAGE_SUFFIX=x86_64.deb
+    PACKAGE_SUFFIX="$(arch).deb"
 else
     echo "Do not know how to install Vagrant on $LSB_DIST."
     exit 1
