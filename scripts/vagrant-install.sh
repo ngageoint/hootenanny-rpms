@@ -43,7 +43,7 @@ pushd /var/tmp
 # Import Hashicorp key.
 if ! gpg --list-public-keys --with-colons | \
         awk -F: '{ print $5 }' | \
-        grep -q '^51852D87348FFC4C\>'; then
+        grep -q -e '\<51852D87348FFC4C\>'; then
     cat > hashicorp.key <<EOF
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v1
