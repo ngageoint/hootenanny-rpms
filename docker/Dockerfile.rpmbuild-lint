@@ -1,0 +1,16 @@
+FROM hootenanny/rpmbuild:latest
+LABEL \
+  description="Container for linting Hootenanny RPMS Source Code" \
+  maintainer="justin.bronn@radiantsolutions.com" \
+  name="Hootenanny RPMS Lint Image" \
+  vendor="Radiant Solutions"
+
+# Install EPEL, ShellCheck, and yamllint.
+RUN yum -q -y update && \
+    yum -q -y install epel-release && \
+    yum -q -y install yamllint ShellCheck && \
+    yum -q -y clean all
+
+# Use unprivleged RPM build user and work directory by default.
+USER ${RPMBUILD_USER}
+WORKDIR ${RPMBUILD_HOME}

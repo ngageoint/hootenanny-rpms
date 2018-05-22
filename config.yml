@@ -44,6 +44,7 @@ images:
         buildrequires: true
         rpmbuild: true
         spec_file: 'SPECS/hootenanny.spec'
+    - rpmbuild-lint: {}
     - rpmbuild-repo: {}
     - rpmbuild-geos:
         buildrequires: true

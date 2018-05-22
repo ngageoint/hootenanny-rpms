@@ -88,7 +88,8 @@ DEPENDENCY_CONTAINERS := \
 	rpmbuild-postgis \
 	rpmbuild-nodejs
 
-REPO_CONTAINERS := \
+OTHER_CONTAINERS := \
+	rpmbuild-lint \
 	rpmbuild-repo
 
 DEPENDENCY_RPMS := \
@@ -167,7 +168,7 @@ GIT_COMMIT ?= develop
 	$(BUILD_CONTAINERS) \
 	$(DEPENDENCY_CONTAINERS) \
 	$(DEPENDENCY_RPMS) \
-	$(REPO_CONTAINERS) \
+	$(OTHER_CONTAINERS) \
 	$(RUN_CONTAINERS)
 
 all: $(BUILD_CONTAINERS)
@@ -206,6 +207,10 @@ rpmbuild: .vagrant/machines/rpmbuild/docker/id
 rpmbuild-base: \
 	rpmbuild \
 	.vagrant/machines/rpmbuild-base/docker/id
+
+rpmbuild-lint: \
+	rpmbuild \
+	.vagrant/machines/rpmbuild-lint/docker/id
 
 rpmbuild-generic: \
 	rpmbuild-base \
