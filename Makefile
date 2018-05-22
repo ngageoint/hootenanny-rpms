@@ -142,7 +142,9 @@ HOOT_VERSION := $(call hoot_version_tag,$(HOOT_VERSION_GEN))-$(HOOT_RELEASE)
 else
 # Development version (HOOT_VERSION_GEN=0.2.38_23_gdadada1)
 HOOT_VERSION := $(call hoot_devel_version,$(HOOT_VERSION_GEN))
+ifeq ($(origin HOOT_VERSION_GEN),environment)
 GIT_COMMIT := $(call hoot_git_revision,$(HOOT_VERSION_GEN))
+endif
 endif
 HOOT_RPM := RPMS/x86_64/hootenanny-core-$(HOOT_VERSION)$(RPMBUILD_DIST).x86_64.rpm
 endif
@@ -176,7 +178,7 @@ base: $(BASE_CONTAINERS)
 
 clean:
 	$(VAGRANT) destroy -f --no-parallel || true
-	rm -fr RPMS/noarch RPMS/x86_64
+	rm -fr RPMS/noarch RPMS/x86_64 SOURCES/hootenanny-[0-9]*.tar.gz
 
 deps: \
 	$(DEPENDENCY_CONTAINERS) \
@@ -192,7 +194,7 @@ ifdef HOOT_RPM
 rpm: $(BUILD_IMAGE) $(HOOT_RPM)
 else
 rpm:
-	$(error Cannot build RPM without an input archive.  Run 'make hoot-archive' first)
+	$(error Cannot build RPM without an input archive.  Run 'make archive' first)
 endif
 
 hoot-rpm: rpm
@@ -286,7 +288,7 @@ run: $(RUN_IMAGE)
 	.
 
 
-## RPM targets.
+## Dependency RPM targets.
 
 dumb-init: rpmbuild-generic $(DUMBINIT_RPM)
 geos: rpmbuild-geos $(GEOS_RPM)
@@ -307,17 +309,12 @@ wamerican-insane: rpmbuild-generic $(WAMERICAN_RPM)
 
 ## Build patterns.
 
-# Runs container and follow logs until it completes.
-RPMS/x86_64/%.rpm RPMS/noarch/%.rpm:
-	$(VAGRANT) up $(call rpm_package,$*)
-	$(call docker_logs,$(call rpm_package,$*))
-
 # Builds a container with Vagrant.
 .vagrant/machines/%/docker/id:
 	$(VAGRANT) up $*
 
 # Builds a Hootenanny RPM from the HOOT_ARCHIVE.
-RPMS/x86_64/hootenanny-%.rpm: $(HOOT_ARCHIVE)
+RPMS/x86_64/hootenanny-%.rpm: .vagrant/machines/$(BUILD_IMAGE)/docker/id
 	$(VAGRANT) docker-run $(BUILD_IMAGE) -- \
 	rpmbuild \
 	  --define "hoot_version_gen $(HOOT_VERSION_GEN)" \
@@ -329,7 +326,12 @@ RPMS/x86_64/hootenanny-%.rpm: $(HOOT_ARCHIVE)
 	  --define "tomcat_version %(rpm -q --queryformat '%%{version}' tomcat8)" \
 	  -bb SPECS/hootenanny.spec
 
+# Runs container and follow logs until it completes.
+RPMS/x86_64/%.rpm RPMS/noarch/%.rpm:
+	$(VAGRANT) up $(call rpm_package,$*)
+	$(call docker_logs,$(call rpm_package,$*))
+
 # Build an archive using the build image.
-SOURCES/hootenanny-%.tar.gz: $(BUILD_IMAGE)
+SOURCES/hootenanny-%.tar.gz:
 	$(VAGRANT) docker-run $(BUILD_IMAGE) -- \
 	/bin/bash -c "/rpmbuild/scripts/hoot-checkout.sh $(GIT_COMMIT) && /rpmbuild/scripts/hoot-archive.sh"
