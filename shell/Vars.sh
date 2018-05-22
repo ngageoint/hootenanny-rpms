@@ -175,18 +175,17 @@ function build_base_images() {
            $SCRIPT_HOME
 }
 
-function build_check_images() {
-    docker build \
-           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-lint \
-           -t hootenanny/rpmbuild-lint \
-           $SCRIPT_HOME
-}
-
-# Build images for creating and signing the RPM repository.
-function build_repo_images() {
+function build_other_images() {
+    # Build image for creating and signing the RPM repository.
     docker build \
            -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-repo \
            -t hootenanny/rpmbuild-repo \
+           $SCRIPT_HOME
+
+    # Build image for linting this repository's source code.
+    docker build \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-lint \
+           -t hootenanny/rpmbuild-lint \
            $SCRIPT_HOME
 }
 
