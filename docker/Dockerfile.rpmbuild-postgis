@@ -30,7 +30,8 @@ RUN yum install -y \
     rm -f /tmp/*.rpm
 
 # Install any other extra packages.
-RUN if [ ! -z "${packages}" ] ; then yum -q -y install ${packages}; fi
+RUN if [ ! -z "${packages}" ] ; then yum -q -y install ${packages}; fi && \
+    yum -q -y clean all
 
 # Switch back to default RPM building user.
 USER ${RPMBUILD_USER}

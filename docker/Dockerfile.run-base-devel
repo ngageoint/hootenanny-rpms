@@ -67,4 +67,5 @@ RUN yum install -y \
     /tmp/tomcat8-${tomcat8_version}${RPMBUILD_DIST}.noarch.rpm \
     && \
     rm -f /tmp/*.rpm && \
+    yum -q -y clean all
     npm install --silent -g mocha@${mocha_version}

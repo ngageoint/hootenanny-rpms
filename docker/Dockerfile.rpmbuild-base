@@ -28,4 +28,5 @@ RUN yum -q -y update && \
         unzip \
         vim \
         wget \
-        zip
+        zip && \
+    yum -q -y clean all
