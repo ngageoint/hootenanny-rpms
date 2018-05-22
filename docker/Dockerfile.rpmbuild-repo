@@ -11,6 +11,7 @@ ARG role_arn
 # Install RPM repository and AWS CLI tools (via pip for latest version)
 RUN yum install -q -y createrepo epel-release groff less rpm-sign && \
     yum install -q -y python2-pip && \
+    yum -q -y clean all && \
     pip install -q --prefix /usr awscli
 
 # Add in the `keepnewer` Python (2.x on CentOS 7) module plugin for awscli;

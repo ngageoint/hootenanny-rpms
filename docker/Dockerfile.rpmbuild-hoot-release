@@ -37,7 +37,8 @@ COPY scripts/hoot-db-setup.sh scripts/postgresql-install.sh /tmp/
 RUN /tmp/postgresql-install.sh && \
     rm -f /tmp/postgresql-install.sh && \
     /tmp/hoot-db-setup.sh && \
-    rm -f /tmp/hoot-db-setup.sh
+    rm -f /tmp/hoot-db-setup.sh && \
+    yum -q -y clean all
 
 # Copy in the entrypoint.
 COPY scripts/build-entrypoint.sh /docker-entrypoint.sh

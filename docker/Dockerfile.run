@@ -28,7 +28,8 @@ RUN yum install -y \
     /tmp/hootenanny-core-deps-${hoot_version}${hoot_dist}.noarch.rpm \
     /tmp/hootenanny-services-ui-${hoot_version}${hoot_dist}.x86_64.rpm \
     && \
-    rm -f /tmp/*.rpm
+    rm -f /tmp/*.rpm && \
+    yum -q -y clean all
 
 # Configure database for Hootenanny runtime use (after package dependencies,
 # especially PostGIS, are installed).

@@ -22,4 +22,5 @@ RUN /tmp/hoot-repo.sh && \
 
 # Install Hootenanny dependencies.
 RUN yum install -y -q dumb-init su-exec tomcat8 && \
-    if [ ! -z "${packages}" ] ; then yum -y -q install ${packages}; fi
+    if [ ! -z "${packages}" ] ; then yum -y -q install ${packages}; fi && \
+    yum -q -y clean all

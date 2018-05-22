@@ -8,7 +8,8 @@ LABEL \
 ARG packages
 
 # If any package dependencies are needed, install them.
-RUN if [ ! -z "${packages}" ] ; then yum -q -y install ${packages}; fi
+RUN if [ ! -z "${packages}" ] ; then yum -q -y install ${packages}; fi && \
+    yum -q -y clean all
 
 # Use unprivleged RPM build user and work directory by default.
 USER ${RPMBUILD_USER}

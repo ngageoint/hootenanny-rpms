@@ -63,4 +63,5 @@ RUN /tmp/pgdg-repo.sh ${pg_version} && \
     rm /tmp/pgdg-repo.sh && \
     yum -q -y install \
         postgresql$(echo ${pg_version} | tr -d '.') \
-        postgresql$(echo ${pg_version} | tr -d '.')-libs
+        postgresql$(echo ${pg_version} | tr -d '.')-libs && \
+    yum -q -y clean all
