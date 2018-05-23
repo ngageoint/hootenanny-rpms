@@ -1,10 +1,6 @@
 DOCKER ?= docker
 VAGRANT ?= vagrant
 
-# TODO: This needs to be retrieved from a setting in config.yml.
-RPMBUILD_DIST := .el7
-
-
 ## Macro functions.
 
 # All versions use a YAML reference so they only have to be defined once,
@@ -46,6 +42,7 @@ latest_hoot_archive = $(call latest_file,SOURCES,hootenanny-[0-9]\*.tar.gz)
 latest_hoot_version_gen = $(subst SOURCES/hootenanny-,,$(subst .tar.gz,,$(call latest_hoot_archive)))
 
 # Variants for getting RPM file names.
+RPMBUILD_DIST := $(call config_reference,rpmbuild_dist)
 rpm_file = RPMS/$(2)/$(1)-$(call config_version,$(1))$(RPMBUILD_DIST).$(2).rpm
 rpm_file2 = RPMS/$(3)/$(1)-$(call config_version,$(2))$(RPMBUILD_DIST).$(3).rpm
 
