@@ -94,7 +94,9 @@ def shared_folders(container, name, options, rpmbuild: false)
 
     # Additional directories need to be shared for Hootenanny builds.
     if options.fetch('spec_file', '') == 'SPECS/hootenanny.spec'
-      maven_cache()
+      if ENV.fetch('MAVEN_CACHE', '1') == '1'
+        maven_cache()
+      end
 
       container.vm.synced_folder 'cache/m2', '/rpmbuild/.m2'
       container.vm.synced_folder 'cache/npm', '/rpmbuild/.npm'
