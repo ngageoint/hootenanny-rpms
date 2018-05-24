@@ -136,13 +136,18 @@ def build_container(config, name, options)
           rpmspec_cmd << '--define'
           # Have to put in single quotes surrounding macro since this is a
           # raw command.
-          rpmspec_cmd << "'#{macro} #{expr}'"
+          rpmspec_cmd << "#{macro} #{expr}"
         end
         rpmspec_cmd << options.fetch(
           'spec_file', "SPECS/#{name.gsub('rpmbuild-', '')}.spec"
         )
 
-        build_packages = `#{rpmspec_cmd.join(' ')}`.split("\n")
+        result = Vagrant::Util::Subprocess.execute(*rpmspec_cmd)
+        if result.exit_code != 0
+          raise Vagrant::Errors::VagrantError, output: "Couldn't execute rpmspec for #{name}"
+        end
+
+        build_packages = result.stdout.split("\n")
         if build_packages
           build_args << '--build-arg'
           build_args << "packages=#{build_packages.join(' ')}"
