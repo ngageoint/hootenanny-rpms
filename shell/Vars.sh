@@ -66,7 +66,7 @@ PG_VERSION=$( config_version pg )
 PG_DOTLESS=$(echo $PG_VERSION | tr -d '.')
 
 ## Package versioning variables.
-RPMBUILD_DIST=.el7
+RPMBUILD_DIST=$( config_version rpmbuild_dist )
 
 # Where binary RPMs are placed.
 RPM_X86_64=$RPMS/x86_64

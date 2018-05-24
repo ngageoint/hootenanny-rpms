@@ -24,12 +24,17 @@ maven:
   cache_sha1: &maven_cache_sha1 'efbd6edd5a13bf3806780f144b4fe314c34eccfc'
 
 
+rpmbuild:
+  dist: &rpmbuild_dist '.el7'
+  uid: &rpmbuild_uid 1000
+
+
 images:
   base: !!omap
     - rpmbuild:
         args:
-          rpmbuild_dist: .el7
-          rpmbuild_uid: 1000
+          rpmbuild_dist: *rpmbuild_dist
+          rpmbuild_uid: *rpmbuild_uid
     - rpmbuild-base: {}
     - rpmbuild-generic: {}
     - rpmbuild-pgdg:
