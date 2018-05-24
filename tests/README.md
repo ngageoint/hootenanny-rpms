@@ -10,7 +10,7 @@ and are shell scripts that exit with a non-zero value on failure.
 
 Runs [`yamllint`](https://yamllint.readthedocs.io/en/stable/) on:
 
-* [`config.yml`](../config.yml
+* [`config.yml`](../config.yml)
 * [`.yamllint`](../.yamllint), which controls configuration of `yamllint` itself
 * CI configuration files if they exist, e.g., `.travis.yml` and `.circleci/config.yml`
 
@@ -20,7 +20,7 @@ Runs [`shellcheck`](https://github.com/koalaman/shellcheck) on the bash scripts 
 
 * [`scripts/`](../scripts)
 * [`shell/`](../shell)
-* [`tests/](./) (the test scripts themselves)
+* [`tests/`](./) (the test scripts themselves)
 
 Although the goal is to have no warnings, exceptions have been grandfathered
-in for specific files and will be fixed later.
+in for some scripts to be fixed later.
