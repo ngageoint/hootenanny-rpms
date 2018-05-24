@@ -165,6 +165,7 @@ GIT_COMMIT ?= develop
 	hoot-rpm \
 	latest-archive \
 	rpm \
+	validate \
 	$(BUILD_CONTAINERS) \
 	$(DEPENDENCY_CONTAINERS) \
 	$(DEPENDENCY_RPMS) \
@@ -288,6 +289,8 @@ run: $(RUN_IMAGE)
 	-t hootenanny/run:$(HOOT_VERSION) \
 	.
 
+validate:
+	MAVEN_CACHE=0 $(VAGRANT) validate
 
 ## Dependency RPM targets.
 
@@ -320,8 +323,8 @@ RPMS/x86_64/hootenanny-%.rpm: .vagrant/machines/$(BUILD_IMAGE)/docker/id
 	rpmbuild \
 	  --define "hoot_version_gen $(HOOT_VERSION_GEN)" \
 	  --define "geos_version %(rpm -q --queryformat '%%{version}' geos)" \
-	  --define "gdal_version %(rpm -q --queryformat '%%{version}' hoot-gdal)" \
 	  --define "glpk_version %(rpm -q --queryformat '%%{version}' glpk)" \
+	  --define "gdal_version %(rpm -q --queryformat '%%{version}' hoot-gdal)" \
 	  --define "nodejs_version %(rpm -q --queryformat '%%{version}' nodejs)" \
 	  --define "stxxl_version %(rpm -q --queryformat '%%{version}' stxxl)" \
 	  --define "tomcat_version %(rpm -q --queryformat '%%{version}' tomcat8)" \
