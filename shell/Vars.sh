@@ -198,7 +198,7 @@ function build_run_images() {
 }
 
 function maven_cache() {
-    if ! test -d $CACHE/m2/repository; then
+    if [ ! -d $CACHE/m2/repository -a "${MAVEN_CACHE:-1}" == "1" ]; then
         echo 'Downloading Maven cache'
         curl -sSL -o /var/tmp/m2-cache.tar.gz $MAVEN_CACHE_URL
         echo 'Extracting Maven cache'
