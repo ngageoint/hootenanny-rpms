@@ -15,6 +15,12 @@ $rpms = settings.fetch('rpms', {})
 $pg_version = settings.fetch('versions')['postgresql']
 $pg_dotless = $pg_version.gsub('.', '')
 
+# Special workaround if we want the `rpmbuild` UID to match that of
+# the user invoking Vagrant, which simplifies file permissions for
+# host volume mounts.
+if ENV.key?['RPMBUILD_UID_MATCH']
+  $images['base']['rpmbuild']['args']['rpmbuild_uid'] = Process.uid
+end
 
 ## Functions used by Vagrant containers.
 
@@ -119,13 +125,6 @@ def build_container(config, name, options)
       # Start build arguments.
       build_args = []
       args = options.fetch('args', {})
-
-      # Special workaround if we want the `rpmbuild` UID to match that of
-      # the user invoking Vagrant, which simplifies file permissions for
-      # host volume mounts.
-      if name == 'rpmbuild' and ENV['RPMBUILD_UID_MATCH']
-        args['rpmbuild_uid'] = Process.uid
-      end
 
       # Pull out `BuildRequires:` packages and add them to a `packages`
       # build argument for the container.
