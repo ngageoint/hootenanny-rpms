@@ -50,6 +50,7 @@ function spec_requires() {
         --define "pg_dotless ${PG_DOTLESS}" \
         --define 'rpmbuild_version 0.0.0' \
         --define 'rpmbuild_release 1' \
+        --define 'tomcat_version 0.0.0' \
         -q --buildrequires $SPECS/$1.spec | \
         awk '{ for (i = 1; i <= NF; ++i) if ($i ~ /^[[:alpha:]]/) print $i }' ORS=' '
 }
@@ -65,7 +66,7 @@ PG_VERSION=$( config_version pg )
 PG_DOTLESS=$(echo $PG_VERSION | tr -d '.')
 
 ## Package versioning variables.
-RPMBUILD_DIST=.el7
+RPMBUILD_DIST=$( config_version rpmbuild_dist )
 
 # Where binary RPMs are placed.
 RPM_X86_64=$RPMS/x86_64
@@ -174,11 +175,17 @@ function build_base_images() {
            $SCRIPT_HOME
 }
 
-# Build images for creating and signing the RPM repository.
-function build_repo_images() {
+function build_other_images() {
+    # Build image for creating and signing the RPM repository.
     docker build \
            -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-repo \
            -t hootenanny/rpmbuild-repo \
+           $SCRIPT_HOME
+
+    # Build image for linting this repository's source code.
+    docker build \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-lint \
+           -t hootenanny/rpmbuild-lint \
            $SCRIPT_HOME
 }
 
@@ -191,7 +198,7 @@ function build_run_images() {
 }
 
 function maven_cache() {
-    if ! test -d $CACHE/m2/repository; then
+    if [ ! -d $CACHE/m2/repository -a "${MAVEN_CACHE:-1}" == "1" ]; then
         echo 'Downloading Maven cache'
         curl -sSL -o /var/tmp/m2-cache.tar.gz $MAVEN_CACHE_URL
         echo 'Extracting Maven cache'
@@ -235,6 +242,42 @@ function run_dep_image() {
                -v $SPECS:/rpmbuild/SPECS:ro \
                -v $RPMS:/rpmbuild/RPMS:rw \
                -u $user \
+               -it --rm \
+               $image "$@"
+    fi
+}
+
+function run_repo_image() {
+    local OPTIND opt
+    local image=hootenanny/rpmbuild-repo
+    local profile=default
+    local usage=no
+
+    while getopts ":i:p:" opt; do
+        case "${opt}" in
+            i)
+                image="${OPTARG}"
+                ;;
+            p)
+                profile="${OPTARG}"
+                ;;
+            *)
+                usage=yes
+                ;;
+        esac
+    done
+    shift $((OPTIND-1))
+
+    if [ "${usage}" = "yes" ]; then
+        echo "run_repo_image: [-i <image>] [-p <awscli profile>]"
+    else
+        mkdir -p $RPMS $SCRIPT_HOME/el7
+        docker run \
+               -e AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id --profile ${profile}) \
+               -e AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key --profile ${profile}) \
+               -v $RPMS:/rpmbuild/RPMS:ro \
+               -v $SCRIPT_HOME/el7:/rpmbuild/el7:rw \
+               -v $SCRIPT_HOME/scripts:/rpmbuild/scripts:ro \
                -it --rm \
                $image "$@"
     fi

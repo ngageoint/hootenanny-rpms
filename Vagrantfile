@@ -4,6 +4,9 @@ require 'vagrant/ui'
 require 'vagrant/util/downloader'
 require 'vagrant/util/subprocess'
 
+# Require Vagrant 2.0+.
+Vagrant.require_version '>= 2.0.0'
+
 # Setting up globals from YAML configuration file.
 settings = YAML::load_file('config.yml')
 $images = settings.fetch('images', {})
@@ -91,7 +94,9 @@ def shared_folders(container, name, options, rpmbuild: false)
 
     # Additional directories need to be shared for Hootenanny builds.
     if options.fetch('spec_file', '') == 'SPECS/hootenanny.spec'
-      maven_cache()
+      if ENV.fetch('MAVEN_CACHE', '1') == '1'
+        maven_cache()
+      end
 
       container.vm.synced_folder 'cache/m2', '/rpmbuild/.m2'
       container.vm.synced_folder 'cache/npm', '/rpmbuild/.npm'
@@ -123,22 +128,28 @@ def build_container(config, name, options)
         # Fill out dummy macros so `rpmspec` won't choke.
         rpmspec_cmd = ['rpmspec', '-q', '--buildrequires']
         {
-          'rpmbuild_version' => '0.0.0',
-          'rpmbuild_release' => '0.0.0',
+          '_topdir' => File.realpath(File.dirname(__FILE__)),
           'hoot_version_gen' => '0.0.0',
           'pg_dotless' => $pg_dotless,
-          '_topdir' => File.realpath(File.dirname(__FILE__)),
+          'rpmbuild_version' => '0.0.0',
+          'rpmbuild_release' => '1',
+          'tomcat_version' => '0.0.0',
         }.each do |macro, expr|
           rpmspec_cmd << '--define'
           # Have to put in single quotes surrounding macro since this is a
           # raw command.
-          rpmspec_cmd << "'#{macro} #{expr}'"
+          rpmspec_cmd << "#{macro} #{expr}"
         end
         rpmspec_cmd << options.fetch(
           'spec_file', "SPECS/#{name.gsub('rpmbuild-', '')}.spec"
         )
 
-        build_packages = `#{rpmspec_cmd.join(' ')}`.split("\n")
+        result = Vagrant::Util::Subprocess.execute(*rpmspec_cmd)
+        if result.exit_code != 0
+          raise Vagrant::Errors::VagrantError, output: "Couldn't execute rpmspec for #{name}"
+        end
+
+        build_packages = result.stdout.split("\n")
         if build_packages
           build_args << '--build-arg'
           build_args << "packages=#{build_packages.join(' ')}"

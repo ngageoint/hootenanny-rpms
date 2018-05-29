@@ -21,7 +21,8 @@ RUN /tmp/pgdg-repo.sh ${pg_version} && \
     rm /tmp/pgdg-repo.sh && \
     yum -q -y install postgresql$(echo ${pg_version} | tr -d '.')-devel && \
     alternatives --install /usr/bin/pg_config pgsql-pg_config /usr/pgsql-${pg_version}/bin/pg_config 500 && \
-    if [ ! -z "${packages}" ] ; then yum -q -y install ${packages}; fi
+    if [ ! -z "${packages}" ] ; then yum -q -y install ${packages}; fi && \
+    yum -q -y clean all
 
 # Switch back to RPM build user.
 USER ${RPMBUILD_USER}

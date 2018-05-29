@@ -15,7 +15,7 @@ versions:
   postgresql: &pg_version '9.5'
   stxxl: &stxxl_version '1.3.1-1'
   su-exec: &suexec_version '0.2-1'
-  tomcat8: &tomcat8_version '8.5.28-1'
+  tomcat8: &tomcat8_version '8.5.30-1'
   wamerican-insane: &wamerican_version '7.1-1'
 
 
@@ -24,12 +24,17 @@ maven:
   cache_sha1: &maven_cache_sha1 'efbd6edd5a13bf3806780f144b4fe314c34eccfc'
 
 
+rpmbuild:
+  dist: &rpmbuild_dist '.el7'
+  uid: &rpmbuild_uid 1000
+
+
 images:
   base: !!omap
     - rpmbuild:
         args:
-          rpmbuild_dist: .el7
-          rpmbuild_uid: 1000
+          rpmbuild_dist: *rpmbuild_dist
+          rpmbuild_uid: *rpmbuild_uid
     - rpmbuild-base: {}
     - rpmbuild-generic: {}
     - rpmbuild-pgdg:
@@ -44,6 +49,7 @@ images:
         buildrequires: true
         rpmbuild: true
         spec_file: 'SPECS/hootenanny.spec'
+    - rpmbuild-lint: {}
     - rpmbuild-repo: {}
     - rpmbuild-geos:
         buildrequires: true

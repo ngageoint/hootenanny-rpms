@@ -1,0 +1,7 @@
+---
+extends: default
+
+# Loosen up on the line length.
+rules:
+  line-length:
+    max: 125

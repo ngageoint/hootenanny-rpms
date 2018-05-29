@@ -1,15 +1,12 @@
 DOCKER ?= docker
 VAGRANT ?= vagrant
 
-# TODO: This needs to be retrieved from a setting in config.yml.
-RPMBUILD_DIST := .el7
-
-
 ## Macro functions.
 
 # All versions use a YAML reference so they only have to be defined once,
 # just grep for this reference and print it out.
-config_version = $(shell cat config.yml | grep '\&$(1)_version' | awk '{ print $$3 }' | tr -d "'")
+config_reference = $(shell cat config.yml | grep '\&$(1)' | awk '{ print $$3 }' | tr -d "'")
+config_version = $(call config_reference,$(1)_version)
 
 # Where Vagrant puts the Docker container id after it's been created.
 container_id = .vagrant/machines/$(1)/docker/id
@@ -45,6 +42,7 @@ latest_hoot_archive = $(call latest_file,SOURCES,hootenanny-[0-9]\*.tar.gz)
 latest_hoot_version_gen = $(subst SOURCES/hootenanny-,,$(subst .tar.gz,,$(call latest_hoot_archive)))
 
 # Variants for getting RPM file names.
+RPMBUILD_DIST := $(call config_reference,rpmbuild_dist)
 rpm_file = RPMS/$(2)/$(1)-$(call config_version,$(1))$(RPMBUILD_DIST).$(2).rpm
 rpm_file2 = RPMS/$(3)/$(1)-$(call config_version,$(2))$(RPMBUILD_DIST).$(3).rpm
 
@@ -88,7 +86,8 @@ DEPENDENCY_CONTAINERS := \
 	rpmbuild-postgis \
 	rpmbuild-nodejs
 
-REPO_CONTAINERS := \
+OTHER_CONTAINERS := \
+	rpmbuild-lint \
 	rpmbuild-repo
 
 DEPENDENCY_RPMS := \
@@ -121,16 +120,16 @@ RUN_CONTAINERS := \
 
 # These may be overridden with environment variables.
 BUILD_IMAGE ?= rpmbuild-hoot-release
-GIT_COMMIT ?= develop
 RUN_IMAGE ?= run-base-release
 
 # Are there any archives?
 HOOT_VERSION_GEN ?= $(call latest_hoot_version_gen)
+DEFAULT_ARCHIVE := SOURCES/hootenanny-archive.tar.gz
 
 ifeq ($(strip $(HOOT_VERSION_GEN)),)
 # Setup a dummy archive file that will force making of an archive
 # from the revision specified in GIT_COMMIT.
-HOOT_ARCHIVE := SOURCES/hootenanny-archive.tar.gz
+HOOT_ARCHIVE := $(DEFAULT_ARCHIVE)
 # don't define `HOOT_VERSION`, or `HOOT_RPM`.
 $(warning HOOT_VERSION_GEN is not defined)
 else
@@ -142,10 +141,15 @@ HOOT_VERSION := $(call hoot_version_tag,$(HOOT_VERSION_GEN))-$(HOOT_RELEASE)
 else
 # Development version (HOOT_VERSION_GEN=0.2.38_23_gdadada1)
 HOOT_VERSION := $(call hoot_devel_version,$(HOOT_VERSION_GEN))
+ifeq ($(origin HOOT_VERSION_GEN),environment)
+GIT_COMMIT := $(call hoot_git_revision,$(HOOT_VERSION_GEN))
+endif
 endif
 HOOT_RPM := RPMS/x86_64/hootenanny-core-$(HOOT_VERSION)$(RPMBUILD_DIST).x86_64.rpm
 endif
 
+# Default to develop branch when making archive.
+GIT_COMMIT ?= develop
 
 ## Main targets.
 
@@ -157,39 +161,43 @@ endif
 	deps \
 	hoot-archive \
 	hoot-rpm \
+	latest-archive \
 	rpm \
+	validate \
 	$(BUILD_CONTAINERS) \
 	$(DEPENDENCY_CONTAINERS) \
 	$(DEPENDENCY_RPMS) \
-	$(REPO_CONTAINERS) \
+	$(OTHER_CONTAINERS) \
 	$(RUN_CONTAINERS)
 
 all: $(BUILD_CONTAINERS)
 
-archive: hoot-archive
+archive: $(BUILD_IMAGE) $(HOOT_ARCHIVE)
 
 base: $(BASE_CONTAINERS)
 
 clean:
 	$(VAGRANT) destroy -f --no-parallel || true
-	rm -fr RPMS/noarch RPMS/x86_64
+	rm -fr RPMS/noarch RPMS/x86_64 SOURCES/hootenanny-[0-9]*.tar.gz
 
 deps: \
 	$(DEPENDENCY_CONTAINERS) \
 	$(DEPENDENCY_RPMS)
 
-hoot-archive: $(BUILD_IMAGE) $(HOOT_ARCHIVE)
+hoot-archive: archive
+
+latest-archive: $(DEFAULT_ARCHIVE)
 
 # Only allow building an RPM when an archive already exists corresponding
 # to the HOOT_VERSION_GEN.
 ifdef HOOT_RPM
-hoot-rpm: $(BUILD_IMAGE) $(HOOT_RPM)
+rpm: $(BUILD_IMAGE) $(HOOT_RPM)
 else
-hoot-rpm:
-	$(error Cannot build RPM without an input archive.  Run 'make hoot-archive' first)
+rpm:
+	$(error Cannot build RPM without an input archive.  Run 'make archive' first)
 endif
 
-rpm: hoot-rpm
+hoot-rpm: rpm
 
 ## Container targets.
 
@@ -198,6 +206,10 @@ rpmbuild: .vagrant/machines/rpmbuild/docker/id
 rpmbuild-base: \
 	rpmbuild \
 	.vagrant/machines/rpmbuild-base/docker/id
+
+rpmbuild-lint: \
+	rpmbuild \
+	.vagrant/machines/rpmbuild-lint/docker/id
 
 rpmbuild-generic: \
 	rpmbuild-base \
@@ -275,8 +287,10 @@ run: $(RUN_IMAGE)
 	-t hootenanny/run:$(HOOT_VERSION) \
 	.
 
+validate:
+	MAVEN_CACHE=0 $(VAGRANT) validate
 
-## RPM targets.
+## Dependency RPM targets.
 
 dumb-init: rpmbuild-generic $(DUMBINIT_RPM)
 geos: rpmbuild-geos $(GEOS_RPM)
@@ -297,27 +311,27 @@ wamerican-insane: rpmbuild-generic $(WAMERICAN_RPM)
 
 ## Build patterns.
 
-# Runs container and follow logs until it completes.
-RPMS/x86_64/%.rpm RPMS/noarch/%.rpm:
-	$(VAGRANT) up $(call rpm_package,$*)
-	$(call docker_logs,$(call rpm_package,$*))
-
 # Builds a container with Vagrant.
 .vagrant/machines/%/docker/id:
 	$(VAGRANT) up $*
 
 # Builds a Hootenanny RPM from the HOOT_ARCHIVE.
-RPMS/x86_64/hootenanny-%.rpm: $(HOOT_ARCHIVE)
+RPMS/x86_64/hootenanny-%.rpm: .vagrant/machines/$(BUILD_IMAGE)/docker/id
 	$(VAGRANT) docker-run $(BUILD_IMAGE) -- \
 	rpmbuild \
 	  --define "hoot_version_gen $(HOOT_VERSION_GEN)" \
 	  --define "geos_version %(rpm -q --queryformat '%%{version}' geos)" \
-	  --define "gdal_version %(rpm -q --queryformat '%%{version}' hoot-gdal)" \
 	  --define "glpk_version %(rpm -q --queryformat '%%{version}' glpk)" \
+	  --define "gdal_version %(rpm -q --queryformat '%%{version}' hoot-gdal)" \
 	  --define "nodejs_version %(rpm -q --queryformat '%%{version}' nodejs)" \
 	  --define "stxxl_version %(rpm -q --queryformat '%%{version}' stxxl)" \
 	  --define "tomcat_version %(rpm -q --queryformat '%%{version}' tomcat8)" \
 	  -bb SPECS/hootenanny.spec
+
+# Runs container and follow logs until it completes.
+RPMS/x86_64/%.rpm RPMS/noarch/%.rpm:
+	$(VAGRANT) up $(call rpm_package,$*)
+	$(call docker_logs,$(call rpm_package,$*))
 
 # Build an archive using the build image.
 SOURCES/hootenanny-%.tar.gz:

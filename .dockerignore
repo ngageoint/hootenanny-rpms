@@ -1,5 +1,6 @@
 .git/*
 .vagrant/*
+cache/*
 el7/*
 el7-src/*
 hootenanny
