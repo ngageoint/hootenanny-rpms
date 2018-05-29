@@ -4,7 +4,8 @@ This repository houses the RPM building specifications for Hootenanny and its
 third-party dependencies.
 
 RPMs are built in minimal, ephemeral CentOS 7 Docker containers.  Invoking programs
-use [`config.yml`](./config.yml) as the source of truth for version information.
+use [`config.yml`](./doc/config.md) as the source of truth for version information.
+
 
 ## Requirements
 
