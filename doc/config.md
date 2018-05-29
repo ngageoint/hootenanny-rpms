@@ -10,7 +10,7 @@ This YAML file holds the all the relevant settings for this repository in dictio
 * `images`: Build arguments, tags, and other settings for container images
 * `maven`: Maven cache URL and SHA1 checksum
 
-Because this file is also used by [shell](../shell), any relevant variable should have an anchor property (`&`).  This allows a shell script to easily search for a value without using a YAML library.  For example:
+Because this file is also used by [shell](../shell) build method (in addition to Vagrant), any relevant variable should have an anchor property (`&`).  This allows a shell script to easily search for a value without using a YAML library.  For example:
 
 ```yaml
 versions:
