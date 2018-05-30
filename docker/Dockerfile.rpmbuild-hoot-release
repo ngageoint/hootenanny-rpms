@@ -17,9 +17,6 @@ ARG pg_data=/var/lib/pgsql/${pg_version}/data
 # Have PostgreSQL data directory persist in environment variable.
 ENV PGDATA=${pg_data}
 
-# Force clone to use https vs ssh
-RUN git config --global url."https://".insteadOf git://
-
 # Switch back to root.
 USER root
 
