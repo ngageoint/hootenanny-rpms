@@ -14,3 +14,6 @@ RUN if [ ! -z "${packages}" ] ; then yum -q -y install ${packages}; fi && \
 # Use unprivleged RPM build user and work directory by default.
 USER ${RPMBUILD_USER}
 WORKDIR ${RPMBUILD_HOME}
+
+# Force clone to use https vs ssh
+RUN git config --global url."https://".insteadOf git://
