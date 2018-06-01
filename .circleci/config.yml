@@ -1,0 +1,48 @@
+---
+version: 2
+
+jobs:
+  lint:
+    working_directory: '/rpmbuild/hootenanny-rpms'
+    docker:
+      - image: hootenanny/rpmbuild-lint@sha256:34d389aad27cb6cd10d158063718d5e47d7a7d96d2211e0bbe8f621f57803fa8
+        user: rpmbuild
+    steps:
+      - checkout
+      - run:
+          name: 'Lint YAML and Scripts'
+          command: |
+            ./tests/lint-yaml.sh
+            ./tests/lint-bash.sh
+  rpmbuild-hoot-release:
+    machine:
+      enabled: true
+    steps:
+      - checkout
+      - run:
+          name: 'Install RPM Tools'
+          command: |
+            sudo apt-get update -qq
+            sudo apt-get install -qq -y rpm
+      - run:
+          name: 'Install Vagrant'
+          command: |
+            ./scripts/vagrant-install.sh
+      - run:
+          name: 'Validate Vagrantfile'
+          command: |
+            MAVEN_CACHE=0 vagrant validate
+      - run:
+          name: 'make rpmbuild-hoot-release'
+          command: |
+            export RPMBUILD_UID_MATCH=1
+            make rpmbuild-hoot-release
+
+workflows:
+  version: 2
+  tests:
+    jobs:
+      - lint
+      - rpmbuild-hoot-release:
+          requires:
+            - lint
