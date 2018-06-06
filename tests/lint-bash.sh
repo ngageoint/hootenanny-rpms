@@ -12,6 +12,7 @@ shellcheck \
     scripts/hoot-archive.sh \
     scripts/hoot-repo.sh \
     scripts/repo-update.sh \
+    scripts/sonar-build.sh \
     scripts/sonar-install.sh \
     scripts/vagrant-install.sh
 
@@ -30,11 +31,6 @@ shellcheck \
     shell/BuildHoot.sh \
     shell/BuildHootImages.sh \
     shell/BuildRunImages.sh
-
-# TODO: Figure out eval quoting.
-shellcheck \
-    --exclude SC2046,SC2086 \
-    scripts/sonar-build.sh
 
 # TODO: shell/Vars.sh needs a lot of work.
 shellcheck \
