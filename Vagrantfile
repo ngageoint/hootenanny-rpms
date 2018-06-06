@@ -15,11 +15,12 @@ $rpms = settings.fetch('rpms', {})
 $pg_version = settings.fetch('versions')['postgresql']
 $pg_dotless = $pg_version.gsub('.', '')
 
-# Special workaround if we want the `rpmbuild` UID to match that of
-# the user invoking Vagrant, which simplifies file permissions for
-# host volume mounts.
+# Special workaround if we want the `rpmbuild` UID and GID to match that of
+# the user invoking Vagrant, which simplifies file permissions for host
+# volume mounts.
 if ENV.key?('RPMBUILD_UID_MATCH')
   $images['base']['rpmbuild']['args']['rpmbuild_uid'] = Process.uid
+  $images['base']['rpmbuild']['args']['rpmbuild_gid'] = Process.gid
 end
 
 ## Functions used by Vagrant containers.

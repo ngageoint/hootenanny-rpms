@@ -35,6 +35,7 @@ images:
         args:
           rpmbuild_dist: *rpmbuild_dist
           rpmbuild_uid: *rpmbuild_uid
+          rpmbuild_gid: *rpmbuild_uid
     - rpmbuild-base: {}
     - rpmbuild-generic: {}
     - rpmbuild-pgdg:
