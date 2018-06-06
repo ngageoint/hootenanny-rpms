@@ -24,15 +24,16 @@ fi
 if [ ! -f $SONAR_PATH ]; then
     echo "### Installing Sonar Scanner..."
     if [ ! -f $SONAR_PKG ]; then
-        unzip -qq -d $SONAR_PATH -o $SONAR_ZIP
+        unzip -qq -o $SONAR_ZIP
     fi
+    mv $SONAR_PKG $SONAR_PATH
+    echo "pathmunge $SONAR_PATH/bin after" > /etc/profile.d/sonarqube.sh
 fi
-echo "pathmunge $SONAR_PATH/bin after" > /etc/profile.d/sonarqube.sh
 
 # Download sonar build wrapper
 if [ ! -f $SONAR_BLD_ZIP ]; then
     echo "### Downloading Sonar Build Wrapper..."
-    curl -sSL $SONAR_BLD_URL/$SONAR_BLD_ZIP
+    curl -sSL -O $SONAR_BLD_URL/$SONAR_BLD_ZIP
 fi
 
 #Install sonar build wrapper
