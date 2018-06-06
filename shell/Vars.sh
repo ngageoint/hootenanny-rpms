@@ -150,6 +150,7 @@ function build_base_images() {
     docker build \
            --build-arg rpmbuild_dist=$RPMBUILD_DIST \
            --build-arg rpmbuild_uid=$(id -u) \
+           --build-arg rpmbuild_gid=$(id -g) \
            -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild \
            -t hootenanny/rpmbuild \
            $SCRIPT_HOME
