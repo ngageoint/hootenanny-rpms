@@ -18,10 +18,10 @@ SONAR_BLD_URL=https://sonarcloud.io/static/cpp
 pushd /var/tmp
 
 echo "### Downloading Sonar Scanner..."
-su-exec $RPMBUILD_USER curl -sSL -O $SONAR_URL/$SONAR_ZIP
+su-exec "$RPMBUILD_USER" curl -sSL -O $SONAR_URL/$SONAR_ZIP
 
 echo "### Installing Sonar Scanner..."
-su-exec $RPMBUILD_USER unzip -qq -o $SONAR_ZIP
+su-exec "$RPMBUILD_USER" unzip -qq -o $SONAR_ZIP
 chown -R root:root $SONAR_PKG
 mv $SONAR_PKG $SONAR_PATH
 
@@ -29,10 +29,10 @@ mv $SONAR_PKG $SONAR_PATH
 echo "pathmunge $SONAR_PATH/bin after" > /etc/profile.d/sonarqube.sh
 
 echo "### Downloading Sonar Build Wrapper..."
-su-exec $RPMBUILD_USER curl -sSL -O $SONAR_BLD_URL/$SONAR_BLD_ZIP
+su-exec "$RPMBUILD_USER" curl -sSL -O $SONAR_BLD_URL/$SONAR_BLD_ZIP
 
 echo "### Installing Sonar Build Wrapper..."
-su-exec $RPMBUILD_USER unzip -qq -o $SONAR_BLD_ZIP
+su-exec "$RPMBUILD_USER" unzip -qq -o $SONAR_BLD_ZIP
 chown -R root:root $SONAR_BLD_PKG
 mv $SONAR_BLD_PKG/$SONAR_BLD_PKG-64 $SONAR_PATH/bin/
 mv $SONAR_BLD_PKG/libinterceptor-x86_64.so $SONAR_PATH/bin/

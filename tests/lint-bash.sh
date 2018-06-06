@@ -31,6 +31,11 @@ shellcheck \
     shell/BuildHootImages.sh \
     shell/BuildRunImages.sh
 
+# TODO: Figure out eval quoting.
+shellcheck \
+    --exclude SC2046,SC2086 \
+    scripts/sonar-build.sh
+
 # TODO: shell/Vars.sh needs a lot of work.
 shellcheck \
     --exclude SC2002,SC2005,SC2012,SC2034,SC2046,SC2086,SC2148,SC2155 \

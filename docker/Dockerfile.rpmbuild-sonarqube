@@ -9,4 +9,7 @@ LABEL \
 USER root
 
 COPY scripts/sonar-install.sh /tmp/sonar-install.sh
+COPY scripts/sonar-build.sh /usr/local/bin/sonar-build.sh
 RUN /tmp/sonar-install.sh && rm /tmp/sonar-install.sh
+
+USER $RPMBUILD_USER
