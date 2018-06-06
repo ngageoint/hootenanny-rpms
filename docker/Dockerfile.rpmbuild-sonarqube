@@ -1,0 +1,12 @@
+FROM hootenanny/rpmbuild-hoot-release:latest
+
+LABEL \
+  description="Sonarqube Scanning Container for Hootenanny" \
+  maintainer="justin.bronn@radiantsolutions.com" \
+  name="Hootenanny Sonarqube Image" \
+  vendor="Radiant Solutions"
+
+USER root
+
+COPY scripts/sonar-install.sh /tmp/sonar-install.sh
+RUN /tmp/sonar-install.sh && rm /tmp/sonar-install.sh

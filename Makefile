@@ -88,7 +88,8 @@ DEPENDENCY_CONTAINERS := \
 
 OTHER_CONTAINERS := \
 	rpmbuild-lint \
-	rpmbuild-repo
+	rpmbuild-repo \
+	rpmbuild-sonarqube
 
 DEPENDENCY_RPMS := \
 	dumb-init \
@@ -265,6 +266,10 @@ rpmbuild-postgis: \
 rpmbuild-repo: \
 	rpmbuild \
 	.vagrant/machines/rpmbuild-repo/docker/id
+
+rpmbuild-sonarqube: \
+	rpmbuild-hoot-release \
+	.vagrant/machines/rpmbuild-sonarqube/docker/id
 
 # Runtime containers
 run-base: .vagrant/machines/run-base/docker/id
