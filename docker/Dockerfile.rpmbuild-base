@@ -17,6 +17,7 @@ RUN yum -q -y update && \
         gdb \
         git \
         git-core \
+        lcov \
         libtool \
         make \
         m4 \
