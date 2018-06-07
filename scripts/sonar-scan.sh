@@ -3,23 +3,27 @@ set -euo pipefail
 
 # Defaults.
 USAGE=no
-SONAR_LOGIN=""
-SONAR_ORG=""
+SONAR_BRANCH=""
 SONAR_EXCLUSIONS="**/*.pb.cc,**/*.pb.h,**/*.sql"
 SONAR_GITHUB_OAUTH=""
 SONAR_GITHUB_PULL=""
 SONAR_GITHUB_REPO=""
 SONAR_HOST_URL="https://sonarcloud.io"
+SONAR_LOGIN=""
+SONAR_ORG=""
 SONAR_PROJECT=""
 SONAR_SOURCES="./hoot-core,./hoot-js,./hoot-rnd,./tbs,./tgs"
 SONAR_THREADS="$(nproc)"
 
 # Getting parameters from the command line.
-while getopts ":a:l:o:r:s:t:" opt; do
+while getopts ":a:b:j:l:o:p:r:s:t:" opt; do
     case "$opt" in
         # Required parameters.
         a)
             SONAR_GITHUB_OAUTH="$OPTARG"
+            ;;
+        b)
+            SONAR_BRANCH="$OPTARG"
             ;;
         j)
             SONAR_PROJECT="$OPTARG"
@@ -51,7 +55,16 @@ shift $((OPTIND-1))
 
 # Setting up.
 function usage() {
-    echo "sonar-build.sh: You've messed up, cowboy."
+    echo "sonar-scan.sh:"
+    echo "  -l <Sonar Login token>"
+    echo "  -o <Sonar Organization>"
+    echo "  -r <GitHub Repository>"
+    echo "  -j <Sonar Project> "
+    echo " [-a <Sonar GitHub OAuth>]"
+    echo " [-b <Sonar Branch Name>]"
+    echo " [-p <Sonar GitHub PR>]"
+    echo " [-s <Sonar Sources>]"
+    echo " [-t <Sonar Threads>]"
     exit 1
 }
 
