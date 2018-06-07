@@ -10,12 +10,12 @@ ENV HOOT_HOME="$RPMBUILD_HOME/hootenanny"
 ENV TOMCAT8_HOME=/usr/share/tomcat8
 
 COPY scripts/sonar-install.sh /tmp/sonar-install.sh
-COPY scripts/sonar-build.sh \
-     scripts/sonar-scan.sh \
-     /usr/local/bin/
 RUN /tmp/sonar-install.sh && \
     rm -f /tmp/sonar-install.sh && \
     mkdir -p $HOOT_HOME && \
     chown $RPMBUILD_USER:$RPMBUILD_USER $HOOT_HOME
+COPY scripts/sonar-build.sh \
+     scripts/sonar-scan.sh \
+     /opt/sonar/bin/
 
 WORKDIR $HOOT_HOME
