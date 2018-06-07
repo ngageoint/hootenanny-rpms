@@ -73,13 +73,6 @@ if [[ "$USAGE" = "yes" || -z "$SONAR_LOGIN" || -z "$SONAR_ORG" || -z "$SONAR_GIT
     usage
 fi
 
-# Configure hoot's autoconf
-aclocal && autoconf && autoheader && automake --add-missing --copy
-./configure --quiet --with-rnd --with-services --with-uitests
-
-# Make with the sonar build watcher
-build-wrapper-linux-x86-64 --out-dir bw-output make -sj"$SONAR_THREADS"
-
 # Build out the scan command
 CMD="sonar-scanner"
 CMD+=" -Dsonar.projectKey=$SONAR_PROJECT"
