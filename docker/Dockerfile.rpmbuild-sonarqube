@@ -7,6 +7,7 @@ LABEL \
   vendor="Radiant Solutions"
 
 ENV HOOT_HOME="$RPMBUILD_HOME/hootenanny"
+ENV TOMCAT8_HOME=/usr/share/tomcat8
 
 COPY scripts/sonar-install.sh /tmp/sonar-install.sh
 COPY scripts/sonar-build.sh \
