@@ -59,7 +59,7 @@ function usage() {
     echo "  -l <Sonar Login token>"
     echo "  -o <Sonar Organization>"
     echo "  -r <GitHub Repository>"
-    echo "  -j <Sonar Project> "
+    echo "  -j <Sonar Project>"
     echo " [-a <Sonar GitHub OAuth>]"
     echo " [-b <Sonar Branch Name>]"
     echo " [-p <Sonar GitHub PR>]"
@@ -73,33 +73,43 @@ if [[ "$USAGE" = "yes" || -z "$SONAR_LOGIN" || -z "$SONAR_ORG" || -z "$SONAR_GIT
     usage
 fi
 
-# Build out the scan command
-CMD="sonar-scanner"
-CMD+=" -Dsonar.projectKey=$SONAR_PROJECT"
-CMD+=" -Dsonar.sources=$SONAR_SOURCES"
-CMD+=" -Dsonar.cfamily.build-wrapper-output=bw-output"
-CMD+=" -Dsonar.host.url=$SONAR_HOST_URL"
-CMD+=" -Dsonar.cfamily.threads=$SONAR_THREADS"
-CMD+=" -Dsonar.exclusions=$SONAR_EXCLUSIONS"
-CMD+=" -Dsonar.cfamily.lcov.reportsPaths=$HOOT_HOME"
-CMD+=" -Dsonar.login=$SONAR_LOGIN"
-CMD+=" -Dsonar.organization=$SONAR_ORG"
-CMD+=" -Dsonar.github.repository=$SONAR_GITHUB_REPO"
+# Build out the scan command options.
+OPTIONS=(
+    "-Dsonar.login=$SONAR_LOGIN"
+    "-Dsonar.organization=$SONAR_ORG"
+    "-Dsonar.github.repository=$SONAR_GITHUB_REPO"
+    "-Dsonar.projectKey=$SONAR_PROJECT"
+    "-Dsonar.cfamily.build-wrapper-output=bw-output"
+    "-Dsonar.cfamily.lcov.reportsPaths=$HOOT_HOME"
+    "-Dsonar.cfamily.threads=$SONAR_THREADS"
+    "-Dsonar.exclusions=$SONAR_EXCLUSIONS"
+    "-Dsonar.host.url=$SONAR_HOST_URL"
+    "-Dsonar.sources=$SONAR_SOURCES"
+)
 
 # Optional scan parameters based off parameters passed into script
 if [ -n "$SONAR_BRANCH" ]; then
-    CMD+=" -Dsonar.branch.name=$SONAR_BRANCH"
+    OPTIONS=(
+        "${OPTIONS[@]}"
+        "-Dsonar.branch.name=$SONAR_BRANCH"
+    )
 fi
 
 if [ -n "$SONAR_GITHUB_PULL" ]; then
     # Optional pull request number that will match scan with git hub pull-request
-    CMD+=" -Dsonar.github.pullRequest=$SONAR_GITHUB_PULL"
-    CMD+=" -Dsonar.analysis.mode=preview"
+    OPTIONS=(
+        "${OPTIONS[@]}"
+        "-Dsonar.github.pullRequest=$SONAR_GITHUB_PULL"
+        "-Dsonar.analysis.mode=preview"
+    )
 fi
 
 if [ -n "$SONAR_GITHUB_OAUTH" ]; then
     # Optional token to allow scan to post comments to github ticket
-    CMD+=" -Dsonar.github.oauth=$SONAR_GITHUB_OAUTH"
+    OPTIONS=(
+        "${OPTIONS[@]}"
+        "-Dsonar.github.oauth=$SONAR_GITHUB_OAUTH"
+    )
 fi
 
-exec "$CMD"
+sonar-scanner "${OPTIONS[@]}"
