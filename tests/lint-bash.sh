@@ -12,9 +12,7 @@ shellcheck \
     scripts/hoot-archive.sh \
     scripts/hoot-repo.sh \
     scripts/repo-update.sh \
-    scripts/sonar-build.sh \
     scripts/sonar-install.sh \
-    scripts/sonar-scan.sh \
     scripts/vagrant-install.sh
 
 # Scripts with *only* quoting errors.
