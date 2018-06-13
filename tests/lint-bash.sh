@@ -11,6 +11,7 @@ shellcheck \
     scripts/docker-install.sh \
     scripts/hoot-archive.sh \
     scripts/hoot-repo.sh \
+    scripts/latest-archive.sh \
     scripts/repo-update.sh \
     scripts/vagrant-install.sh
 
