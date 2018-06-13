@@ -23,7 +23,7 @@ jobs:
           name: 'Install RPM Tools'
           command: |
             sudo apt-get update -qq
-            sudo apt-get install -qq -y rpm
+            sudo apt-get install -qq -y rpm awscli
       - run:
           name: 'Install Vagrant'
           command: |
@@ -37,6 +37,11 @@ jobs:
           command: |
             export RPMBUILD_UID_MATCH=1
             make rpmbuild-hoot-release
+      - run:
+          name: 'Retrieve Latest Develop Archive'
+          command: |
+            LATEST_PREFIX="$(./scripts/latest-archive.sh -b hoot-archives -p circle/develop)"
+            aws s3 cp s3://hoot-archives/$LATEST_PREFIX SOURCES/
 
 workflows:
   version: 2
