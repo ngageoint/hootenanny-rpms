@@ -42,6 +42,10 @@ jobs:
           command: |
             LATEST_PREFIX="$(./scripts/latest-archive.sh -b hoot-archives -p circle/develop)"
             aws s3 cp s3://hoot-archives/$LATEST_PREFIX SOURCES/
+      - run:
+          name: 'Make Hootenanny RPM from Archive'
+          command: |
+            make rpm
 
 workflows:
   version: 2
