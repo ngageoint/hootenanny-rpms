@@ -37,15 +37,32 @@ jobs:
           command: |
             export RPMBUILD_UID_MATCH=1
             make rpmbuild-hoot-release
+            mkdir -p images
+            docker save hootenanny/rpmbuild-hoot-release:latest -o images/rpmbuild-hoot-release.tar
+      - persist_to_workspace:
+          root: images
+          paths:
+            - rpmbuild-hoot-release.tar
+  develop-update:
+    machine:
+      enabled: true
+    steps:
+      - checkout
+      - attach_workspace:
+          at: images
+      - run:
+          name: 'Load rpmbuild-hoot-release image'
+          command: |
+            docker load --input images/rpmbuild-hoot-release.tar
       - run:
           name: 'Retrieve Latest Develop Archive'
           command: |
             LATEST_PREFIX="$(./scripts/latest-archive.sh -b hoot-archives -p circle/develop)"
             aws s3 cp s3://hoot-archives/$LATEST_PREFIX SOURCES/
-      - run:
-          name: 'Make Hootenanny RPM from Archive'
-          command: |
-            make rpm
+      # - run:
+      #     name: 'Make Hootenanny RPM from Archive'
+      #     command: |
+      #       make rpm
 
 workflows:
   version: 2
@@ -55,3 +72,6 @@ workflows:
       - rpmbuild-hoot-release:
           requires:
             - lint
+      - develop-update:
+          requires:
+            - rpmbuild-hoot-release
