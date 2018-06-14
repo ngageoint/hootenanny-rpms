@@ -13,6 +13,7 @@ shellcheck \
     scripts/hoot-repo.sh \
     scripts/latest-archive.sh \
     scripts/repo-update.sh \
+    scripts/rpm-install.sh \
     scripts/vagrant-install.sh
 
 # Scripts with *only* quoting errors.

@@ -22,8 +22,7 @@ jobs:
       - run:
           name: 'Install RPM Tools'
           command: |
-            sudo apt-get update -qq
-            sudo apt-get install -qq -y rpm awscli
+            sudo ./scripts/rpm-install.sh
       - run:
           name: 'Install Vagrant'
           command: |
@@ -50,6 +49,10 @@ jobs:
       - checkout
       - attach_workspace:
           at: images
+      - run:
+          name: 'Install RPM Tools'
+          command: |
+            sudo ./scripts/rpm-install.sh
       - run:
           name: 'Load rpmbuild-hoot-release image'
           command: |
