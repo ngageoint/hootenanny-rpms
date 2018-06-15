@@ -20,12 +20,9 @@ jobs:
     steps:
       - checkout
       - run:
-          name: 'Install RPM Tools'
+          name: 'Install RPM Tools and Vagrant'
           command: |
-            sudo ./scripts/rpm-install.sh
-      - run:
-          name: 'Install Vagrant'
-          command: |
+            ./scripts/rpm-install.sh
             ./scripts/vagrant-install.sh
       - run:
           name: 'Validate Vagrantfile'
@@ -50,9 +47,10 @@ jobs:
       - attach_workspace:
           at: images
       - run:
-          name: 'Install RPM Tools'
+          name: 'Install RPM Tools and Vagrant'
           command: |
-            sudo ./scripts/rpm-install.sh
+            ./scripts/rpm-install.sh
+            ./scripts/vagrant-install.sh
       - run:
           name: 'Load rpmbuild-hoot-release image'
           command: |
