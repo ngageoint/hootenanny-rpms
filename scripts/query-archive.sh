@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euxo pipefail
+set -euo pipefail
 
 # Defaults.
 USAGE=no
@@ -41,7 +41,6 @@ GIT_COMMIT="$(basename "$ARCHIVE" | awk -F_ "{ git_abbrev = \$3; sub(/.tar.gz/, 
 
 # Query the number of RPMs
 aws s3api list-objects-v2 \
-    --debug \
     --bucket "$BUCKET" \
     --prefix "$PREFIX" \
     --query "length(Contents[?ends_with(Key, \`$GIT_COMMIT.el7.x86_64.rpm\`) && starts_with(Key, \`$PREFIX/hootenanny-core-\`)].Key)"

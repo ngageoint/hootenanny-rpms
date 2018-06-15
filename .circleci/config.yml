@@ -64,7 +64,7 @@ jobs:
             mkdir -p el7/develop
             LATEST_ARCHIVE="$(./scripts/latest-archive.sh -b hoot-archives -p circle/develop)"
             if [ "$(./scripts/query-archive.sh -a $LATEST_ARCHIVE -b hoot-repo -p el7/develop/)" = "0" ]; then
-                aws s3 cp s3://hoot-archives/$LATEST_PREFIX SOURCES/
+                aws s3 cp s3://hoot-archives/$LATEST_ARCHIVE SOURCES/
                 make rpm
                 mv -v RPMS/{noarch,x86_64}/*.rpm el7/develop
             else

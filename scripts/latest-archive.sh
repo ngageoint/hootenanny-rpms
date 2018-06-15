@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euxo pipefail
+set -euo pipefail
 
 # Defaults.
 USAGE=no
@@ -34,7 +34,7 @@ fi
 
 # Use a query expression to determine the number of objects in the
 # bucket that match the prefix.
-NUM_ARCHIVES="$(aws s3api list-objects-v2 --debug --bucket "$BUCKET" --prefix "$PREFIX" --query "type(Contents[]) == \`array\` && length(Contents[]) || \`0\`")"
+NUM_ARCHIVES="$(aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$PREFIX" --query "type(Contents[]) == \`array\` && length(Contents[]) || \`0\`")"
 
 if [ "$NUM_ARCHIVES" = "0" ]; then
     # Bail if no archives are found.
@@ -45,7 +45,6 @@ else
     # with reverse sorting on the last modified date for every object in the
     # query expression.
     aws s3api list-objects-v2 \
-        --debug \
         --bucket "$BUCKET" \
         --prefix "$PREFIX" \
         --output text \
