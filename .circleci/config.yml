@@ -97,7 +97,7 @@ workflows:
   tests:
     jobs:
       - lint
-      - rpmbuild-hoot-release:
+      - rpmbuild-hoot-release
       - develop-rpm:
           requires:
             - rpmbuild-hoot-release
