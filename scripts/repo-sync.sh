@@ -2,19 +2,17 @@
 set -euo pipefail
 
 # Default variables.
-DEST=$(pwd)
+DEST="$(pwd)"
 BUCKET=""
-KEEP=10
+KEEP="10"
 PREFIX=""
-UPLOAD=yes
-USAGE=no
+UPLOAD="yes"
+USAGE="no"
 
 # These variables default to value of AWS CLI environment
 # variables (if defined).
-set +u
-PROFILE=${AWS_PROFILE:-default}
-REGION=${AWS_DEFAULT_REGION:-us-east-1}
-set -u
+PROFILE="${AWS_PROFILE:-default}"
+REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 
 # Getting parameters from the command line.
 while getopts ":a:b:p:d:k:nr:" opt; do
@@ -60,33 +58,54 @@ if [[ "${USAGE}" == "yes" || -z "${BUCKET}" || -z "${PREFIX}" ]]; then
     usage
 fi
 
-REPO=$DEST/$PREFIX
-S3_URL="s3://${BUCKET}/${PREFIX}"
-if [ "${REGION}" == "us-east-1" ]; then
+REPO="$DEST/$PREFIX"
+S3_URL="s3://$BUCKET/$PREFIX"
+if [ "$REGION" == "us-east-1" ]; then
     S3_HOST=s3.amazonaws.com
 else
     S3_HOST=s3-$REGION.amazonaws.com
 fi
 
-if [ ! -d $REPO ] ; then
-    mkdir -p $REPO
+# Setting up array of AWS common options.
+AWS_COMMON_OPTS=(
+    "--region=$REGION"
+)
+if [ -n "$PROFILE" ]; then
+    AWS_COMMON_OPTS=(
+        "${AWS_COMMON_OPTS[@]}"
+        "--profile=$PROFILE"
+    )
+fi
+
+if [ ! -d "$REPO" ] ; then
+    mkdir -p "$REPO"
 fi
 
 # If the repo exists, grab it's last modified timestamp.
-REPO_TS=$(aws s3api head-object --bucket $BUCKET --key $PREFIX/repodata/repomd.xml --query LastModified --profile $PROFILE --region $REGION --output text 2>/dev/null || printf none)
+HEAD_OBJECT_OPTS=(
+    "--bucket=$BUCKET"
+    "--key=$PREFIX/repodata/repomd.xml"
+    "--query=LastModified"
+    "--output=text"
+    "${AWS_COMMON_OPTS[@]}"
+)
 
-if [ "${REPO_TS}" == "none" ]; then
+# If a repository already exists, it'll have a repository XML file
+# in a known location.
+REPO_TS="$(aws s3api head-object "${HEAD_OBJECT_OPTS[@]}" 2>/dev/null || printf none)"
+
+if [ "$REPO_TS" = "none" ]; then
     # Initialize the yum repository, as it doesn't exist in S3.
-    if [ ! -f $REPO/repodata/repomd.xml ] ; then
-        createrepo --database --unique-md-filenames --deltas $REPO
+    if [ ! -f "$REPO/repodata/repomd.xml" ] ; then
+        createrepo --database --unique-md-filenames --deltas "$REPO"
     fi
 
     # Ensure a hoot.repo exists for use with yum-config-manager.
-    if [ ! -f $REPO/hoot.repo ]; then
-        cat > $REPO/hoot.repo <<EOF
+    if [ ! -f "$REPO/hoot.repo" ]; then
+        cat > "$REPO/hoot.repo" <<EOF
 [hoot-develop]
 name = Hootenanny Development
-baseurl = https://${S3_HOST}/${BUCKET}/${PREFIX}
+baseurl = https://$S3_HOST/$BUCKET/$PREFIX
 enabled = 1
 gpgcheck = 0
 
@@ -102,16 +121,28 @@ EOF
 else
     # The repo already exists, sync the repository files down, but
     # keep local files that are more recent than what's in S3.
-    aws s3 sync $S3_URL $REPO --profile $PROFILE --region $REGION --keep-newer
+    DOWNLOAD_OPTS=(
+        "$S3_URL"
+        "$REPO"
+        "--keep-newer"
+        "${AWS_COMMON_OPTS[@]}"
+    )
+    aws s3 sync "${DOWNLOAD_OPTS[@]}"
 fi
 
 # Only keep as many packages as specified, deleting older versions.
-repomanage --keep $KEEP --old $REPO | xargs rm -f -v
+repomanage --keep "$KEEP" --old "$REPO" | xargs rm -f -v
 
 # Update the repository metadata.
-createrepo --update $REPO
+createrepo --update "$REPO"
 
-if [ "${UPLOAD}" == "yes" ]; then
+if [ "$UPLOAD" == "yes" ]; then
     # Upload back to the S3 bucket, deleting any files not present locally.
-    aws s3 sync $REPO $S3_URL --delete --profile $PROFILE --region $REGION
+    UPLOAD_OPTS=(
+        "$REPO"
+        "$S3_URL"
+        "--delete"
+        "${AWS_COMMON_OPTS[@]}"
+    )
+    aws s3 sync "${UPLOAD_OPTS[@]}"
 fi
