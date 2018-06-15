@@ -74,23 +74,23 @@ jobs:
       - persist_to_workspace:
           root: el7/develop
           paths:
-            - *.rpm
-   develop-sync:
-     working_directory: '/rpmbuild/hootenanny-rpms'
-     docker:
-       - image: hootenanny/rpmbuild-repo@sha256:7147b62b7a6dded4b72003df0aca52ab4b667dba4da5c11a7ceb4b00bbacd120
-         user: rpmbuild
-     steps:
-       - attach_workspace:
-           at: el7/develop
-       - run:
-           name: 'Update and Sync Develop Repository'
-           command: |
-             if [ -f el7/develop/none.rpm ]; then
-                 echo "RPM has already been created."
-             else
-                 ./scripts/repo-sync -b hoot-repo -p el7/develop
-             fi
+            - "*.rpm"
+  develop-sync:
+    working_directory: '/rpmbuild/hootenanny-rpms'
+    docker:
+      - image: hootenanny/rpmbuild-repo@sha256:7147b62b7a6dded4b72003df0aca52ab4b667dba4da5c11a7ceb4b00bbacd120
+        user: rpmbuild
+    steps:
+      - attach_workspace:
+          at: el7/develop
+      - run:
+          name: 'Update and Sync Develop Repository'
+          command: |
+            if [ -f el7/develop/none.rpm ]; then
+                echo "RPM has already been created."
+            else
+                ./scripts/repo-sync -b hoot-repo -p el7/develop
+            fi
 
 workflows:
   version: 2
