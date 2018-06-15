@@ -6,6 +6,7 @@ DEST="$(pwd)"
 BUCKET=""
 KEEP="10"
 PREFIX=""
+QUIET=""
 UPLOAD="yes"
 USAGE="no"
 
@@ -15,7 +16,7 @@ PROFILE="${AWS_PROFILE:-default}"
 REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 
 # Getting parameters from the command line.
-while getopts ":a:b:p:d:k:nr:" opt; do
+while getopts ":a:b:p:d:k:nqr:" opt; do
     case "${opt}" in
         # Required parameters.
         b)
@@ -36,6 +37,9 @@ while getopts ":a:b:p:d:k:nr:" opt; do
             ;;
         n)
             UPLOAD="no"
+            ;;
+        q)
+            QUIET="--quiet"
             ;;
         r)
             REGION="${OPTARG}"
@@ -125,6 +129,7 @@ else
         "$S3_URL"
         "$REPO"
         "--keep-newer"
+        "$QUIET"
         "${AWS_COMMON_OPTS[@]}"
     )
     aws s3 sync "${DOWNLOAD_OPTS[@]}"
@@ -142,6 +147,7 @@ if [ "$UPLOAD" == "yes" ]; then
         "$REPO"
         "$S3_URL"
         "--delete"
+        "$QUIET"
         "${AWS_COMMON_OPTS[@]}"
     )
     aws s3 sync "${UPLOAD_OPTS[@]}"

@@ -78,7 +78,7 @@ jobs:
             if [ -f el7/develop/none.rpm ]; then
                 echo "RPM has already been created."
             else
-                ./scripts/repo-sync.sh -a "" -b hoot-repo -p el7/develop
+                ./scripts/repo-sync.sh -a "" -b hoot-repo -p el7/develop -q
             fi
 
 workflows:
