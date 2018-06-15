@@ -46,12 +46,13 @@ jobs:
           name: 'Compile Latest Develop RPM'
           command: |
             set -x
-            mkdir -p el7/develop
+            mkdir -p cache/m2 cache/npm el7/develop RPMS
             LATEST_ARCHIVE="$(./scripts/latest-archive.sh -b hoot-archives -p circle/develop)"
             if [ "$(./scripts/query-archive.sh -a $LATEST_ARCHIVE -b hoot-repo -p el7/develop/)" = "0" ]; then
                 aws s3 cp s3://hoot-archives/$LATEST_ARCHIVE SOURCES/
-                mkdir -p RPMS
-                sudo chown -R 1000:1000 RPMS SOURCES
+                source shell/Vars.sh
+                maven_cache
+                sudo chown -R 1000:1000 cache RPMS SOURCES
                 ./shell/BuildHoot.sh
                 sudo mv -v RPMS/{noarch,x86_64}/*.rpm el7/develop
             else
@@ -68,6 +69,7 @@ jobs:
       - image: hootenanny/rpmbuild-repo@sha256:7147b62b7a6dded4b72003df0aca52ab4b667dba4da5c11a7ceb4b00bbacd120
         user: rpmbuild
     steps:
+      - checkout
       - attach_workspace:
           at: el7/develop
       - run:
