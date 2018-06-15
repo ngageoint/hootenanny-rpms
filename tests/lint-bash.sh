@@ -12,6 +12,7 @@ shellcheck \
     scripts/hoot-archive.sh \
     scripts/hoot-repo.sh \
     scripts/latest-archive.sh \
+    scripts/query-archive.sh \
     scripts/repo-update.sh \
     scripts/rpm-install.sh \
     scripts/vagrant-install.sh
