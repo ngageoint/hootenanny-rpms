@@ -45,7 +45,6 @@ jobs:
       - run:
           name: 'Compile Latest Develop RPM'
           command: |
-            set -x
             mkdir -p cache/m2 cache/npm el7/develop RPMS
             LATEST_ARCHIVE="$(./scripts/latest-archive.sh -b hoot-archives -p circle/develop)"
             if [ "$(./scripts/query-archive.sh -a $LATEST_ARCHIVE -b hoot-repo -p el7/develop/)" = "0" ]; then
@@ -79,7 +78,7 @@ jobs:
             if [ -f el7/develop/none.rpm ]; then
                 echo "RPM has already been created."
             else
-                ./scripts/repo-sync.sh -b hoot-repo -p el7/develop
+                ./scripts/repo-sync.sh -a "" -b hoot-repo -p el7/develop
             fi
 
 workflows:
