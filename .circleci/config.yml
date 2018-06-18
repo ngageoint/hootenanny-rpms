@@ -92,7 +92,7 @@ workflows:
             - develop-rpm
     triggers:
       - schedule:
-          cron: "40 16 * * *"
+          cron: "12 17 * * *"
           filters:
             branches:
               only:
