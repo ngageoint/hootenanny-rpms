@@ -28,6 +28,9 @@ shift $((OPTIND-1))
 
 function usage() {
     echo "query-archive.sh: -a <Archive Name> -b <S3 Bucket> -p <Bucket Prefix>"
+    echo "  Queries the yum repository for an RPM built from the archive"
+    echo "  hosted at the given S3 bucket and prefix.  Prints the number"
+    echo "  of RPMs found or '0' if none exist."
     exit 1
 }
 

@@ -24,6 +24,7 @@ shift $((OPTIND-1))
 
 function usage() {
     echo "latest-archive.sh: -b <S3 Bucket> -p <Bucket Prefix>"
+    echo "  Prints the latest archive file hosted at the given S3 bucket and prefix."
     exit 1
 }
 
