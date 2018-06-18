@@ -1,0 +1,18 @@
+FROM hootenanny/rpmbuild-hoot-release:latest
+
+LABEL \
+  description="Sonarqube Scanning Container for Hootenanny" \
+  maintainer="justin.bronn@radiantsolutions.com" \
+  name="Hootenanny Sonarqube Image" \
+  vendor="Radiant Solutions"
+
+ENV HOOT_HOME="$RPMBUILD_HOME/hootenanny"
+ENV TOMCAT8_HOME=/usr/share/tomcat8
+
+COPY scripts/sonar-install.sh /tmp/sonar-install.sh
+RUN /tmp/sonar-install.sh && \
+    rm -f /tmp/sonar-install.sh && \
+    mkdir -p $HOOT_HOME && \
+    chown $RPMBUILD_USER:$RPMBUILD_USER $HOOT_HOME
+
+WORKDIR $HOOT_HOME

@@ -16,6 +16,7 @@ shellcheck \
     scripts/repo-sync.sh \
     scripts/repo-update.sh \
     scripts/rpm-install.sh \
+    scripts/sonar-install.sh \
     scripts/vagrant-install.sh
 
 # Scripts with *only* quoting errors.

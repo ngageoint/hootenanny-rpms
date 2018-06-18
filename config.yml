@@ -52,6 +52,7 @@ images:
         spec_file: 'SPECS/hootenanny.spec'
     - rpmbuild-lint: {}
     - rpmbuild-repo: {}
+    - rpmbuild-sonarqube: {}
     - rpmbuild-geos:
         buildrequires: true
         dockerfile: 'docker/Dockerfile.rpmbuild-generic'

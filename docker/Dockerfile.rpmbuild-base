@@ -29,4 +29,6 @@ RUN yum -q -y update && \
         vim \
         wget \
         zip && \
+    yum -q -y install \
+        lcov && \
     yum -q -y clean all
