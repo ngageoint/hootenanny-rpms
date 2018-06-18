@@ -17,6 +17,10 @@ while getopts ":a:b:p:" opt; do
             ;;
         p)
             PREFIX="$OPTARG"
+            if [ "${PREFIX: -1}" = "/" ]; then
+                echo "Prefix cannot end with a '/'."
+                exit 2
+            fi
             ;;
         *)
             USAGE=yes
@@ -42,8 +46,9 @@ fi
 # Pull out the git commit from the archive filename.
 GIT_COMMIT="$(basename "$ARCHIVE" | awk -F_ "{ git_abbrev = \$3; sub(/.tar.gz/, \"\", git_abbrev); print substr(git_abbrev, 2) }")"
 
-# Query the number of RPMs
+# Query the number of RPMs; have to append a "/" to prefix, otherwise AWS
+# won't allow the query expression.
 aws s3api list-objects-v2 \
     --bucket "$BUCKET" \
-    --prefix "$PREFIX" \
+    --prefix "$PREFIX/" \
     --query "length(Contents[?ends_with(Key, \`$GIT_COMMIT.el7.x86_64.rpm\`) && starts_with(Key, \`$PREFIX/hootenanny-core-\`)].Key)"
