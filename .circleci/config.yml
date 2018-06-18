@@ -45,9 +45,10 @@ jobs:
       - run:
           name: 'Compile Latest Develop RPM'
           command: |
+            set -x
             mkdir -p cache/m2 cache/npm el7/develop RPMS
             LATEST_ARCHIVE="$(./scripts/latest-archive.sh -b hoot-archives -p circle/develop)"
-            if [ "$(./scripts/query-archive.sh -a $LATEST_ARCHIVE -b hoot-repo -p el7/develop/)" = "0" ]; then
+            if [ "$(./scripts/query-archive.sh -a $LATEST_ARCHIVE -b hoot-repo -p el7/develop)" = "0" ]; then
                 aws s3 cp s3://hoot-archives/$LATEST_ARCHIVE SOURCES/
                 source shell/Vars.sh
                 maven_cache
@@ -91,7 +92,7 @@ workflows:
             - develop-rpm
     triggers:
       - schedule:
-          cron: "30 16 * * *"
+          cron: "40 16 * * *"
           filters:
             branches:
               only:
