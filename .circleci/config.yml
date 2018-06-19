@@ -20,28 +20,81 @@ jobs:
     steps:
       - checkout
       - run:
-          name: 'Install RPM Tools'
+          name: 'Install RPM Tools and Vagrant'
           command: |
-            sudo apt-get update -qq
-            sudo apt-get install -qq -y rpm
-      - run:
-          name: 'Install Vagrant'
-          command: |
+            ./scripts/rpm-install.sh
             ./scripts/vagrant-install.sh
       - run:
           name: 'Validate Vagrantfile'
           command: |
             MAVEN_CACHE=0 vagrant validate
       - run:
-          name: 'make rpmbuild-hoot-release'
+          name: 'Building rpmbuild-hoot-release'
           command: |
             make rpmbuild-hoot-release
+  develop-rpm:
+    machine:
+      enabled: true
+    steps:
+      - checkout
+      - run:
+          name: 'Install RPM Tools'
+          command: |
+            ./scripts/rpm-install.sh
+      - run:
+          name: 'Compile Latest Develop RPM'
+          command: |
+            mkdir -p cache/m2 cache/npm el7/develop RPMS
+            LATEST_ARCHIVE="$(./scripts/latest-archive.sh -b hoot-archives -p circle/develop)"
+            if [ "$(./scripts/query-archive.sh -a $LATEST_ARCHIVE -b hoot-repo -p el7/develop)" = "0" ]; then
+                aws s3 cp s3://hoot-archives/$LATEST_ARCHIVE SOURCES/
+                source shell/Vars.sh
+                maven_cache
+                sudo chown -R 1000:1000 cache RPMS SOURCES
+                ./shell/BuildHoot.sh
+                sudo mv -v RPMS/{noarch,x86_64}/*.rpm el7/develop
+            else
+                touch el7/develop/none.rpm
+            fi
+            sudo chown -R 1000:1000 el7/develop
+      - persist_to_workspace:
+          root: el7/develop
+          paths:
+            - "*.rpm"
+  develop-sync:
+    working_directory: '/rpmbuild/hootenanny-rpms'
+    docker:
+      - image: hootenanny/rpmbuild-repo@sha256:7147b62b7a6dded4b72003df0aca52ab4b667dba4da5c11a7ceb4b00bbacd120
+        user: rpmbuild
+    steps:
+      - checkout
+      - attach_workspace:
+          at: el7/develop
+      - run:
+          name: 'Update and Sync Develop Repository'
+          command: |
+            if [ -f el7/develop/none.rpm ]; then
+                echo "RPM has already been created."
+            else
+                ./scripts/repo-sync.sh -a "" -b hoot-repo -p el7/develop -q
+            fi
 
 workflows:
   version: 2
+  develop-repo:
+    jobs:
+      - develop-rpm
+      - develop-sync:
+          requires:
+            - develop-rpm
+    triggers:
+      - schedule:
+          cron: "0 12,20 * * *"
+          filters:
+            branches:
+              only:
+                - develop
   tests:
     jobs:
       - lint
-      - rpmbuild-hoot-release:
-          requires:
-            - lint
+      - rpmbuild-hoot-release

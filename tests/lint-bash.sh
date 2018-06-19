@@ -11,7 +11,11 @@ shellcheck \
     scripts/docker-install.sh \
     scripts/hoot-archive.sh \
     scripts/hoot-repo.sh \
+    scripts/latest-archive.sh \
+    scripts/query-archive.sh \
+    scripts/repo-sync.sh \
     scripts/repo-update.sh \
+    scripts/rpm-install.sh \
     scripts/sonar-install.sh \
     scripts/vagrant-install.sh
 
@@ -24,7 +28,6 @@ shellcheck \
     scripts/pgdg-repo.sh \
     scripts/postgresql-install.sh \
     scripts/repo-sign.sh \
-    scripts/repo-sync.sh \
     shell/BuildArchive.sh \
     shell/BuildDeps.sh \
     shell/BuildHoot.sh \
