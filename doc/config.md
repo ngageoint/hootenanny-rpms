@@ -38,4 +38,4 @@ MAVEN_CACHE=0 vagrant status
 
 ### `RPMBUILD_UID_MATCH`
 
-By default, the containers use a UID of 1000 for the non-privileged `rpmbuild` user.  While this is the first-user ID on most Linux distributions, this is not universally true -- and will result in permission errors because the host's UID doesn't match that of the container because [Docker bind mounts](https://docs.docker.com/storage/bind-mounts/) are used .  Thus, if you want the `rpmbuild` container user to match that of the host user invoking `docker`, set the `RPMBUILD_UID_MATCH` environment variable to any value.
+By default, the containers use a UID and GID matching the invoking user for `rpmbuild`; doing so prevents permission errors because [Docker bind mounts](https://docs.docker.com/storage/bind-mounts/) are used to share files with the hootenanny containers.  If you want the `rpmbuild` user to have the same UID/GID specified in `config.yml`, set `RPMBUILD_UID_MATCH=0` (any value other than `1`).
