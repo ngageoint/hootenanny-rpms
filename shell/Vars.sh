@@ -7,7 +7,7 @@ if ! test -x /usr/bin/rpmbuild; then
 fi
 
 ## Important variables needed for functions.
-SCRIPT_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+SCRIPT_HOME="$WORKSPACE"
 
 # Directories used in RPM process.
 SPECS=$SCRIPT_HOME/SPECS
@@ -328,7 +328,7 @@ function run_hoot_build_image() {
                -v $SCRIPT_HOME/scripts:/rpmbuild/scripts:ro \
                --entrypoint $entrypoint \
                -u $user \
-               -it --rm \
+               -i --rm \
                $image "${@:-/bin/bash}"
     fi
 }
