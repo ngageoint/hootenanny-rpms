@@ -76,9 +76,14 @@ jobs:
             if [ -f el7/develop-test/none.rpm ]; then
                 echo "RPM has already been created."
             else
-               RPM_VERSION="$(ls -1t el7/develop-test/hootenanny-autostart-*noarch.rpm | head -n 1 | awk 'match($0, /hootenanny-autostart-(.+).noarch.rpm$/, a) { print a[1] }')"
+               RPM_FILE="$(ls -1t el7/develop-test/hootenanny-autostart-*noarch.rpm | head -n 1)"
+               RPM_VERSION="$(echo "$RPM_FILE" | awk 'match($0, /hootenanny-autostart-(.+).noarch.rpm$/, a) { print a[1] }')"
                ./scripts/repo-sync.sh -b hoot-repo -p el7/develop-test -q
-               ./scripts/slack-notify -c test -t $SLACK_TOKEN -u circleci_bot -m "Hootenanny Develop RPMs Updated to $RPM_VERSION"
+               ./scripts/slack-notify \
+                 -c test \
+                 -t $SLACK_TOKEN \
+                 -u circleci_bot \
+                 -m "Hootenanny Develop RPMs Updated to $RPM_VERSION"
             fi
 
 workflows:
@@ -89,13 +94,13 @@ workflows:
       - develop-sync:
           requires:
             - develop-rpm
-    # triggers:
-    #   - schedule:
-    #       cron: "0 12,20 * * *"
-    #       filters:
-    #         branches:
-    #           only:
-    #             - develop
+  #  triggers:
+  #    - schedule:
+  #        cron: "0 12,20 * * *"
+  #        filters:
+  #          branches:
+  #            only:
+  #              - develop
   tests:
     jobs:
       - lint
