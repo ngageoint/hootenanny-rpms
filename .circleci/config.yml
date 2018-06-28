@@ -79,7 +79,7 @@ jobs:
                RPM_FILE="$(ls -1t el7/develop-test/hootenanny-autostart-*noarch.rpm | head -n 1)"
                RPM_VERSION="$(echo "$RPM_FILE" | awk 'match($0, /hootenanny-autostart-(.+).noarch.rpm$/, a) { print a[1] }')"
                ./scripts/repo-sync.sh -b hoot-repo -p el7/develop-test -q
-               ./scripts/slack-notify \
+               ./scripts/slack-notify.sh \
                  -c test \
                  -t $SLACK_TOKEN \
                  -u circleci_bot \
