@@ -94,13 +94,13 @@ workflows:
       - develop-sync:
           requires:
             - develop-rpm
-  #  triggers:
-  #    - schedule:
-  #        cron: "0 12,20 * * *"
-  #        filters:
-  #          branches:
-  #            only:
-  #              - develop
+    triggers:
+      - schedule:
+          cron: "0 12,20 * * *"
+          filters:
+            branches:
+              only:
+                - develop
   tests:
     jobs:
       - lint
