@@ -76,7 +76,14 @@ jobs:
             if [ -f el7/develop/none.rpm ]; then
                 echo "RPM has already been created."
             else
-                ./scripts/repo-sync.sh -a "" -b hoot-repo -p el7/develop -q
+               RPM_FILE="$(ls -1t el7/develop/hootenanny-autostart-*noarch.rpm | head -n 1)"
+               RPM_VERSION="$(echo "$RPM_FILE" | awk 'match($0, /hootenanny-autostart-(.+).noarch.rpm$/, a) { print a[1] }')"
+               ./scripts/repo-sync.sh -b hoot-repo -p el7/develop -q
+               ./scripts/slack-notify.sh \
+                 -c $SLACK_CHANNEL \
+                 -t $SLACK_TOKEN \
+                 -u circleci_bot \
+                 -m "Hootenanny Develop Repository Updated to \`$RPM_VERSION\`"
             fi
 
 workflows:

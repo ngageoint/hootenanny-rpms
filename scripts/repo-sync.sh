@@ -12,7 +12,7 @@ USAGE="no"
 
 # These variables default to value of AWS CLI environment
 # variables (if defined).
-PROFILE="${AWS_PROFILE:-default}"
+PROFILE="${AWS_PROFILE:-}"
 REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 
 # Getting parameters from the command line.
