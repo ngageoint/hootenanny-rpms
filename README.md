@@ -6,23 +6,16 @@ third-party dependencies.
 RPMs are built in minimal, ephemeral CentOS 7 Docker containers.  Invoking programs
 use [`config.yml`](./docs/config.md) as the source of truth for version information.
 
-
 ## Requirements
 
-* `rpmspec`: required to properly parse `spec` files properly so that
-  containers may get their package requirements directly from the spec
-  files
-  * CentOS:
-    ```
-    sudo yum install -y rpm-build
-    ```
-  * Ubuntu:
-    ```
-    sudo apt-get -y install rpm
-    ```
+To use this repository, you'll need the following:
+
+* RPM tools (in particular, `rpmspec`)
 * Docker
 * Vagrant 2.0+
 * `make`
+
+For details on how to install these requirements on a Linux machine, read the [setup documentation](./docs/setup.md).
 
 ## Quickstart
 
