@@ -26,7 +26,7 @@ make archive
 make rpm
 ```
 
-## shell
+## Additional Information
 
-Scripts in the [`shell`](./shell) directory can be used to build the RPMs
-on constrained systems without Vagrant.
+Consult the [documentation index](./docs) for background, configuration, and
+information on additional topics.

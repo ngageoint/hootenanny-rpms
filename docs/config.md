@@ -1,7 +1,8 @@
 # Configuration Reference
 
-The repository's primary configuration comes from `config.yml`.
-In addition, environment variables may be used to modify some behavior.
+The repository's primary configuration comes from [`config.yml`](../config.yml).
+In addition, environment variables may be used to modify some behavior
+when creating Hootenanny archives and RPMs.
 
 ## `config.yml`
 
