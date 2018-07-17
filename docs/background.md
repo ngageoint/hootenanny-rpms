@@ -26,9 +26,9 @@ web server or S3 bucket.
 
 This repository tries to follow [Fedora's package versioning guidelines](https://fedoraproject.org/wiki/Packaging:Versioning).
 In practice, this means that non-release versions will use a prerelease
-version number.  For example having a `HOOT_VERSION_GEN` of
+version number.  For example, having a `HOOT_VERSION_GEN` of
 `0.2.41_2_g4d31c87` would create an RPM like `0.2.42-0.2.20180710.4d31c87`
-as the version.  Specifically, the subminor version number is incremented
+as the version.  More specifically, the subminor version number is incremented
 by one to `42` and the `Release` value is indicated as a *prerelease*
 by starting with `0`.  The snapshot date (`20180710`), and the
 git revision (`4d31c87`) are also included as well providing further
