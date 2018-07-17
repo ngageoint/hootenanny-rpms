@@ -115,4 +115,89 @@
 
 ## Dependencies
 
-TODO
+There are a multitude of Hootenanny dependencies; these instructions
+will use an example of upgrading to Tomcat 8.5.34.  Other dependencies
+have *multiple* RPMs -- you'll need to modify the instructions accordingly
+(e.g., `libgeotiff` will have an architecture of `x86_64` and produce a
+`libgeotiff-devel` RPM as well).
+
+1. The configuration file, [config.yml](../config.yml), should be
+   updated to the desired version and release iteration (default
+   to `1`, unless making a corrective release):
+
+   ```yaml
+   versions:
+     tomcat8: &tomcat8_version: '8.5.34-1'
+   ```
+
+   Note: please have the appropriate source archive from the `.spec`
+   file present in `SOURCES` and [verify it's authenticty](./verify.md)
+   (if applicable).  Ideally the `config.yml` change and source archive
+   would be added in a pull request.
+
+1. Next, build the dependency RPM using `make`:
+
+   ```
+   make tomcat8
+   ```
+
+   This should produce an RPM at `RPMS/noarch/tomcat8-8.5.34-1.el7.noarch.rpm`.
+   It is placed in `noarch` because Java bytecode has no architecture,
+   however, compiled C/C++ programs would be placed in `RPMS/x86_64` instead.
+
+1. Create a directory for the release dependency repository, and copy the
+   RPMs into it:
+
+   ```
+   mkdir -p el7/deps/release
+   cp -pv RPMS/noarch/tomcat8-8.5.34-1.el7.noarch.rpm el7/deps/release
+   ```
+
+1. Start the `rpmbuild-repo` container, specifying the AWS credentials
+   in the environment and passing in the proper bind mount locations for
+   the GPG keys, the `el7` and the [`scripts`](../scripts) directories:
+
+   ```
+   docker run \
+     -e "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" \
+     -e "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" \
+     -v $HOME/.gnupg-hoot:/rpmbuild/.gnupg:rw \
+     -v $(pwd)/el7:/rpmbuild/el7:rw \
+     -v $(pwd)/scripts:/rpmbuild/scripts:ro \
+     -it --rm hootenanny/rpmbuild-repo
+   ```
+
+1. Sign the release dependency package using `rpmsign`; enter the
+   GPG passphrase when prompted:
+
+   ```
+   rpmsign --addsign el7/deps/release/tomcat8-8.5.34-1.el7.noarch.rpm
+   ```
+
+1. Copy the existing dependency release repository to `el7/deps/release`
+   using the AWS CLI:
+
+   ```
+   aws s3 sync s3://hoot-repo/el7/deps/release/ el7/deps/release/
+   ```
+
+1. Update the dependency Yum repository with the latest release RPMs:
+
+   ```
+   ./scripts/repo-update.sh el7/deps/release
+   ```
+
+1. Once the repository is updated, its metadata needs to be
+   signed as well.  Provide the passphrase and allow the existing
+   `el7/deps/release/repomd.xml.asc` file to be overwritten:
+
+   ```
+   ./scripts/repo-sign.sh el7/deps/release
+   ```
+
+1. The final step is to reupload the dependency repository back up to S3 using
+   the AWS CLI and deleting any old metadata files out of the bucket:
+
+   ```
+   aws s3 sync el7/deps/release/ s3://hoot-repo/el7/deps/release/ --delete
+   ```
