@@ -13,19 +13,15 @@
 
 ## Hootenanny
 
-1. Set the `HOOT_VERSION_GEN` environment variable with the
-   version number of the desired release:
+1. Set the [`HOOT_VERSION_GEN`](./config.md#hoot_version_gen) environment
+   variable with the version number of the desired release:
 
    ```
    export HOOT_VERSION_GEN=<Hootenanny Version Number>
    ```
 
    Note: The Hootenanny version tag for the version (e.g., `v0.2.41`
-   for a`HOOT_VERSION_GEN=0.2.41`) *must* already exist.  The
-   name [`HOOT_VERSION_GEN`](https://github.com/ngageoint/hootenanny/blob/develop/HOOT_VERSION_GEN)
-   stems from the script in the Hootenanny repository that
-   calculates the Hootenanny version string.
-
+   for a`HOOT_VERSION_GEN=0.2.41`) *must* already exist.
 
 1. Next, the release archive must be created.  Specify the
    git tag using the [`GIT_COMMIT`](./config.md#git_commit)
