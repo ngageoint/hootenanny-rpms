@@ -73,7 +73,7 @@ For example, the following would produce a release RPM with version of
 HOOT_RELEASE=2 HOOT_VERSION_GEN=0.2.41 make rpm
 ```
 
-See the background section on [versioning](./background#versioning) for
+See the background section on [versioning](./background.md#versioning) for
 more details.
 
 ### `MAVEN_CACHE`
