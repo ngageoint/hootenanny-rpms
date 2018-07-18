@@ -8,6 +8,10 @@ for Linux users.  The scripts assume:
   are supported).
 * The Linux user running the script can use `sudo` without a password.
 
+Note: The legacy scripts in [`shell`](./shell.md) can be used to build
+Hootenanny RPMs without Vagrant or `make`, but is reserved for
+resource-constrained environments.
+
 ## RPM Tools
 
 RPM tools (including `rpmbuild` and `rpmspec`) may be installed with:
