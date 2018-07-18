@@ -7,7 +7,7 @@ on constrained systems without Vagrant or `make`.
 
 Use the following to build Hootenanny RPMs:
 
-1. First build the required Hootenanny containers:
+1. First build the required Hootenanny containers (using release dependencies):
 
    ```
    ./shell/BuildHootImages.sh
@@ -25,20 +25,22 @@ Use the following to build Hootenanny RPMs:
    ./shell/BuildHoot.sh
    ```
 
+Note: dependency-only packages will be in `RPMS/noarch`, and Hootenanny packages will be placed in `RPMS/x86_64`.
+
 ## Reference
 
 ### Scripts
 
-* [`BuildArchive.sh`](./BuildArchive.sh):  Builds a Hootenanny source
+* [`BuildArchive.sh`](../shell/BuildArchive.sh):  Builds a Hootenanny source
   code archive.
-* [`BuildDeps.sh`](./BuildDeps.sh): Builds *all* Hootenanny dependency RPMs.
-* [`BuildHootImages.sh`](./BuildHootImages.sh): Builds the containers
+* [`BuildDeps.sh`](../shell/BuildDeps.sh): Builds *all* Hootenanny dependency RPMs.
+* [`BuildHootImages.sh`](../shell/BuildHootImages.sh): Builds the containers
   necessary to compile Hootenanny.
-* [`BuildHoot.sh`](./BuildHoot.sh): Builds Hootenanny RPMs; requires a sourc
+* [`BuildHoot.sh`](../shell/BuildHoot.sh): Builds Hootenanny RPMs; requires a sourc
   archive to be generated first.
-* [`BuildRunImages.sh`](./BuildRunImages.sh): Builds runtime Hootenanny
+* [`BuildRunImages.sh`](../shell/BuildRunImages.sh): Builds runtime Hootenanny
   containers.
-* [`Vars.sh`](./Vars.sh): Holds common variables and functions used by
+* [`Vars.sh`](../shell/Vars.sh): Holds common variables and functions used by
   the other scripts.
 
 ### Functions
