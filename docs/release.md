@@ -2,7 +2,7 @@
 
 ## Requirements
 
-* GPG Key: You'll the Hootenanny packaging release public and private
+* GPG Key: You'll need the Hootenanny packaging release public and private
   keys stored in `$HOME/.gnupg-hoot`.  The release key details are:
   * **Key ID**: 7036657A6767A174
   * **Name/E-Mail**: `Hootenanny Packaging <hoot-packaging@digitalglobe.com>`
@@ -21,7 +21,7 @@
    ```
 
    Note: The Hootenanny version tag for the version (e.g., `v0.2.41`
-   for a`HOOT_VERSION_GEN=0.2.41`) *must* already exist.
+   for a `HOOT_VERSION_GEN=0.2.41`) *must* already exist.
 
 1. Next, the release archive must be created.  Specify the
    git tag using the [`GIT_COMMIT`](./config.md#git_commit)
@@ -50,7 +50,7 @@
    * `x86_64/hootenanny-core-$HOOT_VERSION_GEN-1.el7.x86_64.rpm`
    * `x86_64/hootenanny-services-ui-$HOOT_VERSION_GEN-1.el7.x86_64.rpm`
 
-   Note: The default the release value in the RPM version is `1`.
+   Note: The default release value in the RPM version is `1`.
    If a packaging defect requires a subsequent release, it may be
    set with the [`HOOT_RELEASE`](./config.md#hoot_release) environment
    variable.
