@@ -19,7 +19,8 @@ For details on how to install these requirements on a Linux machine, read the [s
 
 ## Quickstart
 
-This will build Hootenanny RPM from `develop`:
+This will build Hootenanny RPM from its
+[`develop`](https://github.com/ngageoint/hootenanny/tree/develop) branch:
 
 ```
 make archive
