@@ -1,3 +1,20 @@
+# Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
+# Copyright (C) 2016, 2017 DigitalGlobe (http://www.digitalglobe.com)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Default commands for Docker and Vagrant.
 DOCKER ?= docker
 VAGRANT ?= vagrant
 
@@ -48,7 +65,6 @@ rpm_file2 = RPMS/$(3)/$(1)-$(call config_version,$(2))$(RPMBUILD_DIST).$(3).rpm
 
 # Gets the RPM package name from the filename.
 rpm_package = $(shell echo $(1) | awk '{ split($$0, a, "-"); l = length(a); pkg = a[1]; for (i=2; i<l-1; ++i) pkg = pkg "-" a[i]; print pkg }')
-
 
 ## RPM variables.
 
@@ -312,7 +328,6 @@ stxxl: rpmbuild-generic $(STXXL_RPM)
 su-exec: rpmbuild-generic $(SUEXEC_RPM)
 tomcat8: rpmbuild-generic $(TOMCAT8_RPM)
 wamerican-insane: rpmbuild-generic $(WAMERICAN_RPM)
-
 
 ## Build patterns.
 
