@@ -1,11 +1,13 @@
 # Provenance
 
 This repository is an aggregate work of existing open source archives, released
-under open source licenses.  While this aggregate is licensed under the
-[GPLv3](../LICENSE), it does not supercede the license of code and content
+under different open source licenses.  While this aggregate is licensed under the
+[GPLv3](../LICENSE), it does not supercede the the original licensing of
+Hootenanny's dependencies.
+
 The licensing provenance of source archives
-([`SOURCES`](../SOURCES)) and `.spec` files ([`SPECS`](../SPECS)) are
-explained in this document.
+([`SOURCES`](../SOURCES)) and `.spec` files ([`SPECS`](../SPECS)) in this
+repository are explained in this document.
 
 ## FileGDBAPI
 
