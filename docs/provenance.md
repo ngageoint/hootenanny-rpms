@@ -2,7 +2,7 @@
 
 This repository is an aggregate work of existing open source archives, released
 under different open source licenses.  While this aggregate is licensed under the
-[GPLv3](../LICENSE), it does not supercede the the original licensing of
+[GPLv3](../LICENSE), it does not supersede the the original licensing of
 Hootenanny's dependencies.
 
 The licensing provenance of source archives
@@ -14,8 +14,7 @@ use the [MIT license](./licenses/Fedora-LICENSE) or the
 
 ## FileGDBAPI
 
-The File Geodatabase API source archives (e.g.,
-`FileGDB_API_$VERSION-64.tar.gz`) are obtained from
+The File Geodatabase API source archives are obtained from
 [ESRI's GitHub repository](https://github.com/Esri/file-geodatabase-api/tree/master/FileGDB_API_1.5.1)
 and is released under the [Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0).
 
@@ -57,7 +56,7 @@ repository (Fedora 25 release) and are [MIT licensed](./licenses/Fedora-LICENSE)
 * [`hoot-gdal.spec`](../SPECS/hoot-gdal.spec)
 * [`gdal-1.9.0-java.patch`](../SOURCES/gdal-1.9.0-java.patch)
 * [`gdal-2.1.0-zlib.patch`](../SOURCES/gdal-2.1.0-zlib.patch)
-* [`gdal-c2clib.patch`](../SOURCES/gdal-c2clib.patch)
+* [`gdal-g2clib.patch`](../SOURCES/gdal-g2clib.patch)
 * [`gdal-completion.patch`](../SOURCES/gdal-completion.patch)
 * [`gdal-jni.patch`](../SOURCES/gdal-jni.patch)
 * [`gdal-uchar.patch`](../SOURCES/gdal-uchar.patch)
