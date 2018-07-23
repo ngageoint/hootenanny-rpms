@@ -31,12 +31,12 @@ and is released under the [PostgreSQL license](./licenses/PostgreSQL-LICENSE).
 
 ## GLPK
 
-The [GLPK](https://www.gnu.org/software/glpk/glpk.html) source archivse were
+The [GLPK](https://www.gnu.org/software/glpk/glpk.html) source archives were
 obtained directly from [GNU](https://ftp.gnu.org/gnu/glpk/) and licensed under
 the [GPLv3](https://www.gnu.org/licenses/gpl.html).
 
 The following packaging files originate from
-[Fedora's GLPK RPM]((https://src.fedoraproject.org/cgit/rpms/glpk.git/)
+[Fedora's GLPK RPM](https://src.fedoraproject.org/cgit/rpms/glpk.git)
 repository and are [MIT licensed](./licenses/Fedora-LICENSE):
 
 * [`glpk.spec`](../SPECS/glpk.spec)
@@ -70,12 +70,41 @@ mostly [MIT/X11](https://trac.osgeo.org/geotiff/browser/trunk/libgeotiff/LICENSE
 licensed.
 
 The [`libgeotiff.spec`](../SPECS/libgeotiff.spec) originates from
-[PGDG's libgeotiff source RPM](https://download.postgresql.org/pub/repos/yum/srpms/9.5/redhat/rhel-7-x86_64/libgeotiff-1.4.0-1.rhel7.src.rpm)
+[PGDG's `libgeotiff` source RPM](https://download.postgresql.org/pub/repos/yum/srpms/9.5/redhat/rhel-7-x86_64/libgeotiff-1.4.0-1.rhel7.src.rpm)
 and is released under the [PostgreSQL license](./licenses/PostgreSQL-LICENSE).
 
 ## libkml
 
+The [libkml](https://github.com/libkml/libkml) source archives were obtained
+directly from [GitHub](https://github.com/libkml/libkml/releases) and are
+[BSD](https://github.com/libkml/libkml/blob/master/LICENSE) licensed.
+
+The following packaging files originate from
+[Fedora's `libkml` RPM](https://src.fedoraproject.org/cgit/rpms/libkml.git)
+repository and are [MIT licensed](./licenses/Fedora-LICENSE):
+
+* [`libkml.spec`](../SPECS/libkml.spec)
+* [`libkml-0001-Fix-build-failure-due-to-failure-to-convert-pointer-.patch`](../SOURCES/libkml-0001-Fix-build-failure-due-to-failure-to-convert-pointer-.patch)
+* [`libkml-0002-Fix-mistaken-use-of-std-cerr-instead-of-std-endl.patch`](../SOURCES/libkml-0002-Fix-mistaken-use-of-std-cerr-instead-of-std-endl.patch)
+* [`libkml-0003-Fix-python-tests.patch`](../SOURCES/libkml-0003-Fix-python-tests.patch)
+* [`libkml-0004-Correctly-build-and-run-java-test.patch`](../SOURCES/libkml-0004-Correctly-build-and-run-java-test.patch)
+* [`libkml-fragile_test.patch`](../SOURCES/libkml-fragile_test.patch)
+* [`libkml-dont-bytecompile.patch`](../SOURCES/libkml-dont-bytecompile.patch)
+
 ## NodeJS
+
+The [NodeJS](https://nodejs.org/) source archives are obtained
+directly from [Node's download page](https://nodejs.org/en/download/).
+
+The following packaging files originate from
+[Fedora's NodeJS RPM](https://src.fedoraproject.org/cgit/rpms/nodejs.git)
+repository and are [MIT licensed](./licenses/Fedora-LICENSE):
+
+* [`nodejs.spec`](../SPECS/nodejs.spec)
+* [`nodejs_native.attr.patch`](../SOURCES/nodejs_native.attr)
+* [`nodejs-0001-Disable-running-gyp-files-for-bundled-deps.patch.patch`](../SOURCES/nodejs-0001-Disable-running-gyp-files-for-bundled-deps.patch)
+* [`nodejs-0002-Fix-aarch64-debug.patch`](../SOURCES/nodejs-0002-Fix-aarch64-debug.patch)
+* [`nodejs-0003-hoot-value-json-object.patch`](../SOURCES/nodejs-0003-hoot-value-json-object.patch)
 
 ## Osmosis
 
