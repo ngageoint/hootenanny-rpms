@@ -152,3 +152,25 @@ directly from [GitHub](https://github.com/ncopa/su-exec/releases) and
 is [MIT licensed](https://github.com/ncopa/su-exec/blob/master/LICENSE).
 
 ## Tomcat
+
+The [Tomcat](https://tomcat.apache.org/) source archives are obtained
+directly from the [Apache Software Foundation](https://www.apache.org/dist/tomcat/)
+and released under the [Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0).
+
+The [`tomcat8.spec`](../SPECS/tomcat8.spec) file originates from the
+[JPackage Project](http://www.jpackage.org), is BSD licensed and
+was incorporated into Fedora's `tomcat` packaging repository.
+
+These additional packaging files originate from
+[Fedora's Tomcat RPM](https://src.fedoraproject.org/cgit/rpms/tomcat.git)
+repository and are [MIT licensed](./licenses/Fedora-LICENSE):
+
+* [`tomcat8.conf`](../SOURCES/tomcat8.conf)
+* [`tomcat8.functions`](../SOURCES/tomcat8.functions)
+* [`tomcat8.logrotate`](../SOURCES/tomcat8.logrotate)
+* [`tomcat8.named-service`](../SOURCES/tomcat8.named-service)
+* [`tomcat8.preamble`](../SOURCES/tomcat8.preamble)
+* [`tomcat8.server`](../SOURCES/tomcat8.server)
+* [`tomcat8.service`](../SOURCES/tomcat8.service)
+* [`tomcat8.sysconfig`](../SOURCES/tomcat8.sysconfig)
+* [`tomcat8.wrapper`](../SOURCES/tomcat8.wrapper)
