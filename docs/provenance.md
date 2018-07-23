@@ -108,6 +108,13 @@ repository and are [MIT licensed](./licenses/Fedora-LICENSE):
 
 ## Osmosis
 
+The [Osmosis](https://wiki.openstreetmap.org/wiki/Osmosis) source archive was
+obtained directly from the [OpenStreetMap(https://bretth.dev.openstreetmap.org/osmosis-build/)
+project and was released into the public domain.
+
+The [`osmosis-fix_launcher.patch`](../SOURCES/osmosis-fix_launcher.patch) file
+comes from [Debian's GIS Project](https://salsa.debian.org/debian-gis-team/osmosis/blob/master/debian/patches/01-fix_launcher.patch) and is licensed under the GPLv3.
+
 ## PostGIS
 
 ## stxxl
