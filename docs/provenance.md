@@ -12,6 +12,12 @@ were sourced from Fedora or the PostgreSQL Development Group (PGDG), which
 use the [MIT license](./licenses/Fedora-LICENSE) or the
 [PostgreSQL license](./licenses/PostgreSQL-LICENSE) (BSD-like).
 
+## dumb-init
+
+The [dumb-init](https://github.com/Yelp/dumb-init) source archive was obtained
+directly from [GitHub](https://github.com/Yelp/dumb-init/releases) and
+is [MIT licensed](https://github.com/Yelp/dumb-init/blob/master/LICENSE).
+
 ## FileGDBAPI
 
 The File Geodatabase API source archives are obtained from
@@ -25,7 +31,7 @@ directly from [OSGeo](https://download.osgeo.org/geos/) and licensed under the
 [GNU LGPL v2.1](http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html).
 
 The [`geos.spec`](../SPECS/geos.spec) originates from
-[PGDG's GEOS 3.5.0 Source RPM](https://download.postgresql.org/pub/repos/yum/srpms/9.5/redhat/rhel-7-x86_64/geos-3.5.0-1.rhel7.src.rpm)
+[PGDG's GEOS 3.5.0 Source RPM](https://download.postgresql.org/pub/repos/yum/srpms/9.5/redhat/rhel-7-x86_64/)
 and is released under the [PostgreSQL license](./licenses/PostgreSQL-LICENSE).
 
 ## GLPK
@@ -69,7 +75,7 @@ mostly [MIT/X11](https://trac.osgeo.org/geotiff/browser/trunk/libgeotiff/LICENSE
 licensed.
 
 The [`libgeotiff.spec`](../SPECS/libgeotiff.spec) originates from
-[PGDG's `libgeotiff` source RPM](https://download.postgresql.org/pub/repos/yum/srpms/9.5/redhat/rhel-7-x86_64/libgeotiff-1.4.0-1.rhel7.src.rpm)
+[PGDG's `libgeotiff` 1.4.0 source RPM](https://download.postgresql.org/pub/repos/yum/srpms/9.5/redhat/rhel-7-x86_64/)
 and is released under the [PostgreSQL license](./licenses/PostgreSQL-LICENSE).
 
 ## libkml
@@ -112,10 +118,37 @@ obtained directly from the [OpenStreetMap(https://bretth.dev.openstreetmap.org/o
 project and was released into the public domain.
 
 The [`osmosis-fix_launcher.patch`](../SOURCES/osmosis-fix_launcher.patch) file
-comes from [Debian's GIS Project](https://salsa.debian.org/debian-gis-team/osmosis/blob/master/debian/patches/01-fix_launcher.patch) and is licensed under the GPLv3.
+comes from [Debian's GIS Project](https://salsa.debian.org/debian-gis-team/osmosis/blob/master/debian/patches/01-fix_launcher.patch)
+and is licensed under the GPLv3.
 
 ## PostGIS
 
+The [PostGIS](https://trac.osgeo.org/postgis) source archives are obtained
+directly from [OSGeo](https://download.osgeo.org/postgis/) and licensed
+under the [GPLv2](http://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
+
+The following packaging files originate from
+[PGDG's PostGIS 2.3.3 source RPM](https://download.postgresql.org/pub/repos/yum/srpms/9.5/redhat/rhel-7-x86_64/)
+and are released under the [PostgreSQL license](./licenses/PostgreSQL-LICENSE):
+
+* [`hoot-postgis23.spec`](../SPECS/hoot-postgis23.spec)
+* [`postgis-filter-requires-perl-Pg.sh`](../SOURCES/postgis-filter-requires-perl-Pg.sh)
+* [`postgis-gdalfpic.patch`](../SOURCES/postgis-gdalfpic.patch)
+
 ## stxxl
+
+The [stxxl](http://stxxl.org/) source archives are obtained
+directly from their [SourceForge downloads](https://sourceforge.net/projects/stxxl/files/stxxl/1.3.1/stxxl-1.3.1.tar.gz/download)
+and is under the [Boost Software License, Version 1.0](http://www.boost.org/LICENSE_1_0.txt).
+
+The [`stxxl.spec`](../SPECS/stxxl.spec) originates from
+[Fedora's `stxxl` RPM](https://src.fedoraproject.org/cgit/rpms/stxxl.git)
+packaging repository and is [MIT licensed](./licenses/Fedora-LICENSE).
+
+## su-exec
+
+The [su-exec](https://github.com/ncopa/su-exec) source archive was obtained
+directly from [GitHub](https://github.com/ncopa/su-exec/releases) and
+is [MIT licensed](https://github.com/ncopa/su-exec/blob/master/LICENSE).
 
 ## Tomcat
