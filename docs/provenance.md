@@ -1,16 +1,20 @@
 # Provenance
 
-This repository is an aggregate work of existing open source archives, released
-under different open source licenses.  While this aggregate is licensed under the
-[GPLv3](../LICENSE), it does not supersede the the original licensing of
-Hootenanny's dependencies.
-
 The licensing provenance of source archives
 ([`SOURCES`](../SOURCES)) and `.spec` files ([`SPECS`](../SPECS)) in this
-repository are explained in this document.  Most `.spec` files and patches
-were sourced from Fedora or the PostgreSQL Development Group (PGDG), which
-use the [MIT license](./licenses/Fedora-LICENSE) or the
-[PostgreSQL license](./licenses/PostgreSQL-LICENSE) (BSD-like).
+repository are explained in this document.  In particular, this repository
+is an aggregate work of existing open source archives, released
+under different open source licenses.  While this aggregate is licensed under the
+[GPLv3](../LICENSE), it does not supersede the original licensing of
+archives, `.spec` files, or imported patches.
+
+Most `.spec` files and patches
+were originally sourced from Fedora or the PostgreSQL Development Group (PGDG),
+which use the [MIT license](./licenses/Fedora-LICENSE)
+([source](https://fedoraproject.org/wiki/Legal:Licenses/LicenseAgreement))
+or the
+[PostgreSQL license](./licenses/PostgreSQL-LICENSE)
+([source](http://apt.postgresql.org/pub/README)), respectively.
 
 ## dumb-init
 
@@ -22,7 +26,7 @@ is [MIT licensed](https://github.com/Yelp/dumb-init/blob/master/LICENSE).
 
 The File Geodatabase API source archives are obtained from
 [ESRI's GitHub repository](https://github.com/Esri/file-geodatabase-api/tree/master/FileGDB_API_1.5.1)
-and is released under the [Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0).
+and released under the [Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0).
 
 ## GEOS
 
@@ -139,9 +143,10 @@ and are released under the [PostgreSQL license](./licenses/PostgreSQL-LICENSE):
 
 The [stxxl](http://stxxl.org/) source archives are obtained
 directly from their [SourceForge downloads](https://sourceforge.net/projects/stxxl/files/stxxl/1.3.1/stxxl-1.3.1.tar.gz/download)
-and is under the [Boost Software License, Version 1.0](http://www.boost.org/LICENSE_1_0.txt).
+and is released under the
+[Boost Software License, Version 1.0](http://www.boost.org/LICENSE_1_0.txt).
 
-The [`stxxl.spec`](../SPECS/stxxl.spec) originates from
+The [`stxxl.spec`](../SPECS/stxxl.spec) file originates from
 [Fedora's `stxxl` RPM](https://src.fedoraproject.org/cgit/rpms/stxxl.git)
 packaging repository and is [MIT licensed](./licenses/Fedora-LICENSE).
 
@@ -159,7 +164,9 @@ and released under the [Apache 2 license](http://www.apache.org/licenses/LICENSE
 
 The [`tomcat8.spec`](../SPECS/tomcat8.spec) file originates from the
 [JPackage Project](http://www.jpackage.org), is BSD licensed and
-was incorporated into Fedora's `tomcat` packaging repository.
+was later incorporated into
+[Fedora's Tomcat RPM](https://src.fedoraproject.org/cgit/rpms/tomcat.git)
+repository.
 
 These additional packaging files originate from
 [Fedora's Tomcat RPM](https://src.fedoraproject.org/cgit/rpms/tomcat.git)
