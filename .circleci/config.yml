@@ -35,6 +35,8 @@ jobs:
   develop-rpm:
     machine:
       enabled: true
+    environment:
+      REPO_PREFIX: el7/develop-test
     steps:
       - checkout
       - run:
@@ -44,47 +46,27 @@ jobs:
       - run:
           name: 'Compile Latest Develop RPM'
           command: |
-            mkdir -p cache/m2 cache/npm el7/develop RPMS
-            LATEST_ARCHIVE="$(./scripts/latest-archive.sh -b hoot-archives -p circle/develop)"
-            if [ "$(./scripts/query-archive.sh -a $LATEST_ARCHIVE -b hoot-repo -p el7/develop)" = "0" ]; then
-                aws s3 cp s3://hoot-archives/$LATEST_ARCHIVE SOURCES/
-                source shell/Vars.sh
-                maven_cache
-                sudo chown -R 1000:1000 cache RPMS SOURCES
-                ./shell/BuildHoot.sh
-                sudo mv -v RPMS/{noarch,x86_64}/*.rpm el7/develop
-            else
-                touch el7/develop/none.rpm
-            fi
-            sudo chown -R 1000:1000 el7/develop
+            ./tests/create-rpm.sh
       - persist_to_workspace:
-          root: el7/develop
+          root: el7
           paths:
             - "*.rpm"
   develop-sync:
     working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
       - image: hootenanny/rpmbuild-repo@sha256:7147b62b7a6dded4b72003df0aca52ab4b667dba4da5c11a7ceb4b00bbacd120
+        environment:
+          REPO_PREFIX: el7/develop-test
+          SLACK_NOTIFY: 'no'
         user: rpmbuild
     steps:
       - checkout
       - attach_workspace:
-          at: el7/develop
+          at: el7
       - run:
           name: 'Update and Sync Develop Repository'
           command: |
-            if [ -f el7/develop/none.rpm ]; then
-                echo "RPM has already been created."
-            else
-               RPM_FILE="$(ls -1t el7/develop/hootenanny-autostart-*noarch.rpm | head -n 1)"
-               RPM_VERSION="$(echo "$RPM_FILE" | awk 'match($0, /hootenanny-autostart-(.+).noarch.rpm$/, a) { print a[1] }')"
-               ./scripts/repo-sync.sh -b hoot-repo -p el7/develop -q
-               ./scripts/slack-notify.sh \
-                 -c $SLACK_CHANNEL \
-                 -t $SLACK_TOKEN \
-                 -u circleci_bot \
-                 -m "Hootenanny Develop Repository Updated to \`$RPM_VERSION\`"
-            fi
+            ./tests/update-sync-repo.sh
 
 workflows:
   version: 2
@@ -94,13 +76,10 @@ workflows:
       - develop-sync:
           requires:
             - develop-rpm
-    triggers:
-      - schedule:
-          cron: "0 12,20 * * *"
-          filters:
-            branches:
-              only:
-                - develop
+    filters:
+      branches:
+        only:
+          - test-scripts
   tests:
     jobs:
       - lint
