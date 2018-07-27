@@ -76,10 +76,6 @@ workflows:
       - develop-sync:
           requires:
             - develop-rpm
-    filters:
-      branches:
-        only:
-          - test-scripts
   tests:
     jobs:
       - lint
