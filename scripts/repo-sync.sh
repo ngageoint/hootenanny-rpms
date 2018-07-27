@@ -16,7 +16,7 @@
 set -euo pipefail
 
 # Default variables.
-DEST="$(pwd)"
+DEST=""
 BUCKET=""
 KEEP="10"
 PREFIX=""
@@ -76,7 +76,12 @@ if [[ "${USAGE}" == "yes" || -z "${BUCKET}" || -z "${PREFIX}" ]]; then
     usage
 fi
 
-REPO="$DEST/$PREFIX"
+if [ -z "$DEST" ]; then
+    REPO="$(pwd)/$PREFIX"
+else
+    REPO="$DEST"
+fi
+
 S3_URL="s3://$BUCKET/$PREFIX"
 if [ "$REGION" == "us-east-1" ]; then
     S3_HOST=s3.amazonaws.com
