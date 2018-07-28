@@ -20,7 +20,7 @@ source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/Vars.sh
 
 BUILD_IMAGE="${BUILD_IMAGE:-hootenanny/rpmbuild-hoot-release}"
 
-if [ -z "$1" ]; then
+if [ "$#" -lt 1 ]; then
     HOOT_VERSION_GEN="$( latest_hoot_version_gen )"
 else
     HOOT_VERSION_GEN="$1"
