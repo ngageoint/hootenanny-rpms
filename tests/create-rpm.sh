@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 set -euo pipefail
 
+# Default variables.
 HOOT_BRANCH="${HOOT_BRANCH:-develop}"
 ARCHIVE_BUCKET="${ARCHIVE_BUCKET:-hoot-archives}"
 ARCHIVE_PREFIX="${ARCHIVE_PREFIX:-circle/$HOOT_BRANCH}"
@@ -29,13 +30,21 @@ LATEST_ARCHIVE="$(./scripts/latest-archive.sh -b "$ARCHIVE_BUCKET" -p "$ARCHIVE_
 
 # Query the development repository for number of RPMs with the
 # archive's git hash.
-NUM_RPMS="$(./scripts/query-archive.sh -a "$LATEST_ARCHIVE" -b "$REPO_BUCKET" -p "$REPO_PREFIX")" 
+NUM_RPMS="$(./scripts/query-archive.sh -a "$LATEST_ARCHIVE" -b "$REPO_BUCKET" -p "$REPO_PREFIX")"
 
 if [ "$NUM_RPMS" = "0" ]; then
-    aws s3 cp "s3://$ARCHIVE_BUCKET/$LATEST_ARCHIVE" SOURCES/
+    # Retrieve the latest archive.
+    aws s3 cp "s3://$ARCHIVE_BUCKET/$LATEST_ARCHIVE" SOURCES/ --quiet
+
+    # Seed the Maven cache.
     source shell/Vars.sh
     maven_cache
+
+    # Change ownership permissions on directories accessed in container to
+    # match that of the rpmbuild user in the public Docker Hub.
     sudo chown -R 1000:1000 cache el7 RPMS SOURCES
+
+    # Build the RPM and copy RPMs into workspace folder.
     ./shell/BuildHoot.sh
     sudo mv -v RPMS/{noarch,x86_64}/*.rpm el7
 else

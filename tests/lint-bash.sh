@@ -32,7 +32,8 @@ shellcheck \
     scripts/rpm-install.sh \
     scripts/slack-notify.sh \
     scripts/sonar-install.sh \
-    scripts/vagrant-install.sh
+    scripts/vagrant-install.sh \
+    shell/BuildHoot.sh
 
 # Scripts with *only* quoting errors.
 shellcheck \
@@ -45,7 +46,6 @@ shellcheck \
     scripts/repo-sign.sh \
     shell/BuildArchive.sh \
     shell/BuildDeps.sh \
-    shell/BuildHoot.sh \
     shell/BuildHootImages.sh \
     shell/BuildRunImages.sh
 

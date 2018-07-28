@@ -23,8 +23,11 @@ SLACK_USER="${SLACK_USER:-circleci_bot}"
 if [ -f el7/none.rpm ]; then
     echo "RPM has already been created."
 else
+    # Synchronize the new RPMs from the workspace with those in the
+    # repository bucket/prefix.
     ./scripts/repo-sync.sh -d el7 -b "$REPO_BUCKET" -p "$REPO_PREFIX" -q
 
+    # Send slack notification when repository has been updated.
     if [ "$SLACK_NOTIFY" = "yes" ]; then
         ./scripts/slack-notify.sh \
             -c "$SLACK_CHANNEL" \
