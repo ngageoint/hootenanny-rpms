@@ -23,6 +23,10 @@ SLACK_USER="${SLACK_USER:-circleci_bot}"
 if [ -f el7/none.rpm ]; then
     echo "RPM has already been created."
 else
+    # Get the version of the RPM in the workspace.
+    RPM_FILE="$(find el7 -type f -name hootenanny-autostart-\*noarch.rpm | head -n 1)"
+    RPM_VERSION="$(echo "$RPM_FILE" | awk 'match($0, /hootenanny-autostart-(.+).noarch.rpm$/, a) { print a[1] }')"
+
     # Synchronize the new RPMs from the workspace with those in the
     # repository bucket/prefix.
     ./scripts/repo-sync.sh -d el7 -b "$REPO_BUCKET" -p "$REPO_PREFIX" -q
