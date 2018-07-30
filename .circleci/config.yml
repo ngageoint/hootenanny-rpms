@@ -35,8 +35,6 @@ jobs:
   develop-rpm:
     machine:
       enabled: true
-    environment:
-      REPO_PREFIX: el7/develop-test
     steps:
       - checkout
       - run:
@@ -55,9 +53,6 @@ jobs:
     working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
       - image: hootenanny/rpmbuild-repo@sha256:7147b62b7a6dded4b72003df0aca52ab4b667dba4da5c11a7ceb4b00bbacd120
-        environment:
-          REPO_PREFIX: el7/develop-test
-          SLACK_NOTIFY: 'no'
         user: rpmbuild
     steps:
       - checkout
@@ -76,6 +71,13 @@ workflows:
       - develop-sync:
           requires:
             - develop-rpm
+    triggers:
+      - schedule:
+          cron: "0 12,20 * * *"
+          filters:
+            branches:
+              only:
+                - develop
   tests:
     jobs:
       - lint
