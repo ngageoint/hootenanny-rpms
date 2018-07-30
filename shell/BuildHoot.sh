@@ -18,19 +18,17 @@ set -euo pipefail
 ## Get variables.
 source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/Vars.sh
 
-BUILD_IMAGE=${BUILD_IMAGE:-hootenanny/rpmbuild-hoot-release}
+BUILD_IMAGE="${BUILD_IMAGE:-hootenanny/rpmbuild-hoot-release}"
 
-set +u
-if [ -z $1 ]; then
-    HOOT_VERSION_GEN=$( latest_hoot_version_gen )
+if [ "$#" -lt 1 ]; then
+    HOOT_VERSION_GEN="$( latest_hoot_version_gen )"
 else
-    HOOT_VERSION_GEN=$1
+    HOOT_VERSION_GEN="$1"
 fi
-set -u
 
 # Set RPM macros for versions that are used in the container.
 run_hoot_build_image \
-    -i $BUILD_IMAGE \
+    -i "$BUILD_IMAGE" \
     rpmbuild \
       --define "hoot_version_gen ${HOOT_VERSION_GEN}" \
       --define "geos_version %(rpm -q --queryformat '%%{version}' geos)" \
