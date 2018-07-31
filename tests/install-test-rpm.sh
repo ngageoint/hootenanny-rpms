@@ -19,7 +19,7 @@ if [ -f el7/none.rpm ]; then
     echo "No new RPM to install and test with."
 else
     # Determine the version of the RPMs in the workspace.
-    RPM_FILE="$(ls -1t el7/hootenanny-autostart-*noarch.rpm | head -n 1)"
+    RPM_FILE="$(find el7 -type f -name hootenanny-autostart-\*noarch.rpm | head -n 1)"
     RPM_VERSION="$(echo "$RPM_FILE" | awk 'match($0, /hootenanny-autostart-(.+).noarch.rpm$/, a) { print a[1] }')"
 
     # Manually install Hootenanny from the workspace RPMs.
@@ -28,6 +28,7 @@ else
     yum install -y "el7/hootenanny-services-ui-$RPM_VERSION.x86_64.rpm"
 
     # Setup database for testing.
+    ./scripts/postgresql-install.sh
     ./scripts/hoot-db-setup.sh
     su-exec postgres pg_ctl -D "$PGDATA" -s start
 
