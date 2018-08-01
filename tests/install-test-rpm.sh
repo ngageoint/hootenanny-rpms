@@ -40,5 +40,5 @@ else
 
     # Run Hootenanny tests.
     cd /var/lib/hootenanny
-    su-exec tomcat HootTest --diff --glacial --parallel 4
+    su-exec tomcat HootTest --diff --slow --parallel "$(nproc)
 fi
