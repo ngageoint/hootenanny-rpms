@@ -13,7 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-set -euxo pipefail
+set -euo pipefail
 
 HOOT_TESTS="${HOOT_TESTS:-yes}"
 HOOT_TESTS_PARALLEL="${HOOT_TESTS_PARALLEL:-$(nproc)}"
