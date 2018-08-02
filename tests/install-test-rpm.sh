@@ -15,6 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 set -euxo pipefail
 
+HOOT_TESTS="yes"
+HOOT_TESTS_PARALLEL="$(nproc)"
+
 if [ -f el7/none.rpm ]; then
     echo "No new RPM to install and test with."
 else
@@ -27,18 +30,20 @@ else
     yum install -y "el7/hootenanny-core-$RPM_VERSION.x86_64.rpm"
     yum install -y "el7/hootenanny-services-ui-$RPM_VERSION.x86_64.rpm"
 
-    # Setup database for testing.
-    ./scripts/postgresql-install.sh
-    ./scripts/hoot-db-setup.sh
-    su-exec postgres pg_ctl -D "$PGDATA" -s start
+    if [ "$HOOT_TESTS" = "yes" ]; then
+        # Setup database for testing.
+        ./scripts/postgresql-install.sh
+        ./scripts/hoot-db-setup.sh
+        su-exec postgres pg_ctl -D "$PGDATA" -s start
 
-    # Start Tomcat and node-export and send output to logfiles.
-    touch /var/log/{node-export,tomcat8}.log
-    chown tomcat:tomcat /var/log/{node-export,tomcat8}.log
-    su-exec tomcat /usr/libexec/tomcat8/server start &> /var/log/tomcat8.log &
-    su-exec tomcat bash -c "cd /var/lib/hootenanny/node-export-server && npm start" &> /var/log/node-export.log &
+        # Start Tomcat and node-export and send output to logfiles.
+        touch /var/log/{node-export,tomcat8}.log
+        chown tomcat:tomcat /var/log/{node-export,tomcat8}.log
+        su-exec tomcat /usr/libexec/tomcat8/server start &> /var/log/tomcat8.log &
+        su-exec tomcat bash -c "cd /var/lib/hootenanny/node-export-server && npm start" &> /var/log/node-export.log &
 
-    # Run Hootenanny tests.
-    cd /var/lib/hootenanny
-    su-exec tomcat HootTest --diff --quick --parallel "$(nproc)"
+        # Run Hootenanny tests.
+        cd /var/lib/hootenanny
+        su-exec tomcat HootTest --diff --quick --names --parallel "$HOOT_TESTS_PARALLEL"
+    fi
 fi
