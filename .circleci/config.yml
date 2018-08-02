@@ -49,6 +49,20 @@ jobs:
           root: el7
           paths:
             - "*.rpm"
+  develop-install:
+    working_directory: '/rpmbuild/hootenanny-rpms'
+    docker:
+      - image: hootenanny/run-base-release@sha256:d795cdf73f5841beeca7738435d0407b8aeb890ee79612cc687b69d167effa9c
+        environment:
+          HOOT_TESTS: disable
+    steps:
+      - checkout
+      - attach_workspace:
+          at: el7
+      - run:
+          name: 'Test RPM installation and Run Core Hootenanny Tests'
+          command: |
+            ./tests/install-test-rpm.sh
   develop-sync:
     working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
@@ -68,9 +82,12 @@ workflows:
   develop-repo:
     jobs:
       - develop-rpm
-      - develop-sync:
+      - develop-install:
           requires:
             - develop-rpm
+      - develop-sync:
+          requires:
+            - develop-install
     triggers:
       - schedule:
           cron: "0 12,20 * * *"
