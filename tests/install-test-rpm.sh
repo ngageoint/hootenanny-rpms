@@ -15,8 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 set -euxo pipefail
 
-HOOT_TESTS="yes"
-HOOT_TESTS_PARALLEL="$(nproc)"
+HOOT_TESTS="${HOOT_TESTS:-yes}"
+HOOT_TESTS_PARALLEL="${HOOT_TESTS_PARALLEL:-$(nproc)}"
 
 if [ -f el7/none.rpm ]; then
     echo "No new RPM to install and test with."
