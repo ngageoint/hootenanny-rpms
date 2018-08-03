@@ -17,6 +17,8 @@ jobs:
   rpmbuild-hoot-release:
     machine:
       enabled: true
+      environment:
+        REPO_PREFIX: el7/develop-test
     steps:
       - checkout
       - run:
@@ -53,21 +55,36 @@ jobs:
     working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
       - image: hootenanny/run-base-release@sha256:d795cdf73f5841beeca7738435d0407b8aeb890ee79612cc687b69d167effa9c
-        environment:
-          HOOT_TESTS: disable
     steps:
       - checkout
       - attach_workspace:
           at: el7
       - run:
-          name: 'Test RPM installation and Run Core Hootenanny Tests'
+          name: 'Test RPM Installation'
           command: |
-            ./tests/install-test-rpm.sh
+            ./tests/install-rpm.sh
+  develop-upgrade:
+    working_directory: '/rpmbuild/hootenanny-rpms'
+    docker:
+      - image: hootenanny/run-base-release@sha256:d795cdf73f5841beeca7738435d0407b8aeb890ee79612cc687b69d167effa9c
+        environment:
+          REPO_PREFIX: el7/develop-test
+    steps:
+      - checkout
+      - attach_workspace:
+          at: el7
+      - run:
+          name: 'Test RPM Upgrade'
+          command: |
+            ./tests/upgrade-rpm.sh
   develop-sync:
     working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
       - image: hootenanny/rpmbuild-repo@sha256:7147b62b7a6dded4b72003df0aca52ab4b667dba4da5c11a7ceb4b00bbacd120
         user: rpmbuild
+        environment:
+          REPO_PREFIX: el7/develop-test
+          SLACK_NOTIFY: 'no'
     steps:
       - checkout
       - attach_workspace:
@@ -85,16 +102,13 @@ workflows:
       - develop-install:
           requires:
             - develop-rpm
+      - develop-upgrade:
+          requires:
+            - develop-rpm
       - develop-sync:
           requires:
             - develop-install
-    triggers:
-      - schedule:
-          cron: "0 12,20 * * *"
-          filters:
-            branches:
-              only:
-                - develop
+            - develop-upgrade
   tests:
     jobs:
       - lint
