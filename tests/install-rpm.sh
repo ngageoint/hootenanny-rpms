@@ -23,9 +23,10 @@ else
     RPM_VERSION="$(echo "$RPM_FILE" | awk 'match($0, /hootenanny-autostart-(.+).noarch.rpm$/, a) { print a[1] }')"
 
     # Manually install Hootenanny from the workspace RPMs.
-    yum install -y "el7/hootenanny-core-deps-$RPM_VERSION.noarch.rpm"
-    yum install -y "el7/hootenanny-core-$RPM_VERSION.x86_64.rpm"
-    yum install -y "el7/hootenanny-services-ui-$RPM_VERSION.x86_64.rpm"
+    yum install -y \
+        "el7/hootenanny-core-deps-$RPM_VERSION.noarch.rpm" \
+        "el7/hootenanny-core-$RPM_VERSION.x86_64.rpm" \
+        "el7/hootenanny-services-ui-$RPM_VERSION.x86_64.rpm"
 
     # Ensure `hoot version` works.
     echo "hoot version: $(hoot version)"
