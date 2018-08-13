@@ -26,8 +26,8 @@ else
     yum makecache -y
     yum install -y hootenanny-services-ui
 
-    # State the previous version.
-    echo "previous hoot version: $(hoot version)"
+    # Get the previous version.
+    PREV_HOOT_VERSION="$(hoot version)"
 
     # Determine the version of the RPMs in the workspace.
     RPM_FILE="$(find el7 -type f -name hootenanny-autostart-\*noarch.rpm | head -n 1)"
@@ -39,6 +39,7 @@ else
         "el7/hootenanny-core-$RPM_VERSION.x86_64.rpm" \
         "el7/hootenanny-services-ui-$RPM_VERSION.x86_64.rpm"
 
-    # State the upgraded version.
+    # State the previous upgraded versions.
+    echo "previous hoot version: $PREV_HOOT_VERSION"
     echo "upgraded hoot version: $(hoot version)"
 fi
