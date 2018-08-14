@@ -17,8 +17,6 @@ jobs:
   rpmbuild-hoot-release:
     machine:
       enabled: true
-      environment:
-        REPO_PREFIX: el7/develop-test
     steps:
       - checkout
       - run:
@@ -37,12 +35,12 @@ jobs:
   develop-rpm:
     machine:
       enabled: true
-      environment:
-        REPO_PREFIX: el7/develop-test
     steps:
       - checkout
       - run:
           name: 'Install RPM Tools'
+          environment:
+            REPO_PREFIX: el7/develop-test
           command: |
             ./scripts/rpm-install.sh
       - run:
