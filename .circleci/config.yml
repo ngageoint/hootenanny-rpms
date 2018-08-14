@@ -39,12 +39,12 @@ jobs:
       - checkout
       - run:
           name: 'Install RPM Tools'
-          environment:
-            REPO_PREFIX: el7/develop-test
           command: |
             ./scripts/rpm-install.sh
       - run:
           name: 'Compile Latest Develop RPM'
+          environment:
+            REPO_PREFIX: el7/develop-test
           command: |
             ./tests/create-rpm.sh
       - persist_to_workspace:
