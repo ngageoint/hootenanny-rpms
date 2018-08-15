@@ -43,8 +43,6 @@ jobs:
             ./scripts/rpm-install.sh
       - run:
           name: 'Compile Latest Develop RPM'
-          environment:
-            REPO_PREFIX: el7/develop-test
           command: |
             ./tests/create-rpm.sh
       - persist_to_workspace:
@@ -67,8 +65,6 @@ jobs:
     working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
       - image: hootenanny/run-base-release@sha256:d795cdf73f5841beeca7738435d0407b8aeb890ee79612cc687b69d167effa9c
-        environment:
-          REPO_PREFIX: el7/develop-test
     steps:
       - checkout
       - attach_workspace:
@@ -82,9 +78,6 @@ jobs:
     docker:
       - image: hootenanny/rpmbuild-repo@sha256:7147b62b7a6dded4b72003df0aca52ab4b667dba4da5c11a7ceb4b00bbacd120
         user: rpmbuild
-        environment:
-          REPO_PREFIX: el7/develop-test
-          SLACK_NOTIFY: 'no'
     steps:
       - checkout
       - attach_workspace:
@@ -109,6 +102,13 @@ workflows:
           requires:
             - develop-install
             - develop-upgrade
+    triggers:
+      - schedule:
+          cron: "0 12,20 * * *"
+          filters:
+            branches:
+              only:
+                - develop
   tests:
     jobs:
       - lint
