@@ -59,7 +59,7 @@ image from the Docker Hub.
 
 This ensures that the RPMs generated from `create-rpm.sh` can be
 installed on the latest
-[`run-hoot-release`](https://hub.docker.com/r/hootenanny/run-hoot-release/)
+[`run-base-release`](https://hub.docker.com/r/hootenanny/run-base-release/)
 image from the Docker Hub.
 
 ### [`upgrade-rpm.sh`](../tests/upgrade-rpm.sh)
@@ -67,7 +67,7 @@ image from the Docker Hub.
 This test installs the latest RPM from the develop repository
 and ensures the upgrade process works by installing the more
 recent RPMs from `create-rpm.sh` on the
-[`run-hoot-release`](https://hub.docker.com/r/hootenanny/run-hoot-release/)
+[`run-base-release`](https://hub.docker.com/r/hootenanny/run-base-release/)
 image from the Docker Hub.
 
 ### [`update-sync-repo.sh`](../tests/update-sync-repo.sh)
