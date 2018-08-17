@@ -53,16 +53,26 @@ jobs:
     working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
       - image: hootenanny/run-base-release@sha256:d795cdf73f5841beeca7738435d0407b8aeb890ee79612cc687b69d167effa9c
-        environment:
-          HOOT_TESTS: disable
     steps:
       - checkout
       - attach_workspace:
           at: el7
       - run:
-          name: 'Test RPM installation and Run Core Hootenanny Tests'
+          name: 'Test RPM Installation'
           command: |
-            ./tests/install-test-rpm.sh
+            ./tests/install-rpm.sh
+  develop-upgrade:
+    working_directory: '/rpmbuild/hootenanny-rpms'
+    docker:
+      - image: hootenanny/run-base-release@sha256:d795cdf73f5841beeca7738435d0407b8aeb890ee79612cc687b69d167effa9c
+    steps:
+      - checkout
+      - attach_workspace:
+          at: el7
+      - run:
+          name: 'Test RPM Upgrade'
+          command: |
+            ./tests/upgrade-rpm.sh
   develop-sync:
     working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
@@ -85,9 +95,13 @@ workflows:
       - develop-install:
           requires:
             - develop-rpm
+      - develop-upgrade:
+          requires:
+            - develop-rpm
       - develop-sync:
           requires:
             - develop-install
+            - develop-upgrade
     triggers:
       - schedule:
           cron: "0 12,20 * * *"

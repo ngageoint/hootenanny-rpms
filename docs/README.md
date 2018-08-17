@@ -12,6 +12,7 @@
   environment variables.
 * [Release Process](./release.md): How to create signed releases for
   Hootenanny and dependencies.
+* [Tests](./tests.md): Overview of the testing scripts.
 
 ## Additional Information
 
