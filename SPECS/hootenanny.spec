@@ -491,7 +491,6 @@ EOT
     # Update database credentials in various locations.
     sed -i s/password\:\ hoottest/password\:\ $DB_PASSWORD/ %{services_home}/WEB-INF/classes/db/liquibase.properties
     sed -i s/DB_PASSWORD=hoottest/DB_PASSWORD=$DB_PASSWORD/ %{services_home}/WEB-INF/classes/db/db.properties
-    sed -i s/\<Password\>hoottest\<\\/Password\>/\<Password\>$DB_PASSWORD\<\\/Password\>/ %{services_home}/WEB-INF/workspace/jdbc/WFS_Connection.xml
 
     systemctl restart tomcat8
 }
