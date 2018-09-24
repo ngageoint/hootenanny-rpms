@@ -4,6 +4,7 @@
 %global postgismajorversion %{postgis_major}.%{postgis_minor}
 %global postgiscurrmajorversion %(echo %{postgismajorversion}|tr -d '.')
 %global postgisprevmajorversion 2.3
+%global postgisprev_dotless %(echo %{postgisprevmajorversion}|tr -d '.')
 %global sname hoot-postgis
 
 %{!?utils:%global	utils 1}
@@ -57,6 +58,7 @@ Requires:	pcre
 Requires(post):	%{_sbindir}/update-alternatives
 
 Provides:	%{sname} = %{version}-%{release}
+Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}
 Conflicts:	postgis
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}
 
@@ -73,6 +75,7 @@ Summary:	Client tools and their libraries of PostGIS
 Group:		Applications/Databases
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Provides:	%{sname}-client = %{version}-%{release}
+Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-client
 Conflicts:	postgis-client
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-client
 
@@ -85,6 +88,7 @@ Summary:	Development headers and libraries for PostGIS
 Group:		Development/Libraries
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Provides:	%{sname}-devel = %{version}-%{release}
+Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-devel
 Conflicts:	postgis-devel
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-devel
 
@@ -96,6 +100,7 @@ with PostGIS.
 %package docs
 Summary:	Extra documentation for PostGIS
 Group:		Applications/Databases
+Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-docs
 Conflicts:	postgis-docs
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-docs
 
@@ -109,6 +114,7 @@ Group:		Applications/Databases
 Requires:	%{name} = %{version}-%{release}
 Requires:	perl-DBD-Pg
 Provides:	%{sname}-utils = %{version}-%{release}
+Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-utils
 Conflicts:	postgis-utils
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-utils
 
