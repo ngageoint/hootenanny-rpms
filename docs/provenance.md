@@ -132,10 +132,11 @@ directly from [OSGeo](https://download.osgeo.org/postgis/) and licensed
 under the [GPLv2](http://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
 
 The following packaging files originate from
-[PGDG's PostGIS 2.3.3 source RPM](https://download.postgresql.org/pub/repos/yum/srpms/9.5/redhat/rhel-7-x86_64/)
-and are released under the [PostgreSQL license](./licenses/PostgreSQL-LICENSE):
+[PGDG's PostGIS 2.3.3 and 2.4.4 source RPMs](https://download.postgresql.org/pub/repos/yum/srpms/9.5/redhat/rhel-7-x86_64/),
+released under the [PostgreSQL license](./licenses/PostgreSQL-LICENSE):
 
 * [`hoot-postgis23.spec`](../SPECS/hoot-postgis23.spec)
+* [`hoot-postgis24.spec`](../SPECS/hoot-postgis24.spec)
 * [`postgis-filter-requires-perl-Pg.sh`](../SOURCES/postgis-filter-requires-perl-Pg.sh)
 * [`postgis-gdalfpic.patch`](../SOURCES/postgis-gdalfpic.patch)
 
