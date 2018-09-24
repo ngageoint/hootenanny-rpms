@@ -1,7 +1,10 @@
-%global postgismajorversion 2.4
+%global postgis_major %(echo %{rpmbuild_version} | awk -F. '{ print $1 }')
+%global postgis_minor %(echo %{rpmbuild_version} | awk -F. '{ print $2 }')
+%global postgis_micro %(echo %{rpmbuild_version} | awk -F. '{ print $3 }')
+%global postgismajorversion %{postgis_major}.%{postgis_minor}
 %global postgiscurrmajorversion %(echo %{postgismajorversion}|tr -d '.')
 %global postgisprevmajorversion 2.3
-%global sname	postgis
+%global sname hoot-postgis
 
 %{!?utils:%global	utils 1}
 %if 0%{?fedora} >= 24 || 0%{?rhel} >= 6 || 0%{?suse_version} >= 1315
@@ -10,11 +13,7 @@
 %{!?raster:%global     raster 0}
 %endif
 %if 0%{?fedora} >= 24 || 0%{?rhel} >= 7 || 0%{?suse_version} >= 1315
-%ifnarch ppc64 ppc64le
 %{!?sfcgal:%global     sfcgal 1}
-%else
-%{!?sfcgal:%global     sfcgal 0}
-%endif
 %else
 %{!?sfcgal:%global    sfcgal 0}
 %endif
@@ -26,22 +25,19 @@
 %endif
 
 Summary:	Geographic Information Systems Extensions to PostgreSQL
-Name:		%{sname}%{postgiscurrmajorversion}_%{pgmajorversion}
-Version:	%{postgismajorversion}.5
-Release:	1%{?dist}
+Name:		%{sname}%{postgiscurrmajorversion}_%{pg_dotless}
+Version:	%{rpmbuild_version}
+Release:	%{rpmbuild_release}%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
-Source0:	https://download.osgeo.org/%{sname}/source/%{sname}-%{version}.tar.gz
-Source2:	https://download.osgeo.org/%{sname}/docs/%{sname}-%{version}.pdf
-Source4:	%{sname}%{postgiscurrmajorversion}-filter-requires-perl-Pg.sh
-Patch0:		%{sname}%{postgiscurrmajorversion}-%{postgismajorversion}.0-gdalfpic.patch
-# Patch1 can be removed when 2.4.6 comes out
-Patch1:		%{sname}%{postgiscurrmajorversion}-%{postgismajorversion}.5-clangfix.patch
+Source0:	https://download.osgeo.org/postgis/source/postgis-%{version}.tar.gz
+Source2:	https://download.osgeo.org/postgis/docs/postgis-%{version}.pdf
+Source4:	postgis-filter-requires-perl-Pg.sh
+Patch0:		postgis-gdalfpic.patch
 
 URL:		http://www.postgis.net/
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:	postgresql%{pgmajorversion}-devel, geos36-devel >= 3.6.2, pcre-devel
+BuildRequires:	postgresql%{pg_dotless}-devel, geos36-devel >= 3.6.2, pcre-devel
 %if 0%{?suse_version}
 %if 0%{?suse_version} >= 1315
 BuildRequires:  libjson-c-devel libproj-devel
@@ -62,8 +58,8 @@ BuildRequires:	gdal-devel >= 1.9.0
 BuildRequires:	advance-toolchain-%{atstring}-devel
 %endif
 
-Requires:	postgresql%{pgmajorversion} geos36 >= 3.6.2
-Requires:	postgresql%{pgmajorversion}-contrib proj49
+Requires:	postgresql%{pg_dotless} geos36 >= 3.6.2
+Requires:	postgresql%{pg_dotless}-contrib proj49
 %if 0%{?rhel} && 0%{?rhel} < 6
 Requires:	hdf5 < 1.8.7
 %else
@@ -84,8 +80,8 @@ Requires:	advance-toolchain-%{atstring}-runtime
 %endif
 
 Provides:	%{sname} = %{version}-%{release}
-Obsoletes:	%{sname}2_%{pgmajorversion} <= %{postgismajorversion}.2-1
-Provides:	%{sname}2_%{pgmajorversion} => %{postgismajorversion}.0
+Obsoletes:	%{sname}2_%{pg_dotless} <= %{postgismajorversion}.2-1
+Provides:	%{sname}2_%{pg_dotless} => %{postgismajorversion}.0
 
 %description
 PostGIS adds support for geographic objects to the PostgreSQL object-relational
@@ -104,8 +100,8 @@ Provides:	%{sname}-client = %{version}-%{release}
 AutoReq:	0
 Requires:	advance-toolchain-%{atstring}-runtime
 %endif
-Obsoletes:	%{sname}2_%{pgmajorversion}-client <= %{postgismajorversion}.2-1
-Provides:	%{sname}2_%{pgmajorversion}-client => %{postgismajorversion}.0
+Obsoletes:	%{sname}2_%{pg_dotless}-client <= %{postgismajorversion}.2-1
+Provides:	%{sname}2_%{pg_dotless}-client => %{postgismajorversion}.0
 
 %description client
 The %{name}-client package contains the client tools and their libraries
@@ -116,8 +112,8 @@ Summary:	Development headers and libraries for PostGIS
 Group:		Development/Libraries
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Provides:	%{sname}-devel = %{version}-%{release}
-Obsoletes:	%{sname}2_%{pgmajorversion}-devel <= %{postgismajorversion}.2-1
-Provides:	%{sname}2_%{pgmajorversion}-devel => %{postgismajorversion}.0
+Obsoletes:	%{sname}2_%{pg_dotless}-devel <= %{postgismajorversion}.2-1
+Provides:	%{sname}2_%{pg_dotless}-devel => %{postgismajorversion}.0
 %ifarch ppc64 ppc64le
 AutoReq:	0
 Requires:	advance-toolchain-%{atstring}-runtime
@@ -131,8 +127,8 @@ with PostGIS.
 %package docs
 Summary:	Extra documentation for PostGIS
 Group:		Applications/Databases
-Obsoletes:	%{sname}2_%{pgmajorversion}-docs <= %{postgismajorversion}.2-1
-Provides:	%{sname}2_%{pgmajorversion}-docs => %{postgismajorversion}.0
+Obsoletes:	%{sname}2_%{pg_dotless}-docs <= %{postgismajorversion}.2-1
+Provides:	%{sname}2_%{pg_dotless}-docs => %{postgismajorversion}.0
 %ifarch ppc64 ppc64le
 AutoReq:	0
 Requires:	advance-toolchain-%{atstring}-runtime
@@ -147,8 +143,8 @@ Summary:	The utils for PostGIS
 Group:		Applications/Databases
 Requires:	%{name} = %{version}-%{release}, perl-DBD-Pg
 Provides:	%{sname}-utils = %{version}-%{release}
-Obsoletes:	%{sname}2_%{pgmajorversion}-utils <= %{postgismajorversion}.2-1
-Provides:	%{sname}2_%{pgmajorversion}-utils => %{postgismajorversion}.0
+Obsoletes:	%{sname}2_%{pg_dotless}-utils <= %{postgismajorversion}.2-1
+Provides:	%{sname}2_%{pg_dotless}-utils => %{postgismajorversion}.0
 %ifarch ppc64 ppc64le
 AutoReq:	0
 Requires:	advance-toolchain-%{atstring}-runtime
@@ -214,8 +210,8 @@ install -m 644 utils/*.pl %{buildroot}%{_datadir}/%{name}
 
 # Create alternatives entries for common binaries
 %post
-%{_sbindir}/update-alternatives --install /usr/bin/pgsql2shp postgis-pgsql2shp %{pginstdir}/bin/pgsql2shp %{pgmajorversion}0
-%{_sbindir}/update-alternatives --install /usr/bin/shp2pgsql postgis-shp2pgsql %{pginstdir}/bin/shp2pgsql %{pgmajorversion}0
+%{_sbindir}/update-alternatives --install /usr/bin/pgsql2shp postgis-pgsql2shp %{pginstdir}/bin/pgsql2shp %{pg_dotless}0
+%{_sbindir}/update-alternatives --install /usr/bin/shp2pgsql postgis-shp2pgsql %{pginstdir}/bin/shp2pgsql %{pg_dotless}0
 
 # Drop alternatives entries for common binaries and man files
 %postun
@@ -277,7 +273,7 @@ fi
 %{pginstdir}/share/extension/%{sname}_tiger_geocoder.control
 %ifarch ppc64 ppc64le
  %else
- %if %{pgmajorversion} >= 11 && %{pgmajorversion} < 90
+ %if %{pg_dotless} >= 11 && %{pg_dotless} < 90
   %if 0%{?rhel} && 0%{?rhel} <= 6
   %else
    %{pginstdir}/lib/bitcode/address_standardizer-%{postgismajorversion}*.bc
