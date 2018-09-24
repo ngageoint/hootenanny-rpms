@@ -18,12 +18,6 @@
 %{!?sfcgal:%global    sfcgal 0}
 %endif
 
-%ifarch ppc64 ppc64le
-# Define the AT version and path.
-%global atstring	at10.0
-%global atpath		/opt/%{atstring}
-%endif
-
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		%{sname}%{postgiscurrmajorversion}_%{pg_dotless}
 Version:	%{rpmbuild_version}
@@ -52,10 +46,6 @@ Requires:	SFCGAL
 BuildRequires:	gdal-devel >= 1.9.0
 %endif
 
-%ifarch ppc64 ppc64le
-BuildRequires:	advance-toolchain-%{atstring}-devel
-%endif
-
 Requires:	postgresql%{pg_dotless} geos36 >= 3.6.2
 Requires:	postgresql%{pg_dotless}-contrib proj49
 %if 0%{?rhel} && 0%{?rhel} < 6
@@ -71,11 +61,6 @@ Requires:	libjson-c2 libgdal20
 Requires:	json-c gdal-libs >= 1.9.0
 %endif
 Requires(post):	%{_sbindir}/update-alternatives
-
-%ifarch ppc64 ppc64le
-AutoReq:	0
-Requires:	advance-toolchain-%{atstring}-runtime
-%endif
 
 Provides:	%{sname} = %{version}-%{release}
 Obsoletes:	%{sname}2_%{pg_dotless} <= %{postgismajorversion}.2-1
@@ -94,10 +79,6 @@ Summary:	Client tools and their libraries of PostGIS
 Group:		Applications/Databases
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Provides:	%{sname}-client = %{version}-%{release}
-%ifarch ppc64 ppc64le
-AutoReq:	0
-Requires:	advance-toolchain-%{atstring}-runtime
-%endif
 Obsoletes:	%{sname}2_%{pg_dotless}-client <= %{postgismajorversion}.2-1
 Provides:	%{sname}2_%{pg_dotless}-client => %{postgismajorversion}.0
 
@@ -112,10 +93,6 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 Provides:	%{sname}-devel = %{version}-%{release}
 Obsoletes:	%{sname}2_%{pg_dotless}-devel <= %{postgismajorversion}.2-1
 Provides:	%{sname}2_%{pg_dotless}-devel => %{postgismajorversion}.0
-%ifarch ppc64 ppc64le
-AutoReq:	0
-Requires:	advance-toolchain-%{atstring}-runtime
-%endif
 
 %description devel
 The %{name}-devel package contains the header files and libraries
@@ -127,10 +104,6 @@ Summary:	Extra documentation for PostGIS
 Group:		Applications/Databases
 Obsoletes:	%{sname}2_%{pg_dotless}-docs <= %{postgismajorversion}.2-1
 Provides:	%{sname}2_%{pg_dotless}-docs => %{postgismajorversion}.0
-%ifarch ppc64 ppc64le
-AutoReq:	0
-Requires:	advance-toolchain-%{atstring}-runtime
-%endif
 
 %description docs
 The %{name}-docs package includes PDF documentation of PostGIS.
@@ -143,10 +116,6 @@ Requires:	%{name} = %{version}-%{release}, perl-DBD-Pg
 Provides:	%{sname}-utils = %{version}-%{release}
 Obsoletes:	%{sname}2_%{pg_dotless}-utils <= %{postgismajorversion}.2-1
 Provides:	%{sname}2_%{pg_dotless}-utils => %{postgismajorversion}.0
-%ifarch ppc64 ppc64le
-AutoReq:	0
-Requires:	advance-toolchain-%{atstring}-runtime
-%endif
 
 %description utils
 The %{name}-utils package provides the utilities for PostGIS.
@@ -163,13 +132,6 @@ The %{name}-utils package provides the utilities for PostGIS.
 %patch1 -p0
 
 %build
-
-%ifarch ppc64 ppc64le
-        sed -i 's:^GEOS_LDFLAGS=:GEOS_LDFLAGS=-L%{atpath}/%{_lib} :g' configure
-        CFLAGS="-O3 -mcpu=power8 -mtune=power8 -I%{atpath}/include" LDFLAGS="-L%{atpath}/%{_lib}"
-        sed -i 's:^LDFLAGS = :LDFLAGS = -L%{atpath}/%{_lib} :g' raster/loader/Makefile.in
-	CC=%{atpath}/bin/gcc; export CC
-%endif
 
 LDFLAGS="$LDFLAGS -L/usr/geos36/lib -L/usr/proj49/lib"; export LDFLAGS
 
@@ -269,20 +231,6 @@ fi
 %{pginstdir}/share/extension/%{sname}_topology.control
 %{pginstdir}/share/extension/%{sname}_tiger_geocoder*.sql
 %{pginstdir}/share/extension/%{sname}_tiger_geocoder.control
-%ifarch ppc64 ppc64le
- %else
- %if %{pg_dotless} >= 11 && %{pg_dotless} < 90
-  %if 0%{?rhel} && 0%{?rhel} <= 6
-  %else
-   %{pginstdir}/lib/bitcode/address_standardizer-%{postgismajorversion}*.bc
-   %{pginstdir}/lib/bitcode/address_standardizer-%{postgismajorversion}/*.bc
-   %{pginstdir}/lib/bitcode/%{sname}_topology-%{postgismajorversion}*.bc
-   %{pginstdir}/lib/bitcode/%{sname}_topology-%{postgismajorversion}/*.bc
-   %{pginstdir}/lib/bitcode/rt%{sname}-%{postgismajorversion}*.bc
-   %{pginstdir}/lib/bitcode/rt%{sname}-%{postgismajorversion}/*.bc
-  %endif
- %endif
-%endif
 %endif
 
 %files client
