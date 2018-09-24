@@ -36,8 +36,8 @@ Version:	%{postgismajorversion}.5
 Release:	1%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
-Source0:	http://download.osgeo.org/%{sname}/source/%{sname}-%{version}.tar.gz
-Source2:	http://download.osgeo.org/%{sname}/docs/%{sname}-%{version}.pdf
+Source0:	https://download.osgeo.org/%{sname}/source/%{sname}-%{version}.tar.gz
+Source2:	https://download.osgeo.org/%{sname}/docs/%{sname}-%{version}.pdf
 Source4:	%{sname}%{postgiscurrmajorversion}-filter-requires-perl-Pg.sh
 Patch0:		%{sname}%{postgiscurrmajorversion}-%{postgismajorversion}.0-gdalfpic.patch
 # Patch1 can be removed when 2.4.6 comes out
