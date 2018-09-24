@@ -215,6 +215,9 @@ getent passwd %{tomcat_user} 2>/dev/null || \
 %systemd_postun %{name}.service
 
 %changelog
+* Mon Sep 24 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 8.5.34-1
+- Upgrade to 8.5.34
+
 * Tue Jul 10 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 8.5.32-1
 - Upgrade to 8.5.32
 
