@@ -37,15 +37,13 @@ Patch0:		postgis-gdalfpic.patch
 
 URL:		http://www.postgis.net/
 
-BuildRequires:	postgresql%{pg_dotless}-devel, geos36-devel >= 3.6.2, pcre-devel
-%if 0%{?suse_version}
-%if 0%{?suse_version} >= 1315
-BuildRequires:  libjson-c-devel libproj-devel
-%endif
-%else
-BuildRequires:	proj49-devel, flex, json-c-devel
-%endif
-BuildRequires:	libxml2-devel
+BuildRequires:  postgresql%{pg_dotless}-devel
+BuildRequires:  geos36-devel >= 3.6.2
+BuildRequires:  pcre-devel
+BuildRequires:  proj49-devel
+BuildRequires:  flex
+BuildRequires:  json-c-devel
+BuildRequires:  libxml2-devel
 %if %{sfcgal}
 BuildRequires:	SFCGAL-devel
 Requires:	SFCGAL
