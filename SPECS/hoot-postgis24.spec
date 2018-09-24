@@ -4,11 +4,6 @@
 %global sname	postgis
 
 %{!?utils:%global	utils 1}
-%if 0%{?fedora} >= 24 || 0%{?rhel} >= 7 || 0%{?suse_version} >= 1315
-%{!?shp2pgsqlgui:%global	shp2pgsqlgui 1}
-%else
-%{!?shp2pgsqlgui:%global	shp2pgsqlgui 0}
-%endif
 %if 0%{?fedora} >= 24 || 0%{?rhel} >= 6 || 0%{?suse_version} >= 1315
 %{!?raster:%global     raster 1}
 %else
@@ -55,9 +50,6 @@ BuildRequires:  libjson-c-devel libproj-devel
 BuildRequires:	proj49-devel, flex, json-c-devel
 %endif
 BuildRequires:	libxml2-devel
-%if %{shp2pgsqlgui}
-BuildRequires:	gtk2-devel > 2.8.0
-%endif
 %if %{sfcgal}
 BuildRequires:	SFCGAL-devel
 Requires:	SFCGAL
@@ -297,21 +289,6 @@ fi
   %endif
  %endif
 %endif
-%endif
-%if %shp2pgsqlgui
-%{pginstdir}/bin/shp2pgsql-gui
-%{pginstdir}/share/applications/shp2pgsql-gui.desktop
-%{pginstdir}/share/icons/hicolor/*/apps/shp2pgsql-gui.png
-%endif
-%ifarch ppc64 ppc64le
- %else
- %if %{pgmajorversion} >= 11 && %{pgmajorversion} < 90
-  %if 0%{?rhel} && 0%{?rhel} <= 6
-  %else
-   %{pginstdir}/lib/bitcode/%{sname}-%{postgismajorversion}*.bc
-   %{pginstdir}/lib/bitcode/%{sname}-%{postgismajorversion}/*.bc
-  %endif
- %endif
 %endif
 
 %files client
