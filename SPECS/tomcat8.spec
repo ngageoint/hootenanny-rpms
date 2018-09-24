@@ -46,8 +46,8 @@ Version:    %{major_version}.%{minor_version}.%{micro_version}
 Release:    %{rpmbuild_release}%{?dist}
 License:    ASL 2.0
 Group:      Networking/Daemons
-URL:        http://tomcat.apache.org/
-Source0:    http://www.apache.org/dist/tomcat/tomcat-%{major_version}/v%{version}/bin/apache-tomcat-%{version}.tar.gz
+URL:        https://tomcat.apache.org/
+Source0:    https://www.apache.org/dist/tomcat/tomcat-%{major_version}/v%{version}/bin/apache-tomcat-%{version}.tar.gz
 Source1:    %{name}.conf
 Source2:    %{name}.functions
 Source3:    %{name}.logrotate
