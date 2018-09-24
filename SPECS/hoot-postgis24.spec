@@ -32,9 +32,9 @@ Patch0:		postgis-gdalfpic.patch
 URL:		http://www.postgis.net/
 
 BuildRequires:  postgresql%{pg_dotless}-devel
-BuildRequires:  geos36-devel >= 3.6.2
+BuildRequires:  geos-devel >= 3.6.2
 BuildRequires:  pcre-devel
-BuildRequires:  proj49-devel
+BuildRequires:  proj-devel
 BuildRequires:  flex
 BuildRequires:  json-c-devel
 BuildRequires:  libxml2-devel
@@ -43,28 +43,22 @@ BuildRequires:	SFCGAL-devel
 Requires:	SFCGAL
 %endif
 %if %{raster}
-BuildRequires:	gdal-devel >= 1.9.0
+BuildRequires:	hoot-gdal-devel >= 2.1.0
 %endif
 
-Requires:	postgresql%{pg_dotless} geos36 >= 3.6.2
-Requires:	postgresql%{pg_dotless}-contrib proj49
-%if 0%{?rhel} && 0%{?rhel} < 6
-Requires:	hdf5 < 1.8.7
-%else
+Requires:	geos >= 3.6.2
 Requires:	hdf5
-%endif
-
+Requires:	hoot-gdal-libs >= 2.1.0
+Requires:	json-c
+Requires:	postgresql%{pg_dotless}
+Requires:	postgresql%{pg_dotless}-contrib
+Requires:	proj
 Requires:	pcre
-%if 0%{?suse_version} >= 1315
-Requires:	libjson-c2 libgdal20
-%else
-Requires:	json-c gdal-libs >= 1.9.0
-%endif
 Requires(post):	%{_sbindir}/update-alternatives
 
 Provides:	%{sname} = %{version}-%{release}
-Obsoletes:	%{sname}2_%{pg_dotless} <= %{postgismajorversion}.2-1
-Provides:	%{sname}2_%{pg_dotless} => %{postgismajorversion}.0
+Conflicts:	postgis
+Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}
 
 %description
 PostGIS adds support for geographic objects to the PostgreSQL object-relational
@@ -79,8 +73,8 @@ Summary:	Client tools and their libraries of PostGIS
 Group:		Applications/Databases
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Provides:	%{sname}-client = %{version}-%{release}
-Obsoletes:	%{sname}2_%{pg_dotless}-client <= %{postgismajorversion}.2-1
-Provides:	%{sname}2_%{pg_dotless}-client => %{postgismajorversion}.0
+Conflicts:	postgis-client
+Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-client
 
 %description client
 The %{name}-client package contains the client tools and their libraries
@@ -91,8 +85,8 @@ Summary:	Development headers and libraries for PostGIS
 Group:		Development/Libraries
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Provides:	%{sname}-devel = %{version}-%{release}
-Obsoletes:	%{sname}2_%{pg_dotless}-devel <= %{postgismajorversion}.2-1
-Provides:	%{sname}2_%{pg_dotless}-devel => %{postgismajorversion}.0
+Conflicts:	postgis-devel
+Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-devel
 
 %description devel
 The %{name}-devel package contains the header files and libraries
@@ -102,8 +96,8 @@ with PostGIS.
 %package docs
 Summary:	Extra documentation for PostGIS
 Group:		Applications/Databases
-Obsoletes:	%{sname}2_%{pg_dotless}-docs <= %{postgismajorversion}.2-1
-Provides:	%{sname}2_%{pg_dotless}-docs => %{postgismajorversion}.0
+Conflicts:	postgis-docs
+Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-docs
 
 %description docs
 The %{name}-docs package includes PDF documentation of PostGIS.
@@ -112,10 +106,11 @@ The %{name}-docs package includes PDF documentation of PostGIS.
 %package utils
 Summary:	The utils for PostGIS
 Group:		Applications/Databases
-Requires:	%{name} = %{version}-%{release}, perl-DBD-Pg
+Requires:	%{name} = %{version}-%{release}
+Requires:	perl-DBD-Pg
 Provides:	%{sname}-utils = %{version}-%{release}
-Obsoletes:	%{sname}2_%{pg_dotless}-utils <= %{postgismajorversion}.2-1
-Provides:	%{sname}2_%{pg_dotless}-utils => %{postgismajorversion}.0
+Conflicts:	postgis-utils
+Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-utils
 
 %description utils
 The %{name}-utils package provides the utilities for PostGIS.
@@ -124,16 +119,12 @@ The %{name}-utils package provides the utilities for PostGIS.
 %global __perl_requires %{SOURCE4}
 
 %prep
-%setup -q -n %{sname}-%{version}
+%setup -q -n postgis-%{version}
 # Copy .pdf file to top directory before installing.
 %{__cp} -p %{SOURCE2} .
 %patch0 -p0
-# Patch1 can be removed when 2.4.6 comes out
-%patch1 -p0
 
 %build
-
-LDFLAGS="$LDFLAGS -L/usr/geos36/lib -L/usr/proj49/lib"; export LDFLAGS
 
 %configure --with-pgconfig=%{pginstdir}/bin/pg_config \
 %if !%raster
@@ -142,12 +133,7 @@ LDFLAGS="$LDFLAGS -L/usr/geos36/lib -L/usr/proj49/lib"; export LDFLAGS
 %if %{sfcgal}
 	--with-sfcgal=%{_bindir}/sfcgal-config \
 %endif
-%if %{shp2pgsqlgui}
-	--with-gui \
-%endif
-	--disable-rpath --libdir=%{pginstdir}/lib \
-	--with-geosconfig=/usr/geos36/bin/geos-config \
-	--with-projdir=/usr/proj49
+	--disable-rpath --libdir=%{pginstdir}/lib
 
 %{__make} LPATH=`%{pginstdir}/bin/pg_config --pkglibdir` shlib="%{name}.so"
 %{__make} -C extensions
@@ -161,12 +147,12 @@ LDFLAGS="$LDFLAGS -L/usr/geos36/lib -L/usr/proj49/lib"; export LDFLAGS
 %{__make} install DESTDIR=%{buildroot}
 
 %if %utils
-install -d %{buildroot}%{_datadir}/%{name}
-install -m 644 utils/*.pl %{buildroot}%{_datadir}/%{name}
+%{__install} -d %{buildroot}%{_datadir}/%{name}
+%{__install} -m 644 utils/*.pl %{buildroot}%{_datadir}/%{name}
 %endif
 
 # Create symlink of .so file. PostGIS hackers said that this is safe:
-%{__ln_s} %{pginstdir}/lib/%{sname}-%{postgismajorversion}.so %{buildroot}%{pginstdir}/lib/%{sname}-%{postgisprevmajorversion}.so
+%{__ln_s} %{pginstdir}/lib/postgis-%{postgismajorversion}.so %{buildroot}%{pginstdir}/lib/postgis-%{postgisprevmajorversion}.so
 
 # Create alternatives entries for common binaries
 %post
@@ -187,50 +173,50 @@ fi
 
 %files
 %defattr(-,root,root)
-%doc COPYING CREDITS NEWS TODO README.%{sname} doc/html loader/README.* doc/%{sname}.xml doc/ZMSgeoms.txt
+%doc COPYING CREDITS NEWS TODO README.postgis doc/html loader/README.* doc/postgis.xml doc/ZMSgeoms.txt
 %if 0%{?rhel} && 0%{?rhel} <= 6
 %doc LICENSE.TXT
 %else
 %license LICENSE.TXT
 %endif
 %{pginstdir}/doc/extension/README.address_standardizer
-%{pginstdir}/share/contrib/%{sname}-%{postgismajorversion}/postgis.sql
-%{pginstdir}/share/contrib/%{sname}-%{postgismajorversion}/postgis_comments.sql
-%{pginstdir}/share/contrib/%{sname}-%{postgismajorversion}/postgis_for_extension.sql
-%{pginstdir}/share/contrib/%{sname}-%{postgismajorversion}/postgis_upgrade*.sql
-%{pginstdir}/share/contrib/%{sname}-%{postgismajorversion}/postgis_restore.pl
-%{pginstdir}/share/contrib/%{sname}-%{postgismajorversion}/uninstall_postgis.sql
-%{pginstdir}/share/contrib/%{sname}-%{postgismajorversion}/legacy*.sql
-%{pginstdir}/share/contrib/%{sname}-%{postgismajorversion}/*topology*.sql
-%{pginstdir}/share/contrib/%{sname}-%{postgismajorversion}/postgis_proc_set_search_path.sql
+%{pginstdir}/share/contrib/postgis-%{postgismajorversion}/postgis.sql
+%{pginstdir}/share/contrib/postgis-%{postgismajorversion}/postgis_comments.sql
+%{pginstdir}/share/contrib/postgis-%{postgismajorversion}/postgis_for_extension.sql
+%{pginstdir}/share/contrib/postgis-%{postgismajorversion}/postgis_upgrade*.sql
+%{pginstdir}/share/contrib/postgis-%{postgismajorversion}/postgis_restore.pl
+%{pginstdir}/share/contrib/postgis-%{postgismajorversion}/uninstall_postgis.sql
+%{pginstdir}/share/contrib/postgis-%{postgismajorversion}/legacy*.sql
+%{pginstdir}/share/contrib/postgis-%{postgismajorversion}/*topology*.sql
+%{pginstdir}/share/contrib/postgis-%{postgismajorversion}/postgis_proc_set_search_path.sql
 %if %{sfcgal}
-%{pginstdir}/share/contrib/%{sname}-%{postgismajorversion}/*sfcgal*.sql
+%{pginstdir}/share/contrib/postgis-%{postgismajorversion}/*sfcgal*.sql
 %endif
-%{pginstdir}/lib/%{sname}-%{postgisprevmajorversion}.so
-%attr(755,root,root) %{pginstdir}/lib/%{sname}-%{postgismajorversion}.so
-%{pginstdir}/share/extension/%{sname}-*.sql
+%{pginstdir}/lib/postgis-%{postgisprevmajorversion}.so
+%attr(755,root,root) %{pginstdir}/lib/postgis-%{postgismajorversion}.so
+%{pginstdir}/share/extension/postgis-*.sql
 %if %{sfcgal}
-%{pginstdir}/share/extension/%{sname}_sfcgal*.sql
-%{pginstdir}/share/extension/%{sname}_sfcgal.control
+%{pginstdir}/share/extension/postgis_sfcgal*.sql
+%{pginstdir}/share/extension/postgis_sfcgal.control
 %endif
-%{pginstdir}/share/extension/%{sname}.control
+%{pginstdir}/share/extension/postgis.control
 %{pginstdir}/lib/liblwgeom*.so.*
 %{pginstdir}/lib/postgis_topology-%{postgismajorversion}.so
 %{pginstdir}/lib/address_standardizer-%{postgismajorversion}.so
 %{pginstdir}/lib/liblwgeom.so
 %{pginstdir}/share/extension/address_standardizer*.sql
 %{pginstdir}/share/extension/address_standardizer*.control
-%{pginstdir}/share/contrib/%{sname}-%{postgismajorversion}/sfcgal_comments.sql
+%{pginstdir}/share/contrib/postgis-%{postgismajorversion}/sfcgal_comments.sql
 %if %raster
-%{pginstdir}/share/contrib/%{sname}-%{postgismajorversion}/raster_comments.sql
-%{pginstdir}/share/contrib/%{sname}-%{postgismajorversion}/*rtpostgis*.sql
-%{pginstdir}/share/contrib/%{sname}-%{postgismajorversion}/uninstall_legacy.sql
-%{pginstdir}/share/contrib/%{sname}-%{postgismajorversion}/spatial*.sql
+%{pginstdir}/share/contrib/postgis-%{postgismajorversion}/raster_comments.sql
+%{pginstdir}/share/contrib/postgis-%{postgismajorversion}/*rtpostgis*.sql
+%{pginstdir}/share/contrib/postgis-%{postgismajorversion}/uninstall_legacy.sql
+%{pginstdir}/share/contrib/postgis-%{postgismajorversion}/spatial*.sql
 %{pginstdir}/lib/rtpostgis-%{postgismajorversion}.so
-%{pginstdir}/share/extension/%{sname}_topology-*.sql
-%{pginstdir}/share/extension/%{sname}_topology.control
-%{pginstdir}/share/extension/%{sname}_tiger_geocoder*.sql
-%{pginstdir}/share/extension/%{sname}_tiger_geocoder.control
+%{pginstdir}/share/extension/postgis_topology-*.sql
+%{pginstdir}/share/extension/postgis_topology.control
+%{pginstdir}/share/extension/postgis_tiger_geocoder*.sql
+%{pginstdir}/share/extension/postgis_tiger_geocoder.control
 %endif
 
 %files client
@@ -255,7 +241,7 @@ fi
 
 %files docs
 %defattr(-,root,root)
-%doc %{sname}-%{version}.pdf
+%doc postgis-%{version}.pdf
 
 %changelog
 * Mon Sep 24 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 2.4.4-1

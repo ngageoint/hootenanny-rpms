@@ -11,7 +11,7 @@ versions:
   mocha: &mocha_version '3.5.3'
   nodejs: &nodejs_version '8.9.3-1'
   osmosis: &osmosis_version '0.46-1'
-  postgis: &postgis_version '2.3.5-1'
+  postgis: &postgis_version '2.4.4-1'
   postgresql: &pg_version '9.5'
   stxxl: &stxxl_version '1.3.1-1'
   su-exec: &suexec_version '0.2-1'
@@ -132,7 +132,7 @@ images:
         args:
           gdal_version: *gdal_version
         buildrequires: true
-        spec_file: 'SPECS/hoot-postgis23.spec'
+        spec_file: 'SPECS/hoot-postgis24.spec'
 
 
 rpms:
@@ -148,10 +148,10 @@ rpms:
   hoot-gdal:
     image: rpmbuild-gdal
     version: *gdal_version
-  hoot-postgis23_95:
+  hoot-postgis24_95:
     image: rpmbuild-postgis
     version: *postgis_version
-    spec_file: 'SPECS/hoot-postgis23.spec'
+    spec_file: 'SPECS/hoot-postgis24.spec'
   hoot-words:
     image: rpmbuild-generic
     version: *words_version
