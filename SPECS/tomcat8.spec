@@ -90,7 +90,7 @@ find . -type f \( -name "*.bat" -o -name "*.tmp" \) -delete
 
 # Copy all, but omit documentation.
 %{__cp} -R * %{buildroot}%{tomcat_home}/
-%{__rm} -rf %{buildroot}%{tomcat_home}/{LICENSE,NOTICE,RELEASE-NOTES,RUNNING.txt,temp,work}
+%{__rm} -rf %{buildroot}%{tomcat_home}/{BUILDING.txt,CONTRIBUTING.md,LICENSE,NOTICE,README.md,RELEASE-NOTES,RUNNING.txt,temp,work}
 
 # Remove all webapps. Put webapps in /var/lib.
 %{__rm} -rf %{buildroot}%{tomcat_home}/webapps
