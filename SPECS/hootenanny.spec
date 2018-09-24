@@ -92,8 +92,8 @@ BuildRequires:  graphviz
 BuildRequires:  hoot-gdal
 BuildRequires:  hoot-gdal-devel
 BuildRequires:  hoot-gdal-python
-BuildRequires:  hoot-postgis23_%{pg_dotless}-devel
-BuildRequires:  hoot-postgis23_%{pg_dotless}-utils
+BuildRequires:  hoot-postgis24_%{pg_dotless}-devel
+BuildRequires:  hoot-postgis24_%{pg_dotless}-utils
 BuildRequires:  hoot-words
 BuildRequires:  java-1.8.0-openjdk
 BuildRequires:  libicu-devel
@@ -343,7 +343,7 @@ echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hoot
 Summary:   Hootenanny UI and Services
 Group:     Applications/Engineering
 Requires:  %{name}-core = %{version}-%{release}
-Requires:  hoot-postgis23_%{pg_dotless}
+Requires:  hoot-postgis24_%{pg_dotless}
 Requires:  java-1.8.0-openjdk
 Requires:  liquibase
 Requires:  osmosis
@@ -714,8 +714,8 @@ Summary:   Development dependencies for Hootenanny Services
 Group:     Development/Libraries
 BuildArch: noarch
 Requires:  %{name}-core-devel-deps = %{version}-%{release}
-Requires:  hoot-postgis23_%{pg_dotless}
-Requires:  hoot-postgis23_%{pg_dotless}-utils
+Requires:  hoot-postgis24_%{pg_dotless}
+Requires:  hoot-postgis24_%{pg_dotless}-utils
 Requires:  liquibase
 Requires:  maven
 Requires:  nodejs-devel = %{nodejs_epoch}:%{nodejs_version}
