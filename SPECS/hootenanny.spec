@@ -349,7 +349,6 @@ Requires:  liquibase
 Requires:  osmosis
 Requires:  postgresql%{pg_dotless}-contrib
 Requires:  postgresql%{pg_dotless}-server
-Requires:  pwgen
 Requires:  tomcat8 < %{tomcat_version_max}
 Requires:  tomcat8 >= %{tomcat_version_min}
 
@@ -531,7 +530,7 @@ if [ "$1" = "1" ]; then
 
     # create Hoot services db
     if ! su -l postgres -c "psql -lqt | cut -d \| -f 1 | grep -qw hoot"; then
-        RAND_PW=$(pwgen -s 16 1)
+        RAND_PW="$(python -c "import string; from random import SystemRandom; print(''.join([SystemRandom().choice(string.ascii_letters + string.digits) for i in range(16)]))")"
         su -l postgres -c "createuser --superuser hoot || true"
         su -l postgres -c "psql -c \"ALTER USER hoot with password '${RAND_PW}';\""
         if [ -f %{hoot_home}/conf/database/DatabaseConfigDefault.sh ]; then
