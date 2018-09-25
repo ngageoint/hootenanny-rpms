@@ -46,8 +46,8 @@ Version:    %{major_version}.%{minor_version}.%{micro_version}
 Release:    %{rpmbuild_release}%{?dist}
 License:    ASL 2.0
 Group:      Networking/Daemons
-URL:        http://tomcat.apache.org/
-Source0:    http://www.apache.org/dist/tomcat/tomcat-%{major_version}/v%{version}/bin/apache-tomcat-%{version}.tar.gz
+URL:        https://tomcat.apache.org/
+Source0:    https://www.apache.org/dist/tomcat/tomcat-%{major_version}/v%{version}/bin/apache-tomcat-%{version}.tar.gz
 Source1:    %{name}.conf
 Source2:    %{name}.functions
 Source3:    %{name}.logrotate
@@ -90,7 +90,7 @@ find . -type f \( -name "*.bat" -o -name "*.tmp" \) -delete
 
 # Copy all, but omit documentation.
 %{__cp} -R * %{buildroot}%{tomcat_home}/
-%{__rm} -rf %{buildroot}%{tomcat_home}/{LICENSE,NOTICE,RELEASE-NOTES,RUNNING.txt,temp,work}
+%{__rm} -rf %{buildroot}%{tomcat_home}/{BUILDING.txt,CONTRIBUTING.md,LICENSE,NOTICE,README.md,RELEASE-NOTES,RUNNING.txt,temp,work}
 
 # Remove all webapps. Put webapps in /var/lib.
 %{__rm} -rf %{buildroot}%{tomcat_home}/webapps
@@ -215,6 +215,9 @@ getent passwd %{tomcat_user} 2>/dev/null || \
 %systemd_postun %{name}.service
 
 %changelog
+* Mon Sep 24 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 8.5.34-1
+- Upgrade to 8.5.34
+
 * Tue Jul 10 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 8.5.32-1
 - Upgrade to 8.5.32
 
