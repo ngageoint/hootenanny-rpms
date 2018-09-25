@@ -59,9 +59,9 @@ COPY RPMS/x86_64/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/hoot-gdal-devel-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/hoot-gdal-libs-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/hoot-gdal-python-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/hoot-postgis23_95-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/hoot-postgis23_95-devel-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/hoot-postgis23_95-utils-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/hoot-postgis24_95-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/hoot-postgis24_95-devel-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/hoot-postgis24_95-utils-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/noarch/hoot-words-${words_version}${RPMBUILD_DIST}.noarch.rpm \
      RPMS/x86_64/libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
@@ -88,9 +88,9 @@ RUN yum install -y \
     /tmp/hoot-gdal-devel-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/hoot-gdal-libs-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/hoot-gdal-python-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/hoot-postgis23_95-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/hoot-postgis23_95-devel-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/hoot-postgis23_95-utils-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-postgis24_95-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-postgis24_95-devel-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/hoot-postgis24_95-utils-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/hoot-words-${words_version}${RPMBUILD_DIST}.noarch.rpm \
     /tmp/libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \

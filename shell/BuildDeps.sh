@@ -150,7 +150,7 @@ if [ ! -f $RPM_X86_64/$POSTGIS_RPM ]; then
     echo "#### Building RPM: PostGIS"
 
     docker build \
-           --build-arg "packages=$( spec_requires hoot-postgis23 )" \
+           --build-arg "packages=$( spec_requires hoot-postgis24 )" \
            --build-arg gdal_version=$GDAL_VERSION-$GDAL_RELEASE \
            -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-postgis \
            -t hootenanny/rpmbuild-postgis \
@@ -161,7 +161,7 @@ if [ ! -f $RPM_X86_64/$POSTGIS_RPM ]; then
         rpmbuild \
         --define "rpmbuild_version ${POSTGIS_VERSION}" \
         --define "rpmbuild_release ${POSTGIS_RELEASE}" \
-        -bb SPECS/hoot-postgis23.spec
+        -bb SPECS/hoot-postgis24.spec
 fi
 
 ## Simple Dependencies

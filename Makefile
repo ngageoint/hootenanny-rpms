@@ -79,7 +79,7 @@ LIBGEOTIFF_RPM := $(call rpm_file,libgeotiff,x86_64)
 LIBKML_RPM := $(call rpm_file,libkml,x86_64)
 NODEJS_RPM := $(call rpm_file,nodejs,x86_64)
 OSMOSIS_RPM := $(call rpm_file,osmosis,noarch)
-POSTGIS_RPM := $(call rpm_file2,hoot-postgis23_$(PG_DOTLESS),postgis,x86_64)
+POSTGIS_RPM := $(call rpm_file2,hoot-postgis24_$(PG_DOTLESS),postgis,x86_64)
 STXXL_RPM := $(call rpm_file,stxxl,x86_64)
 SUEXEC_RPM := $(call rpm_file2,su-exec,suexec,x86_64)
 TOMCAT8_RPM := $(call rpm_file,tomcat8,noarch)
@@ -115,7 +115,7 @@ DEPENDENCY_RPMS := \
 	libgeotiff \
 	libkml \
 	hoot-gdal \
-	hoot-postgis23_$(PG_DOTLESS) \
+	hoot-postgis24_$(PG_DOTLESS) \
 	hoot-words \
 	nodejs \
 	osmosis \
@@ -322,7 +322,7 @@ nodejs: rpmbuild-nodejs $(NODEJS_RPM)
 glpk: rpmbuild-glpk $(GLPK_RPM)
 hoot-gdal: rpmbuild-gdal $(GDAL_RPM)
 hoot-words: rpmbuild-generic $(WORDS_RPM)
-hoot-postgis23_$(PG_DOTLESS): rpmbuild-postgis $(POSTGIS_RPM)
+hoot-postgis24_$(PG_DOTLESS): rpmbuild-postgis $(POSTGIS_RPM)
 osmosis: rpmbuild-generic $(OSMOSIS_RPM)
 stxxl: rpmbuild-generic $(STXXL_RPM)
 su-exec: rpmbuild-generic $(SUEXEC_RPM)
