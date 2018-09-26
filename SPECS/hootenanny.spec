@@ -206,9 +206,7 @@ popd
 # Services (UI) files and directories.
 %{__install} -d -m 0775 %{buildroot}%{tomcat_config}/conf.d
 %{__install} -d -m 0775 %{buildroot}%{tomcat_home}/.deegree
-%{__install} -d -m 0775 %{buildroot}%{tomcat_home}/lib
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}
-%{__install} -m 0644 hoot-services/target/hoot-services-*/WEB-INF/lib/postgresql-*.jar %{buildroot}%{tomcat_home}/lib
 %{__install} -m 0644 hoot-services/target/hoot-services*.war %{buildroot}%{tomcat_webapps}/hoot-services.war
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id
@@ -370,7 +368,6 @@ This package contains the UI and web services.
 %if 0%{with_node_mapnik} == 1
 %{_unitdir}/node-mapnik.service
 %endif
-%{tomcat_home}/lib/*.jar
 
 %defattr(-, root, tomcat, 0775)
 %{hoot_home}/node-export-server
@@ -469,12 +466,6 @@ function updateConfigFiles () {
         sed -i "s@<\/Host>@      <Context docBase=\""${HOOT_HOME//\//\\\/}"\/userfiles\/ingest\/processed\" path=\"\/static\" \/>\n      &@" $TOMCAT_SRV
     fi
 
-    # Modify Tomcat context for JDBC connection pool.
-    if ! grep -i --quiet 'jdbc/postgres' %{tomcat_config}/context.xml; then
-        echo "Adding Tomcat JNDI Postgresql Connection Pool..."
-        sed -i 's@<\/Context>@\n    <Resource name=\"jdbc/postgres"\n      auth="Container"\n      type="javax.sql.DataSource"\n      driverClassName="org.postgresql.Driver"\n      url="jdbc:postgresql://'"$DB_HOST:$DB_PORT/$DB_NAME"'"\n      username="'"$DB_USER"'" password="'"$DB_PASSWORD"'"\n      maxTotal="90"\n      initialSize="25"\n      minIdle="0"\n      maxIdle="30"\n      maxWaitMillis="10000"\n      timeBetweenEvictionRunsMillis="30000"\n      minEvictableIdleTimeMillis="60000"\n      testWhileIdle="true"\n      validationQuery="SELECT 1" />\n\n&@' %{tomcat_config}/context.xml
-    fi
-
     # Increase the Tomcat java heap size
     TOMCAT_CONF=%{tomcat_config}/tomcat8.conf
     if ! grep -i --quiet 'Xmx2048m' $TOMCAT_CONF; then
@@ -490,6 +481,7 @@ EOT
     # Update database credentials in various locations.
     sed -i s/password\:\ hoottest/password\:\ $DB_PASSWORD/ %{services_home}/WEB-INF/classes/db/liquibase.properties
     sed -i s/DB_PASSWORD=hoottest/DB_PASSWORD=$DB_PASSWORD/ %{services_home}/WEB-INF/classes/db/db.properties
+    sed -i s/password=\"hoottest\"/password=\"$DB_PASSWORD\"/ %{services_home}/META-INF/context.xml
 
     systemctl restart tomcat8
 }
