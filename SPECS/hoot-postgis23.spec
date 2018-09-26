@@ -31,9 +31,9 @@ Version:	%{rpmbuild_version}
 Release:	%{rpmbuild_release}%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
-Source0:	http://download.osgeo.org/postgis/source/postgis-%{version}.tar.gz
-Source1:	http://download.osgeo.org/postgis/source/postgis-%{postgisprevversion}.tar.gz
-Source2:	http://download.osgeo.org/postgis/docs/postgis-%{version}.pdf
+Source0:	https://download.osgeo.org/postgis/source/postgis-%{version}.tar.gz
+Source1:	https://download.osgeo.org/postgis/source/postgis-%{postgisprevversion}.tar.gz
+Source2:	https://download.osgeo.org/postgis/docs/postgis-%{version}.pdf
 Source4:	postgis-filter-requires-perl-Pg.sh
 Patch0:		postgis-gdalfpic.patch
 

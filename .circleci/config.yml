@@ -5,7 +5,7 @@ jobs:
   lint:
     working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
-      - image: hootenanny/rpmbuild-lint@sha256:34d389aad27cb6cd10d158063718d5e47d7a7d96d2211e0bbe8f621f57803fa8
+      - image: hootenanny/rpmbuild-lint@sha256:fb81ceeb23c488549fd7dee06a684dc456f0432586610c94d4d0599b13ab4ff8
         user: rpmbuild
     steps:
       - checkout
@@ -52,7 +52,7 @@ jobs:
   develop-install:
     working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
-      - image: hootenanny/run-base-release@sha256:d795cdf73f5841beeca7738435d0407b8aeb890ee79612cc687b69d167effa9c
+      - image: hootenanny/run-base-release@sha256:db9457cc4d24172c27167bff2320f028817579b70d122772eb77744792972987
     steps:
       - checkout
       - attach_workspace:
@@ -64,7 +64,7 @@ jobs:
   develop-upgrade:
     working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
-      - image: hootenanny/run-base-release@sha256:d795cdf73f5841beeca7738435d0407b8aeb890ee79612cc687b69d167effa9c
+      - image: hootenanny/run-base-release@sha256:db9457cc4d24172c27167bff2320f028817579b70d122772eb77744792972987
     steps:
       - checkout
       - attach_workspace:
@@ -76,7 +76,7 @@ jobs:
   develop-sync:
     working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
-      - image: hootenanny/rpmbuild-repo@sha256:7147b62b7a6dded4b72003df0aca52ab4b667dba4da5c11a7ceb4b00bbacd120
+      - image: hootenanny/rpmbuild-repo@sha256:a885b6c875ca3aaaf966c820728beeff8c13097b8ef9f288a2587d5a1d63c30b
         user: rpmbuild
     steps:
       - checkout

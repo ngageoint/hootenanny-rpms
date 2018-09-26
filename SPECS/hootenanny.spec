@@ -92,8 +92,8 @@ BuildRequires:  graphviz
 BuildRequires:  hoot-gdal
 BuildRequires:  hoot-gdal-devel
 BuildRequires:  hoot-gdal-python
-BuildRequires:  hoot-postgis23_%{pg_dotless}-devel
-BuildRequires:  hoot-postgis23_%{pg_dotless}-utils
+BuildRequires:  hoot-postgis24_%{pg_dotless}-devel
+BuildRequires:  hoot-postgis24_%{pg_dotless}-utils
 BuildRequires:  hoot-words
 BuildRequires:  java-1.8.0-openjdk
 BuildRequires:  libicu-devel
@@ -345,13 +345,12 @@ echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hoot
 Summary:   Hootenanny UI and Services
 Group:     Applications/Engineering
 Requires:  %{name}-core = %{version}-%{release}
-Requires:  hoot-postgis23_%{pg_dotless}
+Requires:  hoot-postgis24_%{pg_dotless}
 Requires:  java-1.8.0-openjdk
 Requires:  liquibase
 Requires:  osmosis
 Requires:  postgresql%{pg_dotless}-contrib
 Requires:  postgresql%{pg_dotless}-server
-Requires:  pwgen
 Requires:  tomcat8 < %{tomcat_version_max}
 Requires:  tomcat8 >= %{tomcat_version_min}
 
@@ -543,7 +542,7 @@ if [ "$1" = "1" ]; then
 
     # create Hoot services db
     if ! su -l postgres -c "psql -lqt | cut -d \| -f 1 | grep -qw hoot"; then
-        RAND_PW=$(pwgen -s 16 1)
+        RAND_PW="$(python -c "import string; from random import SystemRandom; print(''.join([SystemRandom().choice(string.ascii_letters + string.digits) for i in range(16)]))")"
         su -l postgres -c "createuser --superuser hoot || true"
         su -l postgres -c "psql -c \"ALTER USER hoot with password '${RAND_PW}';\""
         if [ -f %{hoot_home}/conf/database/DatabaseConfigDefault.sh ]; then
@@ -726,8 +725,8 @@ Summary:   Development dependencies for Hootenanny Services
 Group:     Development/Libraries
 BuildArch: noarch
 Requires:  %{name}-core-devel-deps = %{version}-%{release}
-Requires:  hoot-postgis23_%{pg_dotless}
-Requires:  hoot-postgis23_%{pg_dotless}-utils
+Requires:  hoot-postgis24_%{pg_dotless}
+Requires:  hoot-postgis24_%{pg_dotless}-utils
 Requires:  liquibase
 Requires:  maven
 Requires:  nodejs-devel = %{nodejs_epoch}:%{nodejs_version}
