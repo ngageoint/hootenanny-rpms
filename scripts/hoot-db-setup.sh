@@ -96,6 +96,7 @@ if rpm -qa | grep -q ^hootenanny ; then
 
     # Update liquibase.
     pushd $TOMCAT_WEBAPPS/hoot-services/WEB-INF
+    JDBC_JAR="$(ls lib/postgresql-*.jar)"
     liquibase --contexts=default,production \
         --changeLogFile=classes/db/db.changelog-master.xml \
         --promptForNonLocalDatabase=false \
@@ -104,7 +105,7 @@ if rpm -qa | grep -q ^hootenanny ; then
         --username=$DB_USER \
         --password=$DB_PASSWORD \
         --logLevel=warning \
-        --classpath=lib/postgresql-9.4.1208.jre7.jar \
+        --classpath=$JDBC_JAR \
         update
 
     popd

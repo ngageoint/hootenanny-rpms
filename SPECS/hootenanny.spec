@@ -207,7 +207,7 @@ popd
 %{__install} -d -m 0775 %{buildroot}%{tomcat_config}/conf.d
 %{__install} -d -m 0775 %{buildroot}%{tomcat_home}/.deegree
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}
-%{__install} -m 0775 hoot-services/target/hoot-services*.war %{buildroot}%{tomcat_webapps}/hoot-services.war
+%{__install} -m 0644 hoot-services/target/hoot-services*.war %{buildroot}%{tomcat_webapps}/hoot-services.war
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id/data
@@ -481,7 +481,7 @@ EOT
     # Update database credentials in various locations.
     sed -i s/password\:\ hoottest/password\:\ $DB_PASSWORD/ %{services_home}/WEB-INF/classes/db/liquibase.properties
     sed -i s/DB_PASSWORD=hoottest/DB_PASSWORD=$DB_PASSWORD/ %{services_home}/WEB-INF/classes/db/db.properties
-    sed -i s/\<Password\>hoottest\<\\/Password\>/\<Password\>$DB_PASSWORD\<\\/Password\>/ %{services_home}/WEB-INF/workspace/jdbc/WFS_Connection.xml
+    sed -i s/password=\"hoottest\"/password=\"$DB_PASSWORD\"/ %{services_home}/META-INF/context.xml
 
     systemctl restart tomcat8
 }
@@ -496,6 +496,10 @@ function updateLiquibase () {
     # Apply any database schema changes
     source %{hoot_home}/conf/database/DatabaseConfig.sh
     cd %{services_home}/WEB-INF
+
+    # Get JDBC JAR.
+    JDBC_JAR="$(ls lib/postgresql-*.jar)"
+
     liquibase --contexts=default,production \
         --changeLogFile=classes/db/db.changelog-master.xml \
         --promptForNonLocalDatabase=false \
@@ -504,7 +508,7 @@ function updateLiquibase () {
         --username=$DB_USER \
         --password=$DB_PASSWORD \
         --logLevel=warning \
-        --classpath=lib/postgresql-9.4.1208.jre7.jar \
+        --classpath=$JDBC_JAR \
         update
 }
 
