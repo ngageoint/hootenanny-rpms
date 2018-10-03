@@ -58,7 +58,7 @@ Requires:	pcre
 Requires(post):	%{_sbindir}/update-alternatives
 
 Provides:	%{sname} = %{version}-%{release}
-Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}
+Conflicts:	%{sname}%{postgisprev_dotless}_%{pg_dotless}
 Conflicts:	postgis
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}
 
@@ -75,7 +75,7 @@ Summary:	Client tools and their libraries of PostGIS
 Group:		Applications/Databases
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Provides:	%{sname}-client = %{version}-%{release}
-Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-client
+Conflicts:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-client
 Conflicts:	postgis-client
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-client
 
@@ -88,7 +88,7 @@ Summary:	Development headers and libraries for PostGIS
 Group:		Development/Libraries
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Provides:	%{sname}-devel = %{version}-%{release}
-Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-devel
+Conflicts:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-devel
 Conflicts:	postgis-devel
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-devel
 
@@ -100,7 +100,7 @@ with PostGIS.
 %package docs
 Summary:	Extra documentation for PostGIS
 Group:		Applications/Databases
-Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-docs
+Conflicts:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-docs
 Conflicts:	postgis-docs
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-docs
 
@@ -114,7 +114,7 @@ Group:		Applications/Databases
 Requires:	%{name} = %{version}-%{release}
 Requires:	perl-DBD-Pg
 Provides:	%{sname}-utils = %{version}-%{release}
-Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-utils
+Conflicts:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-utils
 Conflicts:	postgis-utils
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-utils
 
@@ -250,5 +250,8 @@ fi
 %doc postgis-%{version}.pdf
 
 %changelog
+* Wed Oct 03 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 2.4.4-2
+- Fix packaging issues with initial 2.4.4-1 release.
+
 * Mon Sep 24 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 2.4.4-1
 - Initial release, version 2.4.4.
