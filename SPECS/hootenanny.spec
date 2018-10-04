@@ -869,16 +869,12 @@ core. Use this if you want to build from github.
 Summary:   Dependencies for Hootenanny Core
 Group:     Development/Libraries
 BuildArch: noarch
-Requires:  asciidoc
 Requires:  boost-iostreams
 Requires:  boost-system
 Requires:  cppunit
-Requires:  dblatex
 Requires:  FileGDBAPI
 Requires:  geos = %{geos_version}
 Requires:  glpk = %{glpk_version}
-Requires:  gnuplot
-Requires:  graphviz
 Requires:  hoot-gdal = %{gdal_version}
 Requires:  hoot-gdal-devel = %{gdal_version}
 Requires:  hoot-gdal-python = %{gdal_version}
@@ -887,8 +883,6 @@ Requires:  libicu
 Requires:  log4cxx
 Requires:  nodejs = %{nodejs_epoch}:%{nodejs_version}
 Requires:  opencv
-Requires:  perl-libwww-perl
-Requires:  perl-XML-LibXML
 Requires:  postgresql%{pg_dotless}-libs
 Requires:  protobuf
 Requires:  python-matplotlib
@@ -898,7 +892,6 @@ Requires:  qt-x11
 Requires:  stxxl = %{stxxl_version}
 Requires:  unzip
 Requires:  v8
-Requires:  w3m
 Requires:  wget
 Requires:  words
 Requires:  zip
