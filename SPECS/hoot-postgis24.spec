@@ -138,9 +138,9 @@ The %{name}-utils package provides the utilities for PostGIS.
         --without-raster \
 %endif
 %if %{sfcgal}
-	--with-sfcgal=%{_bindir}/sfcgal-config \
+        --with-sfcgal=%{_bindir}/sfcgal-config \
 %endif
-	--disable-rpath --libdir=%{pginstdir}/lib
+        --disable-rpath --libdir=%{pginstdir}/lib
 
 %{__make} LPATH=`%{pginstdir}/bin/pg_config --pkglibdir` shlib="%{name}.so"
 %{__make} -C extensions
@@ -155,7 +155,7 @@ The %{name}-utils package provides the utilities for PostGIS.
 
 %if %utils
 %{__install} -d %{buildroot}%{_datadir}/%{name}
-%{__install} -m 644 utils/*.pl %{buildroot}%{_datadir}/%{name}
+%{__install} -m 0644 utils/*.pl %{buildroot}%{_datadir}/%{name}
 %endif
 
 # Create symlink of .so file. PostGIS hackers said that this is safe:
@@ -170,7 +170,7 @@ The %{name}-utils package provides the utilities for PostGIS.
 %postun
 if [ "$1" -eq 0 ]
   then
-      	# Only remove these links if the package is completely removed from the system (vs.just being upgraded)
+        # Only remove these links if the package is completely removed from the system (vs.just being upgraded)
         %{_sbindir}/update-alternatives --remove postgis-pgsql2shp	%{pginstdir}/bin/pgsql2shp
         %{_sbindir}/update-alternatives --remove postgis-shp2pgsql	%{pginstdir}/bin/shp2pgsql
 fi
@@ -200,7 +200,7 @@ fi
 %{pginstdir}/share/contrib/postgis-%{postgismajorversion}/*sfcgal*.sql
 %endif
 %{pginstdir}/lib/postgis-%{postgisprevmajorversion}.so
-%attr(755,root,root) %{pginstdir}/lib/postgis-%{postgismajorversion}.so
+%attr(0755,root,root) %{pginstdir}/lib/postgis-%{postgismajorversion}.so
 %{pginstdir}/share/extension/postgis-*.sql
 %if %{sfcgal}
 %{pginstdir}/share/extension/postgis_sfcgal*.sql
@@ -227,10 +227,10 @@ fi
 %endif
 
 %files client
-%defattr(644,root,root)
-%attr(755,root,root) %{pginstdir}/bin/pgsql2shp
-%attr(755,root,root) %{pginstdir}/bin/raster2pgsql
-%attr(755,root,root) %{pginstdir}/bin/shp2pgsql
+%defattr(0644,root,root)
+%attr(0755,root,root) %{pginstdir}/bin/pgsql2shp
+%attr(0755,root,root) %{pginstdir}/bin/raster2pgsql
+%attr(0755,root,root) %{pginstdir}/bin/shp2pgsql
 
 %files devel
 %defattr(644,root,root)
@@ -243,7 +243,7 @@ fi
 %files utils
 %defattr(-,root,root)
 %doc utils/README
-%attr(755,root,root) %{_datadir}/%{name}/*.pl
+%attr(0755,root,root) %{_datadir}/%{name}/*.pl
 %endif
 
 %files docs
@@ -251,8 +251,8 @@ fi
 %doc postgis-%{version}.pdf
 
 %changelog
-* Wed Oct 03 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 2.4.4-2
-- Fix packaging issues with initial 2.4.4-1 release.
+* Fri Oct 05 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 2.4.4-2
+- Fix packaging issues in initial release.
 
 * Mon Sep 24 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 2.4.4-1
 - Initial release, version 2.4.4.
