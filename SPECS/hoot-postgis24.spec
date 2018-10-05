@@ -58,7 +58,7 @@ Requires:	pcre
 Requires(post):	%{_sbindir}/update-alternatives
 
 Provides:	%{sname} = %{version}-%{release}
-Conflicts:	%{sname}%{postgisprev_dotless}_%{pg_dotless}
+Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless} = %{version}-%{release}
 Conflicts:	postgis
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}
 
@@ -75,7 +75,7 @@ Summary:	Client tools and their libraries of PostGIS
 Group:		Applications/Databases
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Provides:	%{sname}-client = %{version}-%{release}
-Conflicts:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-client
+Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-client = %{version}-%{release}
 Conflicts:	postgis-client
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-client
 
@@ -88,7 +88,7 @@ Summary:	Development headers and libraries for PostGIS
 Group:		Development/Libraries
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Provides:	%{sname}-devel = %{version}-%{release}
-Conflicts:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-devel
+Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-devel = %{version}-%{release}
 Conflicts:	postgis-devel
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-devel
 
@@ -100,7 +100,7 @@ with PostGIS.
 %package docs
 Summary:	Extra documentation for PostGIS
 Group:		Applications/Databases
-Conflicts:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-docs
+Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-docs = %{version}-%{release}
 Conflicts:	postgis-docs
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-docs
 
@@ -114,7 +114,7 @@ Group:		Applications/Databases
 Requires:	%{name} = %{version}-%{release}
 Requires:	perl-DBD-Pg
 Provides:	%{sname}-utils = %{version}-%{release}
-Conflicts:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-utils
+Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-utils = %{version}-%{release}
 Conflicts:	postgis-utils
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-utils
 
