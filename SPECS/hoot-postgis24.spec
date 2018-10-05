@@ -57,7 +57,7 @@ Requires:	proj
 Requires:	pcre
 Requires(post):	%{_sbindir}/update-alternatives
 
-Provides:	%{sname} = %{version}-%{release}
+Provides:	%{sname}%{pg_dotless} = %{version}-%{release}
 Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless} = %{version}-%{release}
 Conflicts:	postgis
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}
@@ -74,7 +74,7 @@ certified as compliant with the "Types and Functions" profile.
 Summary:	Client tools and their libraries of PostGIS
 Group:		Applications/Databases
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Provides:	%{sname}-client = %{version}-%{release}
+Provides:	%{sname}%{pg_dotless}-client = %{version}-%{release}
 Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-client = %{version}-%{release}
 Conflicts:	postgis-client
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-client
@@ -87,7 +87,7 @@ of PostGIS.
 Summary:	Development headers and libraries for PostGIS
 Group:		Development/Libraries
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Provides:	%{sname}-devel = %{version}-%{release}
+Provides:	%{sname}%{pg_dotless}-devel = %{version}-%{release}
 Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-devel = %{version}-%{release}
 Conflicts:	postgis-devel
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-devel
@@ -100,6 +100,7 @@ with PostGIS.
 %package docs
 Summary:	Extra documentation for PostGIS
 Group:		Applications/Databases
+Provides:	%{sname}%{pg_dotless}-docs = %{version}-%{release}
 Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-docs = %{version}-%{release}
 Conflicts:	postgis-docs
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-docs
@@ -113,7 +114,7 @@ Summary:	The utils for PostGIS
 Group:		Applications/Databases
 Requires:	%{name} = %{version}-%{release}
 Requires:	perl-DBD-Pg
-Provides:	%{sname}-utils = %{version}-%{release}
+Provides:	%{sname}%{pg_dotless}-utils = %{version}-%{release}
 Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-utils = %{version}-%{release}
 Conflicts:	postgis-utils
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-utils
