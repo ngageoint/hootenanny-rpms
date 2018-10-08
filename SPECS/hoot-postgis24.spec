@@ -163,8 +163,10 @@ The %{name}-utils package provides the utilities for PostGIS.
 %{__install} -m 0644 utils/*.pl %{buildroot}%{_datadir}/%{name}
 %endif
 
-# Create symlink of .so file. PostGIS hackers said that this is safe:
+# Create symlink of .so files to previous versions. PostGIS hackers said that this is safe:
 %{__ln_s} %{pginstdir}/lib/postgis-%{postgismajorversion}.so %{buildroot}%{pginstdir}/lib/postgis-%{postgisprevmajorversion}.so
+%{__ln_s} %{pginstdir}/lib/postgis_topology-%{postgismajorversion}.so %{buildroot}%{pginstdir}/lib/postgis_topology-%{postgisprevmajorversion}.so
+%{__ln_s} %{pginstdir}/lib/rtpostgis-%{postgismajorversion}.so %{buildroot}%{pginstdir}/lib/rtpostgis-%{postgisprevmajorversion}.so
 
 # Create alternatives entries for common binaries
 %post
@@ -214,6 +216,7 @@ fi
 %{pginstdir}/share/extension/postgis.control
 %{pginstdir}/lib/liblwgeom*.so.*
 %{pginstdir}/lib/postgis_topology-%{postgismajorversion}.so
+%{pginstdir}/lib/postgis_topology-%{postgisprevmajorversion}.so
 %{pginstdir}/lib/address_standardizer-%{postgismajorversion}.so
 %{pginstdir}/lib/liblwgeom.so
 %{pginstdir}/share/extension/address_standardizer*.sql
@@ -225,6 +228,7 @@ fi
 %{pginstdir}/share/contrib/postgis-%{postgismajorversion}/uninstall_legacy.sql
 %{pginstdir}/share/contrib/postgis-%{postgismajorversion}/spatial*.sql
 %{pginstdir}/lib/rtpostgis-%{postgismajorversion}.so
+%{pginstdir}/lib/rtpostgis-%{postgisprevmajorversion}.so
 %{pginstdir}/share/extension/postgis_topology-*.sql
 %{pginstdir}/share/extension/postgis_topology.control
 %{pginstdir}/share/extension/postgis_tiger_geocoder*.sql
@@ -256,7 +260,7 @@ fi
 %doc postgis-%{version}.pdf
 
 %changelog
-* Fri Oct 05 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 2.4.4-2
+* Mon Oct 08 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 2.4.4-2
 - Fix packaging issues in initial release.
 
 * Mon Sep 24 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 2.4.4-1
