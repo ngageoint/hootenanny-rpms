@@ -57,8 +57,9 @@ Requires:	proj
 Requires:	pcre
 Requires(post):	%{_sbindir}/update-alternatives
 
-Provides:	%{sname} = %{version}-%{release}
 Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}
+Provides:	%{sname}%{pg_dotless} = %{version}-%{release}
+Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless} = %{version}-%{release}
 Conflicts:	postgis
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}
 
@@ -74,8 +75,9 @@ certified as compliant with the "Types and Functions" profile.
 Summary:	Client tools and their libraries of PostGIS
 Group:		Applications/Databases
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Provides:	%{sname}-client = %{version}-%{release}
 Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-client
+Provides:	%{sname}%{pg_dotless}-client = %{version}-%{release}
+Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-client = %{version}-%{release}
 Conflicts:	postgis-client
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-client
 
@@ -87,8 +89,9 @@ of PostGIS.
 Summary:	Development headers and libraries for PostGIS
 Group:		Development/Libraries
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Provides:	%{sname}-devel = %{version}-%{release}
 Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-devel
+Provides:	%{sname}%{pg_dotless}-devel = %{version}-%{release}
+Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-devel = %{version}-%{release}
 Conflicts:	postgis-devel
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-devel
 
@@ -101,6 +104,8 @@ with PostGIS.
 Summary:	Extra documentation for PostGIS
 Group:		Applications/Databases
 Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-docs
+Provides:	%{sname}%{pg_dotless}-docs = %{version}-%{release}
+Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-docs = %{version}-%{release}
 Conflicts:	postgis-docs
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-docs
 
@@ -113,8 +118,9 @@ Summary:	The utils for PostGIS
 Group:		Applications/Databases
 Requires:	%{name} = %{version}-%{release}
 Requires:	perl-DBD-Pg
-Provides:	%{sname}-utils = %{version}-%{release}
 Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-utils
+Provides:	%{sname}%{pg_dotless}-utils = %{version}-%{release}
+Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-utils = %{version}-%{release}
 Conflicts:	postgis-utils
 Conflicts:	postgis%{postgiscurrmajorversion}_%{pg_dotless}-utils
 
@@ -137,9 +143,9 @@ The %{name}-utils package provides the utilities for PostGIS.
         --without-raster \
 %endif
 %if %{sfcgal}
-	--with-sfcgal=%{_bindir}/sfcgal-config \
+        --with-sfcgal=%{_bindir}/sfcgal-config \
 %endif
-	--disable-rpath --libdir=%{pginstdir}/lib
+        --disable-rpath --libdir=%{pginstdir}/lib
 
 %{__make} LPATH=`%{pginstdir}/bin/pg_config --pkglibdir` shlib="%{name}.so"
 %{__make} -C extensions
@@ -154,11 +160,13 @@ The %{name}-utils package provides the utilities for PostGIS.
 
 %if %utils
 %{__install} -d %{buildroot}%{_datadir}/%{name}
-%{__install} -m 644 utils/*.pl %{buildroot}%{_datadir}/%{name}
+%{__install} -m 0644 utils/*.pl %{buildroot}%{_datadir}/%{name}
 %endif
 
-# Create symlink of .so file. PostGIS hackers said that this is safe:
+# Create symlink of .so files to previous versions. PostGIS hackers said that this is safe:
 %{__ln_s} %{pginstdir}/lib/postgis-%{postgismajorversion}.so %{buildroot}%{pginstdir}/lib/postgis-%{postgisprevmajorversion}.so
+%{__ln_s} %{pginstdir}/lib/postgis_topology-%{postgismajorversion}.so %{buildroot}%{pginstdir}/lib/postgis_topology-%{postgisprevmajorversion}.so
+%{__ln_s} %{pginstdir}/lib/rtpostgis-%{postgismajorversion}.so %{buildroot}%{pginstdir}/lib/rtpostgis-%{postgisprevmajorversion}.so
 
 # Create alternatives entries for common binaries
 %post
@@ -169,7 +177,7 @@ The %{name}-utils package provides the utilities for PostGIS.
 %postun
 if [ "$1" -eq 0 ]
   then
-      	# Only remove these links if the package is completely removed from the system (vs.just being upgraded)
+        # Only remove these links if the package is completely removed from the system (vs.just being upgraded)
         %{_sbindir}/update-alternatives --remove postgis-pgsql2shp	%{pginstdir}/bin/pgsql2shp
         %{_sbindir}/update-alternatives --remove postgis-shp2pgsql	%{pginstdir}/bin/shp2pgsql
 fi
@@ -199,7 +207,7 @@ fi
 %{pginstdir}/share/contrib/postgis-%{postgismajorversion}/*sfcgal*.sql
 %endif
 %{pginstdir}/lib/postgis-%{postgisprevmajorversion}.so
-%attr(755,root,root) %{pginstdir}/lib/postgis-%{postgismajorversion}.so
+%attr(0755,root,root) %{pginstdir}/lib/postgis-%{postgismajorversion}.so
 %{pginstdir}/share/extension/postgis-*.sql
 %if %{sfcgal}
 %{pginstdir}/share/extension/postgis_sfcgal*.sql
@@ -208,6 +216,7 @@ fi
 %{pginstdir}/share/extension/postgis.control
 %{pginstdir}/lib/liblwgeom*.so.*
 %{pginstdir}/lib/postgis_topology-%{postgismajorversion}.so
+%{pginstdir}/lib/postgis_topology-%{postgisprevmajorversion}.so
 %{pginstdir}/lib/address_standardizer-%{postgismajorversion}.so
 %{pginstdir}/lib/liblwgeom.so
 %{pginstdir}/share/extension/address_standardizer*.sql
@@ -219,6 +228,7 @@ fi
 %{pginstdir}/share/contrib/postgis-%{postgismajorversion}/uninstall_legacy.sql
 %{pginstdir}/share/contrib/postgis-%{postgismajorversion}/spatial*.sql
 %{pginstdir}/lib/rtpostgis-%{postgismajorversion}.so
+%{pginstdir}/lib/rtpostgis-%{postgisprevmajorversion}.so
 %{pginstdir}/share/extension/postgis_topology-*.sql
 %{pginstdir}/share/extension/postgis_topology.control
 %{pginstdir}/share/extension/postgis_tiger_geocoder*.sql
@@ -226,10 +236,10 @@ fi
 %endif
 
 %files client
-%defattr(644,root,root)
-%attr(755,root,root) %{pginstdir}/bin/pgsql2shp
-%attr(755,root,root) %{pginstdir}/bin/raster2pgsql
-%attr(755,root,root) %{pginstdir}/bin/shp2pgsql
+%defattr(0644,root,root)
+%attr(0755,root,root) %{pginstdir}/bin/pgsql2shp
+%attr(0755,root,root) %{pginstdir}/bin/raster2pgsql
+%attr(0755,root,root) %{pginstdir}/bin/shp2pgsql
 
 %files devel
 %defattr(644,root,root)
@@ -242,7 +252,7 @@ fi
 %files utils
 %defattr(-,root,root)
 %doc utils/README
-%attr(755,root,root) %{_datadir}/%{name}/*.pl
+%attr(0755,root,root) %{_datadir}/%{name}/*.pl
 %endif
 
 %files docs
@@ -250,5 +260,8 @@ fi
 %doc postgis-%{version}.pdf
 
 %changelog
+* Mon Oct 08 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 2.4.4-2
+- Fix packaging issues in initial release.
+
 * Mon Sep 24 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 2.4.4-1
 - Initial release, version 2.4.4.
