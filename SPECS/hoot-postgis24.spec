@@ -57,6 +57,7 @@ Requires:	proj
 Requires:	pcre
 Requires(post):	%{_sbindir}/update-alternatives
 
+Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}
 Provides:	%{sname}%{pg_dotless} = %{version}-%{release}
 Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless} = %{version}-%{release}
 Conflicts:	postgis
@@ -74,6 +75,7 @@ certified as compliant with the "Types and Functions" profile.
 Summary:	Client tools and their libraries of PostGIS
 Group:		Applications/Databases
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-client
 Provides:	%{sname}%{pg_dotless}-client = %{version}-%{release}
 Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-client = %{version}-%{release}
 Conflicts:	postgis-client
@@ -87,6 +89,7 @@ of PostGIS.
 Summary:	Development headers and libraries for PostGIS
 Group:		Development/Libraries
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-devel
 Provides:	%{sname}%{pg_dotless}-devel = %{version}-%{release}
 Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-devel = %{version}-%{release}
 Conflicts:	postgis-devel
@@ -100,6 +103,7 @@ with PostGIS.
 %package docs
 Summary:	Extra documentation for PostGIS
 Group:		Applications/Databases
+Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-docs
 Provides:	%{sname}%{pg_dotless}-docs = %{version}-%{release}
 Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-docs = %{version}-%{release}
 Conflicts:	postgis-docs
@@ -114,6 +118,7 @@ Summary:	The utils for PostGIS
 Group:		Applications/Databases
 Requires:	%{name} = %{version}-%{release}
 Requires:	perl-DBD-Pg
+Obsoletes:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-utils
 Provides:	%{sname}%{pg_dotless}-utils = %{version}-%{release}
 Provides:	%{sname}%{postgisprev_dotless}_%{pg_dotless}-utils = %{version}-%{release}
 Conflicts:	postgis-utils
