@@ -26,8 +26,9 @@
 %global hoot_version_tag %(echo %{hoot_version_gen} | %{__awk} -F_ '{ print $1 }')
 %global hoot_extra_version %(echo %{hoot_version_gen} | %{__awk} -F_ '{ print $2 }')
 
-# The NodeJS Mapnik service is disabled until it can be fixed.
-%global with_node_mapnik 0
+# Disable NodeJS Mapnik service is until fixed.
+%bcond_with node_mapnik
+
 
 %if 0%{hoot_extra_version} == 0
   # If this is a tagged release, then we want the RPM release to be
@@ -180,7 +181,7 @@ pushd node-export-server
 npm install --production
 popd
 
-%if 0%{with_node_mapnik} == 1
+%if %{with node_mapnik}
 pushd node-mapnik-server
 npm install --production
 popd
@@ -253,7 +254,7 @@ Restart=on-abort
 WantedBy=multi-user.target
 EOF
 
-%if 0%{with_node_mapnik} == 1
+%if %{with node_mapnik}
 # node-mapnik
 %{__install} -d -m 0775 %{buildroot}%{hoot_home}/node-mapnik-server
 %{__cp} -p node-mapnik-server/*.{js,json,xml,svg} %{buildroot}%{hoot_home}/node-mapnik-server
@@ -365,13 +366,13 @@ This package contains the UI and web services.
 
 %files services-ui
 %{_unitdir}/node-export.service
-%if 0%{with_node_mapnik} == 1
+%if %{with node_mapnik}
 %{_unitdir}/node-mapnik.service
 %endif
 
 %defattr(-, root, tomcat, 0775)
 %{hoot_home}/node-export-server
-%if 0%{with_node_mapnik} == 1
+%if %{with node_mapnik}
 %{hoot_home}/node-mapnik-server
 %endif
 %{hoot_home}/test-files
@@ -410,7 +411,7 @@ fi
 %preun services-ui
 
 %systemd_preun node-export.service
-%if 0%{with_node_mapnik} == 1
+%if %{with node_mapnik}
 %systemd_preun node-mapnik.service
 %endif
 
@@ -419,7 +420,7 @@ fi
 if test -f /.dockerenv; then exit 0; fi
 
 %systemd_post node-export.service
-%if 0%{with_node_mapnik} == 1
+%if %{with node_mapnik}
 %systemd_post node-mapnik.service
 %endif
 
@@ -592,7 +593,7 @@ EOT
     rm -f /tmp/osmapidb.log
 
     systemctl start node-export.service
-%if 0%{with_node_mapnik} == 1
+%if %{with node_mapnik}
     systemctl start node-mapnik.service
 %endif
 
@@ -624,7 +625,7 @@ fi
 if test -f /.dockerenv; then exit 0; fi
 
 %systemd_postun node-export.service
-%if 0%{with_node_mapnik} == 1
+%if %{with node_mapnik}
 %systemd_postun node-mapnik.service
 %endif
 
@@ -686,7 +687,7 @@ if [ "$1" = "1" ]; then
     systemctl enable tomcat8
     # set NodeJS node-export-server to autostart
     systemctl enable node-export
-%if 0%{with_node_mapnik} == 1
+%if %{with node_mapnik}
     # set NodeJS node-mapnik-server to autostart
     systemctl enable node-mapnik
 %endif
@@ -705,7 +706,7 @@ if [ "$1" = "0" ]; then
     systemctl disable tomcat8
     # set NodeJS node-export-server to NOT autostart
     systemctl disable node-export
-%if 0%{with_node_mapnik} == 1
+%if %{with node_mapnik}
     # set NodeJS node-mapnik-server to NOT autostart
     systemctl disable node-mapnik
 %endif
