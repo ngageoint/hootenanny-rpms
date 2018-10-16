@@ -29,6 +29,8 @@
 # Disable NodeJS Mapnik service is until fixed.
 %bcond_with node_mapnik
 
+# Conditional for including Hootenanny 2.x files while separat.e
+%bcond_without hoot_ui2
 
 %if 0%{hoot_extra_version} == 0
   # If this is a tagged release, then we want the RPM release to be
@@ -215,6 +217,14 @@ popd
 %{__cp} -pr hoot-ui/dist/* %{buildroot}%{tomcat_webapps}/%{name}-id/
 %{__install} -m 0644 hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{tomcat_webapps}/%{name}-id/data
 %{__install} -m 0644 hoot-ui/data/tdsv61_field_values.json %{buildroot}%{tomcat_webapps}/%{name}-id/data
+%if %{with hoot_ui2}
+# Hootenanny UI 2.x files.
+%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id2x
+%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id2x/data
+%{__cp} -pr hoot-ui-2x/dist/* %{buildroot}%{tomcat_webapps}/%{name}-id2x/
+%{__install} -m 0644 hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{tomcat_webapps}/%{name}-id2x/data
+%{__install} -m 0644 hoot-ui/data/tdsv61_field_values.json %{buildroot}%{tomcat_webapps}/%{name}-id2x/data
+%endif
 
 # Tomcat environment settings for Hootenanny.
 %{__cat} >> %{buildroot}%{tomcat_config}/conf.d/hoot.conf << EOF
@@ -380,6 +390,9 @@ This package contains the UI and web services.
 %{tomcat_config}/conf.d/hoot.conf
 %{tomcat_webapps}/hoot-services.war
 %{tomcat_webapps}/%{name}-id
+%if %{with hoot_ui2}
+%{tomcat_webapps}/%{name}-id2x
+%endif
 
 %defattr(-, tomcat, tomcat, 0775)
 %{hoot_home}/tmp
