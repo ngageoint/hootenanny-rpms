@@ -24,8 +24,11 @@ fi
 shellcheck \
     scripts/docker-install.sh \
     scripts/hoot-archive.sh \
+    scripts/hoot-checkout.sh \
     scripts/hoot-repo.sh \
     scripts/latest-archive.sh \
+    scripts/nodejs-install.sh \
+    scripts/nodesource-repo.sh \
     scripts/query-archive.sh \
     scripts/repo-sync.sh \
     scripts/repo-update.sh \
@@ -38,9 +41,6 @@ shellcheck \
 # Scripts with *only* quoting errors.
 shellcheck \
     --exclude SC2086 \
-    scripts/hoot-checkout.sh \
-    scripts/nodejs-install.sh \
-    scripts/nodesource-repo.sh \
     scripts/pgdg-repo.sh \
     scripts/postgresql-install.sh \
     scripts/repo-sign.sh \

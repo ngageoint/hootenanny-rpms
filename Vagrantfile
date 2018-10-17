@@ -247,6 +247,17 @@ def rpmbuild(config, name, options)
         rpmbuild_cmd << macro
       end
 
+      # Set any with/without options.
+      options.fetch('with', []).each do |with_option|
+        rpmbuild_cmd << '--with'
+        rpmbuild_cmd << with_option
+      end
+
+      options.fetch('without', []).each do |without_option|
+        rpmbuild_cmd << '--without'
+        rpmbuild_cmd << without_option
+      end
+
       # Default to using `rpmbuild -bb`.
       rpmbuild_cmd << options.fetch('build_type', '-bb')
       rpmbuild_cmd << options.fetch('spec_file', "SPECS/#{name}.spec")
