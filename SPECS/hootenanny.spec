@@ -26,7 +26,7 @@
 %global hoot_version_tag %(echo %{hoot_version_gen} | %{__awk} -F_ '{ print $1 }')
 %global hoot_extra_version %(echo %{hoot_version_gen} | %{__awk} -F_ '{ print $2 }')
 
-# Disable NodeJS Mapnik service is until fixed.
+# Disable NodeJS Mapnik service until fixed in Hootenanny.
 %bcond_with node_mapnik
 
 # Include Hootenanny 2.x files by default.
