@@ -29,7 +29,7 @@
 # Disable NodeJS Mapnik service is until fixed.
 %bcond_with node_mapnik
 
-# Conditional for including Hootenanny 2.x files while separat.e
+# Include Hootenanny 2.x files by default.
 %bcond_without hoot_ui2
 
 %if 0%{hoot_extra_version} == 0
