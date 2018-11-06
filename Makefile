@@ -77,6 +77,7 @@ GLPK_RPM := $(call rpm_file,glpk,x86_64)
 FILEGDBAPI_RPM := $(call rpm_file,FileGDBAPI,x86_64)
 LIBGEOTIFF_RPM := $(call rpm_file,libgeotiff,x86_64)
 LIBKML_RPM := $(call rpm_file,libkml,x86_64)
+LIBPHONENUMBER_RPM := $(call rpm_file,libphonenumber,x86_64)
 NODEJS_RPM := $(call rpm_file,nodejs,x86_64)
 OSMOSIS_RPM := $(call rpm_file,osmosis,noarch)
 POSTGIS_RPM := $(call rpm_file2,hoot-postgis24_$(PG_DOTLESS),postgis,x86_64)
@@ -99,6 +100,7 @@ DEPENDENCY_CONTAINERS := \
 	rpmbuild-glpk \
 	rpmbuild-libgeotiff \
 	rpmbuild-libkml \
+	rpmbuild-libphonenumber \
 	rpmbuild-postgis \
 	rpmbuild-nodejs
 
@@ -114,6 +116,7 @@ DEPENDENCY_RPMS := \
 	glpk \
 	libgeotiff \
 	libkml \
+	libphonenumber \
 	hoot-gdal \
 	hoot-postgis24_$(PG_DOTLESS) \
 	hoot-words \
@@ -266,6 +269,10 @@ rpmbuild-libkml: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-libkml/docker/id
 
+rpmbuild-libphonenumber: \
+	rpmbuild-generic \
+	.vagrant/machines/rpmbuild-libphonenumber/docker/id
+
 rpmbuild-nodejs: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-nodejs/docker/id
@@ -318,6 +325,7 @@ geos: rpmbuild-geos $(GEOS_RPM)
 FileGDBAPI: rpmbuild-generic $(FILEGDBAPI_RPM)
 libgeotiff: rpmbuild-libgeotiff $(LIBGEOTIFF_RPM)
 libkml: rpmbuild-libkml $(LIBKML_RPM)
+libphonenumber: rpmbuild-libphonenumber $(LIBPHONENUMBER_RPM)
 nodejs: rpmbuild-nodejs $(NODEJS_RPM)
 glpk: rpmbuild-glpk $(GLPK_RPM)
 hoot-gdal: rpmbuild-gdal $(GDAL_RPM)
@@ -343,6 +351,7 @@ RPMS/x86_64/hootenanny-%.rpm: .vagrant/machines/$(BUILD_IMAGE)/docker/id
 	  --define "geos_version %(rpm -q --queryformat '%%{version}' geos)" \
 	  --define "glpk_version %(rpm -q --queryformat '%%{version}' glpk)" \
 	  --define "gdal_version %(rpm -q --queryformat '%%{version}' hoot-gdal)" \
+	  --define "libphonenumber_version %(rpm -q --queryformat '%%{version}' libphonenumber)" \
 	  --define "nodejs_version %(rpm -q --queryformat '%%{version}' nodejs)" \
 	  --define "stxxl_version %(rpm -q --queryformat '%%{version}' stxxl)" \
 	  --define "tomcat_version %(rpm -q --queryformat '%%{version}' tomcat8)" \

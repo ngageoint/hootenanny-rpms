@@ -100,6 +100,13 @@ repository and are [MIT licensed](./licenses/Fedora-LICENSE):
 * [`libkml-fragile_test.patch`](../SOURCES/libkml-fragile_test.patch)
 * [`libkml-dont-bytecompile.patch`](../SOURCES/libkml-dont-bytecompile.patch)
 
+## libphonenumber
+
+The [libphonenumber](https://github.com/googlei18n/libphonenumber) source
+archives were obtained directly from
+[GitHub](https://github.com/googlei18n/libphonenumber/releases) and are
+[Apache 2 licensed](https://github.com/googlei18n/libphonenumber/blob/master/LICENSE).
+
 ## NodeJS
 
 The [NodeJS](https://nodejs.org/) source archives are obtained
