@@ -54,6 +54,7 @@ applications which use the Google libphonenumber C++ library.
 pushd cpp/build
 %{cmake} ..
 %{make_build}
+popd
 
 
 %check
