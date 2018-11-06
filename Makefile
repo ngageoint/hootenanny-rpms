@@ -351,6 +351,7 @@ RPMS/x86_64/hootenanny-%.rpm: .vagrant/machines/$(BUILD_IMAGE)/docker/id
 	  --define "geos_version %(rpm -q --queryformat '%%{version}' geos)" \
 	  --define "glpk_version %(rpm -q --queryformat '%%{version}' glpk)" \
 	  --define "gdal_version %(rpm -q --queryformat '%%{version}' hoot-gdal)" \
+	  --define "libphonenumber_version %(rpm -q --queryformat '%%{version}' libphonenumber)" \
 	  --define "nodejs_version %(rpm -q --queryformat '%%{version}' nodejs)" \
 	  --define "stxxl_version %(rpm -q --queryformat '%%{version}' stxxl)" \
 	  --define "tomcat_version %(rpm -q --queryformat '%%{version}' tomcat8)" \

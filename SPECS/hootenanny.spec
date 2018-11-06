@@ -18,6 +18,8 @@
 #  * geos_version
 #  * glpk_version
 #  * gdal_version
+#  * libphonenumber_version
+#  * nodejs_version
 #  * stxxl_version
 #  * tomcat_version
 
@@ -100,6 +102,7 @@ BuildRequires:  hoot-postgis24_%{pg_dotless}-utils
 BuildRequires:  hoot-words
 BuildRequires:  java-1.8.0-openjdk
 BuildRequires:  libicu-devel
+BuildRequires:  libphonenumber-devel
 BuildRequires:  libxslt
 BuildRequires:  log4cxx-devel
 BuildRequires:  maven
@@ -894,6 +897,7 @@ Requires:  hoot-gdal-devel = %{gdal_version}
 Requires:  hoot-gdal-python = %{gdal_version}
 Requires:  hoot-words
 Requires:  libicu
+Requires:  libphonenumber = %{libphonenumber_version}
 Requires:  log4cxx
 Requires:  nodejs = %{nodejs_epoch}:%{nodejs_version}
 Requires:  opencv
