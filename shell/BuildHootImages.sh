@@ -38,6 +38,8 @@ case "${BUILD_IMAGE}" in
                --build-arg glpk_version=$GLPK_VERSION-$GLPK_RELEASE \
                --build-arg libgeotiff_version=$LIBGEOTIFF_VERSION-$LIBGEOTIFF_RELEASE \
                --build-arg libkml_version=$LIBKML_VERSION-$LIBKML_RELEASE \
+               --build-arg libphonenumber_version="$LIBPHONENUMBER_VERSION-$LIBPHONENUMBER_RELEASE" \
+               --build-arg libpostal_version="$LIBPOSTAL_VERSION-$LIBPOSTAL_RELEASE" \
                --build-arg mocha_version=$MOCHA_VERSION \
                --build-arg pg_version=$PG_VERSION \
                --build-arg postgis_version=$POSTGIS_VERSION-$POSTGIS_RELEASE \

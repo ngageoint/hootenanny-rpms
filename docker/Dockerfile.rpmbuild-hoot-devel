@@ -30,6 +30,8 @@ ARG geos_version
 ARG glpk_version
 ARG libgeotiff_version
 ARG libkml_version
+ARG libphonenumber_version
+ARG libpostal_version
 ARG mocha_version
 ARG nodejs_version
 ARG osmosis_version
@@ -67,6 +69,10 @@ COPY RPMS/x86_64/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/libphonenumber-${libphonenumber_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/libphonenumber-devel-${libphonenumber_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/libpostal-${libpostal_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/libpostal-devel-${libpostal_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/nodejs-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/nodejs-devel-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/noarch/osmosis-${osmosis_version}${RPMBUILD_DIST}.noarch.rpm \
@@ -96,6 +102,10 @@ RUN yum install -y \
     /tmp/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/libphonenumber-${libphonenumber_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/libphonenumber-devel-${libphonenumber_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/libpostal-${libpostal_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/libpostal-devel-${libpostal_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/nodejs-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/nodejs-devel-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/osmosis-${osmosis_version}${RPMBUILD_DIST}.noarch.rpm \

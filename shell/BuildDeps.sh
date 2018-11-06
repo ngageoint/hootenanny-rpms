@@ -96,6 +96,39 @@ if [ ! -f $RPM_X86_64/$LIBKML_RPM ]; then
         -bb SPECS/libkml.spec
 fi
 
+# libphonenumber
+if [ ! -f "$RPM_X86_64/$LIBPHONENUMBER_RPM" ]; then
+    echo "#### Building RPM: libphonenumber"
+
+    # Build image for building libphonenumber.
+    docker build \
+           --build-arg "packages=$( spec_requires libphonenumber )" \
+           -f "$SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic" \
+           -t hootenanny/rpmbuild-libphonenumber \
+           "$SCRIPT_HOME"
+
+    # Generate libphonenumber RPM.
+    run_dep_image \
+        -i hootenanny/rpmbuild-libphonenumber \
+        rpmbuild \
+        --define "rpmbuild_version $LIBPHONENUMBER_VERSION" \
+        --define "rpmbuild_release $LIBPHONENUMBER_RELEASE" \
+        -bb SPECS/libphonenumber.spec
+fi
+
+# libpostal
+if [ ! -f "$RPM_X86_64/$LIBPOSTAL_RPM" ]; then
+    echo "#### Building RPM: libpostal"
+
+    # Generate libpostal RPM.
+    run_dep_image \
+        -i hootenanny/rpmbuild-generic \
+        rpmbuild \
+        --define "rpmbuild_version $LIBPOSTAL_VERSION" \
+        --define "rpmbuild_release $LIBPOSTAL_RELEASE" \
+        -bb SPECS/libpostal.spec
+fi
+
 # NodeJS
 if [ ! -f $RPM_X86_64/$NODEJS_RPM ]; then
     echo "#### Building RPM: NodeJS"
