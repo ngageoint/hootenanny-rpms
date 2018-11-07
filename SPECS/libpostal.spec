@@ -51,24 +51,28 @@ statistical NLP and open data. The goal of this project is to understand
 location-based strings in every language, everywhere.
 
 
+%package data
+Summary:        Data files and training models for libpostal
+Requires:       %{name}%{_isa} = %{version}-%{release}
+
+%description data
+The data files are on-disk representations of the data structures necessary to
+perform address expansion as well as model training data.
+
+
 %package devel
 Summary:        Development headers and files for libpostal
 Requires:       %{name}%{_isa} = %{version}-%{release}
 
 %description devel
-The %{name}-devel package contains libraries and headers for developing
-applications which use the libphonenumber C library.
+Contains libraries and headers for developing applications which use the
+libpostal library.
 
 
 %prep
 %setup -q
 %patch0 -p1
 %patch1 -p1
-
-%{__mkdir_p} %{libpostal_data}
-%{__tar} -C %{libpostal_data} -xzf %{SOURCE1}
-%{__tar} -C %{libpostal_data} -xzf %{SOURCE2}
-%{__tar} -C %{libpostal_data} -xzf %{SOURCE3}
 
 
 %build
@@ -80,9 +84,18 @@ applications which use the libphonenumber C library.
 
 %install
 %{makeinstall}
+# Extract the data files in the buildroot.
+%{__install} -d -m 0755 %{buildroot}%{libpostal_data}
+%{__tar} -C %{buildroot}%{libpostal_data} -xzf %{SOURCE1}
+%{__tar} -C %{buildroot}%{libpostal_data} -xzf %{SOURCE2}
+%{__tar} -C %{buildroot}%{libpostal_data} -xzf %{SOURCE3}
 
 
 %check
+# Link in datafiles from the buildroot to the global data directory.
+%{__mkdir_p} %{libpostal_data}
+%{__rm} -f %{libpostal_data}/*
+find %{buildroot}%{libpostal_data} -maxdepth 1 -type d -exec ln -s {} %{libpostal_data} \;
 %{__make} check
 
 
@@ -91,6 +104,10 @@ applications which use the libphonenumber C library.
 %{_libdir}/*.so.*
 %exclude %{_libdir}/*.la
 %exclude %{_libdir}/*.a
+
+
+%files data
+%{libpostal_data}
 
 
 %files devel
