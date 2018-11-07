@@ -81,7 +81,6 @@ libpostal library.
 %{make_build}
 
 
-
 %install
 %{makeinstall}
 # Extract the data files in the buildroot.
@@ -100,6 +99,8 @@ find %{buildroot}%{libpostal_data} -maxdepth 1 -type d -exec ln -s {} %{libposta
 
 
 %files
+%doc README.md
+%license LICENSE
 %{_bindir}/libpostal_data
 %{_libdir}/*.so.*
 %exclude %{_libdir}/*.la
