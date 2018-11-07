@@ -20,6 +20,9 @@
 # the user invoking `rpmbuild` in order to run the tests.
 %global libpostal_data %{_datadir}/libpostal
 
+# By default, run the test suite.
+%bcond_without tests
+
 Name:           libpostal
 Version:        %{rpmbuild_version}
 Release:        %{rpmbuild_release}%{?dist}
@@ -72,7 +75,9 @@ libpostal library.
 %prep
 %setup -q
 %patch0 -p1
+%if %{with tests}
 %patch1 -p1
+%endif
 
 
 %build
@@ -90,12 +95,14 @@ libpostal library.
 %{__tar} -C %{buildroot}%{libpostal_data} -xzf %{SOURCE3}
 
 
+%if %{with tests}
 %check
 # Link in datafiles from the buildroot to the global data directory.
 %{__mkdir_p} %{libpostal_data}
 %{__rm} -f %{libpostal_data}/*
 find %{buildroot}%{libpostal_data} -maxdepth 1 -type d -exec ln -s {} %{libpostal_data} \;
 %{__make} check
+%endif
 
 
 %files
