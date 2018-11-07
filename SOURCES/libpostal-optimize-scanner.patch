@@ -1,0 +1,13 @@
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 8e1b8b0..606f803 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -1,7 +1,7 @@
+ # Inherited from autoconf / user-specified
+ CFLAGS_CONF = @CFLAGS@
+ CFLAGS_BASE = -Wall -Wextra -Wno-unused-function -Wformat -Werror=format-security -Winit-self -Wno-sign-compare -DLIBPOSTAL_DATA_DIR='"$(datadir)/libpostal"' -g $(CFLAGS_CONF)
+-CFLAGS_O0 = $(CFLAGS_BASE) -O0
++CFLAGS_O0 = $(CFLAGS_BASE)
+ CFLAGS_O1 = $(CFLAGS_BASE)
+ CFLAGS_O2 = $(CFLAGS_BASE)
+ CFLAGS_O3 = $(CFLAGS_BASE)

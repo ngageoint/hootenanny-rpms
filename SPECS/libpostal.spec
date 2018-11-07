@@ -23,6 +23,10 @@
 # By default, run the test suite.
 %bcond_without tests
 
+# When enabled, don't force use of -O0 optimization on the scanner file.
+# This will make compilation take a *long* time (~1 hour).
+%bcond_with optimize_scanner
+
 Name:           libpostal
 Version:        %{rpmbuild_version}
 Release:        %{rpmbuild_release}%{?dist}
@@ -41,6 +45,9 @@ Patch0:         libpostal-configure.patch
 # Calling `crf_context_destroy` at end of tests will cause a segfault,
 # must patch in order to run the test suite.
 Patch1:         libpostal-tests-fix.patch
+
+# Don't use -O0 when compiling the scanner.
+Patch2:         libpostal-optimize-scanner.patch
 
 BuildRequires:  atlas-devel
 BuildRequires:  autoconf
@@ -77,6 +84,9 @@ libpostal library.
 %patch0 -p1
 %if %{with tests}
 %patch1 -p1
+%endif
+%if %{with optimize_scanner}
+%patch2 -p1
 %endif
 
 
