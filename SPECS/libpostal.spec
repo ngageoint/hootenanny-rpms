@@ -39,9 +39,9 @@ Patch0:         libpostal-configure.patch
 # must patch in order to run the test suite.
 Patch1:         libpostal-tests-fix.patch
 
+BuildRequires:  atlas-devel
 BuildRequires:  autoconf
 BuildRequires:  automake
-BuildRequires:  blas-devel
 BuildRequires:  libtool
 BuildRequires:  pkgconfig
 

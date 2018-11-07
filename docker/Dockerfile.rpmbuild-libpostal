@@ -26,7 +26,7 @@ USER root
 # Install blas and create a data directory in /usr/share for libpostal
 # that's writable by the rpmbuild user.  Unfortunately, it's impossible
 # to test the program without using the global data directory :(
-RUN yum -q -y install blas-devel && \
+RUN yum -q -y install atlas-devel && \
     yum -q -y clean all && \
     mkdir -p $libpostal_data && \
     chown $RPMBUILD_USER:$RPMBUILD_USER $libpostal_data
