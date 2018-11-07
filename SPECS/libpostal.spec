@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Enable fetch of the source by rpmbuild.
+# Enable fetch of the source by rpmbuild (libpostal data files are
+# too large to host in the repository).
 %undefine _disable_source_fetch
 
 # The libpostal data directory, this global path *must* be writable by
@@ -63,7 +64,7 @@ location-based strings in every language, everywhere.
 
 %package data
 Summary:        Data files and training models for libpostal
-Requires:       %{name}%{_isa} = %{version}-%{release}
+BuildArch:      noarch
 
 %description data
 The data files are on-disk representations of the data structures necessary to
