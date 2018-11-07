@@ -120,9 +120,17 @@ fi
 if [ ! -f "$RPM_X86_64/$LIBPOSTAL_RPM" ]; then
     echo "#### Building RPM: libpostal"
 
-    # Generate libpostal RPM.
+    # Build image for building libpostal.
+    docker build \
+           -f "$SCRIPT_HOME/docker/Dockerfile.rpmbuild-libpostal" \
+           -t hootenanny/rpmbuild-libpostal \
+           "$SCRIPT_HOME"
+
+    # Generate libpostal RPM; the SOURCES directory needs to be writable
+    # because the data files are too large to store here.
     run_dep_image \
         -i hootenanny/rpmbuild-generic \
+        -s rw \
         rpmbuild \
         --define "rpmbuild_version $LIBPOSTAL_VERSION" \
         --define "rpmbuild_release $LIBPOSTAL_RELEASE" \

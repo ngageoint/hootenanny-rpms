@@ -1,0 +1,36 @@
+# Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+FROM hootenanny/rpmbuild-base:latest
+LABEL \
+  description="Container for building libpostal" \
+  maintainer="justin.bronn@radiantsolutions.com" \
+  name="Hootenanny Generic RPM Build Image" \
+  vendor="Radiant Solutions"
+
+ARG libpostal_data=/usr/share/libpostal
+
+USER root
+
+# Install blas and create a data directory in /usr/share for libpostal
+# that's writable by the rpmbuild user.  Unfortunately, it's impossible
+# to test the program without using the global data directory :(
+RUN yum -q -y install blas-devel && \
+    yum -q -y clean all && \
+    mkdir -p $libpostal_data && \
+    chown $RPMBUILD_USER:$RPMBUILD_USER $libpostal_data
+
+# Use unprivleged RPM build user and work directory by default.
+USER $RPMBUILD_USER
+WORKDIR $RPMBUILD_HOME

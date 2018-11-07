@@ -70,6 +70,7 @@ images:
     - rpmbuild-libphonenumber:
         buildrequires: true
         dockerfile: 'docker/Dockerfile.rpmbuild-generic'
+    - rpmbuild-libpostal: {}
     - rpmbuild-nodejs:
         buildrequires: true
         dockerfile: 'docker/Dockerfile.rpmbuild-generic'
@@ -174,7 +175,7 @@ rpms:
     image: rpmbuild-libphonenumber
     version: *libphonenumber_version
   libpostal:
-    image: rpmbuild-generic
+    image: rpmbuild-libpostal
     version: *libpostal_version
   nodejs:
     image: rpmbuild-nodejs

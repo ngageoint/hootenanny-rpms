@@ -12,6 +12,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Enable fetch of the source by rpmbuild.
+%undefine _disable_source_fetch
+
+# The libpostal data directory, this global path *must* be writable by
+# the user invoking `rpmbuild` in order to run the tests.
+%global libpostal_data %{_datadir}/libpostal
+
 Name:           libpostal
 Version:        %{rpmbuild_version}
 Release:        %{rpmbuild_release}%{?dist}
@@ -20,16 +28,27 @@ Summary:        C library for parsing/normalizing street addresses around the wo
 License:        MIT
 URL:            https://github.com/openvenues/libpostal/
 Source0:        https://github.com/openvenues/libpostal/archive/v%{version}/libpostal-%{version}.tar.gz
+Source1:        https://github.com/openvenues/libpostal/releases/download/v%{version}/parser.tar.gz
+Source2:        https://github.com/openvenues/libpostal/releases/download/v%{version}/language_classifier.tar.gz
+Source3:        https://github.com/openvenues/libpostal/releases/download/v%{version}/libpostal_data.tar.gz
+
+# Modify build system to accomodate RPM build flags.
+Patch0:         libpostal-configure.patch
+
+# Calling `crf_context_destroy` at end of tests will cause a segfault,
+# must patch in order to run the test suite.
+Patch1:         libpostal-tests-fix.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  blas-devel
 BuildRequires:  libtool
 BuildRequires:  pkgconfig
 
 %description
 A C library for parsing/normalizing street addresses around the world using
 statistical NLP and open data. The goal of this project is to understand
-location-based strings in every language, everywhere. 
+location-based strings in every language, everywhere.
 
 
 %package devel
@@ -43,6 +62,13 @@ applications which use the libphonenumber C library.
 
 %prep
 %setup -q
+%patch0 -p1
+%patch1 -p1
+
+%{__mkdir_p} %{libpostal_data}
+%{__tar} -C %{libpostal_data} -xzf %{SOURCE1}
+%{__tar} -C %{libpostal_data} -xzf %{SOURCE2}
+%{__tar} -C %{libpostal_data} -xzf %{SOURCE3}
 
 
 %build
@@ -51,18 +77,26 @@ applications which use the libphonenumber C library.
 %{make_build}
 
 
+
 %install
 %{makeinstall}
 
 
 %check
+%{__make} check
 
 
 %files
+%{_bindir}/libpostal_data
+%{_libdir}/*.so.*
+%exclude %{_libdir}/*.la
+%exclude %{_libdir}/*.a
 
 
 %files devel
-
+%{_includedir}/libpostal
+%{_libdir}/*.so
+%{_libdir}/pkgconfig/%{name}.pc
 
 
 %changelog

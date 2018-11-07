@@ -285,6 +285,7 @@ Vagrant.configure(2) do |config|
      'rpmbuild-libgeotiff',
      'rpmbuild-libkml',
      'rpmbuild-libphonenumber',
+     'rpmbuild-libpostal',
      'rpmbuild-nodejs']
   ).each do |name, options|
     rpmbuild(config, name, options)
