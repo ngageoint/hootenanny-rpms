@@ -28,9 +28,6 @@
 %global hoot_version_tag %(echo %{hoot_version_gen} | %{__awk} -F_ '{ print $1 }')
 %global hoot_extra_version %(echo %{hoot_version_gen} | %{__awk} -F_ '{ print $2 }')
 
-# Disable NodeJS Mapnik service until fixed in Hootenanny.
-%bcond_with node_mapnik
-
 # Include Hootenanny 2.x files by default.
 %bcond_without hoot_ui2
 
@@ -64,12 +61,11 @@
 # NodeJS package includes an epoch that must be used for requirements.
 %{!?nodejs_epoch: %global nodejs_epoch 1}
 
-# Prevents services-ui from being marked that it provides GDAL or Mapnik.
-%global __provides_exclude ^lib(gdal|mapnik)\\.so.*$
+# Prevents services-ui from being marked that it provides GDAL.
+%global __provides_exclude ^libgdal\\.so.*$
 
-# Use explicit requirements for libgdal and libpq, and Mapnik library
-# is included as part of NPM install.
-%global __requires_exclude ^lib(gdal|mapnik|pq)\\.so.*$
+# Use explicit requirements for libgdal and libpq.
+%global __requires_exclude ^lib(gdal|pq)\\.so.*$
 
 Name:       hootenanny
 Version:    %{hoot_version}
@@ -188,12 +184,6 @@ pushd node-export-server
 npm install --production
 popd
 
-%if %{with node_mapnik}
-pushd node-mapnik-server
-npm install --production
-popd
-%endif
-
 
 %install
 # Start with $HOOT_HOME and systemd unit directories.
@@ -268,31 +258,6 @@ Restart=on-abort
 [Install]
 WantedBy=multi-user.target
 EOF
-
-%if %{with node_mapnik}
-# node-mapnik
-%{__install} -d -m 0775 %{buildroot}%{hoot_home}/node-mapnik-server
-%{__cp} -p node-mapnik-server/*.{js,json,xml,svg} %{buildroot}%{hoot_home}/node-mapnik-server
-%{__cp} -pr node-mapnik-server/{node_modules,utils} %{buildroot}%{hoot_home}/node-mapnik-server
-%{__cat} >> %{buildroot}%{_unitdir}/node-mapnik.service <<EOF
-[Unit]
-Description=Node Mapnik Server
-After=syslog.target network.target
-
-[Service]
-Type=simple
-User=tomcat
-Group=tomcat
-WorkingDirectory=%{hoot_home}/node-mapnik-server
-ExecStartPre=/usr/bin/cd %{hoot_home} && source bin/HootEnv.sh && source conf/database/DatabaseConfig.sh
-ExecStart=/usr/bin/node app.js hoot_style.xml 8000
-ExecStop=/usr/bin/kill -HUP \$MAINPID
-Restart=on-abort
-
-[Install]
-WantedBy=multi-user.target
-EOF
-%endif
 
 # install into the buildroot
 %{__make} install
@@ -381,15 +346,9 @@ This package contains the UI and web services.
 
 %files services-ui
 %{_unitdir}/node-export.service
-%if %{with node_mapnik}
-%{_unitdir}/node-mapnik.service
-%endif
 
 %defattr(-, root, tomcat, 0775)
 %{hoot_home}/node-export-server
-%if %{with node_mapnik}
-%{hoot_home}/node-mapnik-server
-%endif
 %{hoot_home}/test-files
 %{hoot_home}/test-output
 %{tomcat_config}/conf.d/hoot.conf
@@ -429,18 +388,12 @@ fi
 %preun services-ui
 
 %systemd_preun node-export.service
-%if %{with node_mapnik}
-%systemd_preun node-mapnik.service
-%endif
 
 %post services-ui
 
 if test -f /.dockerenv; then exit 0; fi
 
 %systemd_post node-export.service
-%if %{with node_mapnik}
-%systemd_post node-mapnik.service
-%endif
 
 function startTomcat() {
     local count=0
@@ -611,9 +564,6 @@ EOT
     rm -f /tmp/osmapidb.log
 
     systemctl start node-export.service
-%if %{with node_mapnik}
-    systemctl start node-mapnik.service
-%endif
 
     updateConfigFiles
     updateLiquibase
@@ -643,9 +593,6 @@ fi
 if test -f /.dockerenv; then exit 0; fi
 
 %systemd_postun node-export.service
-%if %{with node_mapnik}
-%systemd_postun node-mapnik.service
-%endif
 
 if [ "$1" = "0" ]; then
     # Perform tasks to clean up after uninstallation
@@ -705,10 +652,6 @@ if [ "$1" = "1" ]; then
     systemctl enable tomcat8
     # set NodeJS node-export-server to autostart
     systemctl enable node-export
-%if %{with node_mapnik}
-    # set NodeJS node-mapnik-server to autostart
-    systemctl enable node-mapnik
-%endif
 fi
 
 
@@ -724,10 +667,6 @@ if [ "$1" = "0" ]; then
     systemctl disable tomcat8
     # set NodeJS node-export-server to NOT autostart
     systemctl disable node-export
-%if %{with node_mapnik}
-    # set NodeJS node-mapnik-server to NOT autostart
-    systemctl disable node-mapnik
-%endif
 fi
 
 
