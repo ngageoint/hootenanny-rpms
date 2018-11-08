@@ -82,6 +82,7 @@ URL:        https://github.com/ngageoint/hootenanny
 
 BuildRequires:  asciidoc
 BuildRequires:  autoconf
+BuildRequires:  autoconf-archive
 BuildRequires:  automake
 BuildRequires:  boost-devel
 BuildRequires:  cppunit-devel

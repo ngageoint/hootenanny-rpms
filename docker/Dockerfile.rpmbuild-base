@@ -23,6 +23,7 @@ LABEL \
 RUN yum -q -y update && \
     yum -q -y install \
         autoconf \
+        autoconf-archive \
         automake \
         bzip2 \
         epel-release \
