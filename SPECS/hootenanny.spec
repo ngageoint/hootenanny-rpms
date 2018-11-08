@@ -103,6 +103,7 @@ BuildRequires:  hoot-words
 BuildRequires:  java-1.8.0-openjdk
 BuildRequires:  libicu-devel
 BuildRequires:  libphonenumber-devel
+BuildRequires:  libpostal-devel
 BuildRequires:  libxslt
 BuildRequires:  log4cxx-devel
 BuildRequires:  maven
@@ -898,6 +899,7 @@ Requires:  hoot-gdal-python = %{gdal_version}
 Requires:  hoot-words
 Requires:  libicu
 Requires:  libphonenumber = %{libphonenumber_version}
+Requires:  libpostal
 Requires:  log4cxx
 Requires:  nodejs = %{nodejs_epoch}:%{nodejs_version}
 Requires:  opencv
