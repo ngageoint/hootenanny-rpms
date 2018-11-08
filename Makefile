@@ -200,7 +200,7 @@ archive: $(BUILD_IMAGE) $(HOOT_ARCHIVE)
 base: $(BASE_CONTAINERS)
 
 clean:
-	$(VAGRANT) destroy -f --no-parallel || true
+	MAVEN_CACHE=0 $(VAGRANT) destroy -f --no-parallel || true
 	rm -fr RPMS/noarch RPMS/x86_64 SOURCES/hootenanny-[0-9]*.tar.gz
 
 deps: \
