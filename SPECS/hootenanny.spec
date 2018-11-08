@@ -900,6 +900,7 @@ Requires:  hoot-words
 Requires:  libicu
 Requires:  libphonenumber = %{libphonenumber_version}
 Requires:  libpostal
+Requires:  libpostal-data
 Requires:  log4cxx
 Requires:  nodejs = %{nodejs_epoch}:%{nodejs_version}
 Requires:  opencv
