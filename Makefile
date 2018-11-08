@@ -78,6 +78,7 @@ FILEGDBAPI_RPM := $(call rpm_file,FileGDBAPI,x86_64)
 LIBGEOTIFF_RPM := $(call rpm_file,libgeotiff,x86_64)
 LIBKML_RPM := $(call rpm_file,libkml,x86_64)
 LIBPHONENUMBER_RPM := $(call rpm_file,libphonenumber,x86_64)
+LIBPOSTAL_RPM := $(call rpm_file,libpostal,x86_64)
 NODEJS_RPM := $(call rpm_file,nodejs,x86_64)
 OSMOSIS_RPM := $(call rpm_file,osmosis,noarch)
 POSTGIS_RPM := $(call rpm_file2,hoot-postgis24_$(PG_DOTLESS),postgis,x86_64)
@@ -101,6 +102,7 @@ DEPENDENCY_CONTAINERS := \
 	rpmbuild-libgeotiff \
 	rpmbuild-libkml \
 	rpmbuild-libphonenumber \
+	rpmbuild-libpostal \
 	rpmbuild-postgis \
 	rpmbuild-nodejs
 
@@ -117,6 +119,7 @@ DEPENDENCY_RPMS := \
 	libgeotiff \
 	libkml \
 	libphonenumber \
+	libpostal \
 	hoot-gdal \
 	hoot-postgis24_$(PG_DOTLESS) \
 	hoot-words \
@@ -197,7 +200,7 @@ archive: $(BUILD_IMAGE) $(HOOT_ARCHIVE)
 base: $(BASE_CONTAINERS)
 
 clean:
-	$(VAGRANT) destroy -f --no-parallel || true
+	MAVEN_CACHE=0 $(VAGRANT) destroy -f --no-parallel || true
 	rm -fr RPMS/noarch RPMS/x86_64 SOURCES/hootenanny-[0-9]*.tar.gz
 
 deps: \
@@ -273,6 +276,10 @@ rpmbuild-libphonenumber: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-libphonenumber/docker/id
 
+rpmbuild-libpostal: \
+	rpmbuild-base \
+	.vagrant/machines/rpmbuild-libpostal/docker/id
+
 rpmbuild-nodejs: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-nodejs/docker/id
@@ -326,6 +333,7 @@ FileGDBAPI: rpmbuild-generic $(FILEGDBAPI_RPM)
 libgeotiff: rpmbuild-libgeotiff $(LIBGEOTIFF_RPM)
 libkml: rpmbuild-libkml $(LIBKML_RPM)
 libphonenumber: rpmbuild-libphonenumber $(LIBPHONENUMBER_RPM)
+libpostal: rpmbuild-libpostal $(LIBPOSTAL_RPM)
 nodejs: rpmbuild-nodejs $(NODEJS_RPM)
 glpk: rpmbuild-glpk $(GLPK_RPM)
 hoot-gdal: rpmbuild-gdal $(GDAL_RPM)

@@ -1,0 +1,55 @@
+diff --git a/configure.ac b/configure.ac
+index 4f4bfcc..feb7353 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -19,8 +19,6 @@ AC_CONFIG_HEADERS([config.h])
+ AC_PROG_CC_C99
+ AC_PROG_INSTALL
+ 
+-LDFLAGS="$LDFLAGS -L/usr/local/lib"
+-
+ # Checks for libraries.
+ AC_SEARCH_LIBS([log],
+   [m],,[AC_MSG_ERROR([Could not find math library])])
+diff --git a/src/Makefile.am b/src/Makefile.am
+index ae17c8c..8e1b8b0 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -2,10 +2,10 @@
+ CFLAGS_CONF = @CFLAGS@
+ CFLAGS_BASE = -Wall -Wextra -Wno-unused-function -Wformat -Werror=format-security -Winit-self -Wno-sign-compare -DLIBPOSTAL_DATA_DIR='"$(datadir)/libpostal"' -g $(CFLAGS_CONF)
+ CFLAGS_O0 = $(CFLAGS_BASE) -O0
+-CFLAGS_O1 = $(CFLAGS_BASE) -O1
+-CFLAGS_O2 = $(CFLAGS_BASE) -O2
+-CFLAGS_O3 = $(CFLAGS_BASE) -O3
+-DEFAULT_INCLUDES = -I.. -I/usr/local/include
++CFLAGS_O1 = $(CFLAGS_BASE)
++CFLAGS_O2 = $(CFLAGS_BASE)
++CFLAGS_O3 = $(CFLAGS_BASE)
++DEFAULT_INCLUDES = -I..
+ 
+ # Wonky but have to be able to override the user's optimization level to compile the scanner
+ # as it takes an unreasonably long time to compile with the optimizer on.
+diff --git a/test/Makefile.am b/test/Makefile.am
+index b35f611..58dd670 100644
+--- a/test/Makefile.am
++++ b/test/Makefile.am
+@@ -1,9 +1,6 @@
+-CFLAGS_BASE = -Wfloat-equal -Wpointer-arith -std=gnu99 -DLIBPOSTAL_DATA_DIR='"$(datadir)/libpostal"' -g
+-CFLAGS_O0 = $(CFLAGS_BASE) -O0
+-CFLAGS_O1 = $(CFLAGS_BASE) -O1
+-CFLAGS_O2 = $(CFLAGS_BASE) -O2
+-CFLAGS_O3 = $(CFLAGS_BASE) -O3
+-DEFAULT_INCLUDES = -I.. -I/usr/local/include
++CFLAGS_CONF = @CFLAGS@
++CFLAGS_BASE = -Wfloat-equal -Wpointer-arith -std=gnu99 -DLIBPOSTAL_DATA_DIR='"$(datadir)/libpostal"' -g $(CFLAGS_CONF)
++DEFAULT_INCLUDES = -I..
+ 
+ CFLAGS = $(CFLAGS_BASE)
+ 
+@@ -11,4 +8,4 @@ TESTS = test_libpostal
+ noinst_PROGRAMS = test_libpostal
+ test_libpostal_SOURCES = test.c test_expand.c test_parser.c test_transliterate.c test_numex.c test_trie.c test_string_utils.c test_crf_context.c
+ test_libpostal_LDADD = ../src/libpostal.la $(CBLAS_LIBS)
+-test_libpostal_CFLAGS = $(CFLAGS_O3)
++test_libpostal_CFLAGS = $(CFLAGS_BASE)

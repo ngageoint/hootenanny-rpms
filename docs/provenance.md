@@ -107,6 +107,13 @@ archives were obtained directly from
 [GitHub](https://github.com/googlei18n/libphonenumber/releases) and are
 [Apache 2 licensed](https://github.com/googlei18n/libphonenumber/blob/master/LICENSE).
 
+## libpostal
+
+The [libpostal](https://github.com/openvenues/libpostal) source
+archives were obtained directly from
+[GitHub](https://github.com/openvenues/libpostal/releases) and are
+[MIT](https://github.com/openvenues/libpostal/blob/master/LICENSE).
+
 ## NodeJS
 
 The [NodeJS](https://nodejs.org/) source archives are obtained

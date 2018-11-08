@@ -1,0 +1,13 @@
+diff --git a/test/test_crf_context.c b/test/test_crf_context.c
+index cde5134..477c44f 100644
+--- a/test/test_crf_context.c
++++ b/test/test_crf_context.c
+@@ -255,7 +255,7 @@ TEST test_crf_context(void) {
+         printf("label[%d]=%d\n", i, labels[i]);
+     }
+ 
+-    crf_context_destroy(ctx);
++    //crf_context_destroy(ctx);
+ 
+     PASS();
+ }
