@@ -129,7 +129,7 @@ if [ ! -f "$RPM_X86_64/$LIBPOSTAL_RPM" ]; then
     # Generate libpostal RPM; the SOURCES directory needs to be writable
     # because the data files are too large to store here.
     run_dep_image \
-        -i hootenanny/rpmbuild-generic \
+        -i hootenanny/rpmbuild-libpostal \
         -s rw \
         rpmbuild \
         --define "rpmbuild_version $LIBPOSTAL_VERSION" \
