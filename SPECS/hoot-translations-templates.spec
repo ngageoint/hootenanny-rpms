@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 %global hoot_home %{_sharedstatedir}/hootenanny
+%global hoot_translations_template %{hoot_home}/translations-local/template
 
 Name:        hoot-translations-templates
 Version:     %{rpmbuild_version}
@@ -42,13 +43,13 @@ Supplementary translations template files for use with Hootenanny.
 
 
 %install
-%{__install} -d -m 0755 %{buildroot}%{hoot_home}/translations/templates
-%{__install} -m 0644 %{SOURCE0} %{buildroot}%{hoot_home}/translations/templates
-%{__install} -m 0644 %{SOURCE1} %{buildroot}%{hoot_home}/translations/templates
+%{__install} -d -m 0755 %{buildroot}%{hoot_translations_template}
+%{__install} -m 0644 %{SOURCE0} %{buildroot}%{hoot_translations_template}
+%{__install} -m 0644 %{SOURCE1} %{buildroot}%{hoot_translations_template}
 
 
 %files
-%{hoot_home}/translations/templates
+%{hoot_translations_template}
 
 
 %changelog
