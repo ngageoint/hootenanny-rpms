@@ -1,0 +1,37 @@
+diff --git a/build/CMakeLists.txt b/build/CMakeLists.txt
+index 1eed967..b24a272 100644
+--- a/build/CMakeLists.txt
++++ b/build/CMakeLists.txt
+@@ -5,6 +5,9 @@
+ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+ SET(CMAKE_VERBOSE_MAKEFILE OFF)
+ SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
++SET(liboauthcpp_VERSION_MAJOR 0)
++SET(liboauthcpp_VERSION_MINOR 1)
++
+ 
+ IF(COMMAND CMAKE_POLICY)
+   # Use new policy for absolute path libraries.  We have no reason to depend on the
+@@ -79,11 +82,18 @@ SET(LIBOAUTHCPP_LIB_SOURCES
+   ${LIBOAUTHCPP_SRC}/SHA1.cpp
+   ${LIBOAUTHCPP_SRC}/urlencode.cpp
+   )
+-ADD_LIBRARY(oauthcpp STATIC ${LIBOAUTHCPP_LIB_SOURCES})
++ADD_LIBRARY(oauthcpp SHARED ${LIBOAUTHCPP_LIB_SOURCES})
++SET_TARGET_PROPERTIES (oauthcpp
++  PROPERTIES
++    OUTPUT_NAME "oauthcpp"
++    PREFIX "lib"
++    SOVERSION ${liboauthcpp_VERSION_MAJOR}
++    VERSION ${liboauthcpp_VERSION_MAJOR}.${liboauthcpp_VERSION_MINOR})
++
+ INSTALL(TARGETS oauthcpp
+-  ARCHIVE DESTINATION lib
+-  LIBRARY DESTINATION lib
+-  RUNTIME DESTINATION lib
++  ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
++  LIBRARY DESTINATION ${LIB_INSTALL_DIR}
++  RUNTIME DESTINATION ${LIB_INSTALL_DIR}
+ )
+ INSTALL(DIRECTORY
+   ${LIBOAUTHCPP_INCLUDE}/ DESTINATION include
