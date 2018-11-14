@@ -18,6 +18,7 @@
 #  * geos_version
 #  * glpk_version
 #  * gdal_version
+#  * liboauthcpp_version
 #  * libphonenumber_version
 #  * nodejs_version
 #  * stxxl_version
@@ -99,6 +100,7 @@ BuildRequires:  hoot-postgis24_%{pg_dotless}-utils
 BuildRequires:  hoot-words
 BuildRequires:  java-1.8.0-openjdk
 BuildRequires:  libicu-devel
+BuildRequires:  liboauthcpp-devel
 BuildRequires:  libphonenumber-devel
 BuildRequires:  libpostal-devel
 BuildRequires:  libxslt
@@ -838,6 +840,7 @@ Requires:  hoot-gdal-devel = %{gdal_version}
 Requires:  hoot-gdal-python = %{gdal_version}
 Requires:  hoot-words
 Requires:  libicu
+Requires:  liboauthcpp = %{liboauthcpp_version}
 Requires:  libphonenumber = %{libphonenumber_version}
 Requires:  libpostal
 Requires:  libpostal-data
