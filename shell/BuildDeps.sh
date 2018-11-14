@@ -96,6 +96,26 @@ if [ ! -f $RPM_X86_64/$LIBKML_RPM ]; then
         -bb SPECS/libkml.spec
 fi
 
+# liboauthcpp
+if [ ! -f "$RPM_X86_64/$LIBOAUTHCPP_RPM" ]; then
+    echo "#### Building RPM: liboauthcpp"
+
+    # Build image for building liboauthcpp.
+    docker build \
+           --build-arg "packages=$( spec_requires liboauthcpp )" \
+           -f "$SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic" \
+           -t hootenanny/rpmbuild-liboauthcpp \
+           "$SCRIPT_HOME"
+
+    # Generate liboauthcpp RPM.
+    run_dep_image \
+        -i hootenanny/rpmbuild-liboauthcpp \
+        rpmbuild \
+        --define "rpmbuild_version $LIBOAUTHCPP_VERSION" \
+        --define "rpmbuild_release $LIBOAUTHCPP_RELEASE" \
+        -bb SPECS/liboauthcpp.spec
+fi
+
 # libphonenumber
 if [ ! -f "$RPM_X86_64/$LIBPHONENUMBER_RPM" ]; then
     echo "#### Building RPM: libphonenumber"

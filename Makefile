@@ -77,6 +77,7 @@ GLPK_RPM := $(call rpm_file,glpk,x86_64)
 FILEGDBAPI_RPM := $(call rpm_file,FileGDBAPI,x86_64)
 LIBGEOTIFF_RPM := $(call rpm_file,libgeotiff,x86_64)
 LIBKML_RPM := $(call rpm_file,libkml,x86_64)
+LIBOAUTHCPP_RPM := $(call rpm_file,liboauthcpp,x86_64)
 LIBPHONENUMBER_RPM := $(call rpm_file,libphonenumber,x86_64)
 LIBPOSTAL_RPM := $(call rpm_file,libpostal,x86_64)
 NODEJS_RPM := $(call rpm_file,nodejs,x86_64)
@@ -102,6 +103,7 @@ DEPENDENCY_CONTAINERS := \
 	rpmbuild-glpk \
 	rpmbuild-libgeotiff \
 	rpmbuild-libkml \
+	rpmbuild-liboauthcpp \
 	rpmbuild-libphonenumber \
 	rpmbuild-libpostal \
 	rpmbuild-postgis \
@@ -119,6 +121,7 @@ DEPENDENCY_RPMS := \
 	glpk \
 	libgeotiff \
 	libkml \
+	liboauthcpp \
 	libphonenumber \
 	libpostal \
 	hoot-gdal \
@@ -273,6 +276,10 @@ rpmbuild-libkml: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-libkml/docker/id
 
+rpmbuild-liboauthcpp: \
+	rpmbuild-generic \
+	.vagrant/machines/rpmbuild-liboauthcpp/docker/id
+
 rpmbuild-libphonenumber: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-libphonenumber/docker/id
@@ -333,6 +340,7 @@ geos: rpmbuild-geos $(GEOS_RPM)
 FileGDBAPI: rpmbuild-generic $(FILEGDBAPI_RPM)
 libgeotiff: rpmbuild-libgeotiff $(LIBGEOTIFF_RPM)
 libkml: rpmbuild-libkml $(LIBKML_RPM)
+liboauthcpp: rpmbuild-liboauthcpp $(LIBOAUTHCPP_RPM)
 libphonenumber: rpmbuild-libphonenumber $(LIBPHONENUMBER_RPM)
 libpostal: rpmbuild-libpostal $(LIBPOSTAL_RPM)
 nodejs: rpmbuild-nodejs $(NODEJS_RPM)

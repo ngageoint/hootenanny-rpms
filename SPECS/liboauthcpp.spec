@@ -21,7 +21,8 @@ License:        MIT
 URL:            https://github.com/sirikata/liboauthcpp/
 Source0:        liboauthcpp-%{version}.tar.gz
 
-# Create a shared library instead of static.
+# Create a shared library instead of static, and properly set the
+# library directory to /usr/lib64.
 Patch0:         liboauthcpp-shared-library.patch
 
 BuildRequires:  cmake
