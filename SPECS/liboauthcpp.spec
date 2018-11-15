@@ -19,6 +19,16 @@ Group:          Applications/Engineering
 Summary:        A pure C++ OAuth library
 License:        MIT
 URL:            https://github.com/sirikata/liboauthcpp/
+
+# There are no official releases for this library yet.  Create source
+# archive from a git checkout of master with the following command
+# (set $VERSION to the value you desire):
+#
+#  git archive \
+#    --prefix liboauthcpp-$VERSION/ \
+#    --output hootenanny-rpms/SOURCES/liboauthcpp-$VERSION.tar.gz \
+#    master
+#
 Source0:        liboauthcpp-%{version}.tar.gz
 
 # Create a shared library instead of static, and properly set the
