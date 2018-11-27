@@ -284,6 +284,7 @@ Vagrant.configure(2) do |config|
      'rpmbuild-glpk',
      'rpmbuild-libgeotiff',
      'rpmbuild-libkml',
+     'rpmbuild-liboauthcpp',
      'rpmbuild-libphonenumber',
      'rpmbuild-libpostal',
      'rpmbuild-nodejs']

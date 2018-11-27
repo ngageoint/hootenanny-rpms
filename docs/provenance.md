@@ -100,6 +100,13 @@ repository and are [MIT licensed](./licenses/Fedora-LICENSE):
 * [`libkml-fragile_test.patch`](../SOURCES/libkml-fragile_test.patch)
 * [`libkml-dont-bytecompile.patch`](../SOURCES/libkml-dont-bytecompile.patch)
 
+## liboauthcpp
+
+The [liboauthcpp](https://github.com/sirikata/liboauthcpp) source
+archives were obtained directly from the `master` branch on
+[GitHub](https://github.com/sirikata/liboauthcpp/) and are
+[MIT licensed](https://github.com/sirikata/liboauthcpp/blob/master/LICENSE).
+
 ## libphonenumber
 
 The [libphonenumber](https://github.com/googlei18n/libphonenumber) source
@@ -112,7 +119,7 @@ archives were obtained directly from
 The [libpostal](https://github.com/openvenues/libpostal) source
 archives were obtained directly from
 [GitHub](https://github.com/openvenues/libpostal/releases) and are
-[MIT](https://github.com/openvenues/libpostal/blob/master/LICENSE).
+[MIT licensed](https://github.com/openvenues/libpostal/blob/master/LICENSE).
 
 ## NodeJS
 
