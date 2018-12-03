@@ -268,7 +268,7 @@ function run_dep_image() {
                -v $SPECS:/rpmbuild/SPECS:ro \
                -v $RPMS:/rpmbuild/RPMS:rw \
                -u $user \
-               -it --rm \
+               -i --rm \
                $image "$@"
     fi
 }
@@ -304,7 +304,7 @@ function run_repo_image() {
                -v $RPMS:/rpmbuild/RPMS:ro \
                -v $SCRIPT_HOME/el7:/rpmbuild/el7:rw \
                -v $SCRIPT_HOME/scripts:/rpmbuild/scripts:ro \
-               -it --rm \
+               -i --rm \
                $image "$@"
     fi
 }
@@ -354,7 +354,7 @@ function run_hoot_build_image() {
                -v $SCRIPT_HOME/scripts:/rpmbuild/scripts:ro \
                --entrypoint $entrypoint \
                -u $user \
-               -it --rm \
+               -i --rm \
                $image "${@:-/bin/bash}"
     fi
 }
