@@ -32,6 +32,9 @@
 # Include Hootenanny 2.x files by default.
 %bcond_without hoot_ui2
 
+# Only generate database package when requested.
+%bcond_with hoot_db
+
 %if 0%{hoot_extra_version} == 0
   # If this is a tagged release, then we want the RPM release to be
   # greater than 0 (defaults to 1).
@@ -260,6 +263,16 @@ Restart=on-abort
 [Install]
 WantedBy=multi-user.target
 EOF
+
+%if %{with hoot_db}
+# Separate database package files.
+%{__install} -m 0775 -d %{buildroot}%{_datadir}/hootenanny-db
+%{__cp} -pr \
+ hoot-services/src/main/resources/db/changelogs \
+ hoot-services/src/main/resources/db/db.changelog-master.xml \
+ scripts/database/blank_osmapidb.sql.in \
+ %{buildroot}%{_datadir}/hootenanny-db
+%endif
 
 # install into the buildroot
 %{__make} install
@@ -873,6 +886,19 @@ This packages contains the dependencies to run the Hootenanny core.
 
 %files core-deps
 
+%if %{with hoot_db}
+%package   db
+Summary:   Hootenanny Database Server Files
+Group:     Applications/Engineering
+BuildArch: noarch
+
+%description db
+Database-related files for use by servers that do not need the entire
+Hootenanny stack.
+
+%files db
+%{_datadir}/hootenanny-db
+%endif
 
 %changelog
 * Tue Jan 30 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 0.2.38-1
