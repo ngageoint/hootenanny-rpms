@@ -52,4 +52,6 @@ else
     popd
 fi
 
-mv -v "$HOOT_REPO"/hootenanny-[0-9]*.tar.gz "$HOME/SOURCES"
+#mv -v "$HOOT_REPO"/hootenanny-[0-9]*.tar.gz "$HOME/SOURCES"
+
+mv -v "$HOOT_REPO"/hootenanny-[0-9]*.tar.gz "/rpmbuild/SOURCES"
