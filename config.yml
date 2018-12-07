@@ -23,8 +23,8 @@ versions:
 
 
 maven:
-  cache_url: &maven_cache_url 'https://s3.amazonaws.com/hoot-maven/m2-cache-2018-10-02.tar.gz'
-  cache_sha1: &maven_cache_sha1 '139706efd58685866ea2341d82fef1153785a84c'
+  cache_url: &maven_cache_url 'https://s3.amazonaws.com/hoot-maven/m2-cache-2018-12-06.tar.gz'
+  cache_sha1: &maven_cache_sha1 'c6e87f8100c9461c00b7d28a5a8d0e8b1737ccf3'
 
 
 rpmbuild:
