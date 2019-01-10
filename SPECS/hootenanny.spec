@@ -105,6 +105,7 @@ BuildRequires:  java-1.8.0-openjdk
 BuildRequires:  libicu-devel
 BuildRequires:  liboauthcpp-devel
 BuildRequires:  libphonenumber-devel
+BuildRequires:  libpng-devel
 BuildRequires:  libpostal-devel
 BuildRequires:  libxslt
 BuildRequires:  log4cxx-devel
