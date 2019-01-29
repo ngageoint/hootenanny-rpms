@@ -186,6 +186,8 @@ command -v ccache >/dev/null 2>&1 && echo "QMAKE_CXX=ccache g++" >> LocalConfig.
 
 %make_build
 
+%{__make} ui2x-build
+
 pushd node-export-server
 npm install --production
 popd
