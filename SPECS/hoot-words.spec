@@ -28,7 +28,7 @@ Group:		Applications/Engineering
 Summary:	Hootenanny words dictionary
 License:	GPLv3
 URL:		https://github.com/ngageoint/hootenanny
-Source0:	https://s3.amazonaws.com/hoot-rpms/support-files/%{words_file}.bz2
+Source0:	https://s3.amazonaws.com/hoot-support/%{words_file}.bz2
 BuildArch:	noarch
 BuildRequires:	bzip2
 BuildRequires:	coreutils
