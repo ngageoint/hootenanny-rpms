@@ -6,7 +6,6 @@ pipeline {
         HOOT_CORE_TEST='HootTest --diff --glacial --parallel \$(nproc)'
     }
     parameters {
-        string(name: 'Box', defaultValue: 'default', description: 'Vagrant Box')
         string(name: 'TestInstall', defaultValue: 'true')
         string(name: 'TestUpdate',  defaultValue: 'true')
     }
@@ -20,14 +19,14 @@ pipeline {
         stage("Destroy VM") {
             when { expression { return params.TestInstall } }
             steps {
-                sh "vagrant destory -f ${params.Box} || true"
+                sh "vagrant destory -f || true"
             }   
         }
         stage("Setup to Install") {
             when { expression { return params.TestInstall } }
             steps {
                 sh "export VAGRANT_VAGRANTFILE=Vagrantfile_RPM_Test"
-                sh "vagrant up ${params.Box}"
+                sh "vagrant up"
             }
         }
         stage("Install Hootenanny") {
@@ -49,14 +48,14 @@ pipeline {
         stage("Clean Workspace") {
             when { expression { return params.TestUpdate } }
             steps {
-                sh "vagrant destory -f ${params.Box} || true"
+                sh "vagrant destory -f || true"
             }
         }
         stage("Setup to Update") {
             when { expression { return params.TestUpdate } }
             steps {
                 sh "export VAGRANT_VAGRANTFILE=Vagrantfile_RPM_Test"
-                sh "vagrant up ${params.Box}"
+                sh "vagrant up"
             }
         }
         stage("Install Previous Version of Hootenanny") {
@@ -83,7 +82,7 @@ pipeline {
     post {
         always {
             script {
-                sh "vagrant destroy -f ${params.Box}"
+                sh "vagrant destroy -f"
                 cleanWs()
             }
         }
