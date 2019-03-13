@@ -33,7 +33,7 @@ pipeline {
         stage("Install Hootenanny") {
             when { expression { return params.TestInstall } }
             steps {
-                sh "vagrant ssh -c 'yum -y install hootenanny-autostart; " + \
+                sh "vagrant ssh -c 'sudo yum -y install hootenanny-autostart; " + \
                    "hoot version'"
             }
         }
