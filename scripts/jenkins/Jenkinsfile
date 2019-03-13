@@ -7,8 +7,9 @@ pipeline {
         VAGRANT_VAGRANTFILE='Vagrantfile_RPM_Test'
     }
     parameters {
-        string(name: 'TestInstall', defaultValue: 'true')
-        string(name: 'TestUpdate',  defaultValue: 'true')
+        booleanParam(name: 'TestInstall', defaultValue: 'true')
+        booleanParam(name: 'TestUpdate',  defaultValue: 'true')
+        string(name: 'Box', defaultValue: 'default', description: 'Vagrant Box')
     }
 
     triggers {
@@ -20,14 +21,13 @@ pipeline {
         stage("Destroy VM") {
             when { expression { return params.TestInstall } }
             steps {
-                sh "vagrant destory -f || true"
+                sh "vagrant destory -f ${params.Box} || true"
             }   
         }
         stage("Setup to Install") {
             when { expression { return params.TestInstall } }
             steps {
-//                sh "export VAGRANT_VAGRANTFILE=Vagrantfile_RPM_Test"
-                sh "vagrant up"
+                sh "vagrant up ${params.Box}"
             }
         }
         stage("Install Hootenanny") {
@@ -49,14 +49,13 @@ pipeline {
         stage("Clean Workspace") {
             when { expression { return params.TestUpdate } }
             steps {
-                sh "vagrant destory -f || true"
+                sh "vagrant destory -f ${params.Box} || true"
             }
         }
         stage("Setup to Update") {
             when { expression { return params.TestUpdate } }
             steps {
-//                sh "export VAGRANT_VAGRANTFILE=Vagrantfile_RPM_Test"
-                sh "vagrant up"
+                sh "vagrant up ${params.Box}"
             }
         }
         stage("Install Previous Version of Hootenanny") {
@@ -83,7 +82,7 @@ pipeline {
     post {
         always {
             script {
-                sh "vagrant destroy -f"
+                sh "vagrant destroy -f ${params.Box}"
                 cleanWs()
             }
         }

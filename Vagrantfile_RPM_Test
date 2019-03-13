@@ -4,9 +4,9 @@
 Vagrant.require_version '>= 2.0.0'
 
 # Setting up globals from YAML configuration file.
-#settings = YAML::load_file('config.yml')
-#$pg_yum_repo = settings.fetch('yum-repos')['hoot-pgdb95-repo']
-#$hoot_yum_repo = settings.fetch('yum-repos')['hoot-develop-repo']
+settings = YAML::load_file('config.yml')
+$pg_yum_repo = settings.fetch('yum-repos')['hoot-pgdb95-repo']
+$hoot_yum_repo = settings.fetch('yum-repos')['hoot-develop-repo']
 
 Vagrant.configure("2") do |config|
     tomcatPort = ENV['TOMCAT_PORT']
@@ -31,24 +31,25 @@ Vagrant.configure("2") do |config|
         config.vm.network "forwarded_port", guest: 8096, host: mergePort
     end
     
-    # set VM operating system to CentOS7
-    config.vm.box = "centos/7"
-    config.vm.hostname = "hoot-rpms-test"
-    
     config.vm.provider "virtualbox" do |vb|
         vb.gui = false
         vb.memory = 10240
         vb.cpus = 4
     end
+    
+    # set VM operating system to CentOS7
+    config.vm.define "default", primary: true do |hoot_centos7|
+        config.vm.box = "centos/7"
+        config.vm.hostname = "hoot-rpms-test"
 
-    config.vm.provision :shell, inline: 
-        "sudo yum install -y epel-release yum-utils"
-    #config.vm.provision :shell, inline: 
-    #    "sudo yum-config-manager --add-repo " + $pg_yum_repo
-#    config.vm.provision :shell, inline: 
-#        "sudo yum-config-manager --add-repo " + $hoot_yum_repo
-#    config.vm.provision :shell, inline: 
-#        "sudo yum makecache -y"
-    config.vm.synced_folder ".", "/home/vagrant/hoot-rpms"
-
+        config.vm.provision :shell, inline: 
+            "sudo yum install -y epel-release yum-utils"
+        config.vm.provision :shell, inline: 
+            "sudo yum-config-manager --add-repo " + $pg_yum_repo
+        config.vm.provision :shell, inline: 
+            "sudo yum-config-manager --add-repo " + $hoot_yum_repo
+        config.vm.provision :shell, inline: 
+            "sudo yum makecache -y"
+        config.vm.synced_folder ".", "/home/vagrant/hoot-rpms"
+    end
 end
