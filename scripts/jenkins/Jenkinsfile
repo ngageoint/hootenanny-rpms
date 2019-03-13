@@ -20,7 +20,7 @@ pipeline {
         stage("Destroy VM") {
             when { expression { return params.TestInstall } }
             steps {
-                sh "vagrant destory -f ${params.Box}"
+                sh "vagrant destory -f ${params.Box} || true"
             }   
         }
         stage("Setup to Install") {
@@ -49,7 +49,7 @@ pipeline {
         stage("Clean Workspace") {
             when { expression { return params.TestUpdate } }
             steps {
-                sh "vagrant destory -f ${params.Box}"
+                sh "vagrant destory -f ${params.Box} || true"
             }
         }
         stage("Setup to Update") {
