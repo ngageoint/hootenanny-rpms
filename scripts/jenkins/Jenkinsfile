@@ -21,7 +21,7 @@ pipeline {
         stage("Destroy VM") {
             when { expression { return params.TestInstall } }
             steps {
-                sh "vagrant destory -f ${params.Box} || true"
+                sh "vagrant destroy -f ${params.Box} || true"
             }   
         }
         stage("Setup to Install") {
@@ -33,23 +33,21 @@ pipeline {
         stage("Install Hootenanny") {
             when { expression { return params.TestInstall } }
             steps {
-                sh "vagrant ssh -c 'yum -y install hootenanny-autostart'"
-                sh "vagrant ssh -c 'hoot version'"
+                sh "vagrant ssh -c 'yum -y install hootenanny-autostart; " + \
+                   "hoot version'"
             }
         }
         stage("Run Core Test on Original Install"){
             when { expression { return params.TestInstall } }
             steps {
-                sh "vagrant ssh -c 'cd /var/lib/hootenanny; sudo ${env.HOOT_CORE_TEST}'"
+                sh "vagrant ssh -c 'cd /var/lib/hootenanny; " + \
+                   "sudo ${env.HOOT_CORE_TEST}'"
             }
         }
-        // 'Destroy VM' and 'Clean Workspace' do the same steps, but are named 
-        // differently, because we need to confirm no VM was previously running 
-        // and stage names in the Jenkins pipeline have to be unique
-        stage("Clean Workspace") {
+        stage("Purge Workspace") {
             when { expression { return params.TestUpdate } }
             steps {
-                sh "vagrant destory -f ${params.Box} || true"
+                sh "vagrant destroy -f ${params.Box} || true"
             }
         }
         stage("Setup to Update") {
@@ -61,7 +59,9 @@ pipeline {
         stage("Install Previous Version of Hootenanny") {
            when { expression { return params.TestUpdate } }
            steps {
-               sh "vagrant ssh -c '~/hoot-rpms/scripts/install-previous-hoot-version.sh'" 
+               sh "vagrant ssh -c 'cd ~/hoot-rpms/scripts; " + \
+                  "./install-previous-hoot-version.sh; " + \
+                  "hoot version'"
            }
         }
         stage("Update Hootenanny") {
@@ -73,7 +73,8 @@ pipeline {
         stage("Run Core Test on Update"){
             when { expression { return params.TestUpdate } }
             steps {
-                sh "vagrant ssh -c 'cd /var/lib/hootenanny; sudo ${env.HOOT_CORE_TEST}'"
+                sh "vagrant ssh -c 'cd /var/lib/hootenanny; " + \
+                   "sudo ${env.HOOT_CORE_TEST}'"
             }
         }
         
@@ -83,12 +84,9 @@ pipeline {
         always {
             script {
                 sh "vagrant destroy -f ${params.Box}"
+//                notifySlack(currentBuild.result, "#TBD")
                 cleanWs()
             }
         }
-//        success {
-//            script {
-//                notifySlack(currentBuild.result, "TBD")
-//        }
     }
 }
