@@ -27,7 +27,7 @@ pipeline {
         stage("Setup to Install") {
             when { expression { return params.TestInstall } }
             steps {
-                sh "vagrant up ${params.Box}"
+                sh "vagrant up ${params.Box} --provider aws"
             }
         }
         stage("Install Hootenanny") {
@@ -55,7 +55,7 @@ pipeline {
         stage("Setup to Update") {
             when { expression { return params.TestUpdate } }
             steps {
-                sh "vagrant up ${params.Box}"
+                sh "vagrant up ${params.Box} --provider aws"
             }
         }
         stage("Install Previous Version of Hootenanny") {
