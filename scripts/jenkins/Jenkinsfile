@@ -4,6 +4,7 @@ pipeline {
     agent { label 'master' }
     environment {
         HOOT_CORE_TEST='HootTest --diff --glacial --parallel \$(nproc)'
+        VAGRANT_VAGRANTFILE='Vagrantfile_RPM_Test'
     }
     parameters {
         string(name: 'TestInstall', defaultValue: 'true')
@@ -25,7 +26,7 @@ pipeline {
         stage("Setup to Install") {
             when { expression { return params.TestInstall } }
             steps {
-                sh "export VAGRANT_VAGRANTFILE=Vagrantfile_RPM_Test"
+//                sh "export VAGRANT_VAGRANTFILE=Vagrantfile_RPM_Test"
                 sh "vagrant up"
             }
         }
@@ -39,7 +40,7 @@ pipeline {
         stage("Run Core Test on Original Install"){
             when { expression { return params.TestInstall } }
             steps {
-                sh "vagrant ssh -c 'cd /var/lib/hootenanny; sudo ${HOOT_CORE_TEST}'"
+                sh "vagrant ssh -c 'cd /var/lib/hootenanny; sudo ${env.HOOT_CORE_TEST}'"
             }
         }
         // 'Destroy VM' and 'Clean Workspace' do the same steps, but are named 
@@ -54,7 +55,7 @@ pipeline {
         stage("Setup to Update") {
             when { expression { return params.TestUpdate } }
             steps {
-                sh "export VAGRANT_VAGRANTFILE=Vagrantfile_RPM_Test"
+//                sh "export VAGRANT_VAGRANTFILE=Vagrantfile_RPM_Test"
                 sh "vagrant up"
             }
         }
@@ -73,7 +74,7 @@ pipeline {
         stage("Run Core Test on Update"){
             when { expression { return params.TestUpdate } }
             steps {
-                sh "vagrant ssh -c 'cd /var/lib/hootenanny; sudo ${HOOT_CORE_TEST}'"
+                sh "vagrant ssh -c 'cd /var/lib/hootenanny; sudo ${env.HOOT_CORE_TEST}'"
             }
         }
         
