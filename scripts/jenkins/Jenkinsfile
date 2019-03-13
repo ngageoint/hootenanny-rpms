@@ -1,0 +1,95 @@
+library('radiant-pipeline-library')_
+
+pipeline {
+    agent { label 'master' }
+    environment {
+        HOOT_CORE_TEST='HootTest --diff --glacial --parallel \$(nproc)'
+    }
+    parameters {
+        string(name: 'Box', defaultValue: 'default', description: 'Vagrant Box')
+        string(name: 'TestInstall', defaultValue: 'true')
+        string(name: 'TestUpdate',  defaultValue: 'true')
+    }
+
+    triggers {
+        // Set nightly trigger
+        cron((BRANCH_NAME == "251") ? "H H(4-5) * * 1-5" : "")
+    }
+    
+    stages {
+        stage("Destroy VM") {
+            when { expression { return params.TestInstall } }
+            steps {
+                sh "vagrant destory -f ${params.Box}"
+            }   
+        }
+        stage("Setup to Install") {
+            when { expression { return params.TestInstall } }
+            steps {
+                sh "export VAGRANT_VAGRANTFILE=Vagrantfile_RPM_Test"
+                sh "vagrant up ${params.Box}"
+            }
+        }
+        stage("Install Hootenanny") {
+            when { expression { return params.TestInstall } }
+            steps {
+                sh "vagrant ssh -c 'yum -y install hootenanny-autostart'"
+                sh "vagrant ssh -c 'hoot version'"
+            }
+        }
+        stage("Run Core Test on Original Install"){
+            when { expression { return params.TestInstall } }
+            steps {
+                sh "vagrant ssh -c 'cd /var/lib/hootenanny; sudo ${HOOT_CORE_TEST}'"
+            }
+        }
+        // 'Destroy VM' and 'Clean Workspace' do the same steps, but are named 
+        // differently, because we need to confirm no VM was previously running 
+        // and stage names in the Jenkins pipeline have to be unique
+        stage("Clean Workspace") {
+            when { expression { return params.TestUpdate } }
+            steps {
+                sh "vagrant destory -f ${params.Box}"
+            }
+        }
+        stage("Setup to Update") {
+            when { expression { return params.TestUpdate } }
+            steps {
+                sh "export VAGRANT_VAGRANTFILE=Vagrantfile_RPM_Test"
+                sh "vagrant up ${params.Box}"
+            }
+        }
+        stage("Install Previous Version of Hootenanny") {
+           when { expression { return params.TestUpdate } }
+           steps {
+               sh "vagrant ssh -c '~/hoot-rpms/scripts/install-previous-hoot-version.sh'" 
+           }
+        }
+        stage("Update Hootenanny") {
+            when { expression { return params.TestUpdate } }
+            steps {
+                sh "vagrant ssh -c 'sudo yum -y update hootenanny-autostart'"
+            }
+        }
+        stage("Run Core Test on Update"){
+            when { expression { return params.TestUpdate } }
+            steps {
+                sh "vagrant ssh -c 'cd /var/lib/hootenanny; sudo ${HOOT_CORE_TEST}'"
+            }
+        }
+        
+    }
+
+    post {
+        always {
+            script {
+                sh "vagrant destroy -f ${params.Box}"
+                cleanWs()
+            }
+        }
+//        success {
+//            script {
+//                notifySlack(currentBuild.result, "TBD")
+//        }
+    }
+}

@@ -28,6 +28,10 @@ maven:
   cache_sha1: &maven_cache_sha1 'c6e87f8100c9461c00b7d28a5a8d0e8b1737ccf3'
 
 
+yum-repos:
+  hoot-develop-repo: 'https://s3.amazonaws.com/hoot-repo/el7/develop/hoot.repo'
+  hoot-pgdb95-repo: 'https://s3.amazonaws.com/hoot-repo/el7/pgdg95.repo'
+
 rpmbuild:
   dist: &rpmbuild_dist '.el7'
   uid: &rpmbuild_uid 1000
