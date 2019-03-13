@@ -43,12 +43,12 @@ Vagrant.configure("2") do |config|
 
     config.vm.provision :shell, inline: 
         "sudo yum install -y epel-release yum-utils"
-    config.vm.provision :shell, inline: 
-        "sudo yum-config-manager --add-repo " + $pg_yum_repo
-    config.vm.provision :shell, inline: 
-        "sudo yum-config-manager --add-repo " + $hoot_yum_repo
-    config.vm.provision :shell, inline: 
-        "sudo yum makecache -y"
+    #config.vm.provision :shell, inline: 
+    #    "sudo yum-config-manager --add-repo " + $pg_yum_repo
+#    config.vm.provision :shell, inline: 
+#        "sudo yum-config-manager --add-repo " + $hoot_yum_repo
+#    config.vm.provision :shell, inline: 
+#        "sudo yum makecache -y"
     config.vm.synced_folder ".", "/home/vagrant/hoot-rpms"
 
 end
