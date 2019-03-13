@@ -4,9 +4,9 @@
 Vagrant.require_version '>= 2.0.0'
 
 # Setting up globals from YAML configuration file.
-settings = YAML::load_file('config.yml')
-$pg_yum_repo = settings.fetch('yum-repos')['hoot-pgdb95-repo']
-$hoot_yum_repo = settings.fetch('yum-repos')['hoot-develop-repo']
+#settings = YAML::load_file('config.yml')
+#$pg_yum_repo = settings.fetch('yum-repos')['hoot-pgdb95-repo']
+#$hoot_yum_repo = settings.fetch('yum-repos')['hoot-develop-repo']
 
 Vagrant.configure("2") do |config|
     tomcatPort = ENV['TOMCAT_PORT']
