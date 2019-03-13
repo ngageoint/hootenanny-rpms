@@ -37,6 +37,35 @@ Vagrant.configure("2") do |config|
         vb.cpus = 4
     end
     
+    def aws_provider(config, os)
+        config.vm.provider :aws do |aws, override|
+            override.nfs.functional = false
+            aws.instance_type = ENV.fetch('AWS_INSTANCE_TYPE', 't2.medium')
+            aws.block_device_mapping = [{ 'DeviceName' => '/dev/sda1', 'Ebs.VolumeSize' => 32 }] 
+
+            if ENV.key?('AWS_KEYPAIR_NAME')
+                aws.keypair_name = ENV['AWS_KEYPAIR_NAME']
+            end
+ 
+            if ENV.key?('AWS_SECURITY_GROUP')
+                aws.security_groups = ENV['AWS_SECURITY_GROUP']
+            end
+
+            aws.tags = {
+                'Name' => ENV.fetch('AWS_INSTANCE_NAME_TAG', "jenkins-hootenanny-rpms-#{os.downcase}"),
+                'URL'  => ENV.fetch('AWS_INSTANCE_URL_TAG', 'https://github.com/ngageoint/hootenanny-rpms'),
+            }
+
+            if ENV.key?('JOB_NAME')
+                aws.tags['JobName'] = ENV['JOB_NAME']
+            end
+
+            if ENV.key?('BUILD_NUMBER')
+                aws.tags['BuildNumber'] = ENV['BUILD_NUMBER']
+            end
+        end
+    end
+
     # set VM operating system to CentOS7
     config.vm.define "default", primary: true do |hoot_centos7|
         config.vm.box = "centos/7"
@@ -51,5 +80,6 @@ Vagrant.configure("2") do |config|
         config.vm.provision :shell, inline: 
             "sudo yum makecache -y"
         config.vm.synced_folder ".", "/home/vagrant/hoot-rpms"
+        aws_provider(hoot_centos7, 'CentOS7')
     end
 end
