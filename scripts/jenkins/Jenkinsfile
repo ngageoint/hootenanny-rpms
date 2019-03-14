@@ -84,7 +84,7 @@ pipeline {
         always {
             script {
                 sh "vagrant destroy -f ${params.Box}"
-//                notifySlack(currentBuild.result, "#TBD")
+                notifySlack(currentBuild.result, "#builds_hoot")
                 cleanWs()
             }
         }
