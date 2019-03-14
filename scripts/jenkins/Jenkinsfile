@@ -67,7 +67,8 @@ pipeline {
         stage("Update Hootenanny") {
             when { expression { return params.TestUpdate } }
             steps {
-                sh "vagrant ssh -c 'sudo yum -y update hootenanny-autostart'"
+                sh "vagrant ssh -c 'sudo yum -y update hootenanny-autostart; " + \
+                   "hoot version'" 
             }
         }
         stage("Run Core Test on Update"){
