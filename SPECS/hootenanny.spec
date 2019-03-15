@@ -117,8 +117,8 @@ BuildRequires:  proj-devel
 BuildRequires:  protobuf-devel
 BuildRequires:  python-argparse
 BuildRequires:  python-devel
-BuildRequires:  qt-devel
-BuildRequires:  qt-postgresql
+BuildRequires:  qt5-qtbase-devel
+BuildRequires:  qt5-qtbase-postgresql
 BuildRequires:  stxxl-devel
 BuildRequires:  texlive
 BuildRequires:  texlive-collection-fontsrecommended
