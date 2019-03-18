@@ -814,7 +814,7 @@ Requires:  proj-devel
 Requires:  protobuf-devel
 Requires:  python-argparse
 Requires:  python-devel
-Requires:  qt-devel
+Requires:  qt5-qtbase-devel
 Requires:  stxxl-devel = %{stxxl_version}
 Requires:  v8-devel
 # Documentation and report-related dependencies.
@@ -866,9 +866,9 @@ Requires:  opencv
 Requires:  postgresql%{pg_dotless}-libs
 Requires:  protobuf
 Requires:  python-matplotlib
-Requires:  qt
-Requires:  qt-postgresql
-Requires:  qt-x11
+Requires:  qt5-qtbase
+Requires:  qt5-qtbase-postgresql
+Requires:  qt5-qtx11extras
 Requires:  stxxl = %{stxxl_version}
 Requires:  unzip
 Requires:  v8
