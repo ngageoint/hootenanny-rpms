@@ -74,7 +74,7 @@ pipeline {
         stage("Install Previous Version") {
            when { expression { return params.TestUpdate } }
            steps {
-               sh "vagrant ssh -c 'cd ~/hoot-rpms/scripts; " + \
+               sh "vagrant ssh -c 'cd ~/hoot-rpms/tests/; " + \
                   "./install-previous-hoot-version.sh; " + \
                   "hoot version'"
            }
