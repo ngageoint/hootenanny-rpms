@@ -1,0 +1,113 @@
+library('radiant-pipeline-library')_
+
+pipeline {
+    agent { label 'master' }
+    environment {
+        // command to run the core tests against hootenanny
+        HOOT_CORE_TEST='HootTest --diff --glacial --parallel \$(nproc)'
+        // override which Vagrantfile to read
+        VAGRANT_VAGRANTFILE='Vagrantfile_RPM_Test'
+    }
+    /* Pipeline parameter TestInstall enables users to test only the latest
+     * RPM install, where as the TestUpdate allows users to test only an
+     * update of the RPM version. When both TestInstall and TestUpdate are 
+     * true (which is done by default), then the pipeline will test an install
+     * and update of the Hootenanny RPMs. The Box parameter is included for 
+     * possible future changes to the $VAGRANT_VAGRANTFILE where different 
+     * boxes are created to better fit configuration needs */
+    parameters {
+        booleanParam(name: 'TestInstall', defaultValue: 'true')
+        booleanParam(name: 'TestUpdate',  defaultValue: 'true')
+        string(name: 'Box', defaultValue: 'default', description: 'Vagrant Box')
+    }
+
+    triggers {
+        // Set nightly trigger
+        cron((BRANCH_NAME == "develop") ? "H H(4-5) * * 1-5" : "")
+    }
+    
+    stages {
+        stage("Destroy VM") {
+            when { expression { return params.TestInstall } }
+            steps {
+                sh "vagrant destroy -f ${params.Box} || true"
+            }   
+        }
+        stage("Setup to Install") {
+            when { expression { return params.TestInstall } }
+            steps {
+                sh "vagrant up ${params.Box} --provider aws"
+            }
+        }
+        stage("Install Hootenanny") {
+            when { expression { return params.TestInstall } }
+            steps {
+                sh "vagrant ssh -c 'sudo yum -y install hootenanny-autostart; " + \
+                   "hoot version'"
+            }
+        }
+        // Run the core tests after the latest RPM version of Hootenanny has 
+        // been installed 
+        stage("Core Test Install"){
+            when { expression { return params.TestInstall } }
+            steps {
+                sh "vagrant ssh -c 'cd /var/lib/hootenanny; " + \
+                   "sudo ${env.HOOT_CORE_TEST}'"
+            }
+        }
+        stage("Purge Workspace") {
+            when { expression { return params.TestUpdate } }
+            steps {
+                sh "vagrant destroy -f ${params.Box} || true"
+            }
+        }
+        stage("Setup to Update") {
+            when { expression { return params.TestUpdate } }
+            steps {
+                sh "vagrant up ${params.Box} --provider aws"
+            }
+        }
+        /* The shell script install-previous-hoot-version.sh is located
+         * in the Hootenanny-rpm repo which is synced with the VM from the 
+         * $VAGRANT_VAGRANTFILE. The script finds the previous version
+         * of the Hootenanny RPM from the Yum repo in S3 */
+        stage("Install Previous Version") {
+           when { expression { return params.TestUpdate } }
+           steps {
+               sh "vagrant ssh -c 'cd ~/hoot-rpms/tests/; " + \
+                  "./install-previous-hoot-version.sh; " + \
+                  "hoot version'"
+           }
+        }
+        // Update Hootenanny from the previously installed version
+        stage("Update Hootenanny") {
+            when { expression { return params.TestUpdate } }
+            steps {
+                sh "vagrant ssh -c 'sudo yum -y update hootenanny-autostart; " + \
+                   "hoot version'" 
+            }
+        }
+        // Run the core tests after the Hootenanny RPM has been updated
+        stage("Core Test Update"){
+            when { expression { return params.TestUpdate } }
+            steps {
+                sh "vagrant ssh -c 'cd /var/lib/hootenanny; " + \
+                   "sudo ${env.HOOT_CORE_TEST}'"
+            }
+        }
+        
+    }
+    // Pass or fail, always destroy the VM and report the status of the build
+    // to the slack channel "#builds_hoot"
+    post {
+        always {
+            script {
+                sh "vagrant destroy -f ${params.Box}"
+                notifySlack(currentBuild.result, "#builds_hoot")
+                // Jenkins Workspace Cleanup Plugin - This will delete the 
+                // workspace when the build is done
+                cleanWs()
+            }
+        }
+    }
+}
