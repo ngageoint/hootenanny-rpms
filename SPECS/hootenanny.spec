@@ -85,6 +85,7 @@ BuildRequires:  autoconf
 BuildRequires:  autoconf-archive
 BuildRequires:  automake
 BuildRequires:  boost-devel
+BuildRequires:  ccache
 BuildRequires:  cppunit-devel
 BuildRequires:  dblatex
 BuildRequires:  doxygen
