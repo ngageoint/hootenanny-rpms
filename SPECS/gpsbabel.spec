@@ -11,23 +11,23 @@ Source0:       %{name}-%{version}.tar.gz
 Source2:       %{name}.png
 Source21:      http://www.gpsbabel.org/style3.css
 # Remove network access requirement for XML doc builds and HTML doc reading
-Patch1:        0001-gpsbabel-1.4.2-xmldoc.patch
+Patch1:        gpsbabel-0001-1.4.2-xmldoc.patch
 # Use system shapelib - not suitable for upstream in this form.
-Patch2:        0002-gpsbabel-1.4.3-use-system-shapelib.patch
+Patch2:        gpsbabel-0002-1.4.3-use-system-shapelib.patch
 # Pickup gmapbase.html from /usr/share/gpsbabel
-Patch3:        0003-gpsbabel-1.4.3-gmapbase.patch
+Patch3:        gpsbabel-0003-1.4.3-gmapbase.patch
 # No automatic phone home by default (RHBZ 668865)
-Patch4:        0004-gpsbabel-1.4.3-nosolicitation.patch
+Patch4:        gpsbabel-0004-1.4.3-nosolicitation.patch
 # Use system zlib
-Patch5:        0005-Use-system-zlib.patch
+Patch5:        gpsbabel-0005-Use-system-zlib.patch
 # Use system minizip
-Patch6:        0006-Use-system-minizip.patch
+Patch6:        gpsbabel-0006-Use-system-minizip.patch
 # Upstream patch
-Patch7:        0007-Added-geojson-read-capablity-moved-magic-strings-to-.patch
+Patch7:        gpsbabel-0007-Added-geojson-read-capablity-moved-magic-strings-to.patch
 # RHBZ#1561337
-Patch8:        0008-Correctly-read-diff-and-terr-from-geo-format.patch
+Patch8:        gpsbabel-0008-Correctly-read-diff-and-terr-from-geo-format.patch
 # RHBZ#1625204
-Patch9:        0009-Remove-SHAPE-ZLIB-MINIZIP-from-LIBOBJS.patch
+Patch9:        gpsbabel-0009-Remove-SHAPE-ZLIB-MINIZIP-from-LIBOBJS.patch
 
 BuildRequires: %{__make}
 BuildRequires: %{__perl}
