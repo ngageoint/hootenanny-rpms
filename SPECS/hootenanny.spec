@@ -185,7 +185,7 @@ ln -s %{hoot_home}/conf/dictionary/words1.sqlite conf/dictionary/words1.sqlite
 %{__cp} LocalConfig.pri.orig LocalConfig.pri
 command -v ccache >/dev/null 2>&1 && echo "QMAKE_CXX=ccache g++" >> LocalConfig.pri
 
-%make_build
+%{__make}
 
 %{__make} ui2x-build
 
