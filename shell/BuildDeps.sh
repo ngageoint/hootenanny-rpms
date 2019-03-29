@@ -56,6 +56,23 @@ if [ ! -f $RPM_X86_64/$GLPK_RPM ]; then
         rpmbuild -bb SPECS/glpk.spec
 fi
 
+# gpsbabel
+if [ ! -f $RPM_X86_64/$GPSBABEL_RPM ]; then
+    echo "#### Building RPM: gpsbabel"
+
+    # Build image for gpsbabel.
+    docker build \
+           --build-arg "packages=$( spec_requires gpsbabel )" \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic \
+           -t hoot/rpmbuild-gpsbabel \
+           $SCRIPT_HOME
+
+    # Generate gpsbabel RPM.
+    run_dep_image \
+        -i hoot/rpmbuild-gpsbabel \
+        rpmbuild -bb SPECS/gpsbabel.spec
+fi
+
 # libgeotiff
 if [ ! -f $RPM_X86_64/$LIBGEOTIFF_RPM ]; then
     echo "#### Building RPM: libgeotiff"

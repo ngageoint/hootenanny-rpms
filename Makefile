@@ -74,6 +74,7 @@ DUMBINIT_RPM := $(call rpm_file2,dumb-init,dumbinit,x86_64)
 GEOS_RPM := $(call rpm_file,geos,x86_64)
 GDAL_RPM := $(call rpm_file2,hoot-gdal,gdal,x86_64)
 GLPK_RPM := $(call rpm_file,glpk,x86_64)
+GPSBABEL_RPM := $(call rpm_file,gpsbabel,x86_64)
 FILEGDBAPI_RPM := $(call rpm_file,FileGDBAPI,x86_64)
 LIBGEOTIFF_RPM := $(call rpm_file,libgeotiff,x86_64)
 LIBKML_RPM := $(call rpm_file,libkml,x86_64)
@@ -101,6 +102,7 @@ DEPENDENCY_CONTAINERS := \
 	rpmbuild-gdal \
 	rpmbuild-geos \
 	rpmbuild-glpk \
+	rpmbuild-gpsbabel \
 	rpmbuild-libgeotiff \
 	rpmbuild-libkml \
 	rpmbuild-liboauthcpp \
@@ -247,6 +249,7 @@ rpmbuild-gdal: \
 	rpmbuild-pgdg \
 	FileGDBAPI \
 	geos \
+	gpsbabel \
 	libgeotiff \
 	libkml \
 	.vagrant/machines/rpmbuild-gdal/docker/id
@@ -258,6 +261,10 @@ rpmbuild-geos: \
 rpmbuild-glpk: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-glpk/docker/id
+
+rpmbuild-gpsbabel: \
+	rpmbuild-generic \
+	.vagrant/machines/rpmbuild-gpsbabel/docker/id
 
 rpmbuild-hoot-devel: \
 	rpmbuild-pgdg \
@@ -345,6 +352,7 @@ libphonenumber: rpmbuild-libphonenumber $(LIBPHONENUMBER_RPM)
 libpostal: rpmbuild-libpostal $(LIBPOSTAL_RPM)
 nodejs: rpmbuild-nodejs $(NODEJS_RPM)
 glpk: rpmbuild-glpk $(GLPK_RPM)
+gpsbabel: rpmbuild-gpsbabel $(GPSBABEL_RPM)
 hoot-gdal: rpmbuild-gdal $(GDAL_RPM)
 hoot-words: rpmbuild-generic $(WORDS_RPM)
 hoot-postgis24_$(PG_DOTLESS): rpmbuild-postgis $(POSTGIS_RPM)
