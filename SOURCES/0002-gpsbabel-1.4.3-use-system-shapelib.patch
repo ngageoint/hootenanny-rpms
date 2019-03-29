@@ -1,0 +1,89 @@
+From 4beadd4b4acf1a76732f9599e826c73e9c28dd6a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ralf=20Cors=C3=A9pius?= <corsepiu@fedoraproject.org>
+Date: Tue, 15 Apr 2014 05:18:38 +0200
+Subject: [PATCH 2/6] gpsbabel-1.4.3-use-system-shapelib
+
+	Use system shapelib - not suitable for upstream in this form.
+---
+ Makefile.in  | 8 ++------
+ configure    | 3 +--
+ configure.in | 2 +-
+ shape.cc     | 2 +-
+ 4 files changed, 5 insertions(+), 10 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 041cd90..fe130f0 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -100,7 +100,7 @@ JEEPS=jeeps/gpsapp.o jeeps/gpscom.o \
+ # Extra modules in Jeeps that we don't use
+ # 	jeeps/gpsfmt.o jeeps/gpsinput.o jeeps/gpsproj.o
+ 
+-SHAPE=shapelib/shpopen.o shapelib/dbfopen.o shapelib/safileio.o
++SHAPE=-lshp
+ 
+ MINIZIP=zlib/contrib/minizip/zip.o \
+ 	zlib/contrib/minizip/ioapi.o
+@@ -891,11 +891,7 @@ sbp.o: sbp.cc defs.h config.h queue.h zlib/zlib.h zlib/zconf.h gbfile.h \
+ session.o: session.cc defs.h config.h queue.h zlib/zlib.h zlib/zconf.h \
+   gbfile.h cet.h inifile.h session.h src/core/datetime.h
+ shape.o: shape.cc defs.h config.h queue.h zlib/zlib.h zlib/zconf.h \
+-  gbfile.h cet.h inifile.h session.h src/core/datetime.h \
+-  shapelib/shapefil.h
+-shapelib/dbfopen.o: shapelib/dbfopen.c shapelib/shapefil.h
+-shapelib/safileio.o: shapelib/safileio.c shapelib/shapefil.h
+-shapelib/shpopen.o: shapelib/shpopen.c shapelib/shapefil.h
++  gbfile.h cet.h inifile.h session.h src/core/datetime.h
+ skyforce.o: skyforce.cc defs.h config.h queue.h zlib/zlib.h zlib/zconf.h \
+   gbfile.h cet.h inifile.h session.h src/core/datetime.h
+ skytraq.o: skytraq.cc defs.h config.h queue.h zlib/zlib.h zlib/zconf.h \
+diff --git a/configure b/configure
+index 36312c6..18486d7 100755
+--- a/configure
++++ b/configure
+@@ -5502,7 +5502,7 @@ done
+ 
+ 
+ 
+-ac_config_files="$ac_config_files Makefile gbversion.h gui/setup.iss xmldoc/makedoc tools/mkcapabilities win32/gpsbabel.rc jeeps/Makefile shapelib/Makefile zlib/empty"
++ac_config_files="$ac_config_files Makefile gbversion.h gui/setup.iss xmldoc/makedoc tools/mkcapabilities win32/gpsbabel.rc jeeps/Makefile zlib/empty"
+ 
+ ac_config_files="$ac_config_files gui/makelinuxdist.sh"
+ 
+@@ -6205,7 +6205,6 @@ do
+     "tools/mkcapabilities") CONFIG_FILES="$CONFIG_FILES tools/mkcapabilities" ;;
+     "win32/gpsbabel.rc") CONFIG_FILES="$CONFIG_FILES win32/gpsbabel.rc" ;;
+     "jeeps/Makefile") CONFIG_FILES="$CONFIG_FILES jeeps/Makefile" ;;
+-    "shapelib/Makefile") CONFIG_FILES="$CONFIG_FILES shapelib/Makefile" ;;
+     "zlib/empty") CONFIG_FILES="$CONFIG_FILES zlib/empty" ;;
+     "gui/makelinuxdist.sh") CONFIG_FILES="$CONFIG_FILES gui/makelinuxdist.sh" ;;
+ 
+diff --git a/configure.in b/configure.in
+index ffa6743..be63320 100644
+--- a/configure.in
++++ b/configure.in
+@@ -402,7 +402,7 @@ AC_SUBST(QT_INC_OPT)
+ AC_SUBST(QT_SYSINC_OPT)
+ AC_SUBST(QT_LIBS)
+ 
+-AC_CONFIG_FILES([Makefile gbversion.h gui/setup.iss xmldoc/makedoc tools/mkcapabilities win32/gpsbabel.rc jeeps/Makefile shapelib/Makefile zlib/empty])
++AC_CONFIG_FILES([Makefile gbversion.h gui/setup.iss xmldoc/makedoc tools/mkcapabilities win32/gpsbabel.rc jeeps/Makefile zlib/empty])
+ AC_CONFIG_FILES([gui/makelinuxdist.sh], [chmod +x gui/makelinuxdist.sh])
+ AC_OUTPUT
+ 
+diff --git a/shape.cc b/shape.cc
+index 1256bc0..e74c5a8 100644
+--- a/shape.cc
++++ b/shape.cc
+@@ -20,7 +20,7 @@
+ 
+  */
+ #include "defs.h"
+-#include "shapelib/shapefil.h"
++#include <shapefil.h>
+ #include <stdlib.h>
+ 
+ #if SHAPELIB_ENABLED
+-- 
+2.9.3
+

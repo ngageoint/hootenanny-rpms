@@ -1,0 +1,38 @@
+From 175b500a34988c022da20abc8ed15dbc46046638 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ralf=20Cors=C3=A9pius?= <corsepiu@fedoraproject.org>
+Date: Wed, 5 Sep 2018 07:08:50 +0200
+Subject: [PATCH 9/9] Remove $(SHAPE) @ZLIB@ $(MINIZIP) from LIBOBJS.
+
+---
+ Makefile.in | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index c27bac99..df338b2a 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -114,7 +114,7 @@ LIBOBJS = queue.o route.o waypt.o filter_vecs.o util.o vecs.o mkshort.o \
+ 	  src/core/xmlstreamwriter.o \
+ 	  src/core/usasciicodec.o\
+ 	  src/core/ziparchive.o \
+-	  $(GARMIN) $(JEEPS) $(SHAPE) @ZLIB@ $(MINIZIP) $(FMTS) $(FILTERS)
++	  $(GARMIN) $(JEEPS) $(FMTS) $(FILTERS)
+ OBJS = main.o globals.o $(LIBOBJS) @FILEINFO@
+ 
+ DEPFILES = $(OBJS:.o=.d)
+@@ -143,10 +143,10 @@ toolinfo
+ all: gpsbabel$(EXEEXT)
+ 
+ gpsbabel$(EXEEXT): configure Makefile $(OBJS) @GPSBABEL_DEBUG@ 
+-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJS) @LIBS@ $(QT_LIBS) @USB_LIBS@ $(OUTPUT_SWITCH)$@
++	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJS) @LIBS@ $(SHAPE) @ZLIB@ $(MINIZIP) $(QT_LIBS) @USB_LIBS@ $(OUTPUT_SWITCH)$@
+ 
+ gpsbabel-debug: $(OBJS)
+-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJS) @LIBS@ @EFENCE_LIB@ $(QT_LIBS) @USB_LIBS@ $(OUTPUT_SWITCH)$@
++	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJS) @LIBS@ $(SHAPE) @ZLIB@ $(MINIZIP) @EFENCE_LIB@ $(QT_LIBS) @USB_LIBS@ $(OUTPUT_SWITCH)$@
+ 
+ Makefile gbversion.h: Makefile.in config.status xmldoc/makedoc.in \
+ 	  gbversion.h.in gui/setup.iss.in
+-- 
+2.17.1
+
