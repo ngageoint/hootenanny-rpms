@@ -98,17 +98,17 @@ workflows:
       - develop-upgrade:
           requires:
             - develop-rpm
-  #     - develop-sync:
-  #         requires:
-  #           - develop-install
-  #           - develop-upgrade
-  #   triggers:
-  #     - schedule:
-  #         cron: "0 12,20 * * *"
-  #         filters:
-  #           branches:
-  #             only:
-  #               - develop
+        - develop-sync:
+            requires:
+              - develop-install
+              - develop-upgrade
+      triggers:
+        - schedule:
+            cron: "0 12,20 * * *"
+            filters:
+              branches:
+                only:
+                  - develop
   tests:
     jobs:
       - lint
