@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (C) 2019 Maxar Technologies (https://www.maxar.com)
 # Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,6 +21,16 @@ LSB_DIST="$(. /etc/os-release && echo "$ID")"
 if [ "$LSB_DIST" == 'centos' -o "$LSB_DIST" == 'fedora' -o "$LSB_DIST" == 'rhel' ]; then
     sudo yum install -q -y rpm-build
 elif [ "$LSB_DIST" == 'debian' -o "$LSB_DIST" == 'ubuntu' ]; then
-    sudo apt-get update -qq
+    count=0
+    timeout=180
+    while fuser /var/lib/dpkg/lock ; do
+        sleep 1
+        ((count = count + 1))
+        if [ "$((count >= timeout))" = "1" ]; then
+            echo "Timed out waiting for dpkg lock"
+            exit 1
+        fi
+    done
+    sudo apt-get update -qq -y
     sudo apt-get install -qq -y rpm
 fi

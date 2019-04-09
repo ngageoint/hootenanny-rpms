@@ -282,6 +282,7 @@ Vagrant.configure(2) do |config|
     ['rpmbuild-generic',
      'rpmbuild-geos',
      'rpmbuild-glpk',
+     'rpmbuild-gpsbabel',
      'rpmbuild-libgeotiff',
      'rpmbuild-libkml',
      'rpmbuild-liboauthcpp',

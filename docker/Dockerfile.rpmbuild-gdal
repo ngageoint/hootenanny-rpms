@@ -21,6 +21,7 @@ FROM hootenanny/rpmbuild-pgdg:${pg_version}
 # required arguments.
 ARG filegdbapi_version
 ARG geos_version
+ARG gpsbabel_version
 ARG libgeotiff_version
 ARG libkml_version
 ARG packages
@@ -39,6 +40,8 @@ USER root
 COPY RPMS/x86_64/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/geos-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/geos-devel-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/gpsbabel-${gpsbabel_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/gpsbabel-devel-${gpsbabel_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
@@ -51,6 +54,8 @@ RUN yum install -y \
     /tmp/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/geos-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/geos-devel-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/gpsbabel-${gpsbabel_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/gpsbabel-devel-${gpsbabel_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \

@@ -38,20 +38,6 @@ The [`geos.spec`](../SPECS/geos.spec) originates from
 [PGDG's GEOS 3.5.0 Source RPM](https://download.postgresql.org/pub/repos/yum/srpms/9.5/redhat/rhel-7-x86_64/)
 and is released under the [PostgreSQL license](./licenses/PostgreSQL-LICENSE).
 
-## GLPK
-
-The [GLPK](https://www.gnu.org/software/glpk/glpk.html) source archives were
-obtained directly from [GNU](https://ftp.gnu.org/gnu/glpk/) and licensed under
-the [GPLv3](https://www.gnu.org/licenses/gpl.html).
-
-The following packaging files originate from
-[Fedora's GLPK RPM](https://src.fedoraproject.org/cgit/rpms/glpk.git)
-repository and are [MIT licensed](./licenses/Fedora-LICENSE):
-
-* [`glpk.spec`](../SPECS/glpk.spec)
-* [`glpk-alias.patch`](../SOURCES/glpk-alias.patch)
-* [`glpk-unbundle-suitesparse-zlib.patch`](../SOURCES/glpk-unbundle-suitesparse-zlib.patch)
-
 ## GDAL
 
 The [GDAL](https://trac.osgeo.org/gdal) source archives are obtained
@@ -70,6 +56,28 @@ repository (Fedora 25 release) and are [MIT licensed](./licenses/Fedora-LICENSE)
 * [`gdal-completion.patch`](../SOURCES/gdal-completion.patch)
 * [`gdal-jni.patch`](../SOURCES/gdal-jni.patch)
 * [`gdal-uchar.patch`](../SOURCES/gdal-uchar.patch)
+
+## GLPK
+
+The [GLPK](https://www.gnu.org/software/glpk/glpk.html) source archives were
+obtained directly from [GNU](https://ftp.gnu.org/gnu/glpk/) and licensed under
+the [GPLv3](https://www.gnu.org/licenses/gpl.html).
+
+The following packaging files originate from
+[Fedora's GLPK RPM](https://src.fedoraproject.org/cgit/rpms/glpk.git)
+repository and are [MIT licensed](./licenses/Fedora-LICENSE):
+
+* [`glpk.spec`](../SPECS/glpk.spec)
+* [`glpk-alias.patch`](../SOURCES/glpk-alias.patch)
+* [`glpk-unbundle-suitesparse-zlib.patch`](../SOURCES/glpk-unbundle-suitesparse-zlib.patch)
+
+## gpsbabel
+
+The [gpsbabel](https://www.gpsbabel.org/) source archive was obtained directly
+from their website.  The [`gpsbabel.spec`](../SPECS/gpsbabel.spec) and all
+patches from [`SOURCES`](../SOURCES) starting with `gpsbabel` are from
+[Fedora's `gpsbabel` RPM](https://src.fedoraproject.org/rpms/gpsbabel/tree/master)
+repository and are [MIT licensed](./licenses/Fedora-LICENSE).
 
 ## libgeotiff
 

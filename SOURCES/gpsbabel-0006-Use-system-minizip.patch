@@ -1,0 +1,63 @@
+From 8a6b80bbc812c0752fddf7c8d4947d51f35a6135 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ralf=20Cors=C3=A9pius?= <corsepiu@fedoraproject.org>
+Date: Sun, 3 Jan 2016 16:05:20 +0100
+Subject: [PATCH 6/6] Use system minizip.
+
+---
+ Makefile.in            | 5 ++---
+ src/core/ziparchive.cc | 2 +-
+ src/core/ziparchive.h  | 2 +-
+ 3 files changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 9c580dc..c27bac9 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -102,8 +102,7 @@ JEEPS=jeeps/gpsapp.o jeeps/gpscom.o \
+ 
+ SHAPE=-lshp
+ 
+-MINIZIP=zlib/contrib/minizip/zip.o \
+-	zlib/contrib/minizip/ioapi.o
++MINIZIP=-lminizip
+ 
+ ZLIB=-lz
+ 
+@@ -115,7 +114,7 @@ LIBOBJS = queue.o route.o waypt.o filter_vecs.o util.o vecs.o mkshort.o \
+ 	  src/core/xmlstreamwriter.o \
+ 	  src/core/usasciicodec.o\
+ 	  src/core/ziparchive.o \
+-	  $(GARMIN) $(JEEPS) $(SHAPE) @ZLIB@ $(FMTS) $(FILTERS)
++	  $(GARMIN) $(JEEPS) $(SHAPE) @ZLIB@ $(MINIZIP) $(FMTS) $(FILTERS)
+ OBJS = main.o globals.o $(LIBOBJS) @FILEINFO@
+ 
+ DEPFILES = $(OBJS:.o=.d)
+diff --git a/src/core/ziparchive.cc b/src/core/ziparchive.cc
+index d4b5dca..17f15b5 100644
+--- a/src/core/ziparchive.cc
++++ b/src/core/ziparchive.cc
+@@ -23,7 +23,7 @@
+ 
+ #include "defs.h"
+ #include "src/core/logging.h"
+-#include "zlib/contrib/minizip/zip.h"
++#include <minizip/zip.h>
+ 
+ #include <QtCore/QFile>
+ #include <QtCore/QDebug>
+diff --git a/src/core/ziparchive.h b/src/core/ziparchive.h
+index 0c9f8f2..769baa6 100644
+--- a/src/core/ziparchive.h
++++ b/src/core/ziparchive.h
+@@ -21,7 +21,7 @@
+ 
+ #include <QtCore/QString>
+ #include <QtCore/QStringList>
+-#include "zlib/contrib/minizip/zip.h"
++#include <minizip/zip.h>
+ 
+ class  ZipArchive
+ {
+-- 
+2.9.3
+

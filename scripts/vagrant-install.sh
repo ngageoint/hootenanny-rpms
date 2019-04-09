@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (C) 2019 Maxar Technologies (https://www.maxar.com)
 # Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +20,7 @@ set -euo pipefail
 #  * VAGRANT_VERSION
 #  * VAGRANT_BASEURL
 LSB_DIST="$(. /etc/os-release && echo "$ID")"
-VAGRANT_VERSION="${VAGRANT_VERSION:-2.2.3}"
+VAGRANT_VERSION="${VAGRANT_VERSION:-2.2.4}"
 VAGRANT_BASEURL="${VAGRANT_BASEURL:-https://releases.hashicorp.com/vagrant/$VAGRANT_VERSION}"
 
 # Set up command differences between RHEL and Debian-based systems.

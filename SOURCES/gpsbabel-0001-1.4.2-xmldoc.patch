@@ -1,0 +1,31 @@
+From c13710cf10583dc0395bfacf643e42943438cbe1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ralf=20Cors=C3=A9pius?= <corsepiu@fedoraproject.org>
+Date: Tue, 15 Apr 2014 05:14:10 +0200
+Subject: [PATCH 1/6] gpsbabel-1.4.2-xmldoc
+
+	Remove network access requirement for XML doc builds and HTML doc reading
+---
+ Makefile.in | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 83af604..041cd90 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -275,11 +275,8 @@ gpsbabel.html: FORCE # gpsbabel
+ 	xsltproc --load-trace \
+ 	  --output $@ \
+ 	  --stringparam toc.section.depth "1" \
+-	  --stringparam html.cleanup "1" \
+-	  --stringparam make.clean.html "1" \
+-	  --stringparam html.valid.html "1" \
+-	  --stringparam html.stylesheet \
+-	  "http://www.gpsbabel.org/style3.css" \
++	  --nonet \
++	  --stringparam html.stylesheet "gpsbabel.org-style3.css" \
+ 	  http://docbook.sourceforge.net/release/xsl/current/xhtml/docbook.xsl \
+ 	xmldoc/readme.xml
+ 
+-- 
+2.9.3
+
