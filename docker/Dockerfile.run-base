@@ -61,9 +61,9 @@ RUN yum -q -y update && \
         proj \
         protobuf \
         python-matplotlib \
-        qt \
-        qt-postgresql \
-        qt-x11 \
+        qt5-qtbase \
+        qt5-qtbase-postgresql \
+        qt5-qtx11extras \
         unzip \
         v8 \
         w3m \
