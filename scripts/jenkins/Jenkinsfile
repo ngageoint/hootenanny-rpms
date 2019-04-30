@@ -115,7 +115,7 @@ pipeline {
                 notifySlack("FAILURE", "#builds_hoot")
             }
         }
-        always {
+        cleanup {
             script {
                 sh "vagrant destroy -f ${params.Box}"
                 // Jenkins Workspace Cleanup Plugin - This will delete the 
