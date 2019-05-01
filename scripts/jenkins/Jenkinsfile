@@ -100,10 +100,24 @@ pipeline {
     // Pass or fail, always destroy the VM and report the status of the build
     // to the slack channel "#builds_hoot"
     post {
-        always {
+        aborted {
+            script {
+                notifySlack("ABORTED", "#builds_hoot")
+            }
+        }
+        success {
+            script {
+                notifySlack("SUCCESS", "#builds_hoot")
+            }
+        }
+        failure {
+            script {
+                notifySlack("FAILURE", "#builds_hoot")
+            }
+        }
+        cleanup {
             script {
                 sh "vagrant destroy -f ${params.Box}"
-                notifySlack(currentBuild.result, "#builds_hoot")
                 // Jenkins Workspace Cleanup Plugin - This will delete the 
                 // workspace when the build is done
                 cleanWs()
