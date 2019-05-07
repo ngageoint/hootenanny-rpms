@@ -109,7 +109,6 @@ BuildRequires:  libphonenumber-devel
 BuildRequires:  libpng-devel
 BuildRequires:  libpostal-devel
 BuildRequires:  libxslt
-BuildRequires:  log4cxx-devel
 BuildRequires:  maven
 BuildRequires:  nodejs-devel
 BuildRequires:  opencv-devel
@@ -807,7 +806,6 @@ Requires:  git
 Requires:  glpk-devel = %{glpk_version}
 Requires:  hoot-words
 Requires:  libicu-devel
-Requires:  log4cxx-devel
 Requires:  nodejs-devel = %{nodejs_epoch}:%{nodejs_version}
 Requires:  opencv-devel
 Requires:  postgresql%{pg_dotless}-devel
@@ -861,7 +859,6 @@ Requires:  liboauthcpp = %{liboauthcpp_version}
 Requires:  libphonenumber = %{libphonenumber_version}
 Requires:  libpostal
 Requires:  libpostal-data
-Requires:  log4cxx
 Requires:  nodejs = %{nodejs_epoch}:%{nodejs_version}
 Requires:  opencv
 Requires:  postgresql%{pg_dotless}-libs
