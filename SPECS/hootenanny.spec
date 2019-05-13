@@ -215,18 +215,18 @@ popd
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}
 %{__install} -m 0644 hoot-services/target/hoot-services*.war %{buildroot}%{tomcat_webapps}/hoot-services.war
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}
-%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id
-%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id/data
-%{__cp} -pr hoot-ui/dist/* %{buildroot}%{tomcat_webapps}/%{name}-id/
-%{__install} -m 0644 hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{tomcat_webapps}/%{name}-id/data
-%{__install} -m 0644 hoot-ui/data/tdsv61_field_values.json %{buildroot}%{tomcat_webapps}/%{name}-id/data
+%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id-legacy
+%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id-legacy/data
+%{__cp} -pr hoot-ui/dist/* %{buildroot}%{tomcat_webapps}/%{name}-id-legacy/
+%{__install} -m 0644 hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{tomcat_webapps}/%{name}-id-legacy/data
+%{__install} -m 0644 hoot-ui/data/tdsv61_field_values.json %{buildroot}%{tomcat_webapps}/%{name}-id-legacy/data
 %if %{with hoot_ui2}
 # Hootenanny UI 2.x files.
-%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id2x
-%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id2x/data
-%{__cp} -pr hoot-ui-2x/dist/* %{buildroot}%{tomcat_webapps}/%{name}-id2x/
-%{__install} -m 0644 hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{tomcat_webapps}/%{name}-id2x/data
-%{__install} -m 0644 hoot-ui/data/tdsv61_field_values.json %{buildroot}%{tomcat_webapps}/%{name}-id2x/data
+%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id
+%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id/data
+%{__cp} -pr hoot-ui-2x/dist/* %{buildroot}%{tomcat_webapps}/%{name}-id/
+%{__install} -m 0644 hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{tomcat_webapps}/%{name}-id/data
+%{__install} -m 0644 hoot-ui/data/tdsv61_field_values.json %{buildroot}%{tomcat_webapps}/%{name}-id/data
 %endif
 
 # Tomcat environment settings for Hootenanny.
@@ -371,9 +371,9 @@ This package contains the UI and web services.
 %{hoot_home}/test-output
 %{tomcat_config}/conf.d/hoot.conf
 %{tomcat_webapps}/hoot-services.war
-%{tomcat_webapps}/%{name}-id
+%{tomcat_webapps}/%{name}-id-legacy
 %if %{with hoot_ui2}
-%{tomcat_webapps}/%{name}-id2x
+%{tomcat_webapps}/%{name}-id
 %endif
 
 %defattr(-, tomcat, tomcat, 0775)
