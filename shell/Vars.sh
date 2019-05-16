@@ -1,3 +1,4 @@
+# Copyright (C) 2019 Maxar Technologies (https://www.maxar.com)
 # Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -152,6 +153,11 @@ OSMOSIS_RPM=osmosis-$OSMOSIS_VERSION-$OSMOSIS_RELEASE$RPMBUILD_DIST.noarch.rpm
 POSTGIS_VERSION=$( config_version postgis )
 POSTGIS_RELEASE=$( config_release postgis )
 POSTGIS_RPM=hoot-postgis24_$PG_DOTLESS-$POSTGIS_VERSION-$POSTGIS_RELEASE$RPMBUILD_DIST.x86_64.rpm
+
+PROJ_VERSION=$( config_version proj )
+PROJ_RELEASE=$( config_release proj )
+PROJ_RPM=proj-$PROJ_VERSION-$PROJ_RELEASE$RPMBUILD_DIST.x86_64.rpm
+PROJ_DEVEL_RPM=proj-devel-$PROJ_VERSION-$PROJ_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
 STXXL_VERSION=$( config_version stxxl )
 STXXL_RELEASE=$( config_release stxxl )

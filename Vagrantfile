@@ -288,7 +288,8 @@ Vagrant.configure(2) do |config|
      'rpmbuild-liboauthcpp',
      'rpmbuild-libphonenumber',
      'rpmbuild-libpostal',
-     'rpmbuild-nodejs']
+     'rpmbuild-nodejs',
+     'rpmbuild-proj']
   ).each do |name, options|
     rpmbuild(config, name, options)
   end
