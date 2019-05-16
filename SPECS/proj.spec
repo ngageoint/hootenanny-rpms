@@ -1,6 +1,6 @@
 %global datumgrid_version 1.8
 
-# Major digit of the proj so version
+# Major digit of the proj shared library version.
 %global proj_somaj 15
 
 Name:           proj
@@ -10,7 +10,7 @@ Summary:        Cartographic projection software (PROJ.4)
 License:        MIT
 URL:            https://proj4.org
 Source0:        https://github.com/OSGeo/proj.4/releases/download/%{version}/%{name}-%{version}.tar.gz
-Source1:        https://download.osgeo.org/%{name}/%{name}-datumgrid-%{datumgrid_version}.tar.gz
+Source1:        https://github.com/OSGeo/proj-datumgrid/releases/download/%{datumgrid_version}/proj-datumgrid-%{datumgrid_version}.tar.gz
 
 BuildRequires:  libtool
 BuildRequires:  gcc-c++
