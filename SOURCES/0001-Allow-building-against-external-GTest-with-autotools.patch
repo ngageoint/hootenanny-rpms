@@ -1,0 +1,110 @@
+From 768b80f4c91f2dddb5f71f97c88c20c7a6ad71a9 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Sun, 3 Feb 2019 02:57:38 -0500
+Subject: [PATCH] Allow building against external GTest with autotools.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ configure.ac          | 31 ++++++++++++++++++++++++++-----
+ test/Makefile.am      |  5 ++++-
+ test/unit/Makefile.am |  8 ++++----
+ 3 files changed, 34 insertions(+), 10 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 712720fb..0d5a45e4 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -263,15 +263,36 @@ fi
+ AC_SUBST(MUTEX_SETTING,$MUTEX_SETTING)
+ AC_SUBST(THREAD_LIB,$THREAD_LIB)
+ 
++dnl ---------------------------------------------------------------------------
++dnl Check for external Google Test
++dnl ---------------------------------------------------------------------------
++
++AC_ARG_WITH(external-gtest,
++            AS_HELP_STRING([--with-external-gtest],
++               [Whether to use external Google Test]),,)
++
++if test "x$with_external_gtest" == "xyes" ; then
++    AC_MSG_RESULT([using external GTest.])
++    PKG_CHECK_MODULES([GTEST], [gtest >= 1.8.0])
++else
++    AC_MSG_RESULT([using internal GTest.])
++    GTEST_LIBS="\$(top_builddir)/test/googletest/libgtest.la"
++fi
++AM_CONDITIONAL(USE_EXTERNAL_GTEST, [test "x$with_external_gtest" == "xyes"])
++AC_SUBST(GTEST_CFLAGS,$GTEST_CFLAGS)
++AC_SUBST(GTEST_LIBS,$GTEST_LIBS)
++
+ AC_CONFIG_FILES([Makefile cmake/Makefile src/Makefile
+                  test/Makefile test/gie/Makefile test/gigs/Makefile test/unit/Makefile
+-                 test/googletest/Makefile test/googletest/include/Makefile
+-                 test/googletest/include/gtest/Makefile
+-                 test/googletest/include/gtest/internal/Makefile
+-                 test/googletest/include/gtest/internal/custom/Makefile
+-                 test/googletest/src/Makefile
+                  man/Makefile man/man1/Makefile man/man3/Makefile nad/Makefile
+                  jniwrap/Makefile jniwrap/org.osgeo.proj/Makefile jniwrap/org.osgeo.proj/org/Makefile jniwrap/org.osgeo.proj/org/proj4/Makefile])
++if ! test "x$with_external_gtest" = "xyes" ; then
++    AC_CONFIG_FILES([test/googletest/Makefile test/googletest/include/Makefile
++                     test/googletest/include/gtest/Makefile
++                     test/googletest/include/gtest/internal/Makefile
++                     test/googletest/include/gtest/internal/custom/Makefile
++                     test/googletest/src/Makefile])
++fi
+ AC_CONFIG_FILES([nad/install], [chmod +x nad/install])
+ 
+ AC_CONFIG_FILES([proj.pc])
+diff --git a/test/Makefile.am b/test/Makefile.am
+index 8ea641b9..4590b37c 100644
+--- a/test/Makefile.am
++++ b/test/Makefile.am
+@@ -7,4 +7,7 @@ EXTRA_DIST = CMakeLists.txt
+ # libtestmain_la_LDFLAGS = -no-undefined
+ # libtestmain_la_SOURCES = test_main.cpp
+ 
+-SUBDIRS = googletest . gie gigs unit
++if !USE_EXTERNAL_GTEST
++MAYBE_GTEST = googletest
++endif
++SUBDIRS = $(MAYBE_GTEST) . gie gigs unit
+diff --git a/test/unit/Makefile.am b/test/unit/Makefile.am
+index 65132be7..7510ef5d 100644
+--- a/test/unit/Makefile.am
++++ b/test/unit/Makefile.am
+@@ -4,7 +4,7 @@ EXTRA_DIST = CMakeLists.txt
+ 
+ noinst_HEADERS = gtest_include.h
+ 
+-AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/test -I$(top_srcdir)/test/googletest/include
++AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/test @GTEST_CFLAGS@
+ AM_CXXFLAGS = @CXX_WFLAGS@ @NO_ZERO_AS_NULL_POINTER_CONSTANT_FLAG@
+ 
+ noinst_PROGRAMS = basic_test
+@@ -12,19 +12,19 @@ noinst_PROGRAMS += pj_phi2_test
+ noinst_PROGRAMS += proj_errno_string_test
+ 
+ basic_test_SOURCES = basic_test.cpp main.cpp
+-basic_test_LDADD = ../../src/libproj.la ../../test/googletest/libgtest.la
++basic_test_LDADD = ../../src/libproj.la @GTEST_LIBS@
+ 
+ basic_test-check: basic_test
+ 	./basic_test
+ 
+ pj_phi2_test_SOURCES = pj_phi2_test.cpp main.cpp
+-pj_phi2_test_LDADD = ../../src/libproj.la ../../test/googletest/libgtest.la
++pj_phi2_test_LDADD = ../../src/libproj.la @GTEST_LIBS@
+ 
+ pj_phi2_test-check: pj_phi2_test
+ 	./pj_phi2_test
+ 
+ proj_errno_string_test_SOURCES = proj_errno_string_test.cpp main.cpp
+-proj_errno_string_test_LDADD= ../../src/libproj.la ../../test/googletest/libgtest.la
++proj_errno_string_test_LDADD= ../../src/libproj.la @GTEST_LIBS@
+ 
+ proj_errno_string_test-check: proj_errno_string_test
+ 	./proj_errno_string_test
+-- 
+2.20.1
+
