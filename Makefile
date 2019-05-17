@@ -84,6 +84,7 @@ LIBPOSTAL_RPM := $(call rpm_file,libpostal,x86_64)
 NODEJS_RPM := $(call rpm_file,nodejs,x86_64)
 OSMOSIS_RPM := $(call rpm_file,osmosis,noarch)
 POSTGIS_RPM := $(call rpm_file2,hoot-postgis24_$(PG_DOTLESS),postgis,x86_64)
+PROJ_RPM := $(call rpm_file,proj,x86_64)
 STXXL_RPM := $(call rpm_file,stxxl,x86_64)
 SUEXEC_RPM := $(call rpm_file2,su-exec,suexec,x86_64)
 TOMCAT8_RPM := $(call rpm_file,tomcat8,noarch)
@@ -109,6 +110,7 @@ DEPENDENCY_CONTAINERS := \
 	rpmbuild-libphonenumber \
 	rpmbuild-libpostal \
 	rpmbuild-postgis \
+	rpmbuild-proj \
 	rpmbuild-nodejs
 
 OTHER_CONTAINERS := \
@@ -131,6 +133,7 @@ DEPENDENCY_RPMS := \
 	hoot-words \
 	nodejs \
 	osmosis \
+	proj \
 	stxxl \
 	su-exec \
 	tomcat8 \
@@ -308,6 +311,10 @@ rpmbuild-postgis: \
 	hoot-gdal \
 	.vagrant/machines/rpmbuild-postgis/docker/id
 
+rpmbuild-proj: \
+	rpmbuild-generic \
+	.vagrant/machines/rpmbuild-proj/docker/id
+
 rpmbuild-repo: \
 	rpmbuild \
 	.vagrant/machines/rpmbuild-repo/docker/id
@@ -358,6 +365,7 @@ hoot-words: rpmbuild-generic $(WORDS_RPM)
 hoot-postgis24_$(PG_DOTLESS): rpmbuild-postgis $(POSTGIS_RPM)
 hoot-translations-templates: rpmbuild-generic $(TRANSLATIONS_RPM)
 osmosis: rpmbuild-generic $(OSMOSIS_RPM)
+proj: rpmbuild-proj $(PROJ_RPM)
 stxxl: rpmbuild-generic $(STXXL_RPM)
 su-exec: rpmbuild-generic $(SUEXEC_RPM)
 tomcat8: rpmbuild-generic $(TOMCAT8_RPM)

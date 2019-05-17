@@ -17,6 +17,7 @@ versions:
   osmosis: &osmosis_version '0.46-1'
   postgis: &postgis_version '2.4.4-2'
   postgresql: &pg_version '9.5'
+  proj: &proj_version '6.1.0-1'
   stxxl: &stxxl_version '1.3.1-1'
   su-exec: &suexec_version '0.2-1'
   hoot-translations-templates: &hoot_translations_templates_version '1.0.0-1'
@@ -77,6 +78,9 @@ images:
         buildrequires: true
         dockerfile: 'docker/Dockerfile.rpmbuild-generic'
     - rpmbuild-libphonenumber:
+        buildrequires: true
+        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
+    - rpmbuild-proj:
         buildrequires: true
         dockerfile: 'docker/Dockerfile.rpmbuild-generic'
     - rpmbuild-libpostal: {}
@@ -204,6 +208,9 @@ rpms:
     image: rpmbuild-generic
     version: *osmosis_version
     arch: noarch
+  proj:
+    image: rpmbuild-proj
+    version: *proj_version
   su-exec:
     image: rpmbuild-generic
     version: *suexec_version

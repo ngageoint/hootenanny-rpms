@@ -38,6 +38,18 @@ The [`geos.spec`](../SPECS/geos.spec) originates from
 [PGDG's GEOS 3.5.0 Source RPM](https://download.postgresql.org/pub/repos/yum/srpms/9.5/redhat/rhel-7-x86_64/)
 and is released under the [PostgreSQL license](./licenses/PostgreSQL-LICENSE).
 
+## proj
+
+The [proj](https://github.com/OSGeo/proj.4/releases) source archives are obtained
+directly from [OSGeo's GitHub releases](https://github.com/OSGeo/proj.4/releases).
+The proj source code archives are [MIT licensed](https://github.com/OSGeo/proj.4/blob/master/COPYING),
+and the datumgrid archives are under
+[public domain, MIT, BSD, and Creative Commons licenses](https://github.com/OSGeo/proj-datumgrid/blob/master/README.DATUMGRID).
+
+The [`proj.spec`](../SPECS/proj.spec) file originates from
+[Fedora's proj RPM](https://src.fedoraproject.org/rpms/proj/tree/master)
+repository (master branch) and is [MIT licensed](./licenses/Fedora-LICENSE).
+
 ## GDAL
 
 The [GDAL](https://trac.osgeo.org/gdal) source archives are obtained

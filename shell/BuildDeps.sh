@@ -39,6 +39,26 @@ if [ ! -f $RPM_X86_64/$GEOS_RPM ]; then
         -bb SPECS/geos.spec
 fi
 
+# proj
+if [ ! -f "$RPM_X86_64/$PROJ_RPM" ]; then
+    echo "#### Building RPM: proj"
+
+    # Build image for building proj.
+    docker build \
+           --build-arg "packages=$( spec_requires proj )" \
+           -f "$SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic" \
+           -t hootenanny/rpmbuild-proj \
+           "$SCRIPT_HOME"
+
+    # Generate proj RPM.
+    run_dep_image \
+        -i hootenanny/rpmbuild-proj \
+        rpmbuild \
+        --define "rpmbuild_version $PROJ_VERSION" \
+        --define "rpmbuild_release $PROJ_RELEASE" \
+        -bb SPECS/proj.spec
+fi
+
 # glpk
 if [ ! -f $RPM_X86_64/$GLPK_RPM ]; then
     echo "#### Building RPM: glpk"
