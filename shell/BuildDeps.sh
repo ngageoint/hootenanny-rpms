@@ -9,6 +9,24 @@ build_base_images
 
 ## Build GDAL dependencies.
 
+# armadillo
+if [ ! -f "$RPM_X86_64/$ARMADILLO_RPM" ]; then
+    echo "#### Building RPM: armadillo"
+
+    # Build image for building armadillo.
+    docker build \
+           --build-arg "packages=$( spec_requires armadillo )" \
+           -f "$SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic" \
+           -t hootenanny/rpmbuild-armadillo \
+           "$SCRIPT_HOME"
+
+    run_dep_image \
+        rpmbuild \
+        --define "rpmbuild_version ${ARMADILLO_VERSION}" \
+        --define "rpmbuild_release ${ARMADILLO_RELEASE}" \
+        -bb SPECS/armadillo.spec
+fi
+
 # FileGDBAPI
 if [ ! -f $RPM_X86_64/$FILEGDBAPI_RPM ]; then
     echo "#### Building RPM: FileGDBAPI"

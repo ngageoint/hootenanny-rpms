@@ -1,5 +1,6 @@
 ---
 versions:
+  armadillo: &armadillo_version '9.400.3-1'
   dumb-init: &dumbinit_version '1.2.1-1'
   geos: &geos_version '3.6.2-1'
   glpk: &glpk_version '4.64-1'
@@ -59,6 +60,9 @@ images:
     - rpmbuild-lint: {}
     - rpmbuild-repo: {}
     - rpmbuild-sonarqube: {}
+    - rpmbuild-armadillo:
+        buildrequires: true
+        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
     - rpmbuild-geos:
         buildrequires: true
         dockerfile: 'docker/Dockerfile.rpmbuild-generic'
@@ -157,6 +161,11 @@ images:
 
 
 rpms:
+  armadillo:
+    image: rpmbuild-armadillo
+    version: *armadillo_version
+    undefines:
+      - _disable_source_fetch
   dumb-init:
     image: rpmbuild-generic
     version: *dumbinit_version
