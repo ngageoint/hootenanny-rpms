@@ -71,6 +71,11 @@ EOF
 %{__rm} -fv %{buildroot}%{_libdir}/lib*.la
 
 
+%check
+# Run tests, but use installed path for libraries.
+LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{__make} check
+
+
 %files
 %license LICENSE
 %doc ChangeLog README
