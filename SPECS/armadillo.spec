@@ -6,6 +6,7 @@ Summary:        Fast C++ matrix library with syntax similar to MATLAB and Octave
 License:        ASL 2.0
 URL:            https://arma.sourceforge.net/
 Source:         https://sourceforge.net/projects/arma/files/%{name}-%{version}.tar.xz
+Patch1:         armadillo-tests-makefile.patch
 
 BuildRequires:  arpack-devel
 BuildRequires:  atlas-devel
@@ -52,7 +53,7 @@ and user documentation (API reference guide).
 
 
 %prep
-%setup -q
+%autosetup -p1
 
 # convert DOS end-of-line to UNIX end-of-line
 
@@ -76,6 +77,18 @@ rm -f examples/example1_win64.sln
 rm -f examples/example1_win64.vcxproj
 rm -f examples/example1_win64.README.txt
 rm -rf examples/lib_win64
+
+
+%check
+# The armadillo-tests-makefile.patch allows extension of CXX_FLAGS/LIB_FLAGS.
+CXX_FLAGS=-I%{buildroot}%{_includedir} LIB_FLAGS=-L%{buildroot}%{_libdir} make -C tests
+
+# Exclude spsolve tests that also fail on 8.300.0 package from EPEL.
+LD_LIBRARY_PATH=%{buildroot}%{_libdir} ./tests/main \
+  exclude:fn_spsolve_float_function_test \
+  exclude:fn_spsolve_sparse_complex_float_test \
+  exclude:fn_spsolve_sparse_nonsymmetric_complex_float_test
+
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
