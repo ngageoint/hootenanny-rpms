@@ -80,6 +80,10 @@ EOF
 LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{__make} check
 
 
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
+
+
 %files
 %license LICENSE
 %doc ChangeLog README
