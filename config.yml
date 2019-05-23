@@ -190,8 +190,6 @@ rpms:
   libgeotiff:
     image: rpmbuild-libgeotiff
     version: *libgeotiff_version
-    undefines:
-      - _disable_source_fetch
   libkml:
     image: rpmbuild-libkml
     version: *libkml_version
