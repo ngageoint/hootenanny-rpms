@@ -7,7 +7,7 @@ versions:
   hoot-gdal: &gdal_version '2.1.4-2'
   hoot-words: &words_version '1.0.1-1'
   FileGDBAPI: &FileGDBAPI_version '1.5.1-1'
-  libgeotiff: &libgeotiff_version '1.4.2-1'
+  libgeotiff: &libgeotiff_version '1.5.1-1'
   libkml: &libkml_version '1.3.0-1'
   liboauthcpp: &liboauthcpp_version '0.1.0-1'
   libphonenumber: &libphonenumber_version '8.9.16-1'
@@ -68,9 +68,6 @@ images:
     - rpmbuild-gpsbabel:
         buildrequires: true
         dockerfile: 'docker/Dockerfile.rpmbuild-generic'
-    - rpmbuild-libgeotiff:
-        buildrequires: true
-        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
     - rpmbuild-libkml:
         buildrequires: true
         dockerfile: 'docker/Dockerfile.rpmbuild-generic'
@@ -83,6 +80,10 @@ images:
     - rpmbuild-proj:
         buildrequires: true
         dockerfile: 'docker/Dockerfile.rpmbuild-generic'
+    - rpmbuild-libgeotiff:
+        args:
+          proj_version: *proj_version
+        buildrequires: true
     - rpmbuild-libpostal: {}
     - rpmbuild-nodejs:
         buildrequires: true
