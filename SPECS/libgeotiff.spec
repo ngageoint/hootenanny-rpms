@@ -1,15 +1,15 @@
-Name:		libgeotiff
-Version:	%{rpmbuild_version}
-Release:	%{rpmbuild_release}%{?dist}
-Summary:	GeoTIFF format library
-Group:		System Environment/Libraries
-License:	MIT
-URL:		http://trac.osgeo.org/geotiff/
-Source:		http://download.osgeo.org/geotiff/libgeotiff/libgeotiff-%{version}.tar.gz
-BuildRequires:	libjpeg-devel
-BuildRequires:	libtiff-devel
-BuildRequires:	proj-devel
-BuildRequires:	zlib-devel
+Name:           libgeotiff
+Version:        %{rpmbuild_version}
+Release:        %{rpmbuild_release}%{?dist}
+Summary:        GeoTIFF format library
+Group:          System Environment/Libraries
+License:        MIT
+URL:            http://trac.osgeo.org/geotiff/
+Source:         https://github.com/OSGeo/libgeotiff/releases/download/%{version}/libgeotiff-%{version}.tar.gz
+BuildRequires:  libjpeg-devel
+BuildRequires:  libtiff-devel
+BuildRequires:  proj-devel
+BuildRequires:  zlib-devel
 
 %description
 GeoTIFF represents an effort by over 160 different remote sensing,
@@ -102,15 +102,13 @@ rm -rf %{buildroot}%{_datadir}/epsg_csv/*.py*
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-%files 
+%files
 %doc ChangeLog LICENSE README
 %{_bindir}/applygeo
 %{_bindir}/geotifcp
 %{_bindir}/listgeo
 %{_bindir}/makegeo
 %{_libdir}/libgeotiff.so.*
-%dir %{_datadir}/epsg_csv
-%attr(0644,root,root) %{_datadir}/epsg_csv/*.csv
 %{_mandir}/man1/applygeo.1.gz
 %{_mandir}/man1/geotifcp.1.gz
 %{_mandir}/man1/listgeo.1.gz
@@ -123,5 +121,7 @@ rm -rf %{buildroot}%{_datadir}/epsg_csv/*.py*
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Thu May 23 2019 Justin Bronn <justin.bronn@radiantsolutions.com> - 1.5.1-1
+- Upgrade to 1.5.1.
 * Wed Nov 15 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 1.4.2-1
 - Initial release for use with Hootenanny.

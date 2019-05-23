@@ -100,7 +100,8 @@ if [ ! -f $RPM_X86_64/$LIBGEOTIFF_RPM ]; then
     # Build image for building libgeotiff.
     docker build \
            --build-arg "packages=$( spec_requires libgeotiff )" \
-           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic \
+           --build-arg proj_version=$PROJ_VERSION-$PROJ_RELEASE \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-libgeotiff \
            -t hootenanny/rpmbuild-libgeotiff \
            $SCRIPT_HOME
 

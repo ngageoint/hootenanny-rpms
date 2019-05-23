@@ -280,6 +280,7 @@ rpmbuild-hoot-release: \
 
 rpmbuild-libgeotiff: \
 	rpmbuild-generic \
+	proj \
 	.vagrant/machines/rpmbuild-libgeotiff/docker/id
 
 rpmbuild-libkml: \
