@@ -2,10 +2,10 @@ Name:           libgeotiff
 Version:        %{rpmbuild_version}
 Release:        %{rpmbuild_release}%{?dist}
 Summary:        GeoTIFF format library
-Group:          System Environment/Libraries
 License:        MIT
 URL:            http://trac.osgeo.org/geotiff/
 Source:         https://github.com/OSGeo/libgeotiff/releases/download/%{version}/libgeotiff-%{version}.tar.gz
+BuildRequires:  gcc-c++
 BuildRequires:  libjpeg-devel
 BuildRequires:  libtiff-devel
 BuildRequires:  proj-devel
@@ -18,67 +18,40 @@ to establish a TIFF based interchange format for georeferenced
 raster imagery.
 
 %package devel
-Summary:	Development Libraries for the GeoTIFF file format library
-Group:		Development/Libraries
-Requires:	pkgconfig libtiff-devel
-Requires:	%{name} = %{version}-%{release}
+Summary:        Development library and header for the GeoTIFF file format library
+Requires:       libtiff-devel
+Requires:       pkgconfig
+Requires:       %{name}{?_isa} = %{version}-%{release}
 
 %description devel
 The GeoTIFF library provides support for development of geotiff image format.
 
+
 %prep
 %setup -q
 
-# fix wrongly encoded files from tarball
-set +x
-for f in `find . -type f` ; do
-   if file $f | grep -q ISO-8859 ; then
-      set -x
-      iconv -f ISO-8859-1 -t UTF-8 $f > ${f}.tmp && \
-         mv -f ${f}.tmp $f
-      set +x
-   fi
-   if file $f | grep -q CRLF ; then
-      set -x
-      sed -i -e 's|\r||g' $f
-      set +x
-   fi
-done
-set -x
-
-# remove junks
-find . -name ".cvsignore" -exec rm -rf '{}' \;
 
 %build
-
-# disable -g flag removal
-sed -i 's| \| sed \"s\/-g \/\/\"||g' configure
-
-# use gcc -shared instead of ld -shared to build with -fstack-protector
-sed -i 's|LD_SHARED=@LD_SHARED@|LD_SHARED=@CC@ -shared|' Makefile.in
-
 %configure \
         --prefix=%{_prefix} \
         --includedir=%{_includedir}/%{name}/ \
-        --with-proj               \
-        --with-tiff               \
-        --with-jpeg               \
-        --with-zip
-# WARNING
-# disable %{?_smp_mflags}
-# it breaks compile
+        --with-proj \
+        --with-tiff \
+        --with-jpeg \
+        --with-zip  \
+        --disable-static
 
-make
+%{__sed} -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+%{__sed} -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
+
+%make_build %{?_smp_mflags}
+
 
 %install
-# install libgeotiff
-make install DESTDIR=%{buildroot} INSTALL="%{__install} -p"
-
-# install manualy some file
-install -p -m 0755 bin/makegeo %{buildroot}%{_bindir}
+%{__make} install DESTDIR=%{buildroot} INSTALL="%{__install} -p"
 
 # install pkgconfig file
-cat > %{name}.pc <<EOF
+%{__cat} > %{name}.pc <<EOF
 prefix=%{_prefix}
 exec_prefix=%{_prefix}
 libdir=%{_libdir}
@@ -91,34 +64,28 @@ Libs: -L\${libdir} -lgeotiff
 Cflags: -I\${includedir}
 EOF
 
-mkdir -p %{buildroot}%{_libdir}/pkgconfig/
-install -p -m 0644 %{name}.pc %{buildroot}%{_libdir}/pkgconfig/
+%{__mkdir_p} %{buildroot}%{_libdir}/pkgconfig/
+%{__install} -p -m 0644 %{name}.pc %{buildroot}%{_libdir}/pkgconfig/
 
 #clean up junks
-rm -rf %{buildroot}%{_libdir}/*.a
-%{__rm} -f %{buildroot}%{_libdir}/*.la
-rm -rf %{buildroot}%{_datadir}/epsg_csv/*.py*
+%{__rm} -fv %{buildroot}%{_libdir}/lib*.la
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
 
 %files
-%doc ChangeLog LICENSE README
+%license LICENSE
+%doc ChangeLog README
 %{_bindir}/applygeo
 %{_bindir}/geotifcp
 %{_bindir}/listgeo
-%{_bindir}/makegeo
-%{_libdir}/libgeotiff.so.*
-%{_mandir}/man1/applygeo.1.gz
-%{_mandir}/man1/geotifcp.1.gz
-%{_mandir}/man1/listgeo.1.gz
+%{_libdir}/%{name}.so.*
+%{_mandir}/man1/*.1*
+
 
 %files devel
-%dir %{_includedir}/%{name}
-%attr(0644,root,root) %{_includedir}/%{name}/*.h
-%attr(0644,root,root) %{_includedir}/%{name}/*.inc
-%{_libdir}/libgeotiff.so
+%{_includedir}/%{name}
+%{_libdir}/%{name}.so
 %{_libdir}/pkgconfig/%{name}.pc
+
 
 %changelog
 * Thu May 23 2019 Justin Bronn <justin.bronn@radiantsolutions.com> - 1.5.1-1
