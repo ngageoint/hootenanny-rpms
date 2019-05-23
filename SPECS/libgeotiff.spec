@@ -1,3 +1,5 @@
+%global proj_min_version 6.0.0
+
 Name:           libgeotiff
 Version:        %{rpmbuild_version}
 Release:        %{rpmbuild_release}%{?dist}
@@ -10,6 +12,8 @@ BuildRequires:  libjpeg-devel
 BuildRequires:  libtiff-devel
 BuildRequires:  proj-devel
 BuildRequires:  zlib-devel
+
+Requires:       proj >= %{proj_min_version}
 
 %description
 GeoTIFF represents an effort by over 160 different remote sensing,
