@@ -16,6 +16,16 @@ or the
 [PostgreSQL license](./licenses/PostgreSQL-LICENSE)
 ([source](http://apt.postgresql.org/pub/README)), respectively.
 
+## armadillo
+
+The [armadillo](http://arma.sourceforge.net/) source archive was obtained from
+[SourceForge](https://sourceforge.net/projects/arma/files/) and is released
+under the [Apache 2 license](http://arma.sourceforge.net/license.html).
+
+The [`armadillo.spec`](../SPECS/aramadillo.spec) file was sourced from
+[Fedora's armadillo RPM](https://src.fedoraproject.org/rpms/armadillo/tree/master)
+repository (master branch) and is [MIT licensed](./licenses/Fedora-LICENSE).
+
 ## dumb-init
 
 The [dumb-init](https://github.com/Yelp/dumb-init) source archive was obtained

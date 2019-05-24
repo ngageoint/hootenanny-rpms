@@ -1,3 +1,4 @@
+# Copyright (C) 2019 Maxar Technologies (https://www.maxar.com)
 # Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
 # Copyright (C) 2016, 2017 DigitalGlobe (http://www.digitalglobe.com)
 #
@@ -70,6 +71,7 @@ rpm_package = $(shell echo $(1) | awk '{ split($$0, a, "-"); l = length(a); pkg 
 
 PG_DOTLESS := $(shell echo $(call config_version,pg) | tr -d '.')
 
+ARMADILLO_RPM := $(call rpm_file,armadillo,x86_64)
 DUMBINIT_RPM := $(call rpm_file2,dumb-init,dumbinit,x86_64)
 GEOS_RPM := $(call rpm_file,geos,x86_64)
 GDAL_RPM := $(call rpm_file2,hoot-gdal,gdal,x86_64)
@@ -235,6 +237,10 @@ hoot-rpm: rpm
 
 rpmbuild: .vagrant/machines/rpmbuild/docker/id
 
+rpmbuild-armadillo: \
+	rpmbuild-generic \
+	.vagrant/machines/rpmbuild-armadillo/docker/id
+
 rpmbuild-base: \
 	rpmbuild \
 	.vagrant/machines/rpmbuild-base/docker/id
@@ -350,6 +356,7 @@ validate:
 
 ## Dependency RPM targets.
 
+armadillo: rpmbuild-armadillo $(ARMADILLO_RPM)
 dumb-init: rpmbuild-generic $(DUMBINIT_RPM)
 geos: rpmbuild-geos $(GEOS_RPM)
 FileGDBAPI: rpmbuild-generic $(FILEGDBAPI_RPM)

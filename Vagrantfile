@@ -280,6 +280,7 @@ Vagrant.configure(2) do |config|
   # Generic, NodeJS, and GDAL dependency RPMS are built first.
   collect_rpms(
     ['rpmbuild-generic',
+     'rpmbuild-armadillo',
      'rpmbuild-geos',
      'rpmbuild-glpk',
      'rpmbuild-gpsbabel',
