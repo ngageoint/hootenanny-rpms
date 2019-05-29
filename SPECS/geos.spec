@@ -63,7 +63,8 @@ make %{?_smp_mflags} check
 %postun -p /sbin/ldconfig
 
 %files
-%doc AUTHORS COPYING NEWS README.md TODO
+%doc AUTHORS NEWS README.md TODO
+%license COPYING
 %{_libdir}/libgeos-%{version}.so
 %{_libdir}/libgeos_c.so.1*
 %exclude %{_libdir}/*.a
