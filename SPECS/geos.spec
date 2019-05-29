@@ -1,16 +1,16 @@
-Name:		geos
-Version:	%{rpmbuild_version}
-Release:	%{rpmbuild_release}%{?dist}
-Summary:	GEOS is a C++ port of the Java Topology Suite
+Name:           geos
+Version:        %{rpmbuild_version}
+Release:        %{rpmbuild_release}%{?dist}
+Summary:        GEOS is a C++ port of the Java Topology Suite
 
-License:	LGPLv2
-URL:		http://trac.osgeo.org/geos/
-Source0:	http://download.osgeo.org/%{name}/%{name}-%{version}.tar.bz2
+License:        LGPLv2
+URL:            https://github.com/libgeos/geos
+Source0:        https://download.osgeo.org/%{name}/%{name}-%{version}.tar.bz2
 
-BuildRequires:	doxygen
-BuildRequires:	gcc
-BuildRequires:	gcc-c++
-BuildRequires:	libtool
+BuildRequires:  doxygen
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  libtool
 
 %description
 GEOS (Geometry Engine - Open Source) is a C++ port of the Java Topology
@@ -79,6 +79,8 @@ make %{?_smp_mflags} check
 %exclude %{_libdir}/*.a
 
 %changelog
+* Wed May 29 2019 Justin Bronn <justin.bronn@radiantsolutions.com> - 3.7.2-1
+- Upgrade to 3.7.2.
 * Wed Nov 29 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 3.6.2-1
 - Upgrade to 3.6.2.
 * Wed Nov 15 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 3.6.1-1
