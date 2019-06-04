@@ -45,10 +45,10 @@ Release:	%{rpmbuild_release}%{?dist}
 Summary:	GIS file format library
 Group:		System Environment/Libraries
 License:	MIT
-URL:		http://www.gdal.org
+URL:		https://www.gdal.org
 
-Source0:	http://download.osgeo.org/gdal/%{version}/gdal-%{version}.tar.xz
-Source1:	http://download.osgeo.org/gdal/%{testversion}/gdalautotest-%{testversion}.tar.gz
+Source0:	https://github.com/OSGeo/gdal/releases/download/v%{version}/gdal-%{version}.tar.gz
+Source1:	https://github.com/OSGeo/gdal/releases/download/v%{version}/gdalautotest-%{testversion}.tar.gz
 Source2:	gdal.pom
 
 # Patch to use system g2clib
