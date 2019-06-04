@@ -25,7 +25,7 @@ raster imagery.
 Summary:        Development library and header for the GeoTIFF file format library
 Requires:       libtiff-devel
 Requires:       pkgconfig
-Requires:       %{name}{?_isa} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 The GeoTIFF library provides support for development of geotiff image format.
@@ -101,7 +101,7 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{__make} check
 
 
 %changelog
-* Thu May 23 2019 Justin Bronn <justin.bronn@radiantsolutions.com> - 1.5.1-1
+* Mon Jun 03 2019 Justin Bronn <justin.bronn@radiantsolutions.com> - 1.5.1-1
 - Upgrade to 1.5.1.
 * Wed Nov 15 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 1.4.2-1
 - Initial release for use with Hootenanny.
