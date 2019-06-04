@@ -1,3 +1,4 @@
+# Copyright (C) 2019 Maxar Technologies (https://www.maxar.com)
 # Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,6 +24,7 @@ LABEL \
   name="Hootenanny Development RPM Build Image" \
   vendor="Radiant Solutions"
 
+ARG armadillo_version
 ARG dumbinit_version
 ARG filegdbapi_version
 ARG gdal_version
@@ -40,6 +42,7 @@ ARG packages
 ARG postgis_version
 ARG pg_version
 ARG pg_data=/var/lib/pgsql/${pg_version}/data
+ARG proj_version
 ARG stxxl_version
 ARG suexec_version
 ARG tomcat8_version
@@ -52,7 +55,8 @@ ENV PGDATA=${pg_data}
 USER root
 
 # Copy in development RPMs at the desired versions.
-COPY RPMS/x86_64/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
+COPY RPMS/x86_64/armadillo-${armadillo_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/geos-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/geos-devel-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
@@ -79,6 +83,9 @@ COPY RPMS/x86_64/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/nodejs-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/nodejs-devel-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/noarch/osmosis-${osmosis_version}${RPMBUILD_DIST}.noarch.rpm \
+     RPMS/x86_64/proj-${proj_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/proj-devel-${proj_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/noarch/proj-datumgrid-${datumgrid_version}${RPMBUILD_DIST}.noarch.rpm \
      RPMS/x86_64/stxxl-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/stxxl-devel-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/su-exec-${suexec_version}${RPMBUILD_DIST}.x86_64.rpm \
@@ -87,6 +94,7 @@ COPY RPMS/x86_64/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
 
 # Install Hootenanny dependencies.
 RUN yum install -y \
+    /tmp/armadillo-${armadillo_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/geos-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
@@ -114,6 +122,9 @@ RUN yum install -y \
     /tmp/nodejs-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/nodejs-devel-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/osmosis-${osmosis_version}${RPMBUILD_DIST}.noarch.rpm \
+    /tmp/proj-${proj_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/proj-devel-${proj_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/proj-datumgrid-${datumgrid_version}${RPMBUILD_DIST}.noarch.rpm \
     /tmp/stxxl-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/stxxl-devel-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/su-exec-${suexec_version}${RPMBUILD_DIST}.x86_64.rpm \
