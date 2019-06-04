@@ -43,7 +43,6 @@ Name:		hoot-gdal
 Version:	%{rpmbuild_version}
 Release:	%{rpmbuild_release}%{?dist}
 Summary:	GIS file format library
-Group:		System Environment/Libraries
 License:	MIT
 URL:		https://www.gdal.org
 
@@ -195,7 +194,6 @@ GDAL/OGR is the most widely used geospatial data access library.
 
 %package devel
 Summary:	Development files for the GDAL file format library
-Group:	Development/Libraries
 Conflicts:	gdal-devel
 
 # Old rpm didn't figure out
@@ -213,7 +211,6 @@ This package contains development files for GDAL.
 
 %package libs
 Summary:	GDAL file format library
-Group:		System Environment/Libraries
 Conflicts:	gdal-libs
 
 %description libs
@@ -222,7 +219,6 @@ This package contains the GDAL file format library.
 
 %package java
 Summary:	Java modules for the GDAL file format library
-Group:		Development/Libraries
 Conflicts:	gdal-java
 Requires:	jpackage-utils
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
