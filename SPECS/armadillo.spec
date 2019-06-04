@@ -17,6 +17,12 @@ BuildRequires:  lapack-devel
 BuildRequires:  openblas-devel
 BuildRequires:  SuperLU-devel
 
+%global major_version %(echo %{version} | %{__awk} -F. '{ print $1 }')
+%if 0%{major_version} >= 9
+%global readme_type md
+%else
+%global readme_type txt
+%endif
 
 %description
 Armadillo is a C++ linear algebra library (matrix maths)
@@ -57,7 +63,7 @@ and user documentation (API reference guide).
 
 # convert DOS end-of-line to UNIX end-of-line
 
-for file in README.md; do
+for file in README.%{readme_type}; do
   sed 's/\r//' $file >$file.new && \
   touch -r $file $file.new && \
   mv $file.new $file
@@ -95,7 +101,7 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} ./tests/main \
 
 
 %files
-%{_libdir}/libarmadillo.so.9*
+%{_libdir}/libarmadillo.so.%{major_version}*
 %license LICENSE.txt NOTICE.txt
 
 
@@ -105,13 +111,12 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} ./tests/main \
 %{_includedir}/armadillo
 %{_includedir}/armadillo_bits/
 %{_datadir}/Armadillo/
-%doc README.md index.html docs.html
+%doc README.%{readme_type} index.html docs.html
 %doc examples armadillo_icon.png
-%doc armadillo_nicta_2010.pdf rcpp_armadillo_csda_2014.pdf
-%doc armadillo_joss_2016.pdf arma_spmat_icms_2018.pdf
+%doc *.pdf
 %doc mex_interface
 
 
 %changelog
-* Fri May 24 2019 Justin Bronn <justin.bronn@radiantsolutions.com> - 9.400.3-1
-- Initial release: 9.400.3.
+* Tue Jun 04 2019 Justin Bronn <justin.bronn@radiantsolutions.com> - 8.300.4-1
+- Initial release: 8.300.4.
