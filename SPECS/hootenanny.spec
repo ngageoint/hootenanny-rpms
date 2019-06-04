@@ -507,10 +507,17 @@ if [ "$1" = "1" ]; then
     # start tomcat
     startTomcat
 
+    # PostgreSQL setup binary changes on versions > 10.
+    if [ "$(echo "%{pg_version}" | awk -F. '{ if ($1 >= 10) print "yes"; else print "no" }')" = "yes" ]; then
+        PG_SETUP="postgresql-$PG_DOTLESS-setup"
+    else
+        PG_SETUP="postgresql$PG_DOTLESS-setup"
+    fi
+
     # init and start postgres
     if [ ! -e /var/lib/pgsql/%{pg_version}/data/PG_VERSION ]; then
         PGSETUP_INITDB_OPTIONS="-E UTF-8 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8" \
-                              /usr/pgsql-%{pg_version}/bin/postgresql%{pg_dotless}-setup initdb
+                              /usr/pgsql-%{pg_version}/bin/$PG_SETUP initdb
     fi
 
     systemctl start postgresql-%{pg_version}
@@ -721,10 +728,17 @@ if test -f /.dockerenv; then exit 0; fi
 if [ "$1" = "1" ]; then
     # Perform tasks to prepare for the initial installation
 
+    # PostgreSQL setup binary changes on versions > 10.
+    if [ "$(echo "%{pg_version}" | awk -F. '{ if ($1 >= 10) print "yes"; else print "no" }')" = "yes" ]; then
+        PG_SETUP="postgresql-$PG_DOTLESS-setup"
+    else
+        PG_SETUP="postgresql$PG_DOTLESS-setup"
+    fi
+
     # init and start postgres
     if [ ! -e /var/lib/pgsql/%{pg_version}/data/PG_VERSION ]; then
         PGSETUP_INITDB_OPTIONS="-E UTF-8 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8" \
-                              /usr/pgsql-%{pg_version}/bin/postgresql%{pg_dotless}-setup initdb
+                              /usr/pgsql-%{pg_version}/bin/$PG_SETUP initdb
     fi
 
     systemctl start postgresql-%{pg_version}
