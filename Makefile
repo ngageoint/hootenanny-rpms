@@ -261,6 +261,7 @@ rpmbuild-gdal: \
 	gpsbabel \
 	libgeotiff \
 	libkml \
+	proj \
 	.vagrant/machines/rpmbuild-gdal/docker/id
 
 rpmbuild-geos: \

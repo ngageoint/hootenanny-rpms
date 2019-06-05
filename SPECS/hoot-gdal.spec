@@ -1,5 +1,4 @@
 #TODO: g2clib and grib (said to be modified)
-#TODO: Python 3 modules should be possible since 1.7
 #TODO: Create script to make clean tarball
 #TODO: msg needs to have PublicDecompWT.zip from EUMETSAT, which is not free;
 #      Building without msg therefore
@@ -21,23 +20,14 @@
 # He also suggest to use --with-static-proj4 to actually link to proj, instead of dlopen()ing it.
 
 # Major digit of the proj so version
-%global proj_somaj 0
+%global proj_somaj 15
 
 # Tests can be of a different version
 %global testversion %{rpmbuild_version}
 %global run_tests 0
 
-# Set to 1 to enable spatialite support; disabled by default.
-%global with_spatialite 0
-
-# No ppc64 build for spatialite in EL6
-# https://bugzilla.redhat.com/show_bug.cgi?id=663938
-%if 0%{?rhel} == 6
-%ifnarch ppc64
-%global with_spatialite 0
-%endif
-%endif
-
+%global build_refman 1
+%global build_s57 0
 
 Name:		hoot-gdal
 Version:	%{rpmbuild_version}
@@ -47,8 +37,9 @@ License:	MIT
 URL:		https://www.gdal.org
 
 Source0:	https://github.com/OSGeo/gdal/releases/download/v%{version}/gdal-%{version}.tar.gz
-Source1:	https://github.com/OSGeo/gdal/releases/download/v%{version}/gdalautotest-%{testversion}.tar.gz
+Source1:	https://github.com/OSGeo/gdal/releases/download/v%{version}/gdalautotest-%{testversion}.zip
 Source2:	gdal.pom
+Source3:        gdal-configure
 
 # Patch to use system g2clib
 Patch1:		gdal-g2clib.patch
@@ -56,14 +47,12 @@ Patch1:		gdal-g2clib.patch
 Patch2:		gdal-jni.patch
 # Fix bash-completion install dir
 Patch3:		gdal-completion.patch
-# Fix uchar type
-Patch4:		gdal-uchar.patch
+
+Patch4:         gdal-configure.patch
 
 # Fedora uses Alternatives for Java
 Patch8:		gdal-1.9.0-java.patch
-Patch9:		gdal-2.1.0-zlib.patch
-
-BuildRoot:	%{_tmppath}/gdal-%{version}-%{release}-root-%(%{__id_u} -n)
+Patch9:		gdal-3.0.0-zlib.patch
 
 # Adding FileGDB API for Hootenanny
 BuildRequires:  FileGDBAPI
@@ -83,14 +72,18 @@ BuildRequires:	fontconfig-devel
 # No freexl in EL5
 BuildRequires:	freexl-devel
 BuildRequires:	g2clib-static
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
 BuildRequires:	geos-devel
 BuildRequires:	ghostscript
 BuildRequires:	hdf-devel
 BuildRequires:	hdf-static
 BuildRequires:	hdf5-devel
-BuildRequires:	java-devel >= 1:1.6.0
+BuildRequires:	java-devel
 BuildRequires:	jasper-devel
 BuildRequires:	jpackage-utils
+# For 'mvn_artifact' and 'mvn_install'
+BuildRequires:	maven-local
 BuildRequires:	json-c-devel
 BuildRequires:	libgeotiff-devel
 # No libgta in EL5
@@ -101,14 +94,8 @@ BuildRequires:	libpng-devel
 # No libkml in EL
 BuildRequires:	libkml-devel
 
-%if %{with_spatialite}
-%global spatialite "--with-spatialite"
-BuildRequires:	libspatialite-devel
-%else
-%global spatialite "--without-spatialite"
-%endif
-
 BuildRequires:	libtiff-devel
+BuildRequires:  libtirpc-devel
 # No libwebp in EL 5 and 6
 BuildRequires:	libwebp-devel
 BuildRequires:	libtool
@@ -116,11 +103,9 @@ BuildRequires:	giflib-devel
 BuildRequires:	netcdf-devel
 BuildRequires:	libdap-devel
 BuildRequires:	librx-devel
-BuildRequires:	mysql-devel
 BuildRequires:	numpy
-BuildRequires:	python34-numpy
+BuildRequires:	python36-numpy
 BuildRequires:	pcre-devel
-BuildRequires:	ogdi-devel
 BuildRequires:	perl-devel
 BuildRequires:	perl-generators
 BuildRequires:	openjpeg2-devel
@@ -130,14 +115,12 @@ BuildRequires:	poppler-devel
 BuildRequires:	postgresql%{pg_dotless}-devel
 BuildRequires:	proj-devel
 BuildRequires:	python2-devel
-BuildRequires:	python34-devel
+BuildRequires:	python36-devel
 BuildRequires:	sqlite-devel
 BuildRequires:	swig
+%if %{build_refman}
 BuildRequires:	texlive-latex
-%if 0%{?fedora} >= 20
 BuildRequires:	texlive-collection-fontsrecommended
-BuildRequires:	texlive-collection-langcyrillic
-BuildRequires:	texlive-collection-langportuguese
 BuildRequires:	texlive-collection-latex
 BuildRequires:	texlive-epstopdf
 BuildRequires:	tex(multirow.sty)
@@ -164,9 +147,6 @@ Requires:	gpsbabel
 # %endif
 
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
-
-# Enable/disable generating refmans
-%global build_refman 1
 
 # We have multilib triage
 %if "%{_lib}" == "lib"
@@ -229,7 +209,6 @@ The GDAL Java modules provide support to handle multiple GIS file formats.
 
 %package javadoc
 Summary:	Javadocs for %{name}
-Group:		Documentation
 Conflicts:	gdal-javadoc
 Requires:	jpackage-utils
 BuildArch:	noarch
@@ -240,7 +219,6 @@ This package contains the API documentation for %{name}.
 
 %package perl
 Summary:	Perl modules for the GDAL file format library
-Group:		Development/Libraries
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Requires:	perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Conflicts:	gdal-perl
@@ -251,7 +229,6 @@ The GDAL Perl modules provide support to handle multiple GIS file formats.
 
 %package python
 Summary:	Python modules for the GDAL file format library
-Group:		Development/Libraries
 Requires:	numpy
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Conflicts:	gdal-python
@@ -263,8 +240,7 @@ The package also includes a couple of useful utilities in Python.
 
 %package python3
 Summary:	Python modules for the GDAL file format library
-Group:		Development/Libraries
-Requires:	python34-numpy
+Requires:	python36-numpy
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Conflicts:	gdal-python3
 
@@ -274,7 +250,6 @@ The GDAL Python 3 modules provide support to handle multiple GIS file formats.
 
 %package doc
 Summary:	Documentation for GDAL
-Group:		Documentation
 BuildArch:	noarch
 Conflicts:	gdal-doc
 
@@ -285,7 +260,6 @@ This package contains HTML and PDF documentation for GDAL.
 %global __provides_exclude_from ^(%{python2_sitearch}|%{python3_sitearch})/.*\.so$
 
 %prep
-#%setup -q -n %{name}-%{version}-fedora -a 1
 %setup -q -n gdal-%{version} -a 1
 
 # Delete bundled libraries
@@ -296,12 +270,12 @@ rm -rf frmts/jpeg/libjpeg \
     frmts/jpeg/libjpeg12
 rm -rf frmts/gtiff/libgeotiff \
     frmts/gtiff/libtiff
-rm -r frmts/grib/degrib18/g2clib-1.0.4
+#rm -r frmts/grib/degrib/g2clib
 
-%patch1 -p1 -b .g2clib~
-%patch2 -p1 -b .jni~
+#%%patch1 -p1 -b .g2clib~
+#%%patch2 -p1 -b .jni~
 %patch3 -p1 -b .completion~
-%patch4 -p1 -b .uchar~
+%patch4 -p1 -b .configure~
 %patch8 -p1 -b .java~
 %patch9 -p1 -b .zlib~
 
@@ -325,15 +299,13 @@ for f in `find . -type f` ; do
 done
 set -x
 
-# Solved for 2.0
-for f in ogr/ogrsf_frmts/gpsbabel ogr/ogrsf_frmts/pgdump port apps; do
+for f in apps; do
 pushd $f
-  chmod 644 *.cpp *.h
+  chmod 0644 *.cpp
 popd
 done
 
 # Replace hard-coded library- and include paths
-sed -i 's|@LIBTOOL@|%{_bindir}/libtool|g' GDALmake.opt.in
 sed -i 's|-L\$with_cfitsio -L\$with_cfitsio/lib -lcfitsio|-lcfitsio|g' configure
 sed -i 's|-I\$with_cfitsio -I\$with_cfitsio/include|-I\$with_cfitsio/include/cfitsio|g' configure
 sed -i 's|-L\$with_netcdf -L\$with_netcdf/lib -lnetcdf|-lnetcdf|g' configure
@@ -347,9 +319,6 @@ sed -i 's|-L\$with_geotiff\/lib -lgeotiff $LIBS|-lgeotiff $LIBS|g' configure
 # libproj is dlopened; upstream sources point to .so, which is usually not present
 # http://trac.osgeo.org/gdal/ticket/3602
 sed -i 's|libproj.so|libproj.so.%{proj_somaj}|g' ogr/ogrct.cpp
-
-# Fix Python installation path
-sed -i 's|setup.py install|setup.py install --root=%{buildroot}|' swig/python/GNUmakefile
 
 # Fix Python samples to depend on correct interpreter
 mkdir -p swig/python3/samples
@@ -377,24 +346,23 @@ sed -i 's|CFLAGS=\"${GEOS_CFLAGS}\"|CFLAGS=\"${CFLAGS} ${GEOS_CFLAGS}\"|g' confi
 %build
 #TODO: Couldn't I have modified that in the prep section?
 %ifarch sparcv9 sparc64 s390 s390x
-export CFLAGS="$RPM_OPT_FLAGS -fPIC $(pkg-config FileGDBAPI --cflags)"
+export CFLAGS="$RPM_OPT_FLAGS -fPIC"
 %else
-export CFLAGS="$RPM_OPT_FLAGS -fpic $(pkg-config FileGDBAPI --cflags)"
+export CFLAGS="$RPM_OPT_FLAGS -fpic -I%{_includedir}/FileGDBAPI"
 %endif
-export CXXFLAGS="$CFLAGS -I%{_includedir}/libgeotiff"
-export CPPFLAGS="$CPPFLAGS $(pkg-config FileGDBAPI --cflags) -I%{_includedir}/libgeotiff"
+export CXXFLAGS="$CFLAGS -I%{_includedir}/libgeotiff -I%{_includedir}/tirpc"
+export CPPFLAGS="$CPPFLAGS -I%{_includedir}/FileGDBAPI -I%{_includedir}/libgeotiff -I%{_includedir}/tirpc"
 
 # For future reference:
 # epsilon: Stalled review -- https://bugzilla.redhat.com/show_bug.cgi?id=660024
 # Building without pgeo driver, because it drags in Java
 
 %configure \
-        LIBS=-lgrib2c \
+        LIBS="-lgrib2c -ltirpc" \
         --with-autoload=%{_libdir}/gdalplugins \
         --datadir=%{_datadir}/gdal/ \
         --includedir=%{_includedir}/gdal/ \
         --prefix=%{_prefix}	\
-        --without-bsb		\
         --with-armadillo	\
         --with-curl		\
         --with-cfitsio=%{_prefix}	\
@@ -417,17 +385,17 @@ export CPPFLAGS="$CPPFLAGS $(pkg-config FileGDBAPI --cflags) -I%{_includedir}/li
         --with-libtiff=external	\
         --with-libz		\
         --without-mdb		\
-        --with-mysql		\
+        --without-mysql		\
         --with-netcdf		\
         --with-odbc		\
-        --with-ogdi		\
+        --without-ogdi		\
         --without-msg		\
         --with-openjpeg		\
         --with-pcraster		\
         --with-pg=%{pginstdir}/bin/pg_config		\
         --with-png		\
         --with-poppler		\
-        %{spatialite}		\
+        --without-spatialite	\
         --with-sqlite3		\
         --with-threads		\
         --with-webp		\
@@ -437,43 +405,45 @@ export CPPFLAGS="$CPPFLAGS $(pkg-config FileGDBAPI --cflags) -I%{_includedir}/li
         --with-python		\
         --with-libkml
 
-# {?_smp_mflags} doesn't work; Or it does -- who knows!
-#make %{?_smp_mflags}
-make -s
-make -s man
-make -s docs
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
-# Make Perl modules
-pushd swig/perl
-  perl Makefile.PL;  make -s;
-  echo > Makefile.PL;
-popd
+POPPLER_OPTS="POPPLER_0_20_OR_LATER=yes POPPLER_0_23_OR_LATER=yes POPPLER_BASE_STREAM_HAS_TWO_ARGS=yes"
 
+make %{?_smp_mflags} $POPPLER_OPTS
+
+make man
+make docs
+
+%if %{build_s57}
 # Build some utilities, as requested in BZ #1271906
 pushd ogr/ogrsf_frmts/s57/
-  make -s all
+  make all
 popd
 
 pushd frmts/iso8211/
-  make -s all
+  make all
 popd
-
-# Install the Perl modules in the right place
-sed -i 's|INSTALLDIRS = site|INSTALLDIRS = vendor|' swig/perl/Makefile_*
-
-# Don't append installation info to pod
-#TODO: What about the pod?
-sed -i 's|>> $(DESTINSTALLARCHLIB)\/perllocal.pod|> \/dev\/null|g' swig/perl/Makefile_*
+%endif 
 
 # Make Java module and documentation
 pushd swig/java
-  make -s
-  ./make_doc.sh
+  make
+  ant maven
 popd
 
-# Make Python 3 module
+%mvn_artifact swig/java/build/maven/gdal-%version.pom swig/java/build/maven/gdal-%version.jar
+
+# Make Python modules
 pushd swig/python
-  %{__python3} setup.py build
+  %{py2_build}
+  %{py3_build}
+popd
+
+# Make Perl modules
+pushd swig/perl
+  perl Makefile.PL INSTALLDIRS=vendor
+  %make_build
 popd
 
 # --------- Documentation ----------
@@ -500,10 +470,10 @@ for docdir in %{docdirs}; do
 
     %if %{build_refman}
       pushd latex
-        sed -i -e '/rfoot\[/d' -e '/lfoot\[/d' doxygen.sty
-        sed -i -e '/small/d' -e '/large/d' refman.tex
-        sed -i -e 's|pdflatex|pdflatex -interaction nonstopmode |g' Makefile
-        make -s refman.pdf || true
+	sed -i -e '/rfoot\[/d' -e '/lfoot\[/d' doxygen.sty
+	sed -i -e '/small/d' -e '/large/d' refman.tex
+	sed -i -e 's|pdflatex|pdflatex -interaction nonstopmode |g' Makefile
+	make refman.pdf || true
       popd
     %endif
   popd
@@ -511,22 +481,25 @@ done
 
 
 %install
-rm -rf %{buildroot}
-
-# Install Python 3 module
-# Must be done first so executables are Python 2.
 pushd swig/python
-  %{__python3} setup.py install --skip-build --root %{buildroot}
+  %{py2_install}
+  %{py3_install}
 popd
 
-make -s	DESTDIR=%{buildroot}	\
+pushd swig/perl
+  %make_install
+popd
+
+make 	DESTDIR=%{buildroot}	\
         install	\
         install-man
 
+%if %{build_s57}
 install -pm 755 ogr/ogrsf_frmts/s57/s57dump %{buildroot}%{_bindir}
 install -pm 755 frmts/iso8211/8211createfromxml %{buildroot}%{_bindir}
 install -pm 755 frmts/iso8211/8211dump %{buildroot}%{_bindir}
 install -pm 755 frmts/iso8211/8211view %{buildroot}%{_bindir}
+%endif
 
 # Directory for auto-loading plugins
 mkdir -p %{buildroot}%{_libdir}/gdalplugins
@@ -540,27 +513,13 @@ rm -f %{buildroot}%{perl_archlib}/perllocal.pod
 find %{buildroot}%{perl_vendorarch} -name "*.so" -exec chmod 755 '{}' \;
 find %{buildroot}%{perl_vendorarch} -name "*.pm" -exec chmod 644 '{}' \;
 
-#TODO: JAR files that require JNI shared objects MUST be installed in %%{_libdir}/%%{name}. The JNI shared objects themselves must also be installed in %%{_libdir}/%%{name}.
-#Java programs that wish to make calls into native libraries do so via the Java Native Interface (JNI). A Java package uses JNI if it contains a .so
-#If the JNI-using code calls System.loadLibrary you'll have to patch it to use System.load, passing it the full path to the dynamic shared object. If the package installs a wrapper script you'll need to manually add %%{_libdir}/%%{name}/<jar filename> to CLASSPATH. If you are depending on a JNI-using JAR file, you'll need to add it manually -- build-classpath will not find it.
-touch -r NEWS swig/java/gdal.jar
-mkdir -p %{buildroot}%{_javadir}
-cp -p swig/java/gdal.jar  \
-    %{buildroot}%{_javadir}/gdal.jar
-
-# Install Maven pom and update version number
-install -dm 755 %{buildroot}%{_mavenpomdir}
-install -pm 644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/JPP-gdal.pom
-sed -i 's|<version></version>|<version>%{version}</version>|' %{buildroot}%{_mavenpomdir}/JPP-gdal.pom
-
-# Create depmap fragment
-%add_maven_depmap JPP-gdal.pom gdal.jar
+# install Java plugin
+%mvn_install -J swig/java/java
 
 # 775 on the .so?
 # copy JNI libraries and links, non versioned link needed by JNI
 # What is linked here?
 mkdir -p %{buildroot}%{_jnidir}/gdal
-# cp -pl swig/java/.libs/*.so*  \
 cp -pl swig/java/.libs/*.so*  \
     %{buildroot}%{_jnidir}/gdal/
 chrpath --delete %{buildroot}%{_jnidir}/gdal/*jni.so*
@@ -572,7 +531,6 @@ cp -pr swig/java/java/org %{buildroot}%{_javadocdir}/gdal
 # Install refmans
 for docdir in %{docdirs}; do
   pushd $docdir
-#     path=%{_builddir}/gdal-%{version}-fedora/refman
     path=%{_builddir}/gdal-%{version}/refman
     mkdir -p $path/html/$docdir
     cp -r html $path/html/$docdir
@@ -747,9 +705,13 @@ popd
 %{_bindir}/gdaltransform
 %{_bindir}/nearblack
 %{_bindir}/ogr*
+%if %{build_s57}
 %{_bindir}/8211*
 %{_bindir}/s57*
+%endif
 %{_bindir}/testepsg
+%{_bindir}/gnmanalyse
+%{_bindir}/gnmmanage
 %{_mandir}/man1/gdal*.1*
 %exclude %{_mandir}/man1/gdal-config.1*
 %exclude %{_mandir}/man1/gdal2tiles.1*
@@ -763,7 +725,7 @@ popd
 
 
 %files libs
-%doc LICENSE.TXT NEWS PROVENANCE.TXT COMMITERS
+%doc LICENSE.TXT NEWS PROVENANCE.TXT COMMITTERS
 %{_libdir}/libgdal.so.*
 %{_datadir}/gdal
 #TODO: Possibly remove files like .dxf, .dgn, ...
@@ -792,7 +754,7 @@ popd
 %{_mandir}/man3/*.3pm*
 
 %files python
-%doc swig/python/README.txt
+%doc swig/python/README.rst
 %doc swig/python/samples
 #TODO: Bug with .py files in EPEL 5 bindir, see http://fedoraproject.org/wiki/EPEL/GuidelinesAndPolicies
 %{_bindir}/*.py
@@ -808,9 +770,10 @@ popd
 %{python2_sitearch}/osr.py*
 %{python2_sitearch}/ogr.py*
 %{python2_sitearch}/gdal*.py*
+#%{python2_sitearch}/gnm.py*
 
 %files python3
-%doc swig/python/README.txt
+%doc swig/python/README.rst
 %doc swig/python3/samples
 %{python3_sitearch}/osgeo
 %{python3_sitearch}/GDAL-%{version}-py*.egg-info
@@ -820,6 +783,8 @@ popd
 %{python3_sitearch}/__pycache__/ogr.*.py*
 %{python3_sitearch}/gdal*.py
 %{python3_sitearch}/__pycache__/gdal*.*.py*
+#%{python3_sitearch}/gnm.py*
+#%{python3_sitearch}/__pycache__/gnm.*.py*
 
 %files doc
 %doc gdal_frmts ogrsf_frmts refman
