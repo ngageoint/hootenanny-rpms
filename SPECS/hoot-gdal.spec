@@ -27,7 +27,6 @@
 %global run_tests 0
 
 %global build_refman 1
-%global build_s57 0
 
 Name:		hoot-gdal
 Version:	%{rpmbuild_version}
@@ -48,11 +47,13 @@ Patch2:		gdal-jni.patch
 # Fix bash-completion install dir
 Patch3:		gdal-completion.patch
 
-Patch4:         gdal-configure.patch
-
 # Fedora uses Alternatives for Java
 Patch8:		gdal-1.9.0-java.patch
 Patch9:		gdal-3.0.0-zlib.patch
+
+# Patches for the build system: need to tweak configure for FileGDBAPI
+# detection and minor changes to the iso8211 GNUMakefile.
+Patch10:	gdal-3.0.0-build.patch
 
 # Adding FileGDB API for Hootenanny
 BuildRequires:  FileGDBAPI
@@ -275,9 +276,9 @@ rm -rf frmts/gtiff/libgeotiff \
 #%%patch1 -p1 -b .g2clib~
 #%%patch2 -p1 -b .jni~
 %patch3 -p1 -b .completion~
-%patch4 -p1 -b .configure~
 %patch8 -p1 -b .java~
 %patch9 -p1 -b .zlib~
+%patch10 -p1 -b .build~
 
 # Sanitize linebreaks and encoding
 #TODO: Don't touch data directory!
@@ -415,7 +416,6 @@ make %{?_smp_mflags} $POPPLER_OPTS
 make man
 make docs
 
-%if %{build_s57}
 # Build some utilities, as requested in BZ #1271906
 pushd ogr/ogrsf_frmts/s57/
   make all
@@ -424,7 +424,6 @@ popd
 pushd frmts/iso8211/
   make all
 popd
-%endif 
 
 # Make Java module and documentation
 pushd swig/java
@@ -494,12 +493,10 @@ make 	DESTDIR=%{buildroot}	\
         install	\
         install-man
 
-%if %{build_s57}
 install -pm 755 ogr/ogrsf_frmts/s57/s57dump %{buildroot}%{_bindir}
 install -pm 755 frmts/iso8211/8211createfromxml %{buildroot}%{_bindir}
 install -pm 755 frmts/iso8211/8211dump %{buildroot}%{_bindir}
 install -pm 755 frmts/iso8211/8211view %{buildroot}%{_bindir}
-%endif
 
 # Directory for auto-loading plugins
 mkdir -p %{buildroot}%{_libdir}/gdalplugins
@@ -514,7 +511,16 @@ find %{buildroot}%{perl_vendorarch} -name "*.so" -exec chmod 755 '{}' \;
 find %{buildroot}%{perl_vendorarch} -name "*.pm" -exec chmod 644 '{}' \;
 
 # install Java plugin
-%mvn_install -J swig/java/java
+#%%mvn_install -J swig/java/java
+# Can't use `mvn_install` macro cause we need to use 'gdal' instead of
+# the `%%name` of 'hoot-gdal'.
+xmvn-install  -R .xmvn-reactor -n gdal -d "%{buildroot}"
+jdir="swig/java/java"
+if [ -d "${jdir}" ]; then
+   install -dm755 %{buildroot}%{_javadocdir}/gdal
+   cp -pr "${jdir}"/* %{buildroot}%{_javadocdir}/gdal
+   echo '%{_javadocdir}/gdal' >>.mfiles-javadoc
+fi
 
 # 775 on the .so?
 # copy JNI libraries and links, non versioned link needed by JNI
@@ -705,10 +711,8 @@ popd
 %{_bindir}/gdaltransform
 %{_bindir}/nearblack
 %{_bindir}/ogr*
-%if %{build_s57}
 %{_bindir}/8211*
 %{_bindir}/s57*
-%endif
 %{_bindir}/testepsg
 %{_bindir}/gnmanalyse
 %{_bindir}/gnmmanage
