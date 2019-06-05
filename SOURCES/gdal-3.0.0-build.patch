@@ -5,7 +5,9 @@ Tweaks for building GDAL 3.0.0:
 
 2. Tweak the iso8211 `GNUMakefile` so that the executables won't depend on
    a static library target that causes this error:
-     libiso8211.a: error adding symbols: Archive has no index; run ranlib to add one
+   
+   libiso8211.a: error adding symbols: Archive has no index; run ranlib to add one
+
 --- a/configure
 +++ b/configure
 @@ -32929,7 +32929,7 @@ $as_echo_n "checking for FileGDBAPI... " >&6; }
@@ -13,24 +15,27 @@ Tweaks for building GDAL 3.0.0:
      echo "using namespace FileGDBAPI;" >> testfgdb.cpp
      echo "int main() { Geodatabase oDB; std::wstring osStr; ::OpenGeodatabase(osStr, oDB); return 0; }" >> testfgdb.cpp
 -    if test -z "`${CXX} ${CXXFLAGS} ${CPPFLAGS} testfgdb.cpp -lFileGDBAPI -lfgdbunixrtl -o testfgdb 2>&1`" ; then
-+    if `${CXX} ${CXXFLAGS} ${CPPFLAGS} testfgdb.cpp -lFileGDBAPI -lfgdbunixrtl -o testfgdb 2>&1`; then
++    if `${CXX} ${CXXFLAGS} ${CPPFLAGS} testfgdb.cpp -lFileGDBAPI -lfgdbunixrtl -o testfgdb`; then
          { $as_echo "$as_me:${as_lineno-$LINENO}: result: FileGDBAPI found" >&5
  $as_echo "FileGDBAPI found" >&6; }
          FGDB_ENABLED="yes"
 diff --git a/frmts/iso8211/GNUmakefile b/frmts/iso8211/GNUmakefile
-index e892e26..943bec6 100644
+index e892e26..a411e33 100644
 --- a/frmts/iso8211/GNUmakefile
 +++ b/frmts/iso8211/GNUmakefile
-@@ -29,10 +29,10 @@ $(ISOLIB):	$(OBJ:.o=.$(OBJ_EXT))
+@@ -29,11 +29,11 @@ $(ISOLIB):	$(OBJ:.o=.$(OBJ_EXT))
  8211createfromxml$(EXE):	8211createfromxml.$(OBJ_EXT)
  	$(LD) $(LDFLAGS) 8211createfromxml.$(OBJ_EXT) $(CONFIG_LIBS) -o 8211createfromxml$(EXE)
  
 -8211dump$(EXE):	8211dump.$(OBJ_EXT) $(ISOLIB)
+-	$(LD) $(LDFLAGS) 8211dump.$(OBJ_EXT) $(ISOLIB) $(CONFIG_LIBS) -o 8211dump$(EXE)
 +8211dump$(EXE):	8211dump.$(OBJ_EXT)
- 	$(LD) $(LDFLAGS) 8211dump.$(OBJ_EXT) $(ISOLIB) $(CONFIG_LIBS) -o 8211dump$(EXE)
++	$(LD) $(LDFLAGS) 8211dump.$(OBJ_EXT) $(CONFIG_LIBS) -o 8211dump$(EXE)
  
 -8211view$(EXE):	8211view.$(OBJ_EXT) $(ISOLIB)
+-	$(LD) $(LDFLAGS) 8211view.$(OBJ_EXT) $(ISOLIB) $(CONFIG_LIBS) -o 8211view$(EXE)
 +8211view$(EXE):	8211view.$(OBJ_EXT)
- 	$(LD) $(LDFLAGS) 8211view.$(OBJ_EXT) $(ISOLIB) $(CONFIG_LIBS) -o 8211view$(EXE)
++	$(LD) $(LDFLAGS) 8211view.$(OBJ_EXT) $(CONFIG_LIBS) -o 8211view$(EXE)
  
  timetest$(EXE):	timetest.$(OBJ_EXT)
+ 	$(LD) $(LDFLAGS) timetest.$(OBJ_EXT) $(CONFIG_LIBS) -o timetest$(EXE)
