@@ -672,8 +672,8 @@ pushd gdalautotest-%{testversion}
      ogr/ogr_mongodbv3.py
 
   # Run ogr_fgdb test in isolation due to likely conflict with libxml2
-  #pytest ogr/ogr_fgdb.py
-  #rm -f ogr/ogr_fgdb.py
+  pytest ogr/ogr_fgdb.py
+  rm -f ogr/ogr_fgdb.py
 
   # Run tests with problematic cases deselected.  Some explanations:
   #  * ogr/ogr_gmlas.py: cyrillic encoding issues?
