@@ -9,24 +9,6 @@ build_base_images
 
 ## Build GDAL dependencies.
 
-# armadillo
-if [ ! -f "$RPM_X86_64/$ARMADILLO_RPM" ]; then
-    echo "#### Building RPM: armadillo"
-
-    # Build image for building armadillo.
-    docker build \
-           --build-arg "packages=$( spec_requires armadillo )" \
-           -f "$SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic" \
-           -t hootenanny/rpmbuild-armadillo \
-           "$SCRIPT_HOME"
-
-    run_dep_image \
-        rpmbuild \
-        --define "rpmbuild_version ${ARMADILLO_VERSION}" \
-        --define "rpmbuild_release ${ARMADILLO_RELEASE}" \
-        -bb SPECS/armadillo.spec
-fi
-
 # FileGDBAPI
 if [ ! -f $RPM_X86_64/$FILEGDBAPI_RPM ]; then
     echo "#### Building RPM: FileGDBAPI"
@@ -237,28 +219,30 @@ fi
 ## GDAL and PostGIS (requires PostgreSQL from PGDG)
 
 # GDAL
-if [ ! -f $RPM_X86_64/$GDAL_RPM ]; then
+if [ ! -f "$RPM_X86_64/$GDAL_RPM" ]; then
     echo "#### Building RPM: GDAL (with PostgreSQL ${PG_VERSION})"
 
     # Make GDAL RPM container, specifying the versions of RPMs we
     # need to install.
     docker build \
            --build-arg "packages=$( spec_requires hoot-gdal )" \
-           --build-arg filegdbapi_version=$FILEGDBAPI_VERSION-$FILEGDBAPI_RELEASE \
-           --build-arg geos_version=$GEOS_VERSION-$GEOS_RELEASE \
-           --build-arg libgeotiff_version=$LIBGEOTIFF_VERSION-$LIBGEOTIFF_RELEASE \
-           --build-arg libkml_version=$LIBKML_VERSION-$LIBKML_RELEASE \
-           --build-arg pg_version=$PG_VERSION \
-           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-gdal \
+           --build-arg "filegdbapi_version=$FILEGDBAPI_VERSION-$FILEGDBAPI_RELEASE" \
+           --build-arg "geos_version=$GEOS_VERSION-$GEOS_RELEASE" \
+           --build-arg "gpsbabel_version=$GPSBABEL_VERSION-$GPSBABEL_RELEASE" \
+           --build-arg "libgeotiff_version=$LIBGEOTIFF_VERSION-$LIBGEOTIFF_RELEASE" \
+           --build-arg "libkml_version=$LIBKML_VERSION-$LIBKML_RELEASE" \
+           --build-arg "pg_version=$PG_VERSION" \
+           --build-arg "proj_version=$PROJ_VERSION" \
+           -f "$SCRIPT_HOME/docker/Dockerfile.rpmbuild-gdal" \
            -t hootenanny/rpmbuild-gdal \
-           $SCRIPT_HOME
+           "$SCRIPT_HOME"
 
     # Generate GDAL RPM.
     run_dep_image \
         -i hootenanny/rpmbuild-gdal \
         rpmbuild \
-        --define "rpmbuild_version ${GDAL_VERSION}" \
-        --define "rpmbuild_release ${GDAL_RELEASE}" \
+        --define "rpmbuild_version $GDAL_VERSION" \
+        --define "rpmbuild_release $GDAL_RELEASE" \
         -bb SPECS/hoot-gdal.spec
 fi
 
