@@ -155,9 +155,9 @@ OSMOSIS_VERSION=$( config_version osmosis )
 OSMOSIS_RELEASE=$( config_release osmosis )
 OSMOSIS_RPM=osmosis-$OSMOSIS_VERSION-$OSMOSIS_RELEASE$RPMBUILD_DIST.noarch.rpm
 
-POSTGIS_VERSION=$( config_version postgis )
-POSTGIS_RELEASE=$( config_release postgis )
-POSTGIS_RPM=hoot-postgis24_$PG_DOTLESS-$POSTGIS_VERSION-$POSTGIS_RELEASE$RPMBUILD_DIST.x86_64.rpm
+POSTGIS_VERSION=$( config_version postgis25 )
+POSTGIS_RELEASE=$( config_release postgis25 )
+POSTGIS_RPM=hoot-postgis25_$PG_DOTLESS-$POSTGIS_VERSION-$POSTGIS_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
 PROJ_VERSION=$( config_version proj )
 PROJ_RELEASE=$( config_release proj )
