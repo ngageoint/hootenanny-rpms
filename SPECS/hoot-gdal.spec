@@ -24,7 +24,7 @@
 
 # Tests can be of a different version
 %global testversion %{rpmbuild_version}
-%global run_tests 0
+%global run_tests 1
 
 %global build_refman 1
 
@@ -117,6 +117,7 @@ BuildRequires:	postgresql%{pg_dotless}-devel
 BuildRequires:	proj-devel
 BuildRequires:	python2-devel
 BuildRequires:	python36-devel
+BuildRequires:	python36-pip
 BuildRequires:	sqlite-devel
 BuildRequires:	swig
 %if %{build_refman}
@@ -344,6 +345,7 @@ sed -i "s|^mandir=.*|mandir='\${prefix}/share/man'|" configure
 # https://bugzilla.redhat.com/show_bug.cgi?id=1284714
 sed -i 's|CFLAGS=\"${GEOS_CFLAGS}\"|CFLAGS=\"${CFLAGS} ${GEOS_CFLAGS}\"|g' configure
 
+
 %build
 #TODO: Couldn't I have modified that in the prep section?
 %ifarch sparcv9 sparc64 s390 s390x
@@ -353,10 +355,6 @@ export CFLAGS="$RPM_OPT_FLAGS -fpic -I%{_includedir}/FileGDBAPI"
 %endif
 export CXXFLAGS="$CFLAGS -I%{_includedir}/libgeotiff -I%{_includedir}/tirpc"
 export CPPFLAGS="$CPPFLAGS -I%{_includedir}/FileGDBAPI -I%{_includedir}/libgeotiff -I%{_includedir}/tirpc"
-
-# For future reference:
-# epsilon: Stalled review -- https://bugzilla.redhat.com/show_bug.cgi?id=660024
-# Building without pgeo driver, because it drags in Java
 
 %configure \
         LIBS="-lgrib2c -ltirpc" \
@@ -656,38 +654,73 @@ rm -f %{buildroot}%{_mandir}/man1/_home_rouault_dist_wrk_gdal_apps_.1*
 
 %check
 %if %{run_tests}
-for i in -I/usr/lib/jvm/java/include{,/linux}; do
-    java_inc="$java_inc $i"
-done
-
-
 pushd gdalautotest-%{testversion}
-  # Export test enviroment
-  export PYTHONPATH=$PYTHONPATH:%{buildroot}%{python_sitearch}
-  #TODO: Nötig?
+  # Export test enviroment variables.
+  export PYTHONPATH=%{_usr}/local/lib/python%{python3_version}/site-packages:%{python3_sitearch}:%{buildroot}%{python3_sitearch}
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:%{buildroot}%{_libdir}
-#  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:%%{buildroot}%%{_libdir}:$java_inc
-
-  export GDAL_DATA=%{buildroot}%{_datadir}/gdal/
+  export GDAL_DATA=%{buildroot}%{_datadir}/gdal
+  export GDAL_DRIVER_PATH=%{buildroot}%{_libdir}/gdalplugins
 
   # Enable these tests on demand
-  #export GDAL_RUN_SLOW_TESTS=1
+  export GDAL_RUN_SLOW_TESTS=1
   #export GDAL_DOWNLOAD_TEST_DATA=1
 
-  # Remove some test cases that would require special preparation
- rm -rf ogr/ogr_pg.py        # No database available
- rm -rf ogr/ogr_mysql.py     # No database available
- rm -rf osr/osr_esri.py      # ESRI datum absent
- rm -rf osr/osr_erm.py       # File from ECW absent
+  # Remove test cases that require database access.
+  rm -f \
+     ogr/ogr_pg.py \
+     ogr/ogr_mysql.py \
+     ogr/ogr_mongodbv3.py
 
-  # Run tests but force normal exit in the end
-  ./run_all.py || true
+  # Run ogr_fgdb test in isolation due to likely conflict with libxml2
+  #pytest ogr/ogr_fgdb.py
+  #rm -f ogr/ogr_fgdb.py
+
+  # Run tests with problematic cases deselected.  Some explanations:
+  #  * ogr/ogr_gmlas.py: cyrillic encoding issues?
+  #  * gcore/tiff_read.py: will eventually pass, but consumes all memory
+  #      forcing host to swap.
+  #  * gdrivers/gdalhttp.py: test_http_4 takes way too long
+  #  * gdrivers/pdf.py: disabled tests cause segfaults on EL platforms
+  pytest \
+    --deselect ogr/ogr_dxf.py::test_ogr_dxf_9 \
+    --deselect ogr/ogr_dxf.py::test_ogr_dxf_16 \
+    --deselect ogr/ogr_gft.py::test_ogr_gft_read \
+    --deselect ogr/ogr_gmlas.py::test_ogr_gmlas_basic \
+    --deselect ogr/ogr_gmlas.py::test_ogr_gmlas_writer_check_xml_read_back \
+    --deselect ogr/ogr_gmlas.py::test_ogr_gmlas_cleanup \
+    --deselect ogr/ogr_gpkg.py::test_ogr_gpkg_18 \
+    --deselect ogr/ogr_ili.py::test_ogr_interlis1_7 \
+    --deselect ogr/ogr_ili.py::test_ogr_interlis1_14 \
+    --deselect ogr/ogr_mitab.py::test_ogr_mitab_46 \
+    --deselect ogr/ogr_mitab.py::test_ogr_mitab_local_encoding_label \
+    --deselect ogr/ogr_mvt.py::test_ogr_mvt_point_polygon_clip \
+    --deselect ogr/ogr_pds4.py::test_ogr_pds4_read_table_character \
+    --deselect ogr/ogr_pds4.py::test_ogr_pds4_delete_from_table_character \
+    --deselect gcore/tiff_read.py::test_tiff_read_toomanyblocks \
+    --deselect gcore/tiff_read.py::test_tiff_read_toomanyblocks_separate \
+    --deselect gcore/tiff_write.py::test_tiff_write_87 \
+    --deselect gdrivers/gdalhttp.py::test_http_4 \
+    --deselect gdrivers/ignfheightasciigrid.py::test_ignfheightasciigrid_2 \
+    --deselect gdrivers/ignfheightasciigrid.py::test_ignfheightasciigrid_3 \
+    --deselect gdrivers/ignfheightasciigrid.py::test_ignfheightasciigrid_4 \
+    --deselect gdrivers/pdf.py::test_pdf_jp2_auto_compression \
+    --deselect gdrivers/pdf.py::test_pdf_jp2openjpeg_compression \
+    --deselect gdrivers/pdf.py::test_pdf_jpeg2000_compression \
+    --deselect gdrivers/pds4.py::test_pds4_8 \
+    --deselect gdrivers/pds4.py::test_pds4_9 \
+    --deselect gdrivers/pds4.py::test_pds4_15 \
+    --deselect gdrivers/pds4.py::test_pds4_16 \
+    --deselect gdrivers/pds4.py::test_pds4_17 \
+    --deselect utilities/test_ogr2ogr.py::test_ogr2ogr_6 \
+    --deselect utilities/test_ogr2ogr.py::test_ogr2ogr_7 \
+    --deselect utilities/test_ogr2ogr.py::test_ogr2ogr_41 \
+    --deselect pyscripts/test_ogr2ogr_py.py::test_ogr2ogr_py_6 \
+    --deselect pyscripts/test_ogr2ogr_py.py::test_ogr2ogr_py_7
 popd
-%endif #%%{run_tests}
+%endif
 
 
 %post libs -p /sbin/ldconfig
-
 %postun libs -p /sbin/ldconfig
 
 
@@ -774,7 +807,7 @@ popd
 %{python2_sitearch}/osr.py*
 %{python2_sitearch}/ogr.py*
 %{python2_sitearch}/gdal*.py*
-#%{python2_sitearch}/gnm.py*
+
 
 %files python3
 %doc swig/python/README.rst
@@ -787,13 +820,15 @@ popd
 %{python3_sitearch}/__pycache__/ogr.*.py*
 %{python3_sitearch}/gdal*.py
 %{python3_sitearch}/__pycache__/gdal*.*.py*
-#%{python3_sitearch}/gnm.py*
-#%{python3_sitearch}/__pycache__/gnm.*.py*
+
 
 %files doc
 %doc gdal_frmts ogrsf_frmts refman
 
+
 %changelog
+* Thu Jun 06 2019 Justin Bronn <justin.bronn@maxar.com> - 3.0.0-1
+- Upgrade to 3.0.0.
 * Wed Jan 24 2018 Justin Bronn <justin.bronn@digitalglobe.com> - 2.1.4-2
 - Link to latest libraries in EPEL, including libarmadillo.so.8
 * Wed Nov 15 2017 Justin Bronn <justin.bronn@digitalglobe.com> - 2.1.4-1
