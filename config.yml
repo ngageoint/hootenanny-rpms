@@ -3,7 +3,7 @@ versions:
   armadillo: &armadillo_version '9.400.3-1'
   dumb-init: &dumbinit_version '1.2.1-1'
   geos: &geos_version '3.7.2-1'
-  glpk: &glpk_version '4.64-1'
+  glpk: &glpk_version '4.65-1'
   gpsbabel: &gpsbabel_version '1.5.4-1'
   hoot-gdal: &gdal_version '2.1.4-2'
   hoot-words: &words_version '1.0.1-1'
