@@ -509,9 +509,9 @@ if [ "$1" = "1" ]; then
 
     # PostgreSQL setup binary changes on versions > 10.
     if [ "$(echo "%{pg_version}" | awk -F. '{ if ($1 >= 10) print "yes"; else print "no" }')" = "yes" ]; then
-        PG_SETUP="postgresql-$PG_DOTLESS-setup"
+        PG_SETUP="postgresql-%{pg_dotless}-setup"
     else
-        PG_SETUP="postgresql$PG_DOTLESS-setup"
+        PG_SETUP="postgresql%{pg_dotless}-setup"
     fi
 
     # init and start postgres
@@ -730,9 +730,9 @@ if [ "$1" = "1" ]; then
 
     # PostgreSQL setup binary changes on versions > 10.
     if [ "$(echo "%{pg_version}" | awk -F. '{ if ($1 >= 10) print "yes"; else print "no" }')" = "yes" ]; then
-        PG_SETUP="postgresql-$PG_DOTLESS-setup"
+        PG_SETUP="postgresql-%{pg_dotless}-setup"
     else
-        PG_SETUP="postgresql$PG_DOTLESS-setup"
+        PG_SETUP="postgresql%{pg_dotless}-setup"
     fi
 
     # init and start postgres
