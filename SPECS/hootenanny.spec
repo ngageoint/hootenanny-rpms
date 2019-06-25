@@ -432,6 +432,9 @@ function startTomcat() {
 }
 
 function updateConfigFiles () {
+    if [ -f /var/local/hoot-services-ui-env-vars.sh ]; then
+        source /var/local/hoot-services-ui-env-vars.sh
+    fi
     # Check for existing db config from previous install and move to right location
     if [ -f %{hoot_home}/conf/DatabaseConfigLocal.sh ]; then
         mv %{hoot_home}/conf/DatabaseConfigLocal.sh %{hoot_home}/conf/database/DatabaseConfigLocal.sh
@@ -470,6 +473,73 @@ EOT
     sed -i s/password\:\ hoottest/password\:\ $DB_PASSWORD/ %{services_home}/WEB-INF/classes/db/liquibase.properties
     sed -i s/DB_PASSWORD=hoottest/DB_PASSWORD=$DB_PASSWORD/ %{services_home}/WEB-INF/classes/db/db.properties
     sed -i s/password=\"hoottest\"/password=\"$DB_PASSWORD\"/ %{services_home}/META-INF/context.xml
+    if [ ! -z "$RAILSPORT_HOST" ]; then
+        sed -i "s/RAILSPORT_HOST\ =\ localhost/${RAILSPORT_HOST}/" %{services_home}/WEB-INF/classes/db/db.properties
+    fi
+    if [ ! -z "$RAILSPORT_PORT" ]; then
+        sed -i "s/RAILSPORT_PORT\ =\ 3000/${RAILSPORT_PORT}/" %{services_home}/WEB-INF/classes/db/db.properties
+    fi
+
+    # update hoot-services security-applicationContext.xml file
+    SECURITY_APPCONTEXT=%{services_home}/WEB-INF/classes/security-applicationContext.xml
+    if [ -f ${SECURITY_APPCONTEXT} ]; then
+        if [[ ! -z "$APPCONTEXT_KEY" && ! -z "$DEFAULT_APPCONTEXT_KEY" ]]; then
+            sed -i "s/${DEFAULT_APPCONTEXT_KEY}/${APPCONTEXT_KEY}/" ${SECURITY_APPCONTEXT}
+        fi
+        if [[ ! -z "$APPCONTEXT_SECRET" && ! -z "$DEFAULT_APPCONTEXT_SECRET" ]]; then
+            sed -i "s/${DEFAULT_APPCONTEXT_SECRET}/${APPCONTEXT_SECRET}/" ${SECURITY_APPCONTEXT}
+        fi
+        if [ ! -z "$APPCONTEXT_REQ_TOKEN_URL" ]; then
+            sed -i "s/request-token-url=\"https:\/\/www.openstreetmap.org\/oauth\/request_token\"/${APPCONTEXT_REQ_TOKEN_URL}/" ${SECURITY_APPCONTEXT}
+        fi
+        if [ ! -z "$APPCONTEXT_USER_TOKEN_URL" ]; then
+            sed -i "s/user-authorization-url=\"https:\/\/www.openstreetmap.org\/oauth\/authorize\"/${APPCONTEXT_USER_TOKEN_URL}/" ${SECURITY_APPCONTEXT}
+        fi
+        if [ ! -z "$APPCONTEXT_ACCESS_TOKEN_URL" ]; then
+            sed -i "s/access-token-url=\"https:\/\/www.openstreetmap.org\/oauth\/access_token\"/${APPCONTEXT_ACCESS_TOKEN_URL}/" ${SECURITY_APPCONTEXT}
+        fi
+    else
+        echo "Warning: Security-applicationContext file: ${SECURITY_APPCONTEXT} not found"
+    fi
+
+    # update hoot-service.conf oauth redirect & provider
+    HS_CONFIG=%{services_home}/WEB-INF/classes/conf/hoot-services.conf
+    if [ -f ${HS_CONFIG} ]; then
+        if [ ! -z "$OAUTH_REDIRECT_URL" ]; then
+            sed -i "s/oauthRedirectURL=http:\/\/localhost:8080\//${OAUTH_REDIRECT_URL}/" ${HS_CONFIG}
+        fi
+        if [ ! -z "$OAUTH_PROVIDER_URL" ]; then
+            sed -i "s/oauthProviderURL=https:\/\/api.openstreetmap.org/${OAUTH_PROVIDER_URL}/" ${HS_CONFIG}
+        fi
+    else
+        echo "Warning: hoot-services config file: ${HS_CONFIG} not found"
+    fi
+   
+    # update hoot-ui services iD
+    LEGACY_UI_ID=%{tomcat_webapps}/hootenanny-id-legacy/iD.js
+    if [ -f ${LEGACY_UI_ID} ]; then
+        if [ ! -z "$LEGACY_TRANSLATION_PORT" ]; then
+            sed -i "s/\"translationServerPort\":8094/${LEGACY_TRANSLATION_PORT}/" ${LEGACY_UI_ID}
+        fi
+        if [ ! -z "$LEGACY_ELEMENTMERGE_PORT" ]; then
+            sed -i "s/\"elementMergeServerPort\":8096/${LEGACY_ELEMENTMERGE_PORT}/" ${LEGACY_UI_ID}
+        fi
+    else
+        echo "Warning: hoot-ui services iD file: ${LEGACY_UI_ID} not found"
+    fi 
+
+    # update hoot-ui-2x service iD.min
+    UI_2X_ID=%{tomcat_webapps}/hootenanny-id/iD.min.js
+    if [ -f ${UI_2X_ID} ]; then  
+        if [ ! -z "$TRANSLATION_PORT" ]; then
+            sed -i "s/translationServerPort:\"8094\"/${TRANSLATION_PORT}/" ${UI_2X_ID}
+        fi
+        if [ ! -z "$MERGE_PORT" ]; then
+            sed -i "s/mergeServerPort:\"8096\"/${MERGE_PORT}/" ${UI_2x_ID}
+        fi
+    else
+        echo "Warning: hoot-ui-2x services iD file: ${UI_2X_ID} not found"
+    fi
 
     systemctl restart tomcat8
 }
