@@ -99,8 +99,6 @@ BuildRequires:  graphviz
 BuildRequires:  hoot-gdal
 BuildRequires:  hoot-gdal-devel
 BuildRequires:  hoot-gdal-python
-BuildRequires:  hoot-postgis24_%{pg_dotless}-devel
-BuildRequires:  hoot-postgis24_%{pg_dotless}-utils
 BuildRequires:  hoot-words
 BuildRequires:  java-1.8.0-openjdk
 BuildRequires:  libicu-devel
@@ -340,7 +338,6 @@ echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hoot
 Summary:   Hootenanny UI and Services
 Group:     Applications/Engineering
 Requires:  %{name}-core = %{version}-%{release}
-Requires:  hoot-postgis24_%{pg_dotless}
 Requires:  java-1.8.0-openjdk
 Requires:  liquibase
 Requires:  osmosis
@@ -540,10 +537,7 @@ if [ "$1" = "1" ]; then
             sed -i s/DB_PASSWORD=.*/DB_PASSWORD=$RAND_PW/ %{hoot_home}/conf/database/DatabaseConfig.sh
         fi
         su -l postgres -c "createdb hoot --owner=hoot"
-        su -l postgres -c "createdb wfsstoredb --owner=hoot"
         su -l postgres -c "psql -d hoot -c \"CREATE EXTENSION hstore;\""
-        su -l postgres -c "psql -d wfsstoredb -c \"CREATE EXTENSION postgis; GRANT ALL ON geography_columns, geometry_columns, spatial_ref_sys TO PUBLIC;\""
-        su -l postgres -c "psql -d postgres -c \"UPDATE pg_database SET datistemplate='true' WHERE datname='wfsstoredb';\""
     fi
 
     # restore saved db config file settings if present
@@ -698,8 +692,6 @@ Summary:   Development dependencies for Hootenanny Services
 Group:     Development/Libraries
 BuildArch: noarch
 Requires:  %{name}-core-devel-deps = %{version}-%{release}
-Requires:  hoot-postgis24_%{pg_dotless}
-Requires:  hoot-postgis24_%{pg_dotless}-utils
 Requires:  liquibase
 Requires:  maven
 Requires:  nodejs-devel = %{nodejs_epoch}:%{nodejs_version}
@@ -753,10 +745,7 @@ if [ "$1" = "1" ]; then
         su -l postgres -c "createuser --superuser hoot || true"
         su -l postgres -c "psql -c \"ALTER USER hoot WITH PASSWORD 'hoottest';\""
         su -l postgres -c "createdb hoot --owner=hoot"
-        su -l postgres -c "createdb wfsstoredb --owner=hoot"
         su -l postgres -c "psql -d hoot -c \"CREATE EXTENSION hstore;\""
-        su -l postgres -c "psql -d wfsstoredb -c \"CREATE EXTENSION postgis; GRANT ALL ON geography_columns, geometry_columns, spatial_ref_sys TO PUBLIC;\""
-        su -l postgres -c "psql -d postgres -c \"UPDATE pg_database SET datistemplate='true' WHERE datname='wfsstoredb'\";"
     fi
 
     # configure Postgres settings

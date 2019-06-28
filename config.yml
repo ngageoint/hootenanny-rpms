@@ -125,7 +125,6 @@ images:
           nodejs_version: *nodejs_version
           osmosis_version: *osmosis_version
           pg_version: *pg_version
-          postgis_version: *postgis_version
           stxxl_version: *stxxl_version
           suexec_version: *suexec_version
           tomcat8_version: *tomcat8_version
@@ -146,7 +145,6 @@ images:
           nodejs_version: *nodejs_version
           osmosis_version: *osmosis_version
           pg_version: *pg_version
-          postgis_version: *postgis_version
           stxxl_version: *stxxl_version
           suexec_version: *suexec_version
           tomcat8_version: *tomcat8_version
