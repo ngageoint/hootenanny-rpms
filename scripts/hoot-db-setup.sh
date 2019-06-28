@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (C) 2019 Maxar Technologies (https://www.maxar.com)
 # Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,7 +25,6 @@ DB_NAME="${DB_NAME:-hoot}"
 DB_NAME_OSMAPI="${DB_NAME_OSMAPI:-osmapi_test}"
 DB_USER="${DB_USER:-hoot}"
 DB_PASSWORD="${DB_PASSWORD:-hoottest}"
-WFS_DB_NAME="${WFS_DB_NAME:-wfsstoredb}"
 
 sed -i s/^max_connections/\#max_connections/ $POSTGRES_CONF
 sed -i s/^shared_buffers/\#shared_buffers/ $POSTGRES_CONF
@@ -60,13 +60,6 @@ psql --username postgres --dbname postgres --command \
 createdb --username postgres $DB_NAME --owner $DB_USER
 psql --username postgres --dbname $DB_NAME --command \
      "CREATE EXTENSION hstore;"
-
-# Create hoot WFS database template, with PostGIS.
-createdb --username postgres $WFS_DB_NAME --owner $DB_USER
-psql --username postgres --dbname $WFS_DB_NAME --command \
-     "CREATE EXTENSION postgis; GRANT ALL ON geography_columns, geometry_columns, spatial_ref_sys TO PUBLIC;"
-psql --username postgres --dbname postgres --command \
-     "UPDATE pg_database SET datistemplate='true' WHERE datname='${WFS_DB_NAME}';"
 
 # Stop database.
 su-exec postgres pg_ctl -D $PGDATA -s -m fast -w stop
