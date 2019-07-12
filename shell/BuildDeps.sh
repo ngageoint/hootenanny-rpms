@@ -9,6 +9,24 @@ build_base_images
 
 ## Build GDAL dependencies.
 
+# armadillo
+if [ ! -f "$RPM_X86_64/$ARMADILLO_RPM" ]; then
+    echo "#### Building RPM: armadillo"
+
+    # Build image for building armadillo.
+    docker build \
+           --build-arg "packages=$( spec_requires armadillo )" \
+           -f "$SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic" \
+           -t hootenanny/rpmbuild-armadillo \
+           "$SCRIPT_HOME"
+
+    run_dep_image \
+        rpmbuild \
+        --define "rpmbuild_version ${ARMADILLO_VERSION}" \
+        --define "rpmbuild_release ${ARMADILLO_RELEASE}" \
+        -bb SPECS/armadillo.spec
+fi
+
 # FileGDBAPI
 if [ ! -f $RPM_X86_64/$FILEGDBAPI_RPM ]; then
     echo "#### Building RPM: FileGDBAPI"
@@ -37,6 +55,26 @@ if [ ! -f $RPM_X86_64/$GEOS_RPM ]; then
         --define "rpmbuild_version ${GEOS_VERSION}" \
         --define "rpmbuild_release ${GEOS_RELEASE}" \
         -bb SPECS/geos.spec
+fi
+
+# proj
+if [ ! -f "$RPM_X86_64/$PROJ_RPM" ]; then
+    echo "#### Building RPM: proj"
+
+    # Build image for building proj.
+    docker build \
+           --build-arg "packages=$( spec_requires proj )" \
+           -f "$SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic" \
+           -t hootenanny/rpmbuild-proj \
+           "$SCRIPT_HOME"
+
+    # Generate proj RPM.
+    run_dep_image \
+        -i hootenanny/rpmbuild-proj \
+        rpmbuild \
+        --define "rpmbuild_version $PROJ_VERSION" \
+        --define "rpmbuild_release $PROJ_RELEASE" \
+        -bb SPECS/proj.spec
 fi
 
 # glpk
@@ -80,7 +118,8 @@ if [ ! -f $RPM_X86_64/$LIBGEOTIFF_RPM ]; then
     # Build image for building libgeotiff.
     docker build \
            --build-arg "packages=$( spec_requires libgeotiff )" \
-           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-generic \
+           --build-arg proj_version=$PROJ_VERSION-$PROJ_RELEASE \
+           -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-libgeotiff \
            -t hootenanny/rpmbuild-libgeotiff \
            $SCRIPT_HOME
 

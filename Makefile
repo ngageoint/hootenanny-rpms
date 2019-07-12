@@ -1,3 +1,4 @@
+# Copyright (C) 2019 Maxar Technologies (https://www.maxar.com)
 # Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
 # Copyright (C) 2016, 2017 DigitalGlobe (http://www.digitalglobe.com)
 #
@@ -70,6 +71,7 @@ rpm_package = $(shell echo $(1) | awk '{ split($$0, a, "-"); l = length(a); pkg 
 
 PG_DOTLESS := $(shell echo $(call config_version,pg) | tr -d '.')
 
+ARMADILLO_RPM := $(call rpm_file,armadillo,x86_64)
 DUMBINIT_RPM := $(call rpm_file2,dumb-init,dumbinit,x86_64)
 GEOS_RPM := $(call rpm_file,geos,x86_64)
 GDAL_RPM := $(call rpm_file2,hoot-gdal,gdal,x86_64)
@@ -84,6 +86,7 @@ LIBPOSTAL_RPM := $(call rpm_file,libpostal,x86_64)
 NODEJS_RPM := $(call rpm_file,nodejs,x86_64)
 OSMOSIS_RPM := $(call rpm_file,osmosis,noarch)
 POSTGIS_RPM := $(call rpm_file2,hoot-postgis24_$(PG_DOTLESS),postgis,x86_64)
+PROJ_RPM := $(call rpm_file,proj,x86_64)
 STXXL_RPM := $(call rpm_file,stxxl,x86_64)
 SUEXEC_RPM := $(call rpm_file2,su-exec,suexec,x86_64)
 TOMCAT8_RPM := $(call rpm_file,tomcat8,noarch)
@@ -109,6 +112,7 @@ DEPENDENCY_CONTAINERS := \
 	rpmbuild-libphonenumber \
 	rpmbuild-libpostal \
 	rpmbuild-postgis \
+	rpmbuild-proj \
 	rpmbuild-nodejs
 
 OTHER_CONTAINERS := \
@@ -131,6 +135,7 @@ DEPENDENCY_RPMS := \
 	hoot-words \
 	nodejs \
 	osmosis \
+	proj \
 	stxxl \
 	su-exec \
 	tomcat8 \
@@ -232,6 +237,10 @@ hoot-rpm: rpm
 
 rpmbuild: .vagrant/machines/rpmbuild/docker/id
 
+rpmbuild-armadillo: \
+	rpmbuild-generic \
+	.vagrant/machines/rpmbuild-armadillo/docker/id
+
 rpmbuild-base: \
 	rpmbuild \
 	.vagrant/machines/rpmbuild-base/docker/id
@@ -277,6 +286,7 @@ rpmbuild-hoot-release: \
 
 rpmbuild-libgeotiff: \
 	rpmbuild-generic \
+	proj \
 	.vagrant/machines/rpmbuild-libgeotiff/docker/id
 
 rpmbuild-libkml: \
@@ -307,6 +317,10 @@ rpmbuild-pgdg: \
 rpmbuild-postgis: \
 	hoot-gdal \
 	.vagrant/machines/rpmbuild-postgis/docker/id
+
+rpmbuild-proj: \
+	rpmbuild-generic \
+	.vagrant/machines/rpmbuild-proj/docker/id
 
 rpmbuild-repo: \
 	rpmbuild \
@@ -342,6 +356,7 @@ validate:
 
 ## Dependency RPM targets.
 
+armadillo: rpmbuild-armadillo $(ARMADILLO_RPM)
 dumb-init: rpmbuild-generic $(DUMBINIT_RPM)
 geos: rpmbuild-geos $(GEOS_RPM)
 FileGDBAPI: rpmbuild-generic $(FILEGDBAPI_RPM)
@@ -358,6 +373,7 @@ hoot-words: rpmbuild-generic $(WORDS_RPM)
 hoot-postgis24_$(PG_DOTLESS): rpmbuild-postgis $(POSTGIS_RPM)
 hoot-translations-templates: rpmbuild-generic $(TRANSLATIONS_RPM)
 osmosis: rpmbuild-generic $(OSMOSIS_RPM)
+proj: rpmbuild-proj $(PROJ_RPM)
 stxxl: rpmbuild-generic $(STXXL_RPM)
 su-exec: rpmbuild-generic $(SUEXEC_RPM)
 tomcat8: rpmbuild-generic $(TOMCAT8_RPM)

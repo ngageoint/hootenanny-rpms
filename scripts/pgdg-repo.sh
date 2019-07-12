@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (C) 2019 Maxar Technologies (https://www.maxar.com)
 # Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,11 +16,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 set -euo pipefail
 
-PG_VERSION=$1
-PG_DOTLESS="$(echo ${PG_VERSION} | tr -d '.')"
-PGDG_KEY=/etc/pki/rpm-gpg/RPM-GPG-KEY-PGDG-$PG_DOTLESS
+PG_VERSION="$1"
+PG_DOTLESS="$(echo "$PG_VERSION" | awk '{ gsub(/\./, ""); print substr($0, 1, 2) }')"
+PG_MAJOR_VERSION="$(echo "$PG_VERSION" | awk -F. '{ if ($1 >= 10) print $1; else print $0 }')"
+PGDG_KEY="${PGDG_KEY:-/etc/pki/rpm-gpg/RPM-GPG-KEY-PGDG-$PG_DOTLESS}"
+PGDG_REPO="${PGDG_REPO:-/etc/yum.repos.d/pgdg-$PG_DOTLESS-centos.repo}"
 
-cat > $PGDG_KEY <<EOF
+cat > "$PGDG_KEY" <<EOF
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v1.4.7 (GNU/Linux)
 
@@ -52,19 +55,19 @@ GaCXCY8h3xi6VIhJBBgRAgAJBQJHg/JKAhsMAAoJEB8W0uFELfD4K4cAoJ4yug8y
 -----END PGP PUBLIC KEY BLOCK-----
 EOF
 
-cat > /etc/yum.repos.d/pgdg-$PG_DOTLESS-centos.repo <<EOF
-[pgdg${PG_DOTLESS}]
-name=PostgreSQL ${PG_VERSION} \$releasever - \$basearch
-baseurl=https://download.postgresql.org/pub/repos/yum/${PG_VERSION}/redhat/rhel-\$releasever-\$basearch
+cat > "$PGDG_REPO" <<EOF
+[pgdg$PG_DOTLESS]
+name=PostgreSQL $PG_MAJOR_VERSION \$releasever - \$basearch
+baseurl=https://download.postgresql.org/pub/repos/yum/$PG_MAJOR_VERSION/redhat/rhel-\$releasever-\$basearch
 enabled=1
 gpgcheck=1
-gpgkey=file://${PGDG_KEY}
+gpgkey=file://$PGDG_KEY
 
-[pgdg${PG_DOTLESS}-source]
-name=PostgreSQL ${PG_VERSION} \$releasever - \$basearch - Source
+[pgdg$PG_DOTLESS-source]
+name=PostgreSQL $PG_MAJOR_VERSION \$releasever - \$basearch - Source
 failovermethod=priority
-baseurl=https://download.postgresql.org/pub/repos/yum/srpms/${PG_VERSION}/redhat/rhel-\$releasever-\$basearch
+baseurl=https://download.postgresql.org/pub/repos/yum/srpms/$PG_MAJOR_VERSION/redhat/rhel-\$releasever-\$basearch
 enabled=0
 gpgcheck=1
-gpgkey=file://${PGDG_KEY}
+gpgkey=file://$PGDG_KEY
 EOF
