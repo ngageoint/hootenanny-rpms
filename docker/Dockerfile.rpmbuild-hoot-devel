@@ -20,7 +20,7 @@ FROM hootenanny/rpmbuild-pgdg:${pg_version}
 
 LABEL \
   description="Container for building Hootenanny RPMs using development dependencies." \
-  maintainer="justin.bronn@radiantsolutions.com" \
+  maintainer="justin.bronn@maxar.com" \
   name="Hootenanny Development RPM Build Image" \
   vendor="Radiant Solutions"
 
