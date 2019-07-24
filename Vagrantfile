@@ -1,3 +1,4 @@
+# Copyright (C) 2019 Maxar Technologies (https://www.maxar.com)
 # Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
 # Copyright (C) 2016, 2017 DigitalGlobe (http://www.digitalglobe.com)
 #
@@ -302,11 +303,5 @@ Vagrant.configure(2) do |config|
 
   collect_rpms(['rpmbuild-gdal']).each do |name, options|
     rpmbuild(config, name, options)
-  end
-
-  # The development containers are last because they all depend
-  # on RPMS built previously.
-  $images['hoot'].each do |name, options|
-    build_container(config, name, options)
   end
 end

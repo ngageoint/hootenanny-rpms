@@ -140,13 +140,11 @@ DEPENDENCY_RPMS := \
 
 # Hootenanny RPM variables.
 BUILD_CONTAINERS := \
-	rpmbuild-hoot-devel \
 	rpmbuild-hoot-release
 
 RUN_CONTAINERS := \
 	run \
 	run-base \
-	run-base-devel \
 	run-base-release
 
 # These may be overridden with environment variables.
@@ -273,11 +271,6 @@ rpmbuild-gpsbabel: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-gpsbabel/docker/id
 
-rpmbuild-hoot-devel: \
-	rpmbuild-pgdg \
-	$(DEPENDENCY_RPMS) \
-	.vagrant/machines/rpmbuild-hoot-devel/docker/id
-
 rpmbuild-hoot-release: \
 	rpmbuild-pgdg \
 	.vagrant/machines/rpmbuild-hoot-release/docker/id
@@ -325,11 +318,6 @@ rpmbuild-sonarqube: \
 
 # Runtime containers
 run-base: .vagrant/machines/run-base/docker/id
-
-run-base-devel: \
-	run-base \
-	$(DEPENDENCY_RPMS) \
-	.vagrant/machines/run-base-devel/docker/id
 
 run-base-release: \
 	run-base \

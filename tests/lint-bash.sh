@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (C) 2019 Maxar Technologies (https://www.maxar.com)
 # Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -36,7 +37,9 @@ shellcheck \
     scripts/slack-notify.sh \
     scripts/sonar-install.sh \
     scripts/vagrant-install.sh \
-    shell/BuildHoot.sh
+    shell/BuildHoot.sh \
+    shell/BuildHootImages.sh \
+    shell/BuildRunImages.sh
 
 # Scripts with *only* quoting errors.
 shellcheck \
@@ -45,9 +48,7 @@ shellcheck \
     scripts/postgresql-install.sh \
     scripts/repo-sign.sh \
     shell/BuildArchive.sh \
-    shell/BuildDeps.sh \
-    shell/BuildHootImages.sh \
-    shell/BuildRunImages.sh
+    shell/BuildDeps.sh
 
 # TODO: shell/Vars.sh needs a lot of work.
 shellcheck \

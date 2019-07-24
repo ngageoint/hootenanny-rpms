@@ -82,7 +82,7 @@ more details.
 Hootenanny uses Maven for building its Java services code, which requires
 retrieving assets over HTTP.  To prevent frequent timeouts and race conditions
 a pre-existing cache is downloaded prior to trying to run the
-`rpmbuild-hoot-release` or `rpmbuild-hoot-devel` containers.  Setting the
+`rpmbuild-hoot-release` container.  Setting the
 `MAVEN_CACHE` environment variable to any value other than `1` disables
 retrieving this cache file.  For example:
 
