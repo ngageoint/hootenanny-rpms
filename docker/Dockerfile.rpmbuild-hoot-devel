@@ -20,7 +20,7 @@ FROM hootenanny/rpmbuild-pgdg:${pg_version}
 
 LABEL \
   description="Container for building Hootenanny RPMs using development dependencies." \
-  maintainer="justin.bronn@radiantsolutions.com" \
+  maintainer="justin.bronn@maxar.com" \
   name="Hootenanny Development RPM Build Image" \
   vendor="Radiant Solutions"
 
@@ -39,7 +39,6 @@ ARG mocha_version
 ARG nodejs_version
 ARG osmosis_version
 ARG packages
-ARG postgis_version
 ARG pg_version
 ARG pg_data=/var/lib/pgsql/${pg_version}/data
 ARG proj_version
@@ -66,9 +65,6 @@ COPY RPMS/x86_64/armadillo-${armadillo_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/hoot-gdal-devel-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/hoot-gdal-libs-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/hoot-gdal-python-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/hoot-postgis24_95-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/hoot-postgis24_95-devel-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/hoot-postgis24_95-utils-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/noarch/hoot-words-${words_version}${RPMBUILD_DIST}.noarch.rpm \
      RPMS/x86_64/libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
@@ -105,9 +101,6 @@ RUN yum install -y \
     /tmp/hoot-gdal-devel-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/hoot-gdal-libs-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/hoot-gdal-python-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/hoot-postgis24_95-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/hoot-postgis24_95-devel-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/hoot-postgis24_95-utils-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/hoot-words-${words_version}${RPMBUILD_DIST}.noarch.rpm \
     /tmp/libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \

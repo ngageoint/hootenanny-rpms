@@ -31,7 +31,7 @@ ARG proj_version
 ARG pg_version
 
 LABEL \
-  description="Container for building Hootenanny GDAL RPMs with PostgreSQL ${pg_version}, PROJ ${proj_version}, GEOS ${geos_version}, gpsbabel ${gpsbabel_version}, FileGDBAPI ${filegdbapi_version}, libgeotiff ${libgeotiff_version}, and libkml ${libkml_version}" \
+  description="Container for building Hootenanny GDAL RPMs with PostgreSQL ${pg_version}, GEOS ${geos_version}, FileGDBAPI ${filegdbapi_version}, libgeotiff ${libgeotiff_version}, and libkml ${libkml_version}" \
   maintainer="justin.bronn@maxar.com" \
   name="Hootenanny GDAL RPM Build Image" \
   vendor="Radiant Solutions"

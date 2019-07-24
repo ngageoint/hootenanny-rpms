@@ -3,7 +3,7 @@ versions:
   armadillo: &armadillo_version '9.400.3-1'
   dumb-init: &dumbinit_version '1.2.1-1'
   geos: &geos_version '3.7.2-1'
-  glpk: &glpk_version '4.64-1'
+  glpk: &glpk_version '4.65-1'
   gpsbabel: &gpsbabel_version '1.5.4-1'
   hoot-gdal: &gdal_version '3.0.0-1'
   hoot-words: &words_version '1.0.1-1'
@@ -23,7 +23,7 @@ versions:
   stxxl: &stxxl_version '1.3.1-1'
   su-exec: &suexec_version '0.2-1'
   hoot-translations-templates: &hoot_translations_templates_version '1.0.0-1'
-  tomcat8: &tomcat8_version '8.5.34-1'
+  tomcat8: &tomcat8_version '8.5.43-1'
   wamerican-insane: &wamerican_version '7.1-1'
 
 
@@ -127,7 +127,6 @@ images:
           nodejs_version: *nodejs_version
           osmosis_version: *osmosis_version
           pg_version: *pg_version
-          postgis_version: *postgis25_version
           proj_version: *proj_version
           stxxl_version: *stxxl_version
           suexec_version: *suexec_version
@@ -149,7 +148,6 @@ images:
           nodejs_version: *nodejs_version
           osmosis_version: *osmosis_version
           pg_version: *pg_version
-          postgis_version: *postgis25_version
           stxxl_version: *stxxl_version
           suexec_version: *suexec_version
           tomcat8_version: *tomcat8_version

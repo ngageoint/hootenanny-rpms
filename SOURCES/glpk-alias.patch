@@ -1,7 +1,7 @@
-diff -urN glpk-4.61.orig/src/minisat/minisat.c glpk-4.61/src/minisat/minisat.c
---- glpk-4.61.orig/src/minisat/minisat.c	2017-01-22 00:00:00.000000000 -0700
-+++ glpk-4.61/src/minisat/minisat.c	2017-04-03 10:12:09.016278327 -0600
-@@ -133,11 +133,11 @@ struct clause_t
+diff -urN glpk-4.65.orig/src/minisat/minisat.c glpk-4.65/src/minisat/minisat.c
+--- glpk-4.65.orig/src/minisat/minisat.c	2018-02-16 00:00:00.000000000 -0700
++++ glpk-4.65/src/minisat/minisat.c	2018-05-20 18:54:25.106624859 -0600
+@@ -135,11 +135,11 @@ struct clause_t
  
  #define clause_learnt(c) ((c)->size_learnt & 1)
  
@@ -16,7 +16,7 @@ diff -urN glpk-4.61.orig/src/minisat/minisat.c glpk-4.61/src/minisat/minisat.c
  
  /*====================================================================*/
  /* Encode literals in clause pointers: */
-@@ -300,14 +300,18 @@ static inline void act_clause_rescale(so
+@@ -313,14 +313,18 @@ static inline void act_clause_rescale(so
      clause** cs = (clause**)vecp_begin(&s->learnts);
      int i;
      for (i = 0; i < vecp_size(&s->learnts); i++){
@@ -24,7 +24,7 @@ diff -urN glpk-4.61.orig/src/minisat/minisat.c glpk-4.61/src/minisat/minisat.c
 -        clause_setactivity(cs[i], a * (float)1e-20);
 +        float a;
 +        clause_activity(cs[i], a);
-+	a *= (float)1e-20;
++        a *= (float)1e-20;
 +        clause_setactivity(cs[i], a);
      }
      s->cla_inc *= (float)1e-20;
@@ -38,7 +38,7 @@ diff -urN glpk-4.61.orig/src/minisat/minisat.c glpk-4.61/src/minisat/minisat.c
      clause_setactivity(c,a);
      if (a > 1e20) act_clause_rescale(s);
  }
-@@ -340,7 +344,7 @@ static clause* clause_new(solver* s, lit
+@@ -356,7 +360,7 @@ static clause* clause_new(solver* s, lit
          c->lits[i] = begin[i];
  
      if (learnt)
@@ -47,7 +47,7 @@ diff -urN glpk-4.61.orig/src/minisat/minisat.c glpk-4.61/src/minisat/minisat.c
  
      assert(begin[0] >= 0);
      assert(begin[0] < s->size*2);
-@@ -834,10 +838,17 @@ clause* solver_propagate(solver* s)
+@@ -850,10 +854,17 @@ clause* solver_propagate(solver* s)
  }
  
  static inline int clause_cmp (const void* x, const void* y) {
@@ -61,7 +61,7 @@ diff -urN glpk-4.61.orig/src/minisat/minisat.c glpk-4.61/src/minisat/minisat.c
 +    if (clause_size(cx) <= 2)
 +        return 1;
 +    if (clause_size(cy) == 2)
-+	return -1;
++        return -1;
 +    clause_activity(cx, fx);
 +    clause_activity(cy, fy);
 +    return fx < fy ? -1 : 1;
@@ -69,12 +69,12 @@ diff -urN glpk-4.61.orig/src/minisat/minisat.c glpk-4.61/src/minisat/minisat.c
  
  void solver_reducedb(solver* s)
  {
-@@ -858,10 +869,12 @@ void solver_reducedb(solver* s)
+@@ -874,10 +885,12 @@ void solver_reducedb(solver* s)
              learnts[j++] = learnts[i];
      }
      for (; i < vecp_size(&s->learnts); i++){
 +        float f;
-+	clause_activity(learnts[i], f);
++        clause_activity(learnts[i], f);
          if (clause_size(learnts[i]) > 2
              && reasons[lit_var(*clause_begin(learnts[i]))]
                 != learnts[i]

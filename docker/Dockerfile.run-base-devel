@@ -1,3 +1,4 @@
+# Copyright (C) 2019 Maxar Technologies (https://www.maxar.com)
 # Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,7 +17,7 @@ FROM hootenanny/run-base:latest
 
 LABEL \
   description="Base container for running Hootenanny from development dependencies." \
-  maintainer="justin.bronn@radiantsolutions.com" \
+  maintainer="justin.bronn@maxar.com" \
   name="Hootenanny Base Development Dependency Runtime Image" \
   vendor="Radiant Solutions"
 
@@ -30,7 +31,6 @@ ARG libkml_version
 ARG mocha_version
 ARG nodejs_version
 ARG osmosis_version
-ARG postgis_version
 ARG pg_version
 ARG rpmbuild_dist=.el7
 ARG stxxl_version
@@ -48,8 +48,6 @@ COPY RPMS/x86_64/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/hoot-gdal-devel-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/hoot-gdal-libs-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/hoot-gdal-python-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/hoot-postgis24_95-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/hoot-postgis24_95-utils-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/noarch/hoot-words-${words_version}${RPMBUILD_DIST}.noarch.rpm \
      RPMS/x86_64/libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
@@ -69,8 +67,6 @@ RUN yum install -y \
     /tmp/hoot-gdal-devel-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/hoot-gdal-libs-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/hoot-gdal-python-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/hoot-postgis24_95-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/hoot-postgis24_95-utils-${postgis_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/hoot-words-${words_version}${RPMBUILD_DIST}.noarch.rpm \
     /tmp/libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
