@@ -85,8 +85,6 @@ LIBPHONENUMBER_RPM := $(call rpm_file,libphonenumber,x86_64)
 LIBPOSTAL_RPM := $(call rpm_file,libpostal,x86_64)
 NODEJS_RPM := $(call rpm_file,nodejs,x86_64)
 OSMOSIS_RPM := $(call rpm_file,osmosis,noarch)
-POSTGIS24_RPM := $(call rpm_file2,hoot-postgis24_$(PG_DOTLESS),postgis24,x86_64)
-POSTGIS25_RPM := $(call rpm_file2,hoot-postgis25_$(PG_DOTLESS),postgis25,x86_64)
 PROJ_RPM := $(call rpm_file,proj,x86_64)
 STXXL_RPM := $(call rpm_file,stxxl,x86_64)
 SUEXEC_RPM := $(call rpm_file2,su-exec,suexec,x86_64)
@@ -112,7 +110,6 @@ DEPENDENCY_CONTAINERS := \
 	rpmbuild-liboauthcpp \
 	rpmbuild-libphonenumber \
 	rpmbuild-libpostal \
-	rpmbuild-postgis \
 	rpmbuild-proj \
 	rpmbuild-nodejs
 
@@ -132,7 +129,6 @@ DEPENDENCY_RPMS := \
 	libphonenumber \
 	libpostal \
 	hoot-gdal \
-	hoot-postgis24_$(PG_DOTLESS) \
 	hoot-words \
 	nodejs \
 	osmosis \
@@ -315,11 +311,6 @@ rpmbuild-pgdg: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-pgdg/docker/id
 
-# PostGIS container requires GDAL RPMs.
-rpmbuild-postgis: \
-	hoot-gdal \
-	.vagrant/machines/rpmbuild-postgis/docker/id
-
 rpmbuild-proj: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-proj/docker/id
@@ -372,8 +363,6 @@ glpk: rpmbuild-glpk $(GLPK_RPM)
 gpsbabel: rpmbuild-gpsbabel $(GPSBABEL_RPM)
 hoot-gdal: rpmbuild-gdal $(GDAL_RPM)
 hoot-words: rpmbuild-generic $(WORDS_RPM)
-hoot-postgis24_$(PG_DOTLESS): rpmbuild-postgis $(POSTGIS24_RPM)
-hoot-postgis25_$(PG_DOTLESS): rpmbuild-postgis $(POSTGIS25_RPM)
 hoot-translations-templates: rpmbuild-generic $(TRANSLATIONS_RPM)
 osmosis: rpmbuild-generic $(OSMOSIS_RPM)
 proj: rpmbuild-proj $(PROJ_RPM)

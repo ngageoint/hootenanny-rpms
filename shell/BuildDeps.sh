@@ -215,9 +215,6 @@ if [ ! -f $RPM_X86_64/$NODEJS_RPM ]; then
         -bb SPECS/nodejs.spec
 fi
 
-
-## GDAL and PostGIS (requires PostgreSQL from PGDG)
-
 # GDAL
 if [ ! -f "$RPM_X86_64/$GDAL_RPM" ]; then
     echo "#### Building RPM: GDAL (with PostgreSQL ${PG_VERSION})"
@@ -244,25 +241,6 @@ if [ ! -f "$RPM_X86_64/$GDAL_RPM" ]; then
         --define "rpmbuild_version $GDAL_VERSION" \
         --define "rpmbuild_release $GDAL_RELEASE" \
         -bb SPECS/hoot-gdal.spec
-fi
-
-# PostGIS
-if [ ! -f "$RPM_X86_64/$POSTGIS_RPM" ]; then
-    echo "#### Building RPM: PostGIS"
-
-    docker build \
-           --build-arg "packages=$( spec_requires hoot-postgis )" \
-           --build-arg "gdal_version=$GDAL_VERSION-$GDAL_RELEASE" \
-           -f "$SCRIPT_HOME/docker/Dockerfile.rpmbuild-postgis" \
-           -t hootenanny/rpmbuild-postgis \
-           "$SCRIPT_HOME"
-
-    run_dep_image \
-        -i hootenanny/rpmbuild-postgis \
-        rpmbuild \
-        --define "rpmbuild_version $POSTGIS_VERSION" \
-        --define "rpmbuild_release $POSTGIS_RELEASE" \
-        -bb SPECS/hoot-postgis.spec
 fi
 
 ## Simple Dependencies
