@@ -16,7 +16,7 @@
 set -euo pipefail
 
 REPO_BUCKET="${REPO_BUCKET:-hoot-repo}"
-REPO_PREFIX="${REPO_PREFIX:-el7/develop}"
+REPO_PREFIX="${REPO_PREFIX:-el7/master}"
 SLACK_NOTIFY="${SLACK_NOTIFY:-yes}"
 SLACK_USER="${SLACK_USER:-circleci_bot}"
 
