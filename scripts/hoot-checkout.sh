@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 set -euo pipefail
-GIT_COMMIT="${1:-develop}"
+GIT_COMMIT="${1:-master}"
 HOOT_DEST="${HOOT_DEST:-$HOME/hootenanny}"
 HOOT_REPO="${HOOT_REPO:-https://github.com/ngageoint/hootenanny.git}"
 

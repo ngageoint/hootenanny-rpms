@@ -37,6 +37,6 @@ else
             -c "$SLACK_CHANNEL" \
             -t "$SLACK_TOKEN" \
             -u "$SLACK_USER" \
-            -m "Hootenanny Develop Repository Updated to \`$RPM_VERSION\`"
+            -m "Hootenanny Master Repository Updated to \`$RPM_VERSION\`"
     fi
 fi

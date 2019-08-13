@@ -29,23 +29,23 @@ in for some scripts to be fixed later.
 
 These tests go through the RPM creation process, with a focus on creating
 the latest source archives and RPMs from Hootenanny's
-[`develop`](https://github.com/ngageoint/hootenanny/tree/develop) branch
-and uploading them to the [S3 development repository](./install.md#development).
+[`master`](https://github.com/ngageoint/hootenanny/tree/master) branch
+and uploading them to the [S3 masterment repository](./install.md#masterment).
 
 The following environment variables may be used to modify the test
-behavior.  For example, it's common to set `REPO_PREFIX=el7/develop-test`
-so that the current S3 repository at `el7/develop` is not modified
+behavior.  For example, it's common to set `REPO_PREFIX=el7/master-test`
+so that the current S3 repository at `el7/master` is not modified
 when adding new RPM tests.  CircleCI's AWS user requires access to
 all S3 buckets and prefixes if they're modified.
 
 * `ARCHIVE_BUCKET`: S3 bucket to query for Hootenanny source archive,
   defaults to `hoot-archives`.
 * `ARCHIVE_PREFIX`: S3 bucket prefix for Hootenanny source archives,
-  defaults to `circle/develop` (Hootenanny branch name).
+  defaults to `circle/master` (Hootenanny branch name).
 * `REPO_BUCKET`: The S3 bucket to place yum repositories, defaults
   to `hoot-repo`.
 * `REPO_PREFIX`: S3 bucket prefix for yum repository, defaults to
-  `el7/develop`.
+  `el7/master`.
 
 ### [`create-rpm.sh`](../tests/create-rpm.sh)
 
@@ -64,7 +64,7 @@ image from the Docker Hub.
 
 ### [`upgrade-rpm.sh`](../tests/upgrade-rpm.sh)
 
-This test installs the latest RPM from the develop repository
+This test installs the latest RPM from the master repository
 and ensures the upgrade process works by installing the more
 recent RPMs from `create-rpm.sh` on the
 [`run-base-release`](https://hub.docker.com/r/hootenanny/run-base-release/)
