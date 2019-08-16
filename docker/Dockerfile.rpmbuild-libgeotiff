@@ -20,7 +20,7 @@ ARG packages
 
 LABEL \
   description="Container for building Hootenanny libgeotiff with PROJ ${proj_version}" \
-  maintainer="justin.bronn@radiantsolutions.com" \
+  maintainer="justin.bronn@maxar.com" \
   name="Hootenanny PROJ RPM Build Image" \
   vendor="Maxar Technologies"
 

@@ -1,3 +1,4 @@
+# Copyright (C) 2019 Maxar Technologies (https://www.maxar.com)
 # Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,7 +22,7 @@ ARG packages
 
 LABEL \
   description="Container for building Hootenanny PostGIS RPMs with GDAL ${gdal_version}" \
-  maintainer="justin.bronn@radiantsolutions.com" \
+  maintainer="justin.bronn@maxar.com" \
   name="Hootenanny PostGIS RPM Build Image" \
   vendor="Radiant Solutions"
 

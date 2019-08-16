@@ -20,7 +20,7 @@ ARG pg_version
 
 LABEL \
   description="PostgreSQL ${pg_version} (PGDG) container for building Hootenanny RPMs" \
-  maintainer="justin.bronn@radiantsolutions.com" \
+  maintainer="justin.bronn@maxar.com" \
   name="Hootenanny PostgreSQL ${pg_version} RPM Build Image" \
   vendor="Radiant Solutions"
 
