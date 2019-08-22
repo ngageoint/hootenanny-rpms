@@ -42,7 +42,7 @@ jobs:
           command: |
             ./scripts/rpm-install.sh
       - run:
-          name: 'Compile Latest Develop RPM'
+          name: 'Compile Latest Master RPM'
           command: |
             ./tests/create-rpm.sh
       - persist_to_workspace:
@@ -83,7 +83,7 @@ jobs:
       - attach_workspace:
           at: el7
       - run:
-          name: 'Update and Sync Develop Repository'
+          name: 'Update and Sync Master Repository'
           command: |
             ./tests/update-sync-repo.sh
 
