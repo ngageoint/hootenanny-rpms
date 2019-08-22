@@ -182,8 +182,8 @@ endif
 HOOT_RPM := RPMS/x86_64/hootenanny-core-$(HOOT_VERSION)$(RPMBUILD_DIST).x86_64.rpm
 endif
 
-# Default to develop branch when making archive.
-GIT_COMMIT ?= develop
+# Default to master branch when making archive.
+GIT_COMMIT ?= master
 
 ## Main targets.
 

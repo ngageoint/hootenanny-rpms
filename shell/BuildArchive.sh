@@ -17,7 +17,7 @@ set -euo pipefail
 
 ## Get variables.
 set +u
-GIT_COMMIT="${1:-develop}"
+GIT_COMMIT="${1:-master}"
 set -u
 source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/Vars.sh
 
