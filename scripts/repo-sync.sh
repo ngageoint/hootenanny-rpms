@@ -126,7 +126,7 @@ if [ "$REPO_TS" = "none" ]; then
     # Ensure a hoot.repo exists for use with yum-config-manager.
     if [ ! -f "$REPO/hoot.repo" ]; then
         cat > "$REPO/hoot.repo" <<EOF
-[hoot-develop]
+[hoot-master]
 name = Hootenanny Development
 baseurl = https://$S3_HOST/$BUCKET/$PREFIX
 enabled = 1

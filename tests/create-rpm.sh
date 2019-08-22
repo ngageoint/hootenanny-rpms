@@ -16,7 +16,7 @@
 set -euo pipefail
 
 # Default variables.
-HOOT_BRANCH="${HOOT_BRANCH:-develop}"
+HOOT_BRANCH="${HOOT_BRANCH:-master}"
 ARCHIVE_BUCKET="${ARCHIVE_BUCKET:-hoot-archives}"
 ARCHIVE_PREFIX="${ARCHIVE_PREFIX:-circle/$HOOT_BRANCH}"
 REPO_BUCKET="${REPO_BUCKET:-hoot-repo}"
@@ -25,10 +25,10 @@ REPO_PREFIX="${REPO_PREFIX:-el7/$HOOT_BRANCH}"
 # Ensure directory structure in place for using the shell scripts
 mkdir -p cache/m2 cache/npm el7 RPMS
 
-# Determine what the latest development archive is.
+# Determine what the latest master archive is.
 LATEST_ARCHIVE="$(./scripts/latest-archive.sh -b "$ARCHIVE_BUCKET" -p "$ARCHIVE_PREFIX")"
 
-# Query the development repository for number of RPMs with the
+# Query the master repository for number of RPMs with the
 # archive's git hash.
 NUM_RPMS="$(./scripts/query-archive.sh -a "$LATEST_ARCHIVE" -b "$REPO_BUCKET" -p "$REPO_PREFIX")"
 

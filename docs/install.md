@@ -46,7 +46,7 @@ Yum repositories.  The `hoot-repo` bucket has repositories at the following
 prefixes:
 
 * `el7/release`: Signed repository of tagged Hootenanny releases.
-* `el7/develop`: Unsigned development snapshots of Hootenanny built daily.
+* `el7/master`: Unsigned master snapshots of Hootenanny built daily.
 * `el7/deps/release`: Signed release dependency RPMS.
 
 ### Release
@@ -62,17 +62,17 @@ sudo yum makecache -y
 sudo yum install -y hootenanny-autostart
 ```
 
-### Development
+### Master
 
-Hootenanny development releases are built daily from the latest commits pushed to
-the [`develop`](https://github.com/ngageoint/hootenanny/tree/develop) branch.
-Development releases are *not* signed, and may be installed with these
+Hootenanny Master releases are built daily from the latest commits pushed to
+the [`master`](https://github.com/ngageoint/hootenanny/tree/master) branch.
+Master releases are *not* signed, and may be installed with these
 commands:
 
 ```
 sudo yum install -y epel-release yum-utils
 sudo yum-config-manager --add-repo https://s3.amazonaws.com/hoot-repo/el7/pgdg95.repo
-sudo yum-config-manager --add-repo https://s3.amazonaws.com/hoot-repo/el7/develop/hoot.repo
+sudo yum-config-manager --add-repo https://s3.amazonaws.com/hoot-repo/el7/master/hoot.repo
 sudo yum makecache -y
 sudo yum install -y hootenanny-autostart
 ```
