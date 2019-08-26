@@ -23,7 +23,7 @@ pipeline {
 
     triggers {
         // Set nightly trigger
-        cron((BRANCH_NAME == "develop") ? "H H(4-5) * * 1-5" : "")
+        cron((BRANCH_NAME == "master") ? "H H(4-5) * * 1-5" : "")
     }
     
     stages {
