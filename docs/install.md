@@ -76,3 +76,19 @@ sudo yum-config-manager --add-repo https://s3.amazonaws.com/hoot-repo/el7/master
 sudo yum makecache -y
 sudo yum install -y hootenanny-autostart
 ```
+
+### OAuth configuration
+
+There is an additional configuration step that needs to be made after the RPM install to set the OAuth redirect URL:
+
+`sudo vi /var/lib/tomcat8/webapps/hoot-services/WEB-INF/classes/conf/hoot-services.conf`
+
+At the bottom of this file, update the line:
+>oauthRedirectURL=http://localhost:8080/login.html
+
+to include the proper protocol/host/port of the deployed instance with the `hootenanny-id` URL path.
+
+For example `http://hostname:port/hootenanny-id/login.html`
+
+Save the file and restart tomcat:
+`sudo service tomcat8 restart`
