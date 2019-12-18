@@ -27,6 +27,7 @@ URL:         https://github.com/ngageoint/hootenanny
 
 Source0:     tds40.tgz
 Source1:     tds61.tgz
+Source2:     tds70.tgz
 
 BuildArch:   noarch
 AutoReqProv: no
@@ -53,5 +54,6 @@ Supplementary translations template files for use with Hootenanny.
 
 
 %changelog
+* Wed Dec 18 2019 Seth Putnam <seth.putnam@maxar.com> - 1.0.1
 * Fri Nov 09 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 1.0.0-1
 - Initial release, 1.0.0.
