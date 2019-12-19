@@ -47,6 +47,7 @@ Supplementary translations template files for use with Hootenanny.
 %{__install} -d -m 0755 %{buildroot}%{hoot_translations_template}
 %{__install} -m 0644 %{SOURCE0} %{buildroot}%{hoot_translations_template}
 %{__install} -m 0644 %{SOURCE1} %{buildroot}%{hoot_translations_template}
+%{__install} -m 0644 %{SOURCE2} %{buildroot}%{hoot_translations_template}
 
 
 %files
