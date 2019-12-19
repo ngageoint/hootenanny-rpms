@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
+# Copyright (C) 2018, 2019 Maxar Technologies (https://www.maxar.com)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -54,6 +54,7 @@ Supplementary translations template files for use with Hootenanny.
 
 
 %changelog
-* Wed Dec 18 2019 Seth Putnam <seth.putnam@maxar.com> - 1.0.1
+* Wed Dec 18 2019 Seth Putnam <seth.putnam@maxar.com> - 1.0.1-1
+- Add additional translations.
 * Fri Nov 09 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 1.0.0-1
 - Initial release, 1.0.0.
