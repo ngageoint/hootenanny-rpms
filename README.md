@@ -15,6 +15,7 @@ To use this repository, you'll need the following:
 * Docker
 * Vagrant 2.0+
 * `make`
+* GNU Awk (`gawk` package on Ubuntu)
 
 For details on how to install these requirements on a Linux machine, read the
 [setup documentation](./docs/setup.md).
