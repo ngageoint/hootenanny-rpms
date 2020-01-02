@@ -64,3 +64,14 @@ Make is used to manage the dependency graph between containers.
 In particular, some containers depend on RPMs built from different containers.
 For example, `rpmbuild-gdal` requires the GEOS RPM produced from
 `rpmbuild-geos`.
+
+## GNU Awk
+
+GNU's `awk` implementation is required due to the syntax of expressions
+used by the `Makefile`.  By default, GNU Awk is installed on all CentOS
+systems and Ubuntu releases prior to 18.04.  On Ubuntu 18.04 and above,
+install the `gawk` package:
+
+```
+sudo apt-get -y install gawk
+```
