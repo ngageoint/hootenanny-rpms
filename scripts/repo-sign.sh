@@ -22,4 +22,4 @@ if [ -z "$REPO" ]; then
 fi
 
 # Sign the repository metadata file.
-gpg --detach-sign --armor "$REPO/repodata/repomd.xml"
+gpg --detach-sign --armor --digest-algo sha512 "$REPO/repodata/repomd.xml"
