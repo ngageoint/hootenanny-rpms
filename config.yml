@@ -21,7 +21,7 @@ versions:
   proj: &proj_version '6.1.0-1'
   stxxl: &stxxl_version '1.3.1-1'
   su-exec: &suexec_version '0.2-1'
-  hoot-translations-templates: &hoot_translations_templates_version '1.0.1-1'
+  hoot-translations: &hoot_translations_version '1.0.0-1'
   tomcat8: &tomcat8_version '8.5.51-1'
   wamerican-insane: &wamerican_version '7.1-1'
 
@@ -185,9 +185,9 @@ rpms:
     image: rpmbuild-generic
     version: *words_version
     arch: noarch
-  hoot-translations-templates:
+  hoot-translations:
     image: rpmbuild-generic
-    version: *hoot_translations_templates_version
+    version: *hoot_translations_version
     arch: noarch
   FileGDBAPI:
     image: rpmbuild-generic
