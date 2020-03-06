@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
+# Copyright (C) 2018-2020 Maxar Technologies (https://www.maxar.com)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,16 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 set -euo pipefail
 
-set +u
-if [ -z $1 ]; then
+REPO="${1:-}"
+if [ -z "$REPO" ]; then
     echo 'repo-sign.sh: must provide a repository directory argument.'
     exit 1
 fi
-set -u
-
-REPO=$1
-REPODATA=$REPO/repodata
-REPOMD=$REPODATA/repomd.xml
 
 # Sign the repository metadata file.
-gpg --detach-sign --armor $REPOMD
+gpg --detach-sign --armor --digest-algo sha512 "$REPO/repodata/repomd.xml"

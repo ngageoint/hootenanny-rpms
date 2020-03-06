@@ -22,11 +22,11 @@ popd
 ## Tomcat
 
 There are several Tomcat 8 maintainers that have release privileges; all of these
-keys are available in a [`KEYS`](https://www.apache.org/dist/tomcat/tomcat-8/KEYS) file
+keys are available in a [`KEYS`](https://downloads.apache.org/tomcat/tomcat-8/KEYS) file
 available on their website, and all may be imported with this command:
 
 ```
-curl https://www.apache.org/dist/tomcat/tomcat-8/KEYS | gpg --import
+curl https://downloads.apache.org/tomcat/tomcat-8/KEYS | gpg --import
 ```
 
 For the paranoid, it seems that only the keys for Mark Thomas is used for the
@@ -35,8 +35,8 @@ recent 8.5 releases, thus it's possible to verify with only his key:
 ```
 pushd SOURCES
 gpg --keyserver keys.gnupg.net --recv-keys 6FB21E8933C60243
-curl -O http://www.apache.org/dist/tomcat/tomcat-8/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
-curl -O http://www.apache.org/dist/tomcat/tomcat-8/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz.asc
+curl -O https://downloads.apache.org/tomcat/tomcat-8/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
+curl -O https://downloads.apache.org/tomcat/tomcat-8/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz.asc
 gpg --verify apache-tomcat-$TOMCAT_VERSION.tar.gz.asc
 popd
 ```
