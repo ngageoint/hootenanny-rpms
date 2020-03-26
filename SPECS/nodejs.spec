@@ -42,12 +42,6 @@
 %global c_ares_patch 1
 %global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
 
-# http-parser - from deps/http_parser/http_parser.h
-%global http_parser_major 2
-%global http_parser_minor 7
-%global http_parser_patch 0
-%global http_parser_version %{http_parser_major}.%{http_parser_minor}.%{http_parser_patch}
-
 # libuv - from deps/uv/include/uv-version.h
 %global libuv_major 1
 %global libuv_minor 15
@@ -205,11 +199,17 @@ The API documentation for the Node.js JavaScript runtime.
 
 # remove bundled dependencies that we aren't building
 %patch1 -p1
-rm -rf deps/openssl \
-       deps/zlib
+%{__rm} -rf \
+ deps/http_parser \
+ deps/openssl \
+ deps/zlib
 
 %patch2 -p1
 %patch3 -p1
+
+# Remove hard-coded http_parser.gyp target from Makefile.
+%{__sed} -i -e 's|deps/http_parser/http_parser.gyp||' Makefile
+
 
 %build
 # build with debugging symbols and add defines from libuv (#892601)
@@ -399,5 +399,8 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/html
 
 %changelog
+* Thu Mar 26 2020 Justin Bronn <justin.bronn@maxar.com> - 8.9.3-2
+- Rebuild for using the shared http-parser shared library.
+
 * Tue Jan 30 2018 Justin Bronn <justin.bronn@digitalglobe.com> - 8.9.3-1
 - Initial Release, includes shared library and bundled NPM.
