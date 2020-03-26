@@ -58,9 +58,9 @@
 
 # npm - from deps/npm/package.json
 %global npm_epoch 1
-%global npm_major 5
-%global npm_minor 5
-%global npm_patch 1
+%global npm_major 6
+%global npm_minor 14
+%global npm_patch 4
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # Filter out the NPM bundled dependencies so we aren't providing them
@@ -75,11 +75,12 @@ Release: %{nodejs_release}%{?dist}
 Summary: JavaScript runtime
 License: MIT and ASL 2.0 and ISC and BSD
 Group: Development/Languages
-URL: http://nodejs.org/
+URL: https://nodejs.org/
 
 ExclusiveArch: %{nodejs_arches}
 
-Source0: http://nodejs.org/dist/v%{version}/node-v%{version}.tar.gz
+Source0: https://nodejs.org/dist/v%{version}/node-v%{version}.tar.gz
+Source1: https://github.com/npm/cli/archive/v%{npm_version}/cli-%{npm_version}.tar.gz
 
 # The native module Requires generator remains in the nodejs SRPM, so it knows
 # the nodejs and v8 versions.  The remainder has migrated to the
@@ -207,6 +208,15 @@ The API documentation for the Node.js JavaScript runtime.
 %patch2 -p1
 %patch3 -p1
 
+%{__rm} -rf deps/npm
+%{__mkdir_p} deps/npm
+pushd deps/npm
+# Extract updated NPM.
+%{__tar} --strip-components 1 -xzf %{SOURCE1}
+# Modify updated NPM Makefile to build manpages.
+%{__sed} -i -e 's|node |%{_builddir}/node-v%{nodejs_version}/out/Release/node |' Makefile
+popd
+
 # Remove hard-coded http_parser.gyp target from Makefile.
 %{__sed} -i -e 's|deps/http_parser/http_parser.gyp||' Makefile
 
@@ -215,12 +225,12 @@ The API documentation for the Node.js JavaScript runtime.
 # build with debugging symbols and add defines from libuv (#892601)
 # Node's v8 breaks with GCC 6 because of incorrect usage of methods on
 # NULL objects. We need to pass -fno-delete-null-pointer-checks
-export CFLAGS='%{optflags} -g \
+export CFLAGS='%{optflags} \
                -D_LARGEFILE_SOURCE \
                -D_FILE_OFFSET_BITS=64 \
                -DZLIB_CONST \
                -fno-delete-null-pointer-checks'
-export CXXFLAGS='%{optflags} -g \
+export CXXFLAGS='%{optflags} \
                  -D_LARGEFILE_SOURCE \
                  -D_FILE_OFFSET_BITS=64 \
                  -DZLIB_CONST \
@@ -269,6 +279,11 @@ make BUILDTYPE=Debug %{?_smp_mflags}
 %else
 make BUILDTYPE=Release %{?_smp_mflags}
 %endif
+
+# Create manpages for updated NPM.
+pushd deps/npm
+make mandocs
+popd
 
 
 %install
@@ -371,13 +386,9 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 
 %license LICENSE
 %doc AUTHORS CHANGELOG.md COLLABORATOR_GUIDE.md GOVERNANCE.md README.md
-%doc %{_mandir}/man1/node.1*
-%doc %{_mandir}/man*/npm*
-%doc %{_mandir}/man*/npx*
-%doc %{_mandir}/man5/package.json.5*
-%doc %{_mandir}/man5/package-lock.json.5*
-%doc %{_mandir}/man7/removing-npm.7*
-%doc %{_mandir}/man7/semver.7*
+%doc %{_mandir}/man1/*.1*
+%doc %{_mandir}/man5/*.5*
+%doc %{_mandir}/man7/*.7*
 
 
 # Development package.
@@ -400,7 +411,9 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 
 %changelog
 * Thu Mar 26 2020 Justin Bronn <justin.bronn@maxar.com> - 8.9.3-2
-- Rebuild for using the shared http-parser shared library.
+- Rebuild to fix usage of http-parser shared library.
+- Upgrade bundled NPM to 6.14.4.
+- Remove debug compilation flags.
 
 * Tue Jan 30 2018 Justin Bronn <justin.bronn@digitalglobe.com> - 8.9.3-1
 - Initial Release, includes shared library and bundled NPM.
