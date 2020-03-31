@@ -71,6 +71,8 @@
    docker run \
      -e "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" \
      -e "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" \
+     -e "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN" \     
+     -e "AWS_SECURITY_TOKEN=$AWS_SECURITY_TOKEN" \
      -e "HOOT_VERSION_GEN=$HOOT_VERSION_GEN" \
      -v $HOME/.gnupg-hoot:/rpmbuild/.gnupg:rw \
      -v $(pwd)/el7:/rpmbuild/el7:rw \
