@@ -2,12 +2,7 @@ library('radiant-pipeline-library')_
 
 pipeline {
     agent { label 'master' }
-    environment {
-        // command to run the core tests against hootenanny
-        HOOT_CORE_TEST='HootTest --diff --glacial --parallel \$(nproc)'
-        // override which Vagrantfile to read
-        VAGRANT_VAGRANTFILE='Vagrantfile_RPM_Test'
-    }
+
     /* Pipeline parameter TestInstall enables users to test only the latest
      * RPM install, where as the TestUpdate allows users to test only an
      * update of the RPM version. When both TestInstall and TestUpdate are 
@@ -19,6 +14,19 @@ pipeline {
         booleanParam(name: 'TestInstall', defaultValue: 'true')
         booleanParam(name: 'TestUpdate',  defaultValue: 'true')
         string(name: 'Box', defaultValue: 'default', description: 'Vagrant Box')
+        string(name: 'HOOT_RPM_AWS_ENV_TAG', defaultValue: 'testing')
+        string(name: 'HOOT_RPM_AWS_USE_TAG', defaultValue: 'jenkins')
+        string(name: 'HOOT_RPM_AWS_GROUP_TAG', defaultValue: 'devops')
+    }
+    
+    environment {
+        // command to run the core tests against hootenanny
+        HOOT_CORE_TEST='HootTest --diff --glacial --parallel \$(nproc)'
+        HOOT_RPM_AWS_ENV_TAG="${params.HOOT_RPM_AWS_ENV_TAG}"
+        HOOT_RPM_AWS_USE_TAG="${params.HOOT_RPM_AWS_USE_TAG}"
+        HOOT_RPM_AWS_GROUP_TAG="${params.HOOT_RPM_AWS_GROUP_TAG}"
+        // override which Vagrantfile to read
+        VAGRANT_VAGRANTFILE='Vagrantfile_RPM_Test'
     }
 
     triggers {

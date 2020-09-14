@@ -54,7 +54,10 @@ Vagrant.configure("2") do |config|
                                     "jenkins-hootenanny-rpms-#{os.downcase}"),
 
                 'URL'  => ENV.fetch('AWS_INSTANCE_URL_TAG', 
-                                    "https://github.com/ngageoint/hootenanny-rpms")
+                                    "https://github.com/ngageoint/hootenanny-rpms"),
+                'env' => ENV.fetch('HOOT_RPM_AWS_ENV_TAG', 'testing'),
+                'use' => ENV.fetch('HOOT_RPM_AWS_USE_TAG', 'Jenkins'),
+                'group' => ENV.fetch('HOOT_RPM_AWS_GROUP_TAG', 'devops')
             }
 
             if ENV.key?('JOB_NAME')
