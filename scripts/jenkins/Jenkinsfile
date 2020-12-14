@@ -21,7 +21,7 @@ pipeline {
     
     environment {
         // command to run the core tests against hootenanny
-        HOOT_CORE_TEST='HootTest --diff --glacial --parallel \$(nproc)'
+        HOOT_CORE_TEST='HootTest --diff --glacial --parallel 6'
         HOOT_RPM_AWS_ENV_TAG="${params.HOOT_RPM_AWS_ENV_TAG}"
         HOOT_RPM_AWS_USE_TAG="${params.HOOT_RPM_AWS_USE_TAG}"
         HOOT_RPM_AWS_GROUP_TAG="${params.HOOT_RPM_AWS_GROUP_TAG}"
