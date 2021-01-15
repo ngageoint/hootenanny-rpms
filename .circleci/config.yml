@@ -104,7 +104,7 @@ workflows:
             - master-upgrade
     triggers:
       - schedule:
-          cron: "0 12,20 * * *"
+          cron: "0 8,20 * * *"
           filters:
             branches:
               only:
