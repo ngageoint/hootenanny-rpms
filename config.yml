@@ -1,7 +1,7 @@
 ---
 versions:
   armadillo: &armadillo_version '9.400.3-1'
-  dumb-init: &dumbinit_version '1.2.1-1'
+  dumb-init: &dumb-init_version '1.2.5-1'
   geos: &geos_version '3.7.2-1'
   glpk: &glpk_version '4.65-1'
   gpsbabel: &gpsbabel_version '1.5.4-1'
@@ -114,7 +114,7 @@ images:
   hoot: !!omap
     - rpmbuild-hoot-devel:
         args:
-          dumbinit_version: *dumbinit_version
+          dumbinit_version: *dumb-init_version
           filegdbapi_version: *FileGDBAPI_version
           geos_version: *geos_version
           gdal_version: *gdal_version
@@ -134,7 +134,7 @@ images:
         spec_file: 'SPECS/hootenanny.spec'
     - run-base-devel:
         args:
-          dumbinit_version: *dumbinit_version
+          dumbinit_version: *dumb-init_version
           filegdbapi_version: *FileGDBAPI_version
           geos_version: *geos_version
           gdal_version: *gdal_version
@@ -164,7 +164,7 @@ rpms:
     version: *armadillo_version
   dumb-init:
     image: rpmbuild-generic
-    version: *dumbinit_version
+    version: *dumb-init_version
   geos:
     image: rpmbuild-geos
     version: *geos_version

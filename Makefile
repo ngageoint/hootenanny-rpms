@@ -72,7 +72,7 @@ rpm_package = $(shell echo $(1) | awk '{ split($$0, a, "-"); l = length(a); pkg 
 PG_DOTLESS := $(shell echo $(call config_version,pg) | tr -d '.')
 
 ARMADILLO_RPM := $(call rpm_file,armadillo,x86_64)
-DUMBINIT_RPM := $(call rpm_file2,dumb-init,dumbinit,x86_64)
+DUMBINIT_RPM := $(call rpm_file,dumb-init,x86_64)
 GEOS_RPM := $(call rpm_file,geos,x86_64)
 GDAL_RPM := $(call rpm_file2,hoot-gdal,gdal,x86_64)
 GLPK_RPM := $(call rpm_file,glpk,x86_64)

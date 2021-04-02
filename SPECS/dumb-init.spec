@@ -44,6 +44,8 @@ CFLAGS="%{optflags}" %make_build
 %{_bindir}/dumb-init
 
 %changelog
+* Thu Mar 11 2021 Justin Bronn <justin.bronn@maxar.com> - 1.2.5-1
+- Upgrade to 1.2.5
 * Fri Jul 19 2019 Justin Bronn <justin.bronn@maxar.com> 1.2.2-1
 - Upgrade to 1.2.2.
 * Tue Jan 16 2018 Justin Bronn <justin.bronn@digitalglobe.com> 1.2.1-1
