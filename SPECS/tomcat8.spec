@@ -46,7 +46,7 @@ Version:    %{major_version}.%{minor_version}.%{micro_version}
 Release:    %{rpmbuild_release}%{?dist}
 License:    ASL 2.0
 URL:        https://tomcat.apache.org/
-Source0:    https://www.apache.org/dist/tomcat/tomcat-%{major_version}/v%{version}/bin/apache-tomcat-%{version}.tar.gz
+Source0:    https://downloads.apache.org/tomcat/tomcat-%{major_version}/v%{version}/bin/apache-tomcat-%{version}.tar.gz
 Source1:    %{name}.conf
 Source2:    %{name}.functions
 Source3:    %{name}.logrotate
@@ -214,6 +214,9 @@ getent passwd %{tomcat_user} 2>/dev/null || \
 %systemd_postun %{name}.service
 
 %changelog
+* Thu Mar 11 2021 Justin Bronn <justin.bronn@maxar.com> - 8.5.64-1
+- Upgrade to 8.5.64
+
 * Tue Feb 25 2020 Justin Bronn <justin.bronn@maxar.com> - 8.5.51-1
 - Upgrade to 8.5.51
 
