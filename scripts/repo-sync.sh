@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
+# Copyright (C) 2018-2021 Maxar Technologies (https://www.maxar.com)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -134,11 +134,11 @@ gpgcheck = 0
 
 [hoot-deps]
 name = Hootenanny Dependencies
-baseurl = https://s3.amazonaws.com/hoot-repo/el7/deps/release
+baseurl = https://hoot-repo.s3.amazonaws.com/el7/deps/release
 enabled = 1
 gpgcheck = 1
 repo_gpgcheck = 1
-gpgkey = https://s3.amazonaws.com/hoot-repo/el7/hoot.gpg
+gpgkey = https://hoot-repo.s3.amazonaws.com/el7/hoot.gpg
 EOF
     fi
 else
