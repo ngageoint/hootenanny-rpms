@@ -1,5 +1,4 @@
-# Copyright (C) 2019 Maxar Technologies (https://www.maxar.com)
-# Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
+# Copyright (C) 2018-2021 Maxar Technologies (https://www.maxar.com)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,22 +17,29 @@ LABEL \
   description="Base container for building Hootenanny RPMs" \
   maintainer="justin.bronn@maxar.com" \
   name="Hootenanny Base RPM Build Image" \
-  vendor="Radiant Solutions"
+  vendor="Maxar Technologies"
 
 # Install basic development and RPM authoring tools.
-RUN yum -q -y update && \
+SHELL ["/bin/bash", "-c"]
+RUN yum-config-manager --save \
+        --setopt=base.repo_gpgcheck=1 \
+        --setopt=extras.repo_gpgcheck=1 \
+        --setopt=updates.repo_gpgcheck=1 &> /dev/null && \
+    yum -q -y install epel-release && \
+    yum -q -y update && \
     yum -q -y install \
         autoconf \
         autoconf-archive \
         automake \
         bzip2 \
-        epel-release \
         gcc \
         gcc-c++ \
         gdb \
         git \
         git-core \
+        lcov \
         libtool \
+        parallel \
         make \
         m4 \
         redhat-lsb-core \
@@ -45,7 +51,4 @@ RUN yum -q -y update && \
         vim \
         wget \
         zip && \
-    yum -q -y install \
-        parallel \
-        lcov && \
     yum -q -y clean all
