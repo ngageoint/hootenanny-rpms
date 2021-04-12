@@ -93,8 +93,8 @@ ARMADILLO_RELEASE=$( config_release armadillo )
 ARMADILLO_RPM=armadillo-$ARMADILLO_VERSION-$ARMADILLO_RELEASE$RPMBUILD_DIST.x86_64.rpm
 ARMADILLO_DEVEL_RPM=armadillo-devel-$ARMADILLO_VERSION-$ARMADILLO_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
-DUMBINIT_VERSION=$( config_version dumbinit )
-DUMBINIT_RELEASE=$( config_release dumbinit )
+DUMBINIT_VERSION=$( config_version dumb-init )
+DUMBINIT_RELEASE=$( config_release dumb-init )
 DUMBINIT_RPM=dumb-init-$DUMBINIT_VERSION-$DUMBINIT_RELEASE$RPMBUILD_DIST.x86_64.rpm
 
 FILEGDBAPI_VERSION=$( config_version FileGDBAPI )
