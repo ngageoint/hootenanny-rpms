@@ -18,36 +18,36 @@ set -euo pipefail
 # Allow overrides from environment for:
 #  * VAGRANT_VERSION
 #  * VAGRANT_BASEURL
-LSB_DIST="$(. /etc/os-release && echo "$ID")"
-VAGRANT_VERSION="${VAGRANT_VERSION:-2.2.14}"
-VAGRANT_BASEURL="${VAGRANT_BASEURL:-https://releases.hashicorp.com/vagrant/$VAGRANT_VERSION}"
+LSB_DIST="$(. /etc/os-release && echo "${ID}")"
+VAGRANT_VERSION="${VAGRANT_VERSION:-2.2.15}"
+VAGRANT_BASEURL="${VAGRANT_BASEURL:-https://releases.hashicorp.com/vagrant/${VAGRANT_VERSION}}"
 
 # Set up command differences between RHEL and Debian-based systems.
-if [ "$LSB_DIST" == 'centos' -o "$LSB_DIST" == 'fedora' -o "$LSB_DIST" == 'rhel' ]; then
+if [ "${LSB_DIST}" == "centos" ] || [ "${LSB_DIST}" == "fedora" ] || [ "${LSB_DIST}" == "rhel" ]; then
     # RHEL-based.
-    if [ "$(rpm -q vagrant --queryformat '%{version}')" == "$VAGRANT_VERSION" ]; then
-        echo "Vagrant $VAGRANT_VERSION is already installed."
+    if [ "$(rpm -q vagrant --queryformat '%{version}')" == "${VAGRANT_VERSION}" ]; then
+        echo "Vagrant ${VAGRANT_VERSION} is already installed."
         exit 0
     fi
-    DOWNLOAD_COMMAND='curl -sSL -O'
-    INSTALL_COMMAND='yum install -y'
+    DOWNLOAD_COMMAND="curl -sSL -O"
+    INSTALL_COMMAND="yum install -y"
     PACKAGE_SUFFIX="$(arch).rpm"
-elif [ "$LSB_DIST" == 'debian' -o "$LSB_DIST" == 'ubuntu' ]; then
+elif [ "${LSB_DIST}" == "debian" ] || [ "${LSB_DIST}" == "ubuntu" ]; then
     # Debian-based.
-    if [ "$(dpkg-query --showformat=\$\{Version\} --show vagrant)" == "1:$VAGRANT_VERSION" ]; then
-        echo "Vagrant $VAGRANT_VERSION is already installed."
+    if [ "$(dpkg-query --showformat=\$\{Version\} --show vagrant)" == "1:${VAGRANT_VERSION}" ]; then
+        echo "Vagrant ${VAGRANT_VERSION} is already installed."
         exit 0
     fi
-    DOWNLOAD_COMMAND='wget -nv -L'
-    INSTALL_COMMAND='dpkg -i'
+    DOWNLOAD_COMMAND="wget -nv -L"
+    INSTALL_COMMAND="dpkg -i"
     PACKAGE_SUFFIX="$(arch).deb"
 else
-    echo "Do not know how to install Vagrant on $LSB_DIST."
+    echo "Do not know how to install Vagrant on ${LSB_DIST}."
     exit 1
 fi
 
 if [ "$(id -u)" -ne 0 ]; then
-    INSTALL_COMMAND="sudo $INSTALL_COMMAND"
+    INSTALL_COMMAND="sudo ${INSTALL_COMMAND}"
 fi
 
 # Variables for package, checksum, and signature file.
@@ -56,7 +56,7 @@ CHECKSUMS="vagrant_${VAGRANT_VERSION}_SHA256SUMS"
 SIGNATURE="vagrant_${VAGRANT_VERSION}_SHA256SUMS.sig"
 
 if [ ! -x /usr/bin/gpgv ]; then
-    echo "Then gpgv utility is needed to verify $PACKAGE." >> /dev/stderr
+    echo "Then gpgv utility is needed to verify ${PACKAGE}." >> /dev/stderr
     exit 1
 fi
 
@@ -65,7 +65,6 @@ pushd /var/tmp
 
 # Create Hashicorp GPG keyring from base64-encoded binary of the release
 # key (91A6E7F85D05C65630BEF18951852D87348FFC4C).
-if [ ! -f hashicorp.gpg ]; then
 echo "mQENBFMORM0BCADBRyKO1MhCirazOSVwcfTr1xUxjPvfxD3hjUwHtjsOy/bT6p9fW2mRPfwnq2JB
 5As+paL3UGDsSRDnK9KAxQb0NNF4+eVhr/EJ18s3wwXXDMjpIifqfIm2WyH3G+aRLTLPIpscUNKD
 yxFOUbsmgXAmJ46Re1fn8uKxKRHbfa39aeuEYWFA3drdL1WoUngvED7f+RnKBK2G6ZEpO+LDovQk
@@ -88,24 +87,22 @@ zqqqwLxgliSDfSnqUhubGwvykANPO+93BBx89MRGunNoYGXtPlhNFrAsB1VR8+EyKLv2HQtGCPSF
 BhrjuzH3gxGibNDDdFQLxxuJWepJEK1UbTS4ms0NgZ2Uknqn1WRU1Ki7rE4sTy68iZtWpKQXZEJa
 0IGnuI2sSINGcXCJoEIgXTMyCILo34Fa/C6VCm2WBgz9zZO8/rHIiQm1J5zqz0DrDwKBUM9C" | \
     base64 -d > hashicorp.gpg
-fi
 
 # Download Vagrant files.
-for vagrant_file in $PACKAGE $CHECKSUMS $SIGNATURE
-do
-    $DOWNLOAD_COMMAND "$VAGRANT_BASEURL/$vagrant_file"
+for vagrant_file in ${PACKAGE} ${CHECKSUMS} ${SIGNATURE}; do
+    ${DOWNLOAD_COMMAND} "${VAGRANT_BASEURL}/${vagrant_file}"
 done
 
 # GPG verify the signature for the SHA256SUMS file.
-gpgv --keyring ./hashicorp.gpg "$SIGNATURE" "$CHECKSUMS"
+gpgv --keyring ./hashicorp.gpg "${SIGNATURE}" "${CHECKSUMS}"
 
 # Verify checksums, but grep out all other lines in the checksum
 # file except the desired package.
-sha256sum -c <(grep -e "[[:space:]]\\+$PACKAGE\\>" "$CHECKSUMS")
+sha256sum -c <(grep -e "[[:space:]]\\+${PACKAGE}\\>" "${CHECKSUMS}")
 
 # Finally install Vagrant.
-$INSTALL_COMMAND "$PACKAGE"
+${INSTALL_COMMAND} "${PACKAGE}"
 
 # Clean up.
-rm -f hashicorp.gpg "$PACKAGE" "$CHECKSUMS" "$SIGNATURE"
+rm -f hashicorp.gpg "${PACKAGE}" "${CHECKSUMS}" "${SIGNATURE}"
 popd
