@@ -147,7 +147,6 @@ else
     DOWNLOAD_OPTS=(
         "$S3_URL"
         "$REPO"
-        "--keep-newer"
         "$QUIET"
         "${AWS_COMMON_OPTS[@]}"
     )

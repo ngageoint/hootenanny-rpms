@@ -28,17 +28,12 @@ RUN yum install -q -y createrepo epel-release groff less rpm-sign && \
     yum -q -y clean all && \
     pip install -q --prefix /usr awscli
 
-# Add in the `keepnewer` Python (2.x on CentOS 7) module plugin for awscli;
-# enables `aws s3 sync --keep-newer` functionality.
-COPY scripts/keepnewer.py /usr/lib/python2.7/site-packages/
-
 # Use unprivleged RPM build user and work directory by default.
 USER ${RPMBUILD_USER}
 WORKDIR ${RPMBUILD_HOME}
 
-# Create stub awscli configuration and enable the keepnewer plugin.
-RUN aws configure set plugins.keepnewer keepnewer && \
-    if [ ! -z "${role_arn}" ] ; then \
+# Create stub awscli configuration.
+RUN if [ -n "${role_arn}" ] ; then \
        profile=$(basename ${role_arn}) && \
        aws configure set credential_source Environment --profile ${profile} && \
        aws configure set region ${AWS_DEFAULT_REGION:-us-east-1} --profile ${profile} && \
