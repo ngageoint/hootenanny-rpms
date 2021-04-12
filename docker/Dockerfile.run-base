@@ -62,7 +62,6 @@ RUN yum-config-manager --save \
         opencv \
         perl-libwww-perl \
         perl-XML-LibXML \
-        proj \
         protobuf \
         python-matplotlib \
         qt5-qtbase \
