@@ -1,5 +1,4 @@
-# Copyright (C) 2019 Maxar Technologies (https://www.maxar.com)
-# Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
+# Copyright (C) 2018-2021 Maxar Technologies (https://www.maxar.com)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +18,7 @@ LABEL \
   description="Base container for running Hootenanny" \
   maintainer="justin.bronn@maxar.com" \
   name="Hootenanny Base Runtime Image" \
-  vendor="Radiant Solutions"
+  vendor="Maxar Technologies"
 
 ARG lang=en_US.UTF-8
 ARG locale=en_US.UTF-8
@@ -38,7 +37,12 @@ ENV HOOT_HOME=/var/lib/hootenanny \
 # as well as with some CLI niceties (htop and less).  Avoid installing
 # dependencies we built, as we'll want to install those manually from
 # built RPMs for the development image.
-RUN yum -q -y update && \
+RUN yum-config-manager --save \
+        --setopt=base.repo_gpgcheck=1 \
+        --setopt=extras.repo_gpgcheck=1 \
+        --setopt=updates.repo_gpgcheck=1 &> /dev/null && \
+    yum -q -y install epel-release && \
+    yum -q -y update && \
     yum -q -y install \
         asciidoc \
         boost-iostreams \
@@ -46,7 +50,6 @@ RUN yum -q -y update && \
         cppunit \
         cpptest \
         dblatex \
-        epel-release \
         less \
         gnuplot \
         graphviz \
@@ -59,7 +62,6 @@ RUN yum -q -y update && \
         opencv \
         perl-libwww-perl \
         perl-XML-LibXML \
-        proj \
         protobuf \
         python-matplotlib \
         qt5-qtbase \
