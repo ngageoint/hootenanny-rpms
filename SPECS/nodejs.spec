@@ -366,6 +366,8 @@ rm -rf deps/brotli
 
 
 %build
+. /opt/rh/devtoolset-8/enable
+
 # When compiled on armv7hl this package generates an out of range
 # reference to the literal pool.  This is most likely a GCC issue.
 %ifarch armv7hl
