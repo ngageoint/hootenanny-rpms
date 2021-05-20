@@ -89,7 +89,8 @@ images:
           proj_version: *proj_version
         buildrequires: true
     - rpmbuild-libpostal: {}
-    - rpmbuild-nodejs: {}
+    - rpmbuild-nodejs:
+        buildrequires: true
     - run-base:
         args:
           pg_version: *pg_version

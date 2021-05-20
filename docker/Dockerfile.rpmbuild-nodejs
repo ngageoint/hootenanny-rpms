@@ -19,32 +19,13 @@ LABEL \
   name="Hootenanny NodeJs RPM" \
   vendor="Maxar Technologies"
 
-# Install basic development and RPM authoring tools.
-#SHELL ["/bin/bash", "-c"]
+ARG packages
+
 # Temporarily switch to root for package installation.
 USER root
 
-#
-RUN yum -q -y install centos-release-scl && \
-    yum-config-manager --enable rhel-server-rhscl-7-rpms && \
-    yum -q -y install devtoolset-8 && \
-    yum -q -y update && \
-    yum -y install \
-        brotli-devel \
-        chrpath \
-        libatomic \
-        libnghttp2-devel \
-        libuv-devel \
-        nodejs-packaging \
-        openssl11 \
-        openssl11-devel \
-        python3-devel \
-        python3-setuptools \
-        systemtap-sdt-devel
-
-#    && \
-#    yum -q -y clean all
+RUN yum-config-manager --enable rhel-server-rhscl-7-rpms && \
+    if [ ! -z "${packages}" ] ; then yum -y install ${packages}; fi
 
 # Switch back to default RPM building user.
 USER ${RPMBUILD_USER}
-
