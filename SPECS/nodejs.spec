@@ -7,24 +7,18 @@
 # LTO is currently broken on Node.js builds
 %define _lto_cflags %{nil}
 
-# == Master Relase ==
-# This is used by both the nodejs package and the npm subpackage thar
-# has a separate version - the name is special so that rpmdev-bumpspec
-# will bump this rather than adding .1 to the end.
-%global baserelease 3
-
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
 # == Node.js Version ==
 %global nodejs_epoch 1
-%global nodejs_major 14
-%global nodejs_minor 16
-%global nodejs_patch 1
+%global nodejs_major %(echo %{rpmbuild_version} | awk -F. '{ print $1 }')
+%global nodejs_minor %(echo %{rpmbuild_version} | awk -F. '{ print $2 }')
+%global nodejs_patch %(echo %{rpmbuild_version} | awk -F. '{ print $3 }')
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 83
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release %{baserelease}
+%global nodejs_release %{rpmbuild_release}
 
 %global nodejs_datadir %{_datarootdir}/nodejs
 
@@ -692,8 +686,5 @@ end
 
 
 %changelog
-* Thu May 20 2021 Benjamin Marchant <benjamin.marchant@maxar.com> 1:14.16.1-3
+* Thu May 20 2021 Benjamin Marchant <benjamin.marchant@maxar.com> 14.16.1-1
 - Build as shared module for Hootenanny
-
-* Tue Apr 20 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:14.16.1-2
-- Disable stack execution (bz#1950528)
