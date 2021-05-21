@@ -214,6 +214,9 @@ getent passwd %{tomcat_user} 2>/dev/null || \
 %systemd_postun %{name}.service
 
 %changelog
+* Fri Mar 21 2021 Justin Bronn <justin.bronn@maxar.com> - 8.5.66-1
+- Upgrade to 8.5.66
+
 * Thu Mar 11 2021 Justin Bronn <justin.bronn@maxar.com> - 8.5.64-1
 - Upgrade to 8.5.64
 
