@@ -146,7 +146,6 @@ BuildRequires: make
 BuildRequires: python3-devel
 BuildRequires: python3-setuptools
 #BuildRequires: python-unversioned-command
-BuildRequires: zlib-devel
 BuildRequires: brotli-devel
 BuildRequires: devtoolset-8
 #BuildRequires: gcc >= 6.3.0
@@ -256,7 +255,6 @@ Summary: JavaScript runtime - development headers
 Group: Development/Languages
 Requires: %{name}%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 Requires: openssl-devel%{?_isa}
-Requires: zlib-devel%{?_isa}
 Requires: brotli-devel%{?_isa}
 Requires: nodejs-packaging
 
@@ -355,7 +353,6 @@ The API documentation for the Node.js JavaScript runtime.
 %autosetup -p1 -n node-v%{nodejs_version}
 
 # remove bundled dependencies that we aren't building
-rm -rf deps/zlib
 rm -rf deps/brotli
 
 
@@ -383,7 +380,6 @@ export CXX='%{__cxx}'
 export CFLAGS='%{optflags} \
                -D_LARGEFILE_SOURCE \
                -D_FILE_OFFSET_BITS=64 \
-               -DZLIB_CONST \
                -fno-delete-null-pointer-checks \
                -Wno-implicit-fallthrough \
                -Wno-stringop-overflow \
@@ -391,7 +387,6 @@ export CFLAGS='%{optflags} \
 export CXXFLAGS='%{optflags} \
                  -D_LARGEFILE_SOURCE \
                  -D_FILE_OFFSET_BITS=64 \
-                 -DZLIB_CONST \
                  -fno-delete-null-pointer-checks \
                  -Wno-class-memaccess \
                  -Wno-implicit-fallthrough \
@@ -414,7 +409,6 @@ sed -i "s/configure_library('openssl', o)/configure_library('openssl', o, pkgnam
            --shared-openssl \
            --shared-openssl-libpath=%{_libdir}/openssl11 \
            --shared-openssl-includes=%{_includedir}/openssl11 \
-           --shared-zlib \
            --shared-brotli \
            --without-dtrace \
            --with-intl=small-icu \
@@ -426,7 +420,6 @@ sed -i "s/configure_library('openssl', o)/configure_library('openssl', o, pkgnam
            --shared-openssl \
            --shared-openssl-libpath=%{_libdir}/openssl11 \
            --shared-openssl-includes=%{_includedir}/openssl11 \
-           --shared-zlib \
            --shared-brotli \
            --shared-libuv \
            --with-dtrace \
