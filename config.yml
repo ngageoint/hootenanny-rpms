@@ -14,7 +14,7 @@ versions:
   libphonenumber: &libphonenumber_version '8.9.16-1'
   libpostal: &libpostal_version '1.0.0-1'
   mocha: &mocha_version '3.5.3'
-  nodejs: &nodejs_version '8.9.3-2'
+  nodejs: &nodejs_version '14.16.1-1'
   osmosis: &osmosis_version '0.46-1'
   postgis: &postgis_version '2.4.4-2'
   postgresql: &pg_version '9.5'
@@ -91,7 +91,6 @@ images:
     - rpmbuild-libpostal: {}
     - rpmbuild-nodejs:
         buildrequires: true
-        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
     - run-base:
         args:
           pg_version: *pg_version

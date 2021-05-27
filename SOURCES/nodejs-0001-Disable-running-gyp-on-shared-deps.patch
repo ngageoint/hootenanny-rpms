@@ -1,0 +1,29 @@
+From 0a889af5ee18290d833f7f63742d5b714bdb1a40 Mon Sep 17 00:00:00 2001
+From: Zuzana Svetlikova <zsvetlik@redhat.com>
+Date: Fri, 17 Apr 2020 12:59:44 +0200
+Subject: [PATCH 1/3] Disable running gyp on shared deps
+
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 93d63110ae2e3928a95d24036b86d11885ab240f..79caaec2112cefa8f6a1c947375b517e9676f176 100644
+--- a/Makefile
++++ b/Makefile
+@@ -136,11 +136,11 @@ endif
+ .PHONY: test-code-cache
+ with-code-cache test-code-cache:
+ 	$(warning '$@' target is a noop)
+ 
+ out/Makefile: config.gypi common.gypi node.gyp \
+-	deps/uv/uv.gyp deps/llhttp/llhttp.gyp deps/zlib/zlib.gyp \
++	deps/llhttp/llhttp.gyp \
+ 	tools/v8_gypfiles/toolchain.gypi tools/v8_gypfiles/features.gypi \
+ 	tools/v8_gypfiles/inspector.gypi tools/v8_gypfiles/v8.gyp
+ 	$(PYTHON) tools/gyp_node.py -f make
+ 
+ # node_version.h is listed because the N-API version is taken from there
+-- 
+2.31.1
+

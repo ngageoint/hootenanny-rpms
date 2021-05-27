@@ -155,16 +155,23 @@ archives were obtained directly from
 
 The [NodeJS](https://nodejs.org/) source archives are obtained
 directly from [Node's download page](https://nodejs.org/en/download/).
+NodeJS includes bundled copy of [Unicode ICU](https://github.com/unicode-org/icu);
+its [source code archive](../SOURCES/icu4c-67_1-src.tgz) is under the
+[Unicode License](https://github.com/unicode-org/icu/blob/main/icu4c/LICENSE).
 
 The following packaging files originate from
 [Fedora's NodeJS RPM](https://src.fedoraproject.org/cgit/rpms/nodejs.git)
 repository and are [MIT licensed](./licenses/Fedora-LICENSE):
 
 * [`nodejs.spec`](../SPECS/nodejs.spec)
-* [`nodejs_native.attr.patch`](../SOURCES/nodejs_native.attr)
+* [`macros.nodejs`](../SOURCES/macros.nodejs)
 * [`nodejs-0001-Disable-running-gyp-files-for-bundled-deps.patch.patch`](../SOURCES/nodejs-0001-Disable-running-gyp-files-for-bundled-deps.patch)
-* [`nodejs-0002-Fix-aarch64-debug.patch`](../SOURCES/nodejs-0002-Fix-aarch64-debug.patch)
-* [`nodejs-0003-hoot-value-json-object.patch`](../SOURCES/nodejs-0003-hoot-value-json-object.patch)
+* [`nodejs-0002-Install-both-binaries-and-use-libdir.patch`](../SOURCES/nodejs-0002-Install-both-binaries-and-use-libdir.patch)
+* [`nodejs-0003-src-add-.note.GNU-stack-section.patch`](../SOURCES/nodejs-0003-src-add-.note.GNU-stack-section.patch)
+* [`nodejs-btest402.js`](../SOURCES/nodejs-btest402.js)
+* [`nodejs_native.attr.patch`](../SOURCES/nodejs_native.attr)
+* [`nodejs-tarball.sh`](../SOURCES/nodejs-tarball.sh)
+* [`npmrc`](../SOURCES/npmrc)
 
 ## Osmosis
 
