@@ -22,7 +22,7 @@ versions:
   stxxl: &stxxl_version '1.3.1-1'
   su-exec: &suexec_version '0.2-1'
   hoot-translations-templates: &hoot_translations_templates_version '1.0.0-1'
-  tomcat8: &tomcat8_version '8.5.64-1'
+  tomcat8: &tomcat8_version '8.5.66-1'
   wamerican-insane: &wamerican_version '7.1-1'
 
 
