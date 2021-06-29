@@ -32,22 +32,19 @@ case "${BUILD_IMAGE}" in
         docker build \
                --build-arg "packages=$( spec_requires hootenanny )" \
                --build-arg dumbinit_version=$DUMBINIT_VERSION-$DUMBINIT_RELEASE \
-               --build-arg filegdbapi_version=$FILEGDBAPI_VERSION-$FILEGDBAPI_RELEASE \
-               --build-arg gdal_version=$GDAL_VERSION-$GDAL_RELEASE \
-               --build-arg geos_version=$GEOS_VERSION-$GEOS_RELEASE \
                --build-arg glpk_version=$GLPK_VERSION-$GLPK_RELEASE \
-               --build-arg libgeotiff_version=$LIBGEOTIFF_VERSION-$LIBGEOTIFF_RELEASE \
-               --build-arg libkml_version=$LIBKML_VERSION-$LIBKML_RELEASE \
                --build-arg libphonenumber_version="$LIBPHONENUMBER_VERSION-$LIBPHONENUMBER_RELEASE" \
+               --build-arg liboauthcpp_version="$LIBOAUTHCPP_VERSION-$LIBOAUTHCPP_RELEASE" \
                --build-arg libpostal_version="$LIBPOSTAL_VERSION-$LIBPOSTAL_RELEASE" \
                --build-arg mocha_version=$MOCHA_VERSION \
                --build-arg pg_version=$PG_VERSION \
-               --build-arg postgis_version=$POSTGIS_VERSION-$POSTGIS_RELEASE \
                --build-arg nodejs_version=$NODEJS_VERSION-$NODEJS_RELEASE \
+               --build-arg npm_version=$NPM_VERSION-$NPM_RELEASE.$NODEJS_VERSION.$NODEJS_RELEASE \
                --build-arg osmosis_version=$OSMOSIS_VERSION-$OSMOSIS_RELEASE \
                --build-arg stxxl_version=$STXXL_VERSION-$STXXL_RELEASE \
                --build-arg suexec_version=$SUEXEC_VERSION-$SUEXEC_RELEASE \
                --build-arg tomcat8_version=$TOMCAT8_VERSION-$TOMCAT8_RELEASE \
+               --build-arg v8_version=$V8_VERSION-$V8_RELEASE.$NODEJS_VERSION.$NODEJS_RELEASE \
                --build-arg words_version=$WORDS_VERSION-$WORDS_RELEASE \
                -f $SCRIPT_HOME/docker/Dockerfile.rpmbuild-hoot-devel \
                -t hootenanny/rpmbuild-hoot-devel \

@@ -25,17 +25,13 @@ LABEL \
   vendor="Radiant Solutions"
 
 ARG dumbinit_version
-ARG filegdbapi_version
-ARG gdal_version
-ARG geos_version
 ARG glpk_version
-ARG libgeotiff_version
-ARG libkml_version
 ARG liboauthcpp_version
 ARG libphonenumber_version
 ARG libpostal_version
 ARG mocha_version
 ARG nodejs_version
+ARG npm_version
 ARG osmosis_version
 ARG packages
 ARG pg_version
@@ -43,6 +39,7 @@ ARG pg_data=/var/lib/pgsql/${pg_version}/data
 ARG stxxl_version
 ARG suexec_version
 ARG tomcat8_version
+ARG v8_version
 ARG words_version
 
 # Have PostgreSQL data directory persist in environment variable.
@@ -53,20 +50,9 @@ USER root
 
 # Copy in development RPMs at the desired versions.
 COPY RPMS/x86_64/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/geos-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/geos-devel-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/glpk-${glpk_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/glpk-devel-${glpk_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/hoot-gdal-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/hoot-gdal-devel-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/hoot-gdal-libs-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/hoot-gdal-python-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/noarch/hoot-words-${words_version}${RPMBUILD_DIST}.noarch.rpm \
-     RPMS/x86_64/libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/x86_64/libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/liboauthcpp-${liboauthcpp_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/liboauthcpp-devel-${liboauthcpp_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libphonenumber-${libphonenumber_version}${RPMBUILD_DIST}.x86_64.rpm \
@@ -75,30 +61,23 @@ COPY RPMS/x86_64/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/libpostal-devel-${libpostal_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/nodejs-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/nodejs-devel-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/x86_64/nodejs-libs-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
+     RPMS/noarch/nodejs-docs-${nodejs_version}${RPMBUILD_DIST}.noarch.rpm \
+     RPMS/x86_64/npm-${npm_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/noarch/osmosis-${osmosis_version}${RPMBUILD_DIST}.noarch.rpm \
      RPMS/x86_64/stxxl-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/stxxl-devel-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/x86_64/su-exec-${suexec_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/noarch/tomcat8-${tomcat8_version}${RPMBUILD_DIST}.noarch.rpm \
+     RPMS/x86_64/v8-devel-${v8_version}${RPMBUILD_DIST}.x86_64.rpm \
      /tmp/
 
 # Install Hootenanny dependencies.
 RUN yum install -y \
     /tmp/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/FileGDBAPI-${filegdbapi_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/geos-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/geos-devel-${geos_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/glpk-${glpk_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/glpk-devel-${glpk_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/hoot-gdal-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/hoot-gdal-devel-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/hoot-gdal-libs-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/hoot-gdal-python-${gdal_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/hoot-words-${words_version}${RPMBUILD_DIST}.noarch.rpm \
-    /tmp/libgeotiff-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/libgeotiff-devel-${libgeotiff_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/libkml-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
-    /tmp/libkml-devel-${libkml_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/liboauthcpp-${liboauthcpp_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/liboauthcpp-devel-${liboauthcpp_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/libphonenumber-${libphonenumber_version}${RPMBUILD_DIST}.x86_64.rpm \
@@ -107,11 +86,15 @@ RUN yum install -y \
     /tmp/libpostal-devel-${libpostal_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/nodejs-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/nodejs-devel-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/nodejs-libs-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
+    /tmp/nodejs-docs-${nodejs_version}${RPMBUILD_DIST}.noarch.rpm \
+    /tmp/npm-${npm_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/osmosis-${osmosis_version}${RPMBUILD_DIST}.noarch.rpm \
     /tmp/stxxl-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/stxxl-devel-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/su-exec-${suexec_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/tomcat8-${tomcat8_version}${RPMBUILD_DIST}.noarch.rpm \
+    /tmp/v8-devel-${v8_version}${RPMBUILD_DIST}.x86_64.rpm \
     && \
     rm -f /tmp/*.rpm && \
     npm install --silent -g mocha@${mocha_version} && \

@@ -277,39 +277,15 @@ Vagrant.configure(2) do |config|
     build_container(config, name, options)
   end
 
-  # Generic, NodeJS, and GDAL dependency RPMS are built first.
+  # Generic, NodeJS, and GLPK dependency RPMS are built first.
   collect_rpms(
     ['rpmbuild-generic',
-     'rpmbuild-armadillo',
-     'rpmbuild-geos',
      'rpmbuild-glpk',
-     'rpmbuild-gpsbabel',
-     'rpmbuild-libgeotiff',
-     'rpmbuild-libkml',
      'rpmbuild-liboauthcpp',
      'rpmbuild-libphonenumber',
      'rpmbuild-libpostal',
-     'rpmbuild-nodejs',
-     'rpmbuild-proj']
+     'rpmbuild-nodejs']
   ).each do |name, options|
-    rpmbuild(config, name, options)
-  end
-
-  # GDAL can be built when dependency RPMs are present.
-  $images['gdal'].each do |name, options|
-    build_container(config, name, options)
-  end
-
-  collect_rpms(['rpmbuild-gdal']).each do |name, options|
-    rpmbuild(config, name, options)
-  end
-
-  # PostGIS can be built when GDAL RPMs are present.
-  $images['postgis'].each do |name, options|
-    build_container(config, name, options)
-  end
-
-  collect_rpms(['rpmbuild-postgis']).each do |name, options|
     rpmbuild(config, name, options)
   end
 

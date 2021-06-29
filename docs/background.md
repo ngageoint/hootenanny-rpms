@@ -46,6 +46,7 @@ repositories for dependencies:
 * EPEL
 * PGDG (PostgreSQL)
 * Hootenanny Dependencies
+* GEOINT Dependencies
 
 ### EPEL
 
@@ -66,4 +67,7 @@ Hootenanny dependencies are created from the files in this repository.
 While the dependencies can be compiled from source, a set of stable
 dependencies are signed and kept in a *release* repository published on S3.
 
+### GEOINT Dependencies
+
+Library dependencies including GDAL, GEOS, proj4, FileGDBAPI, etc.
 

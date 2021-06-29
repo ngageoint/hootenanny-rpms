@@ -20,27 +20,27 @@ LABEL \
   vendor="Maxar Technologies"
 
 # Install basic development and RPM authoring tools.
-SHELL ["/bin/bash", "-c"]
 RUN yum-config-manager --save \
         --setopt=base.repo_gpgcheck=1 \
         --setopt=extras.repo_gpgcheck=1 \
-        --setopt=updates.repo_gpgcheck=1 &> /dev/null && \
+        --setopt=updates.repo_gpgcheck=1 \
+        --add-repo https://geoint-deps.s3.amazonaws.com/el7/stable/geoint-deps.repo &> /dev/null && \
     yum -q -y install centos-release-scl epel-release && \
+    yum-config-manager --enable rhel-server-rhscl-7-rpms && \
     yum -q -y update && \
     yum -q -y install \
         autoconf \
         autoconf-archive \
         automake \
         bzip2 \
+        devtoolset-8 \
         gcc \
         gcc-c++ \
-        gdb \
         git \
         git-core \
         lcov \
         libtool \
         parallel \
-        make \
         m4 \
         redhat-lsb-core \
         redhat-rpm-config \
@@ -52,3 +52,5 @@ RUN yum-config-manager --save \
         wget \
         zip && \
     yum -q -y clean all
+# Set the path to use devtoolset-8
+ENV PATH=/opt/rh/devtoolset-8/root/usr/bin:$PATH

@@ -20,7 +20,7 @@ a YAML library.  For example:
 
 ```yaml
 versions:
-  geos: &geos_version: '3.6.2-1'
+  libpostal: &libpostal_version '1.0.0-1'
 ```
 
 In addition, using anchors allows reuse of the variable without repeating it,
@@ -28,9 +28,12 @@ for example:
 
 ```yaml
 images:
-  - rpmbuild-gdal:
-      args:
-        geos_version: *geos_version
+  base: !!omap
+    - rpmbuild:
+        args:
+          rpmbuild_dist: *rpmbuild_dist
+          rpmbuild_uid: *rpmbuild_uid
+          rpmbuild_gid: *rpmbuild_uid
 ```
 
 ## Environment Variables

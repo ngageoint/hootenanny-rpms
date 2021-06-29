@@ -71,22 +71,13 @@ rpm_package = $(shell echo $(1) | awk '{ split($$0, a, "-"); l = length(a); pkg 
 
 PG_DOTLESS := $(shell echo $(call config_version,pg) | tr -d '.')
 
-ARMADILLO_RPM := $(call rpm_file,armadillo,x86_64)
 DUMBINIT_RPM := $(call rpm_file,dumb-init,x86_64)
-GEOS_RPM := $(call rpm_file,geos,x86_64)
-GDAL_RPM := $(call rpm_file2,hoot-gdal,gdal,x86_64)
 GLPK_RPM := $(call rpm_file,glpk,x86_64)
-GPSBABEL_RPM := $(call rpm_file,gpsbabel,x86_64)
-FILEGDBAPI_RPM := $(call rpm_file,FileGDBAPI,x86_64)
-LIBGEOTIFF_RPM := $(call rpm_file,libgeotiff,x86_64)
-LIBKML_RPM := $(call rpm_file,libkml,x86_64)
 LIBOAUTHCPP_RPM := $(call rpm_file,liboauthcpp,x86_64)
 LIBPHONENUMBER_RPM := $(call rpm_file,libphonenumber,x86_64)
 LIBPOSTAL_RPM := $(call rpm_file,libpostal,x86_64)
 NODEJS_RPM := $(call rpm_file,nodejs,x86_64)
 OSMOSIS_RPM := $(call rpm_file,osmosis,noarch)
-POSTGIS_RPM := $(call rpm_file2,hoot-postgis24_$(PG_DOTLESS),postgis,x86_64)
-PROJ_RPM := $(call rpm_file,proj,x86_64)
 STXXL_RPM := $(call rpm_file,stxxl,x86_64)
 SUEXEC_RPM := $(call rpm_file2,su-exec,suexec,x86_64)
 TOMCAT8_RPM := $(call rpm_file,tomcat8,noarch)
@@ -102,18 +93,13 @@ BASE_CONTAINERS := \
 
 DEPENDENCY_CONTAINERS := \
 	$(BASE_CONTAINERS) \
-	rpmbuild-gdal \
-	rpmbuild-geos \
 	rpmbuild-glpk \
-	rpmbuild-gpsbabel \
-	rpmbuild-libgeotiff \
-	rpmbuild-libkml \
 	rpmbuild-liboauthcpp \
 	rpmbuild-libphonenumber \
 	rpmbuild-libpostal \
-	rpmbuild-postgis \
-	rpmbuild-proj \
-	rpmbuild-nodejs
+	rpmbuild-nodejs \
+	rpmbuild-suexec \
+	rpmbuild-dumb-init
 
 OTHER_CONTAINERS := \
 	rpmbuild-lint \
@@ -122,20 +108,13 @@ OTHER_CONTAINERS := \
 
 DEPENDENCY_RPMS := \
 	dumb-init \
-	FileGDBAPI \
-	geos \
 	glpk \
-	libgeotiff \
-	libkml \
 	liboauthcpp \
 	libphonenumber \
 	libpostal \
-	hoot-gdal \
-	hoot-postgis24_$(PG_DOTLESS) \
 	hoot-words \
 	nodejs \
 	osmosis \
-	proj \
 	stxxl \
 	su-exec \
 	tomcat8 \
@@ -237,10 +216,6 @@ hoot-rpm: rpm
 
 rpmbuild: .vagrant/machines/rpmbuild/docker/id
 
-rpmbuild-armadillo: \
-	rpmbuild-generic \
-	.vagrant/machines/rpmbuild-armadillo/docker/id
-
 rpmbuild-base: \
 	rpmbuild \
 	.vagrant/machines/rpmbuild-base/docker/id
@@ -253,27 +228,9 @@ rpmbuild-generic: \
 	rpmbuild-base \
 	.vagrant/machines/rpmbuild-generic/docker/id
 
-# GDAL container requires GEOS, FileGDBAPI, libgeotiff, and libkml RPMs.
-rpmbuild-gdal: \
-	rpmbuild-pgdg \
-	FileGDBAPI \
-	geos \
-	gpsbabel \
-	libgeotiff \
-	libkml \
-	.vagrant/machines/rpmbuild-gdal/docker/id
-
-rpmbuild-geos: \
-	rpmbuild-generic \
-	.vagrant/machines/rpmbuild-geos/docker/id
-
 rpmbuild-glpk: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-glpk/docker/id
-
-rpmbuild-gpsbabel: \
-	rpmbuild-generic \
-	.vagrant/machines/rpmbuild-gpsbabel/docker/id
 
 rpmbuild-hoot-devel: \
 	rpmbuild-pgdg \
@@ -283,15 +240,6 @@ rpmbuild-hoot-devel: \
 rpmbuild-hoot-release: \
 	rpmbuild-pgdg \
 	.vagrant/machines/rpmbuild-hoot-release/docker/id
-
-rpmbuild-libgeotiff: \
-	rpmbuild-generic \
-	proj \
-	.vagrant/machines/rpmbuild-libgeotiff/docker/id
-
-rpmbuild-libkml: \
-	rpmbuild-generic \
-	.vagrant/machines/rpmbuild-libkml/docker/id
 
 rpmbuild-liboauthcpp: \
 	rpmbuild-generic \
@@ -312,15 +260,6 @@ rpmbuild-nodejs: \
 rpmbuild-pgdg: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-pgdg/docker/id
-
-# PostGIS container requires GDAL RPMs.
-rpmbuild-postgis: \
-	hoot-gdal \
-	.vagrant/machines/rpmbuild-postgis/docker/id
-
-rpmbuild-proj: \
-	rpmbuild-generic \
-	.vagrant/machines/rpmbuild-proj/docker/id
 
 rpmbuild-repo: \
 	rpmbuild \
@@ -356,24 +295,15 @@ validate:
 
 ## Dependency RPM targets.
 
-armadillo: rpmbuild-armadillo $(ARMADILLO_RPM)
 dumb-init: rpmbuild-generic $(DUMBINIT_RPM)
-geos: rpmbuild-geos $(GEOS_RPM)
-FileGDBAPI: rpmbuild-generic $(FILEGDBAPI_RPM)
-libgeotiff: rpmbuild-libgeotiff $(LIBGEOTIFF_RPM)
-libkml: rpmbuild-libkml $(LIBKML_RPM)
 liboauthcpp: rpmbuild-liboauthcpp $(LIBOAUTHCPP_RPM)
 libphonenumber: rpmbuild-libphonenumber $(LIBPHONENUMBER_RPM)
 libpostal: rpmbuild-libpostal $(LIBPOSTAL_RPM)
 nodejs: rpmbuild-nodejs $(NODEJS_RPM)
 glpk: rpmbuild-glpk $(GLPK_RPM)
-gpsbabel: rpmbuild-gpsbabel $(GPSBABEL_RPM)
-hoot-gdal: rpmbuild-gdal $(GDAL_RPM)
 hoot-words: rpmbuild-generic $(WORDS_RPM)
-hoot-postgis24_$(PG_DOTLESS): rpmbuild-postgis $(POSTGIS_RPM)
 hoot-translations-templates: rpmbuild-generic $(TRANSLATIONS_RPM)
 osmosis: rpmbuild-generic $(OSMOSIS_RPM)
-proj: rpmbuild-proj $(PROJ_RPM)
 stxxl: rpmbuild-generic $(STXXL_RPM)
 su-exec: rpmbuild-generic $(SUEXEC_RPM)
 tomcat8: rpmbuild-generic $(TOMCAT8_RPM)
@@ -390,9 +320,7 @@ RPMS/x86_64/hootenanny-%.rpm: .vagrant/machines/$(BUILD_IMAGE)/docker/id
 	$(VAGRANT) docker-run $(BUILD_IMAGE) -- \
 	rpmbuild \
 	  --define "hoot_version_gen $(HOOT_VERSION_GEN)" \
-	  --define "geos_version %(rpm -q --queryformat '%%{version}' geos)" \
 	  --define "glpk_version %(rpm -q --queryformat '%%{version}' glpk)" \
-	  --define "gdal_version %(rpm -q --queryformat '%%{version}' hoot-gdal)" \
 	  --define "liboauthcpp_version %(rpm -q --queryformat '%%{version}' liboauthcpp)" \
 	  --define "libphonenumber_version %(rpm -q --queryformat '%%{version}' libphonenumber)" \
 	  --define "nodejs_version %(rpm -q --queryformat '%%{version}' nodejs)" \

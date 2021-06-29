@@ -31,15 +31,9 @@ case "${BUILD_IMAGE}" in
     devel)
         docker build \
                --build-arg dumbinit_version=$DUMBINIT_VERSION-$DUMBINIT_RELEASE \
-               --build-arg filegdbapi_version=$FILEGDBAPI_VERSION-$FILEGDBAPI_RELEASE \
-               --build-arg gdal_version=$GDAL_VERSION-$GDAL_RELEASE \
-               --build-arg geos_version=$GEOS_VERSION-$GEOS_RELEASE \
                --build-arg glpk_version=$GLPK_VERSION-$GLPK_RELEASE \
-               --build-arg libgeotiff_version=$LIBGEOTIFF_VERSION-$LIBGEOTIFF_RELEASE \
-               --build-arg libkml_version=$LIBKML_VERSION-$LIBKML_RELEASE \
                --build-arg mocha_version=$MOCHA_VERSION \
                --build-arg pg_version=$PG_VERSION \
-               --build-arg postgis_version=$POSTGIS_VERSION-$POSTGIS_RELEASE \
                --build-arg nodejs_version=$NODEJS_VERSION-$NODEJS_RELEASE \
                --build-arg osmosis_version=$OSMOSIS_VERSION-$OSMOSIS_RELEASE \
                --build-arg stxxl_version=$STXXL_VERSION-$STXXL_RELEASE \
