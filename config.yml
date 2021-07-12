@@ -68,36 +68,6 @@ images:
         args:
           mocha_version: *mocha_version
           nodejs_version: *nodejs_version
-  hoot: !!omap
-    - rpmbuild-hoot-devel:
-        args:
-          glpk_version: *glpk_version
-          liboauthcpp_version: *liboauthcpp_version
-          libphonenumber_version: *libphonenumber_version
-          libpostal_version: *libpostal_version
-          mocha_version: *mocha_version
-          nodejs_version: *nodejs_version
-          npm_version: *npm_version
-          pg_version: *pg_version
-          stxxl_version: *stxxl_version
-          tomcat8_version: *tomcat8_version
-          v8_version: *v8_version
-          words_version: *words_version
-        buildrequires: true
-        rpmbuild: true
-        spec_file: 'SPECS/hootenanny.spec'
-    - run-base-devel:
-        args:
-          glpk_version: *glpk_version
-          mocha_version: *mocha_version
-          nodejs_version: *nodejs_version
-          npm_version: *npm_version
-          pg_version: *pg_version
-          stxxl_version: *stxxl_version
-          tomcat8_version: *tomcat8_version
-          v8_version: *v8_version
-          words_version: *words_version
-        rpmbuild: true
 
 rpms:
   glpk:

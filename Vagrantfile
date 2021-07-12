@@ -288,10 +288,4 @@ Vagrant.configure(2) do |config|
   ).each do |name, options|
     rpmbuild(config, name, options)
   end
-
-  # The development containers are last because they all depend
-  # on RPMS built previously.
-  $images['hoot'].each do |name, options|
-    build_container(config, name, options)
-  end
 end
