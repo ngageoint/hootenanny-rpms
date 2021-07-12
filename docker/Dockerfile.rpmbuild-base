@@ -18,9 +18,9 @@ LABEL \
   maintainer="justin.bronn@maxar.com" \
   name="Hootenanny Base RPM Build Image" \
   vendor="Maxar Technologies"
-SHELL ["/bin/bash", "-c"]
 
 # Install basic development and RPM authoring tools.
+SHELL ["/bin/bash", "-c"]
 RUN yum-config-manager --save \
         --setopt=base.repo_gpgcheck=1 \
         --setopt=extras.repo_gpgcheck=1 \
