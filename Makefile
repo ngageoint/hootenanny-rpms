@@ -71,15 +71,12 @@ rpm_package = $(shell echo $(1) | awk '{ split($$0, a, "-"); l = length(a); pkg 
 
 PG_DOTLESS := $(shell echo $(call config_version,pg) | tr -d '.')
 
-DUMBINIT_RPM := $(call rpm_file,dumb-init,x86_64)
 GLPK_RPM := $(call rpm_file,glpk,x86_64)
 LIBOAUTHCPP_RPM := $(call rpm_file,liboauthcpp,x86_64)
 LIBPHONENUMBER_RPM := $(call rpm_file,libphonenumber,x86_64)
 LIBPOSTAL_RPM := $(call rpm_file,libpostal,x86_64)
 NODEJS_RPM := $(call rpm_file,nodejs,x86_64)
-OSMOSIS_RPM := $(call rpm_file,osmosis,noarch)
 STXXL_RPM := $(call rpm_file,stxxl,x86_64)
-SUEXEC_RPM := $(call rpm_file2,su-exec,suexec,x86_64)
 TOMCAT8_RPM := $(call rpm_file,tomcat8,noarch)
 TRANSLATIONS_RPM := $(call rpm_file2,hoot-translations-templates,hoot_translations_templates,noarch)
 WAMERICAN_RPM := $(call rpm_file2,wamerican-insane,wamerican,noarch)
@@ -97,9 +94,7 @@ DEPENDENCY_CONTAINERS := \
 	rpmbuild-liboauthcpp \
 	rpmbuild-libphonenumber \
 	rpmbuild-libpostal \
-	rpmbuild-nodejs \
-	rpmbuild-suexec \
-	rpmbuild-dumb-init
+	rpmbuild-nodejs
 
 OTHER_CONTAINERS := \
 	rpmbuild-lint \
@@ -295,7 +290,6 @@ validate:
 
 ## Dependency RPM targets.
 
-dumb-init: rpmbuild-generic $(DUMBINIT_RPM)
 liboauthcpp: rpmbuild-liboauthcpp $(LIBOAUTHCPP_RPM)
 libphonenumber: rpmbuild-libphonenumber $(LIBPHONENUMBER_RPM)
 libpostal: rpmbuild-libpostal $(LIBPOSTAL_RPM)
@@ -303,9 +297,7 @@ nodejs: rpmbuild-nodejs $(NODEJS_RPM)
 glpk: rpmbuild-glpk $(GLPK_RPM)
 hoot-words: rpmbuild-generic $(WORDS_RPM)
 hoot-translations-templates: rpmbuild-generic $(TRANSLATIONS_RPM)
-osmosis: rpmbuild-generic $(OSMOSIS_RPM)
 stxxl: rpmbuild-generic $(STXXL_RPM)
-su-exec: rpmbuild-generic $(SUEXEC_RPM)
 tomcat8: rpmbuild-generic $(TOMCAT8_RPM)
 wamerican-insane: rpmbuild-generic $(WAMERICAN_RPM)
 
