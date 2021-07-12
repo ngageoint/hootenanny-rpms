@@ -12,13 +12,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-SHELL ["/bin/bash", "-c"]
 FROM hootenanny/rpmbuild
 LABEL \
   description="Base container for building Hootenanny RPMs" \
   maintainer="justin.bronn@maxar.com" \
   name="Hootenanny Base RPM Build Image" \
   vendor="Maxar Technologies"
+SHELL ["/bin/bash", "-c"]
 
 # Install basic development and RPM authoring tools.
 RUN yum-config-manager --save \
