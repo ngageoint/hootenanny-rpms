@@ -19,7 +19,7 @@ set -euo pipefail
 #  * VAGRANT_VERSION
 #  * VAGRANT_BASEURL
 LSB_DIST="$(. /etc/os-release && echo "${ID}")"
-VAGRANT_VERSION="${VAGRANT_VERSION:-2.2.16}"
+VAGRANT_VERSION="${VAGRANT_VERSION:-2.2.17}"
 VAGRANT_BASEURL="${VAGRANT_BASEURL:-https://releases.hashicorp.com/vagrant/${VAGRANT_VERSION}}"
 
 # Set up command differences between RHEL and Debian-based systems.
