@@ -77,6 +77,7 @@ LIBPHONENUMBER_RPM := $(call rpm_file,libphonenumber,x86_64)
 LIBPOSTAL_RPM := $(call rpm_file,libpostal,x86_64)
 NODEJS_RPM := $(call rpm_file,nodejs,x86_64)
 STXXL_RPM := $(call rpm_file,stxxl,x86_64)
+SUEXEC_RPM := $(call rpm_file2,su-exec,suexec,x86_64)
 TOMCAT8_RPM := $(call rpm_file,tomcat8,noarch)
 TRANSLATIONS_RPM := $(call rpm_file2,hoot-translations-templates,hoot_translations_templates,noarch)
 WAMERICAN_RPM := $(call rpm_file2,wamerican-insane,wamerican,noarch)
@@ -110,6 +111,7 @@ DEPENDENCY_RPMS := \
 	nodejs \
 	osmosis \
 	stxxl \
+	su-exec \
 	tomcat8 \
 	wamerican-insane
 
@@ -284,6 +286,7 @@ glpk: rpmbuild-glpk $(GLPK_RPM)
 hoot-words: rpmbuild-generic $(WORDS_RPM)
 hoot-translations-templates: rpmbuild-generic $(TRANSLATIONS_RPM)
 stxxl: rpmbuild-generic $(STXXL_RPM)
+su-exec: rpmbuild-generic $(SUEXEC_RPM)
 tomcat8: rpmbuild-generic $(TOMCAT8_RPM)
 wamerican-insane: rpmbuild-generic $(WAMERICAN_RPM)
 

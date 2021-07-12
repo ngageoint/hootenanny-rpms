@@ -1,6 +1,8 @@
 #!/bin/bash
-# Copyright (C) 2018-2021 Maxar Technologies (https://www.maxar.com)
+# Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
 #
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
@@ -28,4 +30,4 @@ alternatives --install /usr/bin/pg_ctl pgsql-pg_ctl \
              /usr/pgsql-$PG_VERSION/bin/pg_ctl 500
 
 # Initialize the database as `postgres` user.
-su -l postgres -s /bin/sh -c "initdb -D ${PGDATA} --locale ${LANG}"
+su-exec postgres initdb -D $PGDATA --locale $LANG

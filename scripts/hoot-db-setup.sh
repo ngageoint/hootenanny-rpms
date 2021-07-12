@@ -49,7 +49,7 @@ if ! grep -i --quiet hoot $POSTGRES_HBA; then
 fi
 
 # Start database.
-su -l postgres -s /bin/sh -c "pg_ctl -D $PGDATA -s -w start"
+su-exec postgres pg_ctl -D $PGDATA -s -w start
 
 # Create hoot database user.
 createuser --username postgres --superuser $DB_USER
@@ -62,11 +62,11 @@ psql --username postgres --dbname $DB_NAME --command \
      "CREATE EXTENSION hstore;"
 
 # Stop database.
-su -l postgres -s /bin/sh -c "pg_ctl -D $PGDATA -s -m fast -w stop"
+su-exec postgres pg_ctl -D $PGDATA -s -m fast -w stop
 
 # Setup that only occurs for runtime containers.
 if rpm -qa | grep -q ^hootenanny ; then
-    su -l postgres -s /bin/sh -c "pg_ctl -D $PGDATA -s -w start"
+    su-exec postgres pg_ctl -D $PGDATA -s -w start
     source $HOOT_HOME/conf/database/DatabaseConfig.sh
 
     # Run `SetupOsmApiDB.sh`, and clean up its logfile.
@@ -79,7 +79,7 @@ if rpm -qa | grep -q ^hootenanny ; then
 
     # Start Tomcat, and wait for it to unpack the hoot-services WAR,
     # as it's where we'll update liquibase.
-    su -l tomcat -c "$TOMCAT_SERVER start &> /dev/null &"
+    su-exec tomcat $TOMCAT_SERVER start &> /dev/null &
     echo -n 'Waiting for tomcat to start.'
     while ! test -d $TOMCAT_WEBAPPS/hoot-services/WEB-INF; do
         sleep 1
@@ -103,6 +103,6 @@ if rpm -qa | grep -q ^hootenanny ; then
 
     popd
 
-    su -l tomcat -s /bin/sh "$TOMCAT_SERVER stop &> /dev/null &"
-    su -l postgres -s /bin/sh -c "pg_ctl -D $PGDATA -s -m fast -w stop"
+    su-exec tomcat $TOMCAT_SERVER stop &> /dev/null &
+    su-exec postgres pg_ctl -D $PGDATA -s -m fast -w stop
 fi

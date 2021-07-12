@@ -10,6 +10,7 @@ versions:
   postgresql: &pg_version '13'
   stxxl: &stxxl_version '1.3.1-1'
   hoot-translations-templates: &hoot_translations_templates_version '1.0.0-1'
+  su-exec: &suexec_version '0.2-1'
   tomcat8: &tomcat8_version '8.5.66-1'
   # v8 requires the v8 version followed by the NodeJs version
   v8: &v8_version '8.4.371.19-1.14.16.1.1'
@@ -96,6 +97,9 @@ rpms:
   stxxl:
     image: rpmbuild-generic
     version: *stxxl_version
+  su-exec:
+    image: rpmbuild-generic
+    version: *suexec_version
   tomcat8:
     image: rpmbuild-generic
     version: *tomcat8_version
