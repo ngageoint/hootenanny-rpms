@@ -7,12 +7,12 @@ versions:
   libpostal: &libpostal_version '1.0.0-1'
   mocha: &mocha_version '3.5.3'
   nodejs: &nodejs_version '14.16.1-1'
-  npm: &npm_version '6.14.12-1'
   postgresql: &pg_version '13'
   stxxl: &stxxl_version '1.3.1-1'
   hoot-translations-templates: &hoot_translations_templates_version '1.0.0-1'
   tomcat8: &tomcat8_version '8.5.66-1'
-  v8: &v8_version '8.4.371.19-1'
+  # v8 requires the v8 version followed by the NodeJs version
+  v8: &v8_version '8.4.371.19-1.14.16.1.1'
   wamerican-insane: &wamerican_version '7.1-1'
 
 

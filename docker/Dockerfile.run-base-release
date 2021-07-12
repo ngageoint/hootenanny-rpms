@@ -34,6 +34,13 @@ RUN /tmp/hoot-repo.sh && \
     rm -f /tmp/nodejs-install.sh && \
     npm install --silent -g mocha@${mocha_version}
 
+# Install GEOINT deps repository
+RUN yum-config-manager --save \
+        --setopt=base.repo_gpgcheck=1 \
+        --setopt=extras.repo_gpgcheck=1 \
+        --setopt=updates.repo_gpgcheck=1 \
+        --add-repo https://geoint-deps.s3.amazonaws.com/el7/stable/geoint-deps.repo &> /dev/null
+
 # Install Hootenanny dependencies.
 RUN yum install -y -q dumb-init tomcat8 && \
     if [ ! -z "${packages}" ] ; then yum -y -q install ${packages}; fi && \

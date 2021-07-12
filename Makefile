@@ -102,7 +102,6 @@ OTHER_CONTAINERS := \
 	rpmbuild-sonarqube
 
 DEPENDENCY_RPMS := \
-	dumb-init \
 	glpk \
 	liboauthcpp \
 	libphonenumber \

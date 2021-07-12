@@ -31,7 +31,6 @@ case "${BUILD_IMAGE}" in
     devel)
         docker build \
                --build-arg "packages=$( spec_requires hootenanny )" \
-               --build-arg dumbinit_version=$DUMBINIT_VERSION-$DUMBINIT_RELEASE \
                --build-arg glpk_version=$GLPK_VERSION-$GLPK_RELEASE \
                --build-arg libphonenumber_version="$LIBPHONENUMBER_VERSION-$LIBPHONENUMBER_RELEASE" \
                --build-arg liboauthcpp_version="$LIBOAUTHCPP_VERSION-$LIBOAUTHCPP_RELEASE" \
