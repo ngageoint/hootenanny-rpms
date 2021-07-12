@@ -30,7 +30,6 @@ case "${BUILD_IMAGE}" in
     # with the `BuildDeps.sh` script.
     devel)
         docker build \
-               --build-arg dumbinit_version=$DUMBINIT_VERSION-$DUMBINIT_RELEASE \
                --build-arg glpk_version=$GLPK_VERSION-$GLPK_RELEASE \
                --build-arg mocha_version=$MOCHA_VERSION \
                --build-arg pg_version=$PG_VERSION \
