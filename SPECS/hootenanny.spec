@@ -96,9 +96,9 @@ BuildRequires:  git
 BuildRequires:  glpk-devel
 BuildRequires:  gnuplot
 BuildRequires:  graphviz
-BuildRequires:  hoot-gdal
-BuildRequires:  hoot-gdal-devel
-BuildRequires:  hoot-gdal-python
+BuildRequires:  gdal
+BuildRequires:  gdal-devel
+BuildRequires:  gdal-python-tools
 BuildRequires:  hoot-words
 BuildRequires:  java-1.8.0-openjdk
 BuildRequires:  libicu-devel
@@ -851,9 +851,9 @@ Requires:  cppunit
 Requires:  FileGDBAPI
 Requires:  geos = %{geos_version}
 Requires:  glpk = %{glpk_version}
-Requires:  hoot-gdal = %{gdal_version}
-Requires:  hoot-gdal-devel = %{gdal_version}
-Requires:  hoot-gdal-python = %{gdal_version}
+Requires:  gdal = %{gdal_version}
+Requires:  gdal-devel = %{gdal_version}
+Requires:  gdal-python-tools = %{gdal_version}
 Requires:  hoot-words
 Requires:  libicu
 Requires:  liboauthcpp = %{liboauthcpp_version}
