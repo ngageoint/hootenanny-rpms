@@ -37,11 +37,12 @@ ENV HOOT_HOME=/var/lib/hootenanny \
 # as well as with some CLI niceties (htop and less).  Avoid installing
 # dependencies we built, as we'll want to install those manually from
 # built RPMs for the development image.
+COPY scripts/geoint-repo.sh /tmp/
 RUN yum-config-manager --save \
         --setopt=base.repo_gpgcheck=1 \
         --setopt=extras.repo_gpgcheck=1 \
-        --setopt=updates.repo_gpgcheck=1 \
-        --add-repo https://geoint-deps.s3.amazonaws.com/el7/stable/geoint-deps.repo &> /dev/null && \
+        --setopt=updates.repo_gpgcheck=1 &> /dev/null && \
+    /tmp/geoint-repo.sh && rm -f /tmp/geoint-repo.sh && \
     yum -q -y install epel-release && \
     yum -q -y update && \
     yum -q -y install \

@@ -35,6 +35,6 @@ RUN /tmp/hoot-repo.sh && \
     npm install --silent -g mocha@${mocha_version}
 
 # Install Hootenanny dependencies.
-RUN yum install -y -q dumb-init su-exec tomcat8 && \
+RUN yum install -y -q dumb-init tomcat8 && \
     if [ ! -z "${packages}" ] ; then yum -y -q install ${packages}; fi && \
     yum -q -y clean all

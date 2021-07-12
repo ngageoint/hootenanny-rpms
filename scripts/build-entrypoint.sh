@@ -1,5 +1,5 @@
 #!/usr/bin/dumb-init /bin/bash
-# Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
+# Copyright (C) 2018-2021 Maxar Technologies (https://www.maxar.com)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 set -euo pipefail
 
 # Start PostgreSQL, suppressing output.
-su-exec postgres pg_ctl -D $PGDATA -s start &> /dev/null
+su -l postgres -s /bin/sh -c "pg_ctl -D $PGDATA -s start &> /dev/null"
 
 # Start desired command as the unprivileged build user.
-exec su-exec $RPMBUILD_USER "$@"
+exec su -l $RPMBUILD_USER -s /bin/bash -c "$@"

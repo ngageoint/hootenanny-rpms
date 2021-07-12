@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
+# Copyright (C) 2018-2021 Maxar Technologies, Inc. (https://www.maxar.com)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,8 @@ Source0:        https://github.com/googlei18n/libphonenumber/archive/v%{version}
 
 BuildRequires:  boost-devel
 BuildRequires:  cmake
-BuildRequires:  gcc-c++
+BuildRequires:  devtoolset-8-gcc
+BuildRequires:  devtoolset-8-gcc-c++
 BuildRequires:  gtest-devel
 BuildRequires:  libicu-devel
 BuildRequires:  protobuf
@@ -50,6 +51,7 @@ applications which use the Google libphonenumber C++ library.
 
 
 %build
+. /opt/rh/devtoolset-8/enable
 %{__mkdir_p} cpp/build
 pushd cpp/build
 %{cmake} ..
@@ -81,5 +83,7 @@ popd
 
 
 %changelog
+* Mon Jul 12 2021 Justin Bronn <justin.bronn@maxar.com> - 8.12.27-1
+- Upgrade to 8.12.27 with devtoolset-8.
 * Tue Nov 06 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 8.9.16-1
 - Initial release, 8.9.16.

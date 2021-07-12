@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
+# Copyright (C) 2018-2021 Maxar Technologies (https://www.maxar.com)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,10 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 set -euo pipefail
 
-HOOT_BASEURL=${HOOT_BASEURL:-https://s3.amazonaws.com/hoot-repo/el7/deps/release}
-HOOT_KEY=/etc/pki/rpm-gpg/RPM-GPG-KEY-Hoot
+HOOT_DEPS_CHANNEL="${HOOT_DEPS_CHANNEL:-stable}"
+HOOT_DEPS_BASEURL="${HOOT_DEPS_BASEURL:-https://hoot-repo.s3.amazonaws.com/el7/deps/${HOOT_DEPS_CHANNEL}}"
+HOOT_DEPS_KEY=/etc/pki/rpm-gpg/RPM-GPG-KEY-Hoot
 
-cat > $HOOT_KEY <<EOF
+cat > $HOOT_DEPS_KEY <<EOF
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v1
 
@@ -54,9 +55,9 @@ EOF
 cat > /etc/yum.repos.d/hoot.repo <<EOF
 [hoot-deps]
 name = Hootenanny Dependencies
-baseurl = ${HOOT_BASEURL}
+baseurl = ${HOOT_DEPS_BASEURL}
 enable = 1
 gpgcheck = 1
 repo_gpgcheck = 1
-gpgkey=file://${HOOT_KEY}
+gpgkey=file://${HOOT_DEPS_KEY}
 EOF

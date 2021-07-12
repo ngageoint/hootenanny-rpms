@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
+# Copyright (C) 2018-2021 Maxar Technologies, Inc. (https://www.maxar.com)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -88,6 +88,8 @@ BuildRequires:  boost-devel
 BuildRequires:  ccache
 BuildRequires:  cppunit-devel
 BuildRequires:  dblatex
+BuildRequires:  devtoolset-8-gcc
+BuildRequires:  devtoolset-8-gcc-c++
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
 BuildRequires:  gdb
@@ -163,6 +165,8 @@ This package contains the core algorithms and command line interface.
 
 
 %build
+# Enable the devtoolset-8 toolchain prior to building.
+. /opt/rh/devtoolset-8/enable
 source ./SetupEnv.sh
 
 # Link in the dictionary file.

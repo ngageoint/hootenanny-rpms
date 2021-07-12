@@ -111,7 +111,6 @@ DEPENDENCY_RPMS := \
 	nodejs \
 	osmosis \
 	stxxl \
-	su-exec \
 	tomcat8 \
 	wamerican-insane
 

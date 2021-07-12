@@ -36,22 +36,15 @@ ENV PGDATA=${pg_data}
 USER root
 
 # Install Hootenanny release repository, NodeJS and pin to desired version.
-COPY scripts/hoot-repo.sh scripts/nodejs-install.sh /tmp/
-RUN /tmp/hoot-repo.sh && \
-    rm /tmp/hoot-repo.sh && \
+COPY scripts/hoot-repo.sh scripts/geoint-repo.sh scripts/nodejs-install.sh /tmp/
+RUN /tmp/geoint-repo.sh && \
+    /tmp/hoot-repo.sh && \
     /tmp/nodejs-install.sh ${nodejs_version} && \
-    rm -f /tmp/nodejs-install.sh && \
+    rm -f /tmp/*.sh && \
     npm install --silent -g mocha@${mocha_version}
 
-# Install GEOINT deps repository
-RUN yum-config-manager --save \
-        --setopt=base.repo_gpgcheck=1 \
-        --setopt=extras.repo_gpgcheck=1 \
-        --setopt=updates.repo_gpgcheck=1 \
-        --add-repo https://geoint-deps.s3.amazonaws.com/el7/stable/geoint-deps.repo &> /dev/null
-
 # Install Hootenanny dependencies.
-RUN yum install -y -q dumb-init su-exec tomcat8 && \
+RUN yum install -y -q dumb-init tomcat8 && \
     if [ ! -z "${packages}" ] ; then yum -y -q install ${packages}; fi
 
 # Install PostgreSQL server at desired version, and setup the Hoot databases.

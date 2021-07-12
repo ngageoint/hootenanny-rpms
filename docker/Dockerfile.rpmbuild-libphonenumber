@@ -1,0 +1,34 @@
+# Copyright (C) 2018-2021 Maxar Technologies (https://www.maxar.com)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+FROM hootenanny/rpmbuild-base:latest
+LABEL \
+  description="Container for building libphonenumber" \
+  maintainer="justin.bronn@maxar.com" \
+  name="Hootenanny libphonenumber RPM Build Image" \
+  vendor="Maxar Technologies"
+
+ARG packages
+
+USER root
+
+# Use GEOINT dependencies for more recent protobuf library.
+COPY scripts/geoint-repo.sh /tmp/
+RUN /tmp/geoint-repo.sh && rm -f /tmp/geoint-repo.sh && \
+    if [ -n "${packages}" ]; then yum -q -y install ${packages}; fi && \
+    yum -q -y clean all
+
+# Use unprivleged RPM build user and work directory by default.
+USER $RPMBUILD_USER
+WORKDIR $RPMBUILD_HOME
