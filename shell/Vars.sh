@@ -88,10 +88,6 @@ RPMBUILD_DIST=$( config_version rpmbuild_dist )
 RPM_X86_64=$RPMS/x86_64
 RPM_NOARCH=$RPMS/noarch
 
-DUMBINIT_VERSION=$( config_version dumb-init )
-DUMBINIT_RELEASE=$( config_release dumb-init )
-DUMBINIT_RPM=dumb-init-$DUMBINIT_VERSION-$DUMBINIT_RELEASE$RPMBUILD_DIST.x86_64.rpm
-
 GLPK_VERSION=$( config_version glpk )
 GLPK_RELEASE=$( config_release glpk )
 GLPK_RPM=glpk-$GLPK_VERSION-$GLPK_RELEASE$RPMBUILD_DIST.x86_64.rpm

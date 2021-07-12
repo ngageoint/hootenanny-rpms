@@ -21,7 +21,6 @@ LABEL \
   name="Hootenanny Base Development Dependency Runtime Image" \
   vendor="Radiant Solutions"
 
-ARG dumbinit_version
 ARG glpk_version
 ARG mocha_version
 ARG nodejs_version
@@ -37,8 +36,7 @@ ARG words_version
 ENV RPMBUILD_DIST=${rpmbuild_dist}
 
 # Copy in development RPMs at the desired versions.
-COPY RPMS/x86_64/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
-     RPMS/noarch/hoot-words-${words_version}${RPMBUILD_DIST}.noarch.rpm \
+COPY RPMS/noarch/hoot-words-${words_version}${RPMBUILD_DIST}.noarch.rpm \
      RPMS/x86_64/nodejs-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
      RPMS/noarch/osmosis-${osmosis_version}${RPMBUILD_DIST}.noarch.rpm \
      RPMS/x86_64/stxxl-${stxxl_version}${RPMBUILD_DIST}.x86_64.rpm \
@@ -48,7 +46,6 @@ COPY RPMS/x86_64/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
 
 # Install Hootenanny dependencies.
 RUN yum install -y \
-    /tmp/dumb-init-${dumbinit_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/hoot-words-${words_version}${RPMBUILD_DIST}.noarch.rpm \
     /tmp/nodejs-${nodejs_version}${RPMBUILD_DIST}.x86_64.rpm \
     /tmp/osmosis-${osmosis_version}${RPMBUILD_DIST}.noarch.rpm \

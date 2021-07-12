@@ -16,12 +16,6 @@ or the
 [PostgreSQL license](./licenses/PostgreSQL-LICENSE)
 ([source](http://apt.postgresql.org/pub/README)), respectively.
 
-## dumb-init
-
-The [dumb-init](https://github.com/Yelp/dumb-init) source archive was obtained
-directly from [GitHub](https://github.com/Yelp/dumb-init/releases) and
-is [MIT licensed](https://github.com/Yelp/dumb-init/blob/master/LICENSE).
-
 ## GLPK
 
 The [GLPK](https://www.gnu.org/software/glpk/glpk.html) source archives were

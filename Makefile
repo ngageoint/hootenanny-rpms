@@ -71,7 +71,6 @@ rpm_package = $(shell echo $(1) | awk '{ split($$0, a, "-"); l = length(a); pkg 
 
 PG_DOTLESS := $(shell echo $(call config_version,pg) | tr -d '.')
 
-DUMBINIT_RPM := $(call rpm_file,dumb-init,x86_64)
 GLPK_RPM := $(call rpm_file,glpk,x86_64)
 LIBOAUTHCPP_RPM := $(call rpm_file,liboauthcpp,x86_64)
 LIBPHONENUMBER_RPM := $(call rpm_file,libphonenumber,x86_64)
@@ -99,7 +98,6 @@ DEPENDENCY_CONTAINERS := \
 	rpmbuild-libpostal \
 	rpmbuild-nodejs \
 	rpmbuild-suexec \
-	rpmbuild-dumb-init
 
 OTHER_CONTAINERS := \
 	rpmbuild-lint \
@@ -107,7 +105,6 @@ OTHER_CONTAINERS := \
 	rpmbuild-sonarqube
 
 DEPENDENCY_RPMS := \
-	dumb-init \
 	glpk \
 	liboauthcpp \
 	libphonenumber \
@@ -295,7 +292,6 @@ validate:
 
 ## Dependency RPM targets.
 
-dumb-init: rpmbuild-generic $(DUMBINIT_RPM)
 liboauthcpp: rpmbuild-liboauthcpp $(LIBOAUTHCPP_RPM)
 libphonenumber: rpmbuild-libphonenumber $(LIBPHONENUMBER_RPM)
 libpostal: rpmbuild-libpostal $(LIBPOSTAL_RPM)

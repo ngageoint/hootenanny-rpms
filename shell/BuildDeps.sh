@@ -112,16 +112,6 @@ fi
 
 ## Simple Dependencies
 
-# dumb-init
-if [ ! -f $RPM_X86_64/$DUMBINIT_RPM ]; then
-    echo "#### Building RPM: dumb-init"
-    run_dep_image \
-        rpmbuild \
-        --define "rpmbuild_version ${DUMBINIT_VERSION}" \
-        --define "rpmbuild_release ${DUMBINIT_RELEASE}" \
-        -bb SPECS/dumb-init.spec
-fi
-
 # hoot-words
 if [ ! -f $RPM_NOARCH/$WORDS_RPM ]; then
     echo "#### Building RPM: hoot-words"
