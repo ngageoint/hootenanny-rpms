@@ -103,6 +103,7 @@ BuildRequires:  gdal-devel
 BuildRequires:  gdal-python-tools
 BuildRequires:  hoot-words
 BuildRequires:  java-1.8.0-openjdk
+BuildRequires:  lcov
 BuildRequires:  libicu-devel
 BuildRequires:  liboauthcpp-devel
 BuildRequires:  libphonenumber-devel
