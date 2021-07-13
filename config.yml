@@ -12,14 +12,12 @@ versions:
   hoot-translations-templates: &hoot_translations_templates_version '1.0.0-1'
   su-exec: &suexec_version '0.2-1'
   tomcat8: &tomcat8_version '8.5.66-1'
-  # v8 requires the v8 version followed by the NodeJs version
-  v8: &v8_version '8.4.371.19-1.14.16.1.1'
   wamerican-insane: &wamerican_version '7.1-1'
 
 
 maven:
-  cache_url: &maven_cache_url 'https://s3.amazonaws.com/hoot-maven/m2-cache-2018-12-06.tar.gz'
-  cache_sha1: &maven_cache_sha1 'c6e87f8100c9461c00b7d28a5a8d0e8b1737ccf3'
+  cache_url: &maven_cache_url https://hoot-maven.s3.amazonaws.com/m2-cache-2021-07-12.tar.gz
+  cache_sha1: &maven_cache_sha1 a98c09d93d4381d17ddbac45a7261da6af89b15e
 
 
 rpmbuild:
