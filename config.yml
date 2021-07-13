@@ -2,6 +2,7 @@
 versions:
   glpk: &glpk_version '4.65-1'
   hoot-words: &words_version '1.0.1-1'
+  lcov: &lcov_version '1.15-1'
   liboauthcpp: &liboauthcpp_version '0.1.0-1'
   libphonenumber: &libphonenumber_version '8.12.27-1'
   libpostal: &libpostal_version '1.0.0-1'
@@ -21,7 +22,7 @@ maven:
 
 
 rpmbuild:
-  dist: &rpmbuild_dist '.el7'
+  dist: &rpmbuild_dist .el7
   uid: &rpmbuild_uid 1000
 
 
@@ -45,16 +46,19 @@ images:
           pg_version: *pg_version
         buildrequires: true
         rpmbuild: true
-        spec_file: 'SPECS/hootenanny.spec'
+        spec_file: SPECS/hootenanny.spec
     - rpmbuild-lint: {}
     - rpmbuild-repo: {}
     - rpmbuild-sonarqube: {}
     - rpmbuild-glpk:
         buildrequires: true
-        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
+        dockerfile: docker/Dockerfile.rpmbuild-generic
+    - rpmbuild-lcov:
+        buildrequires: true
+        dockerfile: docker/Dockerfile.rpmbuild-generic
     - rpmbuild-liboauthcpp:
         buildrequires: true
-        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
+        dockerfile: docker/Dockerfile.rpmbuild-generic
     - rpmbuild-libphonenumber:
         buildrequires: true
     - rpmbuild-libpostal: {}
@@ -80,6 +84,9 @@ rpms:
     image: rpmbuild-generic
     version: *hoot_translations_templates_version
     arch: noarch
+  lcov:
+    image: rpmbuild-lcov
+    version: *lcov_version
   liboauthcpp:
     image: rpmbuild-liboauthcpp
     version: *liboauthcpp_version

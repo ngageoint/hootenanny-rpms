@@ -72,6 +72,7 @@ rpm_package = $(shell echo $(1) | awk '{ split($$0, a, "-"); l = length(a); pkg 
 PG_DOTLESS := $(shell echo $(call config_version,pg) | tr -d '.')
 
 GLPK_RPM := $(call rpm_file,glpk,x86_64)
+LCOV_RPM := $(call rpm_file,lcov,x86_64)
 LIBOAUTHCPP_RPM := $(call rpm_file,liboauthcpp,x86_64)
 LIBPHONENUMBER_RPM := $(call rpm_file,libphonenumber,x86_64)
 LIBPOSTAL_RPM := $(call rpm_file,libpostal,x86_64)
@@ -92,6 +93,7 @@ BASE_CONTAINERS := \
 DEPENDENCY_CONTAINERS := \
 	$(BASE_CONTAINERS) \
 	rpmbuild-glpk \
+	rpmbuild-lcov \
 	rpmbuild-liboauthcpp \
 	rpmbuild-libphonenumber \
 	rpmbuild-libpostal \
@@ -104,6 +106,7 @@ OTHER_CONTAINERS := \
 
 DEPENDENCY_RPMS := \
 	glpk \
+	lcov \
 	liboauthcpp \
 	libphonenumber \
 	libpostal \
@@ -229,6 +232,10 @@ rpmbuild-hoot-release: \
 	rpmbuild-pgdg \
 	.vagrant/machines/rpmbuild-hoot-release/docker/id
 
+rpmbuild-lcov: \
+	rpmbuild-generic \
+	.vagrant/machines/rpmbuild-lcov/docker/id
+
 rpmbuild-liboauthcpp: \
 	rpmbuild-generic \
 	.vagrant/machines/rpmbuild-liboauthcpp/docker/id
@@ -278,13 +285,14 @@ validate:
 
 ## Dependency RPM targets.
 
+glpk: rpmbuild-glpk $(GLPK_RPM)
+hoot-words: rpmbuild-generic $(WORDS_RPM)
+hoot-translations-templates: rpmbuild-generic $(TRANSLATIONS_RPM)
+lcov: rpmbuild-lcov $(LCOV_RPM)
 liboauthcpp: rpmbuild-liboauthcpp $(LIBOAUTHCPP_RPM)
 libphonenumber: rpmbuild-libphonenumber $(LIBPHONENUMBER_RPM)
 libpostal: rpmbuild-libpostal $(LIBPOSTAL_RPM)
 nodejs: rpmbuild-nodejs $(NODEJS_RPM)
-glpk: rpmbuild-glpk $(GLPK_RPM)
-hoot-words: rpmbuild-generic $(WORDS_RPM)
-hoot-translations-templates: rpmbuild-generic $(TRANSLATIONS_RPM)
 stxxl: rpmbuild-generic $(STXXL_RPM)
 su-exec: rpmbuild-generic $(SUEXEC_RPM)
 tomcat8: rpmbuild-generic $(TOMCAT8_RPM)

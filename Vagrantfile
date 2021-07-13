@@ -281,6 +281,7 @@ Vagrant.configure(2) do |config|
   collect_rpms(
     ['rpmbuild-generic',
      'rpmbuild-glpk',
+     'rpmbuild-lcov',
      'rpmbuild-liboauthcpp',
      'rpmbuild-libphonenumber',
      'rpmbuild-libpostal',
