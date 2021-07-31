@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
+# Copyright (C) 2018-2021 Maxar Technologies, Inc. (https://www.maxar.com)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -88,6 +88,8 @@ BuildRequires:  boost-devel
 BuildRequires:  ccache
 BuildRequires:  cppunit-devel
 BuildRequires:  dblatex
+BuildRequires:  devtoolset-8-gcc
+BuildRequires:  devtoolset-8-gcc-c++
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
 BuildRequires:  gdb
@@ -96,11 +98,12 @@ BuildRequires:  git
 BuildRequires:  glpk-devel
 BuildRequires:  gnuplot
 BuildRequires:  graphviz
-BuildRequires:  hoot-gdal
-BuildRequires:  hoot-gdal-devel
-BuildRequires:  hoot-gdal-python
+BuildRequires:  gdal
+BuildRequires:  gdal-devel
+BuildRequires:  gdal-python-tools
 BuildRequires:  hoot-words
 BuildRequires:  java-1.8.0-openjdk
+BuildRequires:  lcov
 BuildRequires:  libicu-devel
 BuildRequires:  liboauthcpp-devel
 BuildRequires:  libphonenumber-devel
@@ -163,6 +166,8 @@ This package contains the core algorithms and command line interface.
 
 
 %build
+# Enable the devtoolset-8 toolchain prior to building.
+. /opt/rh/devtoolset-8/enable
 source ./SetupEnv.sh
 
 # Link in the dictionary file.
@@ -851,9 +856,9 @@ Requires:  cppunit
 Requires:  FileGDBAPI
 Requires:  geos = %{geos_version}
 Requires:  glpk = %{glpk_version}
-Requires:  hoot-gdal = %{gdal_version}
-Requires:  hoot-gdal-devel = %{gdal_version}
-Requires:  hoot-gdal-python = %{gdal_version}
+Requires:  gdal = %{gdal_version}
+Requires:  gdal-devel = %{gdal_version}
+Requires:  gdal-python-tools = %{gdal_version}
 Requires:  hoot-words
 Requires:  libicu
 Requires:  liboauthcpp = %{liboauthcpp_version}

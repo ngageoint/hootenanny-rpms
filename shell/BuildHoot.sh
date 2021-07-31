@@ -31,9 +31,7 @@ run_hoot_build_image \
     -i "$BUILD_IMAGE" \
     rpmbuild \
       --define "hoot_version_gen ${HOOT_VERSION_GEN}" \
-      --define "geos_version %(rpm -q --queryformat '%%{version}' geos)" \
       --define "glpk_version %(rpm -q --queryformat '%%{version}' glpk)" \
-      --define "gdal_version %(rpm -q --queryformat '%%{version}' hoot-gdal)" \
       --define "liboauthcpp_version %(rpm -q --queryformat '%%{version}' liboauthcpp)" \
       --define "libphonenumber_version %(rpm -q --queryformat '%%{version}' libphonenumber)" \
       --define "nodejs_version %(rpm -q --queryformat '%%{version}' nodejs)" \

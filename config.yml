@@ -1,38 +1,28 @@
 ---
 versions:
-  armadillo: &armadillo_version '9.400.3-1'
-  dumb-init: &dumb-init_version '1.2.5-1'
-  geos: &geos_version '3.7.2-1'
   glpk: &glpk_version '4.65-1'
-  gpsbabel: &gpsbabel_version '1.5.4-1'
-  hoot-gdal: &gdal_version '2.1.4-2'
   hoot-words: &words_version '1.0.1-1'
-  FileGDBAPI: &FileGDBAPI_version '1.5.1-1'
-  libgeotiff: &libgeotiff_version '1.5.1-1'
-  libkml: &libkml_version '1.3.0-1'
+  lcov: &lcov_version '1.15-1'
   liboauthcpp: &liboauthcpp_version '0.1.0-1'
-  libphonenumber: &libphonenumber_version '8.9.16-1'
+  libphonenumber: &libphonenumber_version '8.12.27-1'
   libpostal: &libpostal_version '1.0.0-1'
   mocha: &mocha_version '3.5.3'
   nodejs: &nodejs_version '14.16.1-1'
-  osmosis: &osmosis_version '0.46-1'
-  postgis: &postgis_version '2.4.4-2'
-  postgresql: &pg_version '9.5'
-  proj: &proj_version '6.1.0-1'
+  postgresql: &pg_version '13'
   stxxl: &stxxl_version '1.3.1-1'
-  su-exec: &suexec_version '0.2-1'
   hoot-translations-templates: &hoot_translations_templates_version '1.0.0-1'
+  su-exec: &suexec_version '0.2-1'
   tomcat8: &tomcat8_version '8.5.66-1'
   wamerican-insane: &wamerican_version '7.1-1'
 
 
 maven:
-  cache_url: &maven_cache_url 'https://s3.amazonaws.com/hoot-maven/m2-cache-2018-12-06.tar.gz'
-  cache_sha1: &maven_cache_sha1 'c6e87f8100c9461c00b7d28a5a8d0e8b1737ccf3'
+  cache_url: &maven_cache_url https://hoot-maven.s3.amazonaws.com/m2-cache-2021-07-12.tar.gz
+  cache_sha1: &maven_cache_sha1 a98c09d93d4381d17ddbac45a7261da6af89b15e
 
 
 rpmbuild:
-  dist: &rpmbuild_dist '.el7'
+  dist: &rpmbuild_dist .el7
   uid: &rpmbuild_uid 1000
 
 
@@ -56,37 +46,20 @@ images:
           pg_version: *pg_version
         buildrequires: true
         rpmbuild: true
-        spec_file: 'SPECS/hootenanny.spec'
+        spec_file: SPECS/hootenanny.spec
     - rpmbuild-lint: {}
     - rpmbuild-repo: {}
     - rpmbuild-sonarqube: {}
-    - rpmbuild-armadillo:
-        buildrequires: true
-        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
-    - rpmbuild-geos:
-        buildrequires: true
-        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
     - rpmbuild-glpk:
         buildrequires: true
-        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
-    - rpmbuild-gpsbabel:
+        dockerfile: docker/Dockerfile.rpmbuild-generic
+    - rpmbuild-lcov:
         buildrequires: true
-        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
-    - rpmbuild-libkml:
-        buildrequires: true
-        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
+        dockerfile: docker/Dockerfile.rpmbuild-generic
     - rpmbuild-liboauthcpp:
         buildrequires: true
-        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
+        dockerfile: docker/Dockerfile.rpmbuild-generic
     - rpmbuild-libphonenumber:
-        buildrequires: true
-        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
-    - rpmbuild-proj:
-        buildrequires: true
-        dockerfile: 'docker/Dockerfile.rpmbuild-generic'
-    - rpmbuild-libgeotiff:
-        args:
-          proj_version: *proj_version
         buildrequires: true
     - rpmbuild-libpostal: {}
     - rpmbuild-nodejs:
@@ -98,88 +71,11 @@ images:
         args:
           mocha_version: *mocha_version
           nodejs_version: *nodejs_version
-          pg_version: *pg_version
-  gdal: !!omap
-    - rpmbuild-gdal:
-        args:
-          filegdbapi_version: *FileGDBAPI_version
-          geos_version: *geos_version
-          gpsbabel_version: *gpsbabel_version
-          libgeotiff_version: *libgeotiff_version
-          libkml_version: *libkml_version
-          pg_version: *pg_version
-        buildrequires: true
-        spec_file: 'SPECS/hoot-gdal.spec'
-  hoot: !!omap
-    - rpmbuild-hoot-devel:
-        args:
-          dumbinit_version: *dumb-init_version
-          filegdbapi_version: *FileGDBAPI_version
-          geos_version: *geos_version
-          gdal_version: *gdal_version
-          glpk_version: *glpk_version
-          libgeotiff_version: *libgeotiff_version
-          libkml_version: *libkml_version
-          mocha_version: *mocha_version
-          nodejs_version: *nodejs_version
-          osmosis_version: *osmosis_version
-          pg_version: *pg_version
-          stxxl_version: *stxxl_version
-          suexec_version: *suexec_version
-          tomcat8_version: *tomcat8_version
-          words_version: *words_version
-        buildrequires: true
-        rpmbuild: true
-        spec_file: 'SPECS/hootenanny.spec'
-    - run-base-devel:
-        args:
-          dumbinit_version: *dumb-init_version
-          filegdbapi_version: *FileGDBAPI_version
-          geos_version: *geos_version
-          gdal_version: *gdal_version
-          glpk_version: *glpk_version
-          libgeotiff_version: *libgeotiff_version
-          libkml_version: *libkml_version
-          mocha_version: *mocha_version
-          nodejs_version: *nodejs_version
-          osmosis_version: *osmosis_version
-          pg_version: *pg_version
-          stxxl_version: *stxxl_version
-          suexec_version: *suexec_version
-          tomcat8_version: *tomcat8_version
-          words_version: *words_version
-        rpmbuild: true
-  postgis: !!omap
-    - rpmbuild-postgis:
-        args:
-          gdal_version: *gdal_version
-        buildrequires: true
-        spec_file: 'SPECS/hoot-postgis24.spec'
-
 
 rpms:
-  armadillo:
-    image: rpmbuild-armadillo
-    version: *armadillo_version
-  dumb-init:
-    image: rpmbuild-generic
-    version: *dumb-init_version
-  geos:
-    image: rpmbuild-geos
-    version: *geos_version
   glpk:
     image: rpmbuild-glpk
     version: *glpk_version
-  gpsbabel:
-    image: rpmbuild-gpsbabel
-    version: *gpsbabel_version
-  hoot-gdal:
-    image: rpmbuild-gdal
-    version: *gdal_version
-  hoot-postgis24_95:
-    image: rpmbuild-postgis
-    version: *postgis_version
-    spec_file: 'SPECS/hoot-postgis24.spec'
   hoot-words:
     image: rpmbuild-generic
     version: *words_version
@@ -188,15 +84,9 @@ rpms:
     image: rpmbuild-generic
     version: *hoot_translations_templates_version
     arch: noarch
-  FileGDBAPI:
-    image: rpmbuild-generic
-    version: *FileGDBAPI_version
-  libgeotiff:
-    image: rpmbuild-libgeotiff
-    version: *libgeotiff_version
-  libkml:
-    image: rpmbuild-libkml
-    version: *libkml_version
+  lcov:
+    image: rpmbuild-lcov
+    version: *lcov_version
   liboauthcpp:
     image: rpmbuild-liboauthcpp
     version: *liboauthcpp_version
@@ -209,19 +99,12 @@ rpms:
   nodejs:
     image: rpmbuild-nodejs
     version: *nodejs_version
-  osmosis:
-    image: rpmbuild-generic
-    version: *osmosis_version
-    arch: noarch
-  proj:
-    image: rpmbuild-proj
-    version: *proj_version
-  su-exec:
-    image: rpmbuild-generic
-    version: *suexec_version
   stxxl:
     image: rpmbuild-generic
     version: *stxxl_version
+  su-exec:
+    image: rpmbuild-generic
+    version: *suexec_version
   tomcat8:
     image: rpmbuild-generic
     version: *tomcat8_version
