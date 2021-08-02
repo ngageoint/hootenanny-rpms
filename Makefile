@@ -309,6 +309,8 @@ RPMS/x86_64/hootenanny-%.rpm: .vagrant/machines/$(BUILD_IMAGE)/docker/id
 	$(VAGRANT) docker-run $(BUILD_IMAGE) -- \
 	rpmbuild \
 	  --define "hoot_version_gen $(HOOT_VERSION_GEN)" \
+	  --define "geos_version %(rpm -q --queryformat '%%{version}' geos)" \
+	  --define "gdal_version %(rpm -q --queryformat '%%{version}' gdal)" \
 	  --define "glpk_version %(rpm -q --queryformat '%%{version}' glpk)" \
 	  --define "liboauthcpp_version %(rpm -q --queryformat '%%{version}' liboauthcpp)" \
 	  --define "libphonenumber_version %(rpm -q --queryformat '%%{version}' libphonenumber)" \
