@@ -112,16 +112,6 @@ NODEJS_VERSION=$( config_version nodejs )
 NODEJS_RELEASE=$( config_release nodejs )
 NODEJS_RPM=nodejs-$NODEJS_VERSION-$NODEJS_RELEASE$RPMBUILD_DIST.x86_64.rpm
 NODEJS_DEVEL_RPM=nodejs-devel-$NODEJS_VERSION-$NODEJS_RELEASE$RPMBUILD_DIST.x86_64.rpm
-NPM_VERSION=$( config_version npm )
-NPM_RELEASE=$( config_release npm )
-NPM_RPM=npm-$NPM_VERSION-$NPM_RELEASE$RPMBUILD_DIST.x86_64.rpm
-V8_VERSION=$( config_version v8 )
-V8_RELEASE=$( config_release v8 )
-V8_RPM=v8-devel-$V8_VERSION-$V8_RELEASE$RPMBUILD_DIST.x86_64.rpm
-
-OSMOSIS_VERSION=$( config_version osmosis )
-OSMOSIS_RELEASE=$( config_release osmosis )
-OSMOSIS_RPM=osmosis-$OSMOSIS_VERSION-$OSMOSIS_RELEASE$RPMBUILD_DIST.noarch.rpm
 
 STXXL_VERSION=$( config_version stxxl )
 STXXL_RELEASE=$( config_release stxxl )
