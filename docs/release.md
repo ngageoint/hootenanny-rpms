@@ -148,11 +148,11 @@ have *multiple* RPMs -- you'll need to modify the instructions accordingly
    however, compiled C/C++ programs would be placed in `RPMS/x86_64` instead.
 
 1. Create a directory for the release dependency repository, and copy the
-   RPMs into it:
+   RPMs into it; by default we call it `stable`:
 
    ```
-   mkdir -p el7/deps/release
-   cp -pv RPMS/noarch/tomcat8-8.5.34-1.el7.noarch.rpm el7/deps/release
+   mkdir -p el7/deps/stable
+   cp -pv RPMS/noarch/tomcat8-8.5.34-1.el7.noarch.rpm el7/deps/stable
    ```
 
 1. Start the `rpmbuild-repo` container, specifying the AWS credentials
@@ -173,33 +173,33 @@ have *multiple* RPMs -- you'll need to modify the instructions accordingly
    GPG passphrase when prompted:
 
    ```
-   rpmsign --addsign el7/deps/release/tomcat8-8.5.34-1.el7.noarch.rpm
+   rpmsign --addsign el7/deps/stable/tomcat8-8.5.34-1.el7.noarch.rpm
    ```
 
-1. Copy the existing dependency release repository to `el7/deps/release`
+1. Copy the existing dependency release repository to `el7/deps/stable`
    using the AWS CLI:
 
    ```
-   aws s3 sync s3://hoot-repo/el7/deps/release/ el7/deps/release/
+   aws s3 sync s3://hoot-repo/el7/deps/stable/ el7/deps/stable/
    ```
 
 1. Update the dependency Yum repository with the latest release RPMs:
 
    ```
-   ./scripts/repo-update.sh el7/deps/release
+   ./scripts/repo-update.sh el7/deps/stable
    ```
 
 1. Once the repository is updated, its metadata needs to be
    signed as well.  Provide the passphrase and allow the existing
-   `el7/deps/release/repomd.xml.asc` file to be overwritten:
+   `el7/deps/stable/repomd.xml.asc` file to be overwritten:
 
    ```
-   ./scripts/repo-sign.sh el7/deps/release
+   ./scripts/repo-sign.sh el7/deps/stable
    ```
 
 1. The final step is to reupload the dependency repository back up to S3 using
    the AWS CLI and deleting any old metadata files out of the bucket:
 
    ```
-   aws s3 sync el7/deps/release/ s3://hoot-repo/el7/deps/release/ --delete
+   aws s3 sync el7/deps/stable/ s3://hoot-repo/el7/deps/stable/ --delete
    ```
