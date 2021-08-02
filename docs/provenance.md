@@ -23,12 +23,26 @@ obtained directly from [GNU](https://ftp.gnu.org/gnu/glpk/) and licensed under
 the [GPLv3](https://www.gnu.org/licenses/gpl.html).
 
 The following packaging files originate from
-[Fedora GLPK RPM](https://src.fedoraproject.org/cgit/rpms/glpk.git)
+[Fedora GLPK RPM](https://src.fedoraproject.org/rpms/glpk)
 repository and are [MIT licensed](./licenses/Fedora-LICENSE):
 
 * [`glpk.spec`](../SPECS/glpk.spec)
 * [`glpk-alias.patch`](../SOURCES/glpk-alias.patch)
 * [`glpk-unbundle-suitesparse-zlib.patch`](../SOURCES/glpk-unbundle-suitesparse-zlib.patch)
+
+## lcov
+
+The [lcov](https://github.com/linux-test-project/lcov/) source
+archives were obtained directly from
+[GitHub](https://github.com/linux-test-project/lcov/releases) and
+is GPLv2 licensed.
+
+The following packaging files originate from
+[Fedora lcov RPM](https://src.fedoraproject.org/rpms/lcov)
+repository and are [MIT licensed](./licenses/Fedora-LICENSE):
+
+* [`lcov.spec`](../SPECS/lcov.spec)
+
 
 ## liboauthcpp
 
@@ -60,7 +74,7 @@ its [source code archive](../SOURCES/icu4c-67_1-src.tgz) is under the
 [Unicode License](https://github.com/unicode-org/icu/blob/main/icu4c/LICENSE).
 
 The following packaging files originate from
-[Fedora NodeJS RPM](https://src.fedoraproject.org/cgit/rpms/nodejs.git)
+[Fedora NodeJS RPM](https://src.fedoraproject.org/rpms/nodejs)
 repository and are [MIT licensed](./licenses/Fedora-LICENSE):
 
 * [`nodejs.spec`](../SPECS/nodejs.spec)
@@ -91,7 +105,7 @@ and is released under the
 [Boost Software License, Version 1.0](http://www.boost.org/LICENSE_1_0.txt).
 
 The [`stxxl.spec`](../SPECS/stxxl.spec) file originates from
-[Fedora `stxxl` RPM](https://src.fedoraproject.org/cgit/rpms/stxxl.git)
+[Fedora `stxxl` RPM](https://src.fedoraproject.org/rpms/stxxl)
 packaging repository and is [MIT licensed](./licenses/Fedora-LICENSE).
 
 ## su-exec
@@ -109,11 +123,11 @@ and released under the [Apache 2 license](http://www.apache.org/licenses/LICENSE
 The [`tomcat8.spec`](../SPECS/tomcat8.spec) file originates from the
 [JPackage Project](http://www.jpackage.org), is BSD licensed and
 was later incorporated into
-[Fedora Tomcat RPM](https://src.fedoraproject.org/cgit/rpms/tomcat.git)
+[Fedora Tomcat RPM](https://src.fedoraproject.org/rpms/tomcat)
 repository.
 
 These additional packaging files originate from
-[Fedora Tomcat RPM](https://src.fedoraproject.org/cgit/rpms/tomcat.git)
+[Fedora Tomcat RPM](https://src.fedoraproject.org/rpms/tomcat)
 repository and are [MIT licensed](./licenses/Fedora-LICENSE):
 
 * [`tomcat8.conf`](../SOURCES/tomcat8.conf)
