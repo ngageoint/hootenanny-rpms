@@ -204,6 +204,7 @@ popd
 # User data directories, make directories group-writable.
 %{__install} -d -m 0775 %{buildroot}%{hoot_home}/tmp
 %{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles
+%{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/changesets
 %{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/customscript
 %{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/ingest
 %{__install} -d -m 0775 %{buildroot}%{hoot_home}/userfiles/ingest/processed
@@ -284,6 +285,7 @@ EOF
 %{__make} install
 
 echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
+echo "export JAVA_HOME=/usr/lib/jvm" >> %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
 %{__chmod} 0755 %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
 
 # testing files.
