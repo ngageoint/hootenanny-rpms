@@ -26,6 +26,10 @@ else
     yum makecache -y
     yum install -y hootenanny-services-ui
 
+    # Temporary workaround to get upgrade test to pass from busted previous version
+    export JAVA_HOME=/usr/lib/jvm
+    $HOOT_HOME/scripts/HootEnv.sh
+
     # Get the previous version.
     PREV_HOOT_VERSION="$(hoot version)"
 
