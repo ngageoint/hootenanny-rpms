@@ -1,5 +1,7 @@
 # Installing Hootenanny RPMs
 
+Current version of Hootenanny can be installed from RPMs only on CentOS7. CentOS8 fails due to missing dependencies of liquibase and postgresql.
+
 The following provides instructions for installing Hootenanny from
 locally (RPMS built by the user) or from repositories hosted in
 S3.
