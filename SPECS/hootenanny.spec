@@ -238,6 +238,9 @@ popd
 export GDAL_DATA=%{gdal_data}
 export HOOT_HOME=%{hoot_home}
 export HOOT_WORKING_NAME=%{name}
+export JAVA_HOME=/usr/lib/jvm
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:$JAVA_HOME/jre/lib/amd64/server:${HOOT_HOME}/lib
+export PATH=${HOOT_HOME}/bin:${PATH}
 EOF
 
 # Add a dummy Tomcat log file, `catalina.out`, to prevent error popup in UI.
