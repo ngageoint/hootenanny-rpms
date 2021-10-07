@@ -43,8 +43,8 @@ else
     autoheader
     automake --add-missing --copy
 
-    # Run configure, enable R&D, services, and PostgreSQL.
-    ./configure --quiet --with-rnd --with-services --with-postgresql
+    # Run configure, enable services and PostgreSQL.
+    ./configure --quiet --with-services --with-postgresql
 
     # Make the archive.
     make -j"$(nproc)" clean

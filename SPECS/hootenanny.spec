@@ -175,7 +175,7 @@ ln -s %{hoot_home}/conf/dictionary/words1.sqlite conf/dictionary/words.sqlite
 ln -s %{hoot_home}/conf/dictionary/words1.sqlite conf/dictionary/words1.sqlite
 
 # The dir configurations set the install directory to work with EL's dir structure
-./configure -q --with-rnd --with-services --with-postgresql --with-josm \
+./configure -q --with-services --with-postgresql \
     --prefix=%{buildroot}%{_prefix} \
     --datarootdir=%{buildroot}%{_datarootdir}/%{name} \
     --docdir=%{buildroot}%{_docdir}/%{name} \
