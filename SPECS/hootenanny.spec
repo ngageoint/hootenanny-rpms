@@ -53,7 +53,7 @@
 # Default variables for Hootenanny and Tomcat.
 %{!?gdal_data: %global gdal_data %{_datadir}/gdal}
 %{!?hoot_home: %global hoot_home %{_sharedstatedir}/%{name}}
-%{!?jre_home: %global jre_home %{_libdir}/jvm/jre-1.8.0}
+%{!?jre_home: %global jre_home %{_prefix}/lib/jvm/jre-1.8.0}
 %{!?tomcat_basedir: %global tomcat_basedir %{_sharedstatedir}/tomcat8}
 %{!?tomcat_config: %global tomcat_config %{_sysconfdir}/tomcat8}
 %{!?tomcat_home: %global tomcat_home %{_datadir}/tomcat8}
