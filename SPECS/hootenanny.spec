@@ -53,7 +53,7 @@
 # Default variables for Hootenanny and Tomcat.
 %{!?gdal_data: %global gdal_data %{_datadir}/gdal}
 %{!?hoot_home: %global hoot_home %{_sharedstatedir}/%{name}}
-%{!?java_home: %global java_home %{_libdir}/jvm/jre-1.8.0}
+%{!?jre_home: %global jre_home %{_libdir}/jvm/jre-1.8.0}
 %{!?tomcat_basedir: %global tomcat_basedir %{_sharedstatedir}/tomcat8}
 %{!?tomcat_config: %global tomcat_config %{_sysconfdir}/tomcat8}
 %{!?tomcat_home: %global tomcat_home %{_datadir}/tomcat8}
@@ -239,7 +239,7 @@ popd
 export GDAL_DATA=%{gdal_data}
 export HOOT_HOME=%{hoot_home}
 export HOOT_WORKING_NAME=%{name}
-export JAVA_HOME=%{java_home}
+export JAVA_HOME=%{jre_home}
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:$JAVA_HOME/lib/amd64/server:$HOOT_HOME/lib
 export PATH=$HOOT_HOME/bin:$PATH
 EOF
@@ -289,7 +289,7 @@ EOF
 %{__make} install
 
 echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
-echo "export JAVA_HOME=%{java_home}" >> %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
+echo "export JAVA_HOME=%{jre_home}" >> %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
 %{__chmod} 0755 %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
 
 # testing files.
