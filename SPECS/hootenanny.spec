@@ -289,7 +289,6 @@ EOF
 %{__make} install
 
 echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
-echo "export JAVA_HOME=%{jre_home}" >> %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
 %{__chmod} 0755 %{buildroot}%{_sysconfdir}/profile.d/hootenanny.sh
 
 # testing files.
