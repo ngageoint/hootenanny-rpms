@@ -17,6 +17,7 @@ jobs:
   rpmbuild-hoot-release:
     machine:
       enabled: true
+      resource_class: large
     steps:
       - checkout
       - run:
@@ -35,6 +36,7 @@ jobs:
   master-rpm:
     machine:
       enabled: true
+      resource_class: large
     steps:
       - checkout
       - run:
