@@ -103,7 +103,7 @@ workflows:
       - master-sync: &master-sync
           requires:
             - master-install
-            - master-upgrade
+            #- master-upgrade
     triggers:
       - schedule:
           cron: "0 6,17 * * *"
