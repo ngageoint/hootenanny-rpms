@@ -3,9 +3,9 @@ version: 2
 
 jobs:
   lint:
-    working_directory: /rpmbuild/hootenanny-rpms
+    working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
-      - image: hootenanny/rpmbuild-lint@sha256:c11074a08e08469033ecb098bb3cc46c877a0f010799c083e0d0abb844ed285a
+      - image: hootenanny/rpmbuild-lint@sha256:e54184398548d02abc7552bb49b7c2dae8aa554ae10760837162b1477ba87465
         user: rpmbuild
     steps:
       - checkout
@@ -17,7 +17,6 @@ jobs:
   rpmbuild-hoot-release:
     machine:
       enabled: true
-      resource_class: large
     steps:
       - checkout
       - run:
@@ -36,7 +35,6 @@ jobs:
   master-rpm:
     machine:
       enabled: true
-      resource_class: large
     steps:
       - checkout
       - run:
@@ -52,9 +50,9 @@ jobs:
           paths:
             - "*.rpm"
   master-install:
-    working_directory: /rpmbuild/hootenanny-rpms
+    working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
-      - image: hootenanny/run-base-release@sha256:7da69a9b0fac75a56ee14020ae285376889dcf6349720ae0dbfb8ff05cdf39ae
+      - image: hootenanny/run-base-release@sha256:0655f8f13e9b60c6958607f943e736dd6235772a66f28472ee6fd85f3c5486f7
     steps:
       - checkout
       - attach_workspace:
@@ -64,9 +62,9 @@ jobs:
           command: |
             ./tests/install-rpm.sh
   master-upgrade:
-    working_directory: /rpmbuild/hootenanny-rpms
+    working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
-      - image: hootenanny/run-base-release@sha256:7da69a9b0fac75a56ee14020ae285376889dcf6349720ae0dbfb8ff05cdf39ae
+      - image: hootenanny/run-base-release@sha256:0655f8f13e9b60c6958607f943e736dd6235772a66f28472ee6fd85f3c5486f7
     steps:
       - checkout
       - attach_workspace:
@@ -76,9 +74,9 @@ jobs:
           command: |
             ./tests/upgrade-rpm.sh
   master-sync:
-    working_directory: /rpmbuild/hootenanny-rpms
+    working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
-      - image: hootenanny/rpmbuild-repo@sha256:31678e77444090d0d2bdd6cfc3d19d957ffd3a494cfed05e005abb24adc8f2d6
+      - image: hootenanny/rpmbuild-repo@sha256:4108df08fe36d9dc573fd5d78919c6bedc7ad4bc29a74be5d9729111df28dd22
         user: rpmbuild
     steps:
       - checkout
@@ -91,41 +89,23 @@ jobs:
 
 workflows:
   version: 2
-  master-repo:
-    jobs:
-      - master-rpm
-      - master-install: &master-install
-          requires:
-            - master-rpm
-      - master-upgrade: &master-upgrade
-          requires:
-            - master-rpm
-      - master-sync: &master-sync
-          requires:
-            - master-install
-            - master-upgrade
-    triggers:
-      - schedule:
-          cron: "0 6,17 * * *"
-          filters: &filters-master
-            branches:
-              only:
-                - master
   # Always run the RPM workflow on merges to master to take into account
   # any SPEC changes and to make it possible to force a RPM rebuild at
   # any time.
   master-rpm:
     jobs:
       - master-rpm:
-          filters: *filters-master
+          filters: &filters-master
+            branches:
+              only:
+                - master
       - master-install:
-          <<: *master-install
+          requires:
+            - master-rpm
           filters: *filters-master
       - master-upgrade:
-          <<: *master-upgrade
-          filters: *filters-master
-      - master-sync:
-          <<: *master-sync
+          requires:
+            - master-rpm
           filters: *filters-master
   tests:
     jobs:
