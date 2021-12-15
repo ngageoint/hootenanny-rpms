@@ -91,41 +91,48 @@ jobs:
 
 workflows:
   version: 2
-  master-repo:
-    jobs:
-      - master-rpm
-      - master-install: &master-install
-          requires:
-            - master-rpm
-      - master-upgrade: &master-upgrade
-          requires:
-            - master-rpm
-      - master-sync: &master-sync
-          requires:
-            - master-install
-            - master-upgrade
-    triggers:
-      - schedule:
-          cron: "0 6,17 * * *"
-          filters: &filters-master
-            branches:
-              only:
-                - master
+  # master-repo:
+  #   jobs:
+  #     - master-rpm
+  #     - master-install: &master-install
+  #         requires:
+  #           - master-rpm
+  #     - master-upgrade: &master-upgrade
+  #         requires:
+  #           - master-rpm
+  #     - master-sync: &master-sync
+  #         requires:
+  #           - master-install
+  #           - master-upgrade
+  #   triggers:
+  #     - schedule:
+  #         cron: "0 6,17 * * *"
+  #         filters: &filters-master
+  #           branches:
+  #             only:
+  #               - master
   # Always run the RPM workflow on merges to master to take into account
   # any SPEC changes and to make it possible to force a RPM rebuild at
   # any time.
   master-rpm:
     jobs:
       - master-rpm:
-          filters: *filters-master
+          filters: &filters-master
+            branches:
+              only:
+                - master
       - master-install:
-          <<: *master-install
+          requires:
+            - master-rpm
           filters: *filters-master
       - master-upgrade:
-          <<: *master-upgrade
+          requires:
+            - master-rpm
           filters: *filters-master
       - master-sync:
-          <<: *master-sync
+          requires:
+            - master-install
+            - master-upgrade
           filters: *filters-master
   tests:
     jobs:
