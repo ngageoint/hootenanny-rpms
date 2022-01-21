@@ -239,8 +239,8 @@ Provides: bundled(histogram) = %{histogram_version}
 Requires: (nodejs-packaging if rpm-build)
 %endif
 
-# Make sure we keep NPM up to date when we update Node.js
-Requires: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
+# Make sure we lock NPM to version bundled with this NodeJS.
+Requires: npm = %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
 
 %description
 Node.js is a platform built on Chrome's JavaScript runtime
@@ -679,5 +679,8 @@ end
 
 
 %changelog
+* Fri Jan 21 2022 Justin Bronn <justin.bronn@maxar.com> - 14.16.1-2
+- Lock NPM version together with NodeJS.
+
 * Thu May 20 2021 Benjamin Marchant <benjamin.marchant@maxar.com> 14.16.1-1
 - Build as shared module for Hootenanny
