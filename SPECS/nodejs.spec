@@ -26,10 +26,10 @@
 # v8 - from deps/v8/include/v8-version.h
 # Epoch is set to ensure clean upgrades from the old v8 package
 %global v8_epoch 2
-%global v8_major 8
-%global v8_minor 4
-%global v8_build 371
-%global v8_patch 19
+%global v8_major %(echo %{v8_version} | awk -F. '{ print $1 }')
+%global v8_minor %(echo %{v8_version} | awk -F. '{ print $2 }')
+%global v8_build %(echo %{v8_version} | awk -F. '{ print $3 }')
+%global v8_patch %(echo %{v8_version} | awk -F. '{ print $4 }')
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
