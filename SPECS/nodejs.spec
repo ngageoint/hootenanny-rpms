@@ -26,10 +26,10 @@
 # v8 - from deps/v8/include/v8-version.h
 # Epoch is set to ensure clean upgrades from the old v8 package
 %global v8_epoch 2
-%global v8_major 8
-%global v8_minor 4
-%global v8_build 371
-%global v8_patch 19
+%global v8_major %(echo %{v8_version} | awk -F. '{ print $1 }')
+%global v8_minor %(echo %{v8_version} | awk -F. '{ print $2 }')
+%global v8_build %(echo %{v8_version} | awk -F. '{ print $3 }')
+%global v8_patch %(echo %{v8_version} | awk -F. '{ print $4 }')
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -239,8 +239,8 @@ Provides: bundled(histogram) = %{histogram_version}
 Requires: (nodejs-packaging if rpm-build)
 %endif
 
-# Make sure we keep NPM up to date when we update Node.js
-Requires: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
+# Make sure we lock NPM to version bundled with this NodeJS.
+Requires: npm = %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
 
 %description
 Node.js is a platform built on Chrome's JavaScript runtime
@@ -679,5 +679,8 @@ end
 
 
 %changelog
+* Fri Jan 21 2022 Justin Bronn <justin.bronn@maxar.com> - 14.16.1-2
+- Lock NPM version together with NodeJS.
+
 * Thu May 20 2021 Benjamin Marchant <benjamin.marchant@maxar.com> 14.16.1-1
 - Build as shared module for Hootenanny
