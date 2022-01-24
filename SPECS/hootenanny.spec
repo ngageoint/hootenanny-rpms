@@ -826,7 +826,7 @@ Requires:  python-argparse
 Requires:  python-devel
 Requires:  qt5-qtbase-devel
 Requires:  stxxl-devel = %{stxxl_version}
-Requires:  v8-devel
+Requires:  v8-devel = %{v8_version}
 # Documentation and report-related dependencies.
 Requires:  doxygen
 Requires:  liberation-fonts-common
