@@ -158,6 +158,7 @@ def build_container(config, name, options)
           'rpmbuild_version' => '0.0.0',
           'rpmbuild_release' => '1',
           'tomcat_version' => '0.0.0',
+          'v8_version' => '0.0.0.0',
         }.each do |macro, expr|
           rpmspec_cmd << '--define'
           # Have to put in single quotes surrounding macro since this is a

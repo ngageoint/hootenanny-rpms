@@ -28,6 +28,7 @@ ARG nodejs_version
 ARG packages
 ARG pg_version
 ARG pg_data=/var/lib/pgsql/${pg_version}/data
+ARG v8_version
 
 # Have PostgreSQL data directory persist in environment variable.
 ENV PGDATA=${pg_data}
@@ -39,7 +40,7 @@ USER root
 COPY scripts/hoot-repo.sh scripts/geoint-repo.sh scripts/nodejs-install.sh /tmp/
 RUN /tmp/geoint-repo.sh && \
     /tmp/hoot-repo.sh && \
-    /tmp/nodejs-install.sh ${nodejs_version} && \
+    /tmp/nodejs-install.sh ${nodejs_version} ${v8_version} && \
     rm -f /tmp/*.sh && \
     npm install --silent -g mocha@${mocha_version}
 
