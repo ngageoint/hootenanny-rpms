@@ -71,7 +71,6 @@ RUN yum-config-manager --save \
         qt5-qtbase-postgresql \
         qt5-qtx11extras \
         unzip \
-        v8 \
         w3m \
         wget \
         words \

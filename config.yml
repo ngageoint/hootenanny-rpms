@@ -8,12 +8,22 @@ versions:
   libpostal: &libpostal_version '1.0.0-1'
   mocha: &mocha_version '3.5.3'
   nodejs: &nodejs_version '14.16.1-2'
+  nodejs_bundled_versions: &nodejs_bundled_versions
+    c_ares_version: '1.16.1'
+    histogram_version: '0.9.7'
+    icu_version: '67.1'
+    libuv_version: '1.40.0'
+    llhttp_version: '2.1.3'
+    nghttp2_version: '1.41.0'
+    npm_version: '6.14.12'
+    punycode_version: '2.1.0'
+    uvwasi_version: '0.0.11'
+    v8_version: &v8_version '8.4.371.19'
   postgresql: &pg_version '13'
   stxxl: &stxxl_version '1.3.1-1'
   hoot-translations-templates: &hoot_translations_templates_version '1.0.0-1'
   su-exec: &suexec_version '0.2-1'
-  tomcat8: &tomcat8_version '8.5.66-1'
-  v8_version: &v8_version '8.4.371.19'
+  tomcat8: &tomcat8_version '8.5.75-1'
   wamerican-insane: &wamerican_version '7.1-1'
 
 
@@ -73,6 +83,7 @@ images:
         args:
           mocha_version: *mocha_version
           nodejs_version: *nodejs_version
+          v8_version: *v8_version
 
 rpms:
   glpk:
@@ -102,7 +113,7 @@ rpms:
     image: rpmbuild-nodejs
     version: *nodejs_version
     defines:
-      v8_version: *v8_version
+      <<: *nodejs_bundled_versions
   stxxl:
     image: rpmbuild-generic
     version: *stxxl_version
