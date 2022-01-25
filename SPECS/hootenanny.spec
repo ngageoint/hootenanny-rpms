@@ -70,7 +70,7 @@
 %global __provides_exclude ^libgdal\\.so.*$
 
 # Use explicit requirements for libgdal and libpq.
-%global __requires_exclude ^lib(gdal|pq)\\.so.*$
+%global __requires_exclude ^(/usr/bin/node|lib(gdal|pq)\\.so.*)$
 
 Name:       hootenanny
 Version:    %{hoot_version}
@@ -826,7 +826,7 @@ Requires:  python-argparse
 Requires:  python-devel
 Requires:  qt5-qtbase-devel
 Requires:  stxxl-devel = %{stxxl_version}
-Requires:  v8-devel
+Requires:  v8-devel = %{v8_version}
 # Documentation and report-related dependencies.
 Requires:  doxygen
 Requires:  liberation-fonts-common

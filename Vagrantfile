@@ -158,6 +158,15 @@ def build_container(config, name, options)
           'rpmbuild_version' => '0.0.0',
           'rpmbuild_release' => '1',
           'tomcat_version' => '0.0.0',
+          'c_ares_version' => '0.0.0',
+          'histogram_version' => '0.0.0',
+          'icu_version' => '0.0',
+          'libuv_version' => '0.0.0',
+          'llhttp_version' => '0.0.0',
+          'nghttp2_version' => '0.0.0',
+          'npm_version' => '0.0.0',
+          'punycode_version' => '0.0.0',
+          'uvwasi_version' => '0.0.0',
           'v8_version' => '0.0.0.0',
         }.each do |macro, expr|
           rpmspec_cmd << '--define'

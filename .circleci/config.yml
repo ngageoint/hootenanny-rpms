@@ -52,7 +52,7 @@ jobs:
   master-install:
     working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
-      - image: hootenanny/run-base-release@sha256:0655f8f13e9b60c6958607f943e736dd6235772a66f28472ee6fd85f3c5486f7
+      - image: hootenanny/run-base-release@sha256:94b5df9bbe8231f35576c26cbb60c3610fa8680c29f2a5b87c684e8cac962a0d
     steps:
       - checkout
       - attach_workspace:
@@ -64,7 +64,7 @@ jobs:
   master-upgrade:
     working_directory: '/rpmbuild/hootenanny-rpms'
     docker:
-      - image: hootenanny/run-base-release@sha256:0655f8f13e9b60c6958607f943e736dd6235772a66f28472ee6fd85f3c5486f7
+      - image: hootenanny/run-base-release@sha256:94b5df9bbe8231f35576c26cbb60c3610fa8680c29f2a5b87c684e8cac962a0d
     steps:
       - checkout
       - attach_workspace:
