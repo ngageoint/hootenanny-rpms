@@ -70,7 +70,7 @@
 %global __provides_exclude ^libgdal\\.so.*$
 
 # Use explicit requirements for libgdal and libpq.
-%global __requires_exclude ^lib(gdal|pq)\\.so.*$
+%global __requires_exclude ^(/usr/bin/node|lib(gdal|pq)\\.so.*)$
 
 Name:       hootenanny
 Version:    %{hoot_version}
