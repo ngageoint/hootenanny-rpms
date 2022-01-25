@@ -83,6 +83,7 @@ images:
         args:
           mocha_version: *mocha_version
           nodejs_version: *nodejs_version
+          v8_version: *v8_version
 
 rpms:
   glpk:

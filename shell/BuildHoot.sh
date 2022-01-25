@@ -39,4 +39,5 @@ run_hoot_build_image \
       --define "nodejs_version %(rpm -q --queryformat '%%{version}' nodejs)" \
       --define "stxxl_version %(rpm -q --queryformat '%%{version}' stxxl)" \
       --define "tomcat_version %(rpm -q --queryformat '%%{version}' tomcat8)" \
+      --define "v8_version %(rpm -q --queryformat '%%{version}' v8)" \
       -bb SPECS/hootenanny.spec
