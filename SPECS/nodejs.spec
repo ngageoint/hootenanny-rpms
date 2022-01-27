@@ -23,7 +23,18 @@
 %global nodejs_datadir %{_datarootdir}/nodejs
 
 # == Bundled Dependency Versions ==
-# v8 - from deps/v8/include/v8-version.h
+# The following macros are required:
+#  * c_ares_version:    deps/cares/include/ares_version.h
+#  * histogram_version: assumed from timestamps
+#  * icu_version:       tools/icu/current_ver.dep
+#  * libuv_version:     deps/uv/include/uv/version.h
+#  * llhttp_version:    deps/llhttp/include/llhttp.h44
+#  * nghttp2_version:   deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
+#  * npm_version:       deps/npm/package.json
+#  * punycode_version:  lib/punycode.js
+#  * uvwasi:            deps/uvwasi/include/uvwasi.h
+#  * v8_version:        deps/v8/include/v8-version.h
+#
 # Epoch is set to ensure clean upgrades from the old v8 package
 %global v8_epoch 2
 %global v8_major %(echo %{v8_version} | awk -F. '{ print $1 }')
@@ -32,78 +43,23 @@
 %global v8_patch %(echo %{v8_version} | awk -F. '{ print $4 }')
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
-%global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
 %global v8_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
 
-# c-ares - from deps/cares/include/ares_version.h
-# https://github.com/nodejs/node/pull/9332
-%global c_ares_major 1
-%global c_ares_minor 16
-%global c_ares_patch 1
-%global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
-
-# llhttp - from deps/llhttp/include/llhttp.h
-%global llhttp_major 2
-%global llhttp_minor 1
-%global llhttp_patch 3
-%global llhttp_version %{llhttp_major}.%{llhttp_minor}.%{llhttp_patch}
-
-# libuv - from deps/uv/include/uv/version.h
-%global libuv_major 1
-%global libuv_minor 40
-%global libuv_patch 0
-%global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
-
-# nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
-%global nghttp2_major 1
-%global nghttp2_minor 41
-%global nghttp2_patch 0
-%global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
-
-# ICU - from tools/icu/current_ver.dep
-%global icu_major 67
-%global icu_minor 1
-%global icu_version %{icu_major}.%{icu_minor}
-
+# ICU
+%global icu_major %(echo %{icu_version} | awk -F. '{ print $1 }')
+%global icu_minor %(echo %{icu_version} | awk -F. '{ print $2 }')
 %global icudatadir %{nodejs_datadir}/icudata
 %{!?little_endian: %global little_endian %(%{__python3} -c "import sys;print (0 if sys.byteorder=='big' else 1)")}
 # " this line just fixes syntax highlighting for vim that is confused by the above and continues literal
 
-
 # OpenSSL minimum version
 %global openssl_minimum 1:1.1.1
-
-# punycode - from lib/punycode.js
-# Note: this was merged into the mainline since 0.6.x
-# Note: this will be unmerged in an upcoming major release
-%global punycode_major 2
-%global punycode_minor 1
-%global punycode_patch 0
-%global punycode_version %{punycode_major}.%{punycode_minor}.%{punycode_patch}
-
-# npm - from deps/npm/package.json
-%global npm_epoch 1
-%global npm_major 6
-%global npm_minor 14
-%global npm_patch 12
-%global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
-
-# uvwasi - from deps/uvwasi/include/uvwasi.h
-%global uvwasi_major 0
-%global uvwasi_minor 0
-%global uvwasi_patch 11
-%global uvwasi_version %{uvwasi_major}.%{uvwasi_minor}.%{uvwasi_patch}
-
-# histogram_c - assumed from timestamps
-%global histogram_major 0
-%global histogram_minor 9
-%global histogram_patch 7
-%global histogram_version %{histogram_major}.%{histogram_minor}.%{histogram_patch}
 
 # In order to avoid needing to keep incrementing the release version for the
 # main package forever, we will just construct one for npm that is guaranteed
 # to increment safely. Changing this can only be done during an update when the
 # base npm version number is increasing.
+%global npm_epoch 1
 %global npm_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
 
 

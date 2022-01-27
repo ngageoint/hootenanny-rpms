@@ -317,6 +317,7 @@ RPMS/x86_64/hootenanny-%.rpm: .vagrant/machines/$(BUILD_IMAGE)/docker/id
 	  --define "nodejs_version %(rpm -q --queryformat '%%{version}' nodejs)" \
 	  --define "stxxl_version %(rpm -q --queryformat '%%{version}' stxxl)" \
 	  --define "tomcat_version %(rpm -q --queryformat '%%{version}' tomcat8)" \
+	  --define "v8_version %(rpm -q --queryformat '%%{version}' v8-devel)" \
 	  -bb SPECS/hootenanny.spec
 
 # Runs container and follow logs until it completes.
