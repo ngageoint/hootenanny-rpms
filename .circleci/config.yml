@@ -17,6 +17,7 @@ jobs:
   rpmbuild-hoot-release:
     machine:
       enabled: true
+      image: ubuntu-2004:202111-02
       resource_class: large
     steps:
       - checkout
@@ -36,6 +37,7 @@ jobs:
   master-rpm:
     machine:
       enabled: true
+      image: ubuntu-2004:202111-02
       resource_class: large
     steps:
       - checkout
