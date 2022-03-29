@@ -16,6 +16,7 @@ repositories:
 sudo yum install -y epel-release yum-utils
 sudo yum-config-manager --add-repo https://s3.amazonaws.com/hoot-repo/el7/pgdg95.repo
 sudo yum-config-manager --add-repo https://s3.amazonaws.com/hoot-repo/el7/deps/release/hoot-deps.repo
+sudo yum-config-manager --add-repo https://geoint-deps.s3.amazonaws.com/el7/stable/geoint-deps.repo
 sudo yum makecache -y
 ```
 
@@ -75,6 +76,7 @@ commands:
 sudo yum install -y epel-release yum-utils
 sudo yum-config-manager --add-repo https://s3.amazonaws.com/hoot-repo/el7/pgdg95.repo
 sudo yum-config-manager --add-repo https://s3.amazonaws.com/hoot-repo/el7/master/hoot.repo
+sudo yum-config-manager --add-repo https://geoint-deps.s3.amazonaws.com/el7/stable/geoint-deps.repo
 sudo yum makecache -y
 sudo yum install -y hootenanny-autostart
 ```
