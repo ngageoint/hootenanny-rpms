@@ -303,6 +303,12 @@ echo "export HOOT_HOME=%{hoot_home}" > %{buildroot}%{_sysconfdir}/profile.d/hoot
 %{__ln_s} %{hoot_home}/test-files %{buildroot}%{hoot_home}/hoot-core-test/src/test/resources
 %{__chmod} 0664 %{buildroot}%{hoot_home}/test-files/DcTigerRoadsHighwayExactMatchInputs.osm
 
+# Selectively install hoot-josm bits.
+%{__install} -m 0755 -d %{buildroot}%{hoot_home}/hoot-josm/target
+%{__install} -m 0644 hoot-josm/target/hoot-josm.jar %{buildroot}%{hoot_home}/hoot-josm/target
+%{__cp} -pr hoot-josm/target/dependency-jars %{buildroot}%{hoot_home}/hoot-josm/target
+
+
 # This makes it so HootEnv.sh resolves `$HOOT_HOME` properly.
 %{__ln_s} %{hoot_home}/bin/HootEnv.sh %{buildroot}%{_bindir}/HootEnv.sh
 
