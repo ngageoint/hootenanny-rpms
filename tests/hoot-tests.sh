@@ -34,6 +34,6 @@ if [ "$HOOT_TESTS" = "yes" -a ! -f el7/none.rpm ]; then
     # Run Hootenanny tests.
     cd /var/lib/hootenanny
     chown -R root:tomcat test-output
-    echo $LD_LIBRARY_PATH
-    su-exec tomcat LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64/ HootTest --diff "$HOOT_TESTS_OPT" --parallel "$HOOT_TESTS_PARALLEL"
+    su-exec tomcat echo "$(env)"
+    su-exec tomcat LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/lib64/" HootTest --diff "$HOOT_TESTS_OPT" --parallel "$HOOT_TESTS_PARALLEL"
 fi
