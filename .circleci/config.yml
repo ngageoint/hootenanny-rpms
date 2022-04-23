@@ -64,7 +64,7 @@ jobs:
       - run:
           name: 'Test RPM Installation'
           command: |
-            ./tests/install-rpm.sh && ./tests/hoot-tests.sh
+            ./tests/install-rpm.sh
   master-upgrade:
     working_directory: '/rpmbuild/hootenanny-rpms'
     docker:

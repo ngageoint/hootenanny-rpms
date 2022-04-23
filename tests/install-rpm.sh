@@ -30,4 +30,5 @@ else
 
     # Ensure `hoot version` works.
     echo "hoot version: $(hoot version)"
+    HootTest --quick
 fi
