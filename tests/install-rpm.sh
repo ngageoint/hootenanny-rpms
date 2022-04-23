@@ -26,10 +26,8 @@ else
     yum install -y \
         "el7/hootenanny-core-deps-$RPM_VERSION.noarch.rpm" \
         "el7/hootenanny-core-$RPM_VERSION.x86_64.rpm" \
-        "el7/hootenanny-services-ui-$RPM_VERSION.x86_64.rpm" \
-        "el7/hootenanny-autostart-$RPM_VERSION.x86_64.rpm"
+        "el7/hootenanny-services-ui-$RPM_VERSION.x86_64.rpm"
 
     # Ensure `hoot version` works.
     echo "hoot version: $(hoot version)"
-    HootTest --quick
 fi
