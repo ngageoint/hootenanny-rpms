@@ -4,7 +4,7 @@ versions:
   hoot-words: &words_version '1.0.1-1'
   lcov: &lcov_version '1.15-1'
   liboauthcpp: &liboauthcpp_version '0.1.0-1'
-  libphonenumber: &libphonenumber_version '8.12.52-1'
+  libphonenumber: &libphonenumber_version '8.12.39-1'
   libpostal: &libpostal_version '1.0.0-1'
   mocha: &mocha_version '3.5.3'
   nodejs: &nodejs_version '14.16.1-2'

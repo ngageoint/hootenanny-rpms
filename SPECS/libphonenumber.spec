@@ -83,8 +83,8 @@ DESTDIR=%{buildroot} %__cmake3 --install %{__cmake3_builddir}
 
 
 %changelog
-* Tue Aug 02 2022 Justin Bronn <justin.bronn@maxar.com> - 8.12.52-1
-- Upgrade to 8.12.52 now built with CMake 3.
+* Tue Aug 02 2022 Justin Bronn <justin.bronn@maxar.com> - 8.12.39-1
+- Upgrade to 8.12.39 now built with CMake 3.
 * Mon Jul 12 2021 Justin Bronn <justin.bronn@maxar.com> - 8.12.27-1
 - Upgrade to 8.12.27 with devtoolset-8.
 * Tue Nov 06 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 8.9.16-1
