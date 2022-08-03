@@ -12,6 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Manually set CMake build directory.
+%global __cmake3_builddir cpp/build
+
 Name:           libphonenumber
 Version:        %{rpmbuild_version}
 Release:        %{rpmbuild_release}%{?dist}
@@ -22,7 +26,7 @@ URL:            https://github.com/googlei18n/libphonenumber/
 Source0:        https://github.com/googlei18n/libphonenumber/archive/v%{version}/libphonenumber-%{version}.tar.gz
 
 BuildRequires:  boost-devel
-BuildRequires:  cmake
+BuildRequires:  cmake3
 BuildRequires:  devtoolset-8-gcc
 BuildRequires:  devtoolset-8-gcc-c++
 BuildRequires:  gtest-devel
@@ -47,26 +51,23 @@ applications which use the Google libphonenumber C++ library.
 
 
 %prep
-%setup -q
+%autosetup -p1
 
 
 %build
 . /opt/rh/devtoolset-8/enable
-%{__mkdir_p} cpp/build
-pushd cpp/build
-%{cmake} ..
-%{make_build}
-popd
+%cmake3 -S cpp -B %{__cmake3_builddir}
+%__cmake3 --build %{__cmake3_builddir} -j%(nproc) --verbose
 
 
 %check
 # Run the compiled tests.
-./cpp/build/geocoding_test_program
-./cpp/build/libphonenumber_test
+./%{__cmake3_builddir}/geocoding_test_program
+./%{__cmake3_builddir}/libphonenumber_test
 
 
 %install
-%{__make} -C cpp/build install DESTDIR=%{buildroot}
+DESTDIR=%{buildroot} %__cmake3 --install %{__cmake3_builddir}
 
 
 %files
@@ -75,7 +76,6 @@ popd
 %{_libdir}/*.so.*
 %exclude %{_libdir}/*.a
 
-
 %files devel
 %doc AUTHORS CONTRIBUTORS CONTRIBUTING.md
 %{_includedir}/phonenumbers
@@ -83,6 +83,8 @@ popd
 
 
 %changelog
+* Tue Aug 02 2022 Justin Bronn <justin.bronn@maxar.com> - 8.12.39-1
+- Upgrade to 8.12.39 now built with CMake 3.
 * Mon Jul 12 2021 Justin Bronn <justin.bronn@maxar.com> - 8.12.27-1
 - Upgrade to 8.12.27 with devtoolset-8.
 * Tue Nov 06 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 8.9.16-1
