@@ -135,6 +135,7 @@ RUN_IMAGE ?= run-base-release
 HOOT_VERSION_GEN ?= $(call latest_hoot_version_gen)
 DEFAULT_ARCHIVE := SOURCES/hootenanny-archive.tar.gz
 
+HOOT_RELEASE ?= 1
 ifeq ($(strip $(HOOT_VERSION_GEN)),)
 # Setup a dummy archive file that will force making of an archive
 # from the revision specified in GIT_COMMIT.
@@ -145,7 +146,6 @@ else
 HOOT_ARCHIVE := SOURCES/hootenanny-$(HOOT_VERSION_GEN).tar.gz
 ifeq ($(strip $(call hoot_extra_version,$(HOOT_VERSION_GEN))),)
 # Release version (HOOT_VERSION_GEN=0.2.38).
-HOOT_RELEASE ?= 1
 HOOT_VERSION := $(call hoot_version_tag,$(HOOT_VERSION_GEN))-$(HOOT_RELEASE)
 else
 # Development version (HOOT_VERSION_GEN=0.2.38_23_gdadada1)
@@ -309,6 +309,7 @@ RPMS/x86_64/hootenanny-%.rpm: .vagrant/machines/$(BUILD_IMAGE)/docker/id
 	$(VAGRANT) docker-run $(BUILD_IMAGE) -- \
 	rpmbuild \
 	  --define "hoot_version_gen $(HOOT_VERSION_GEN)" \
+	  --define "hoot_release $(HOOT_RELEASE)" \
 	  --define "geos_version %(rpm -q --queryformat '%%{version}' geos)" \
 	  --define "gdal_version %(rpm -q --queryformat '%%{version}' gdal)" \
 	  --define "glpk_version %(rpm -q --queryformat '%%{version}' glpk)" \
