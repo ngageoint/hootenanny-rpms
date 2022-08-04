@@ -16,7 +16,7 @@
 set -euo pipefail
 
 REPO_URL="${REPO_URL:-https://s3.amazonaws.com/hoot-repo}"
-REPO_PREFIX="${REPO_PREFIX:-el7/master}"
+REPO_PREFIX="${REPO_PREFIX:-el7/release}"
 
 if [ -f el7/none.rpm ]; then
     echo "No new RPM to install and test with."
@@ -24,7 +24,7 @@ else
     # Install Hootenanny package.
     yum-config-manager --add-repo "${REPO_URL}/${REPO_PREFIX}/hoot.repo"
     yum makecache -y
-    yum install -y hootenanny-services-ui
+    yum install -y hootenanny-services-ui-0.2.72-2
 
     # Get the previous version.
     PREV_HOOT_VERSION="$(hoot version)"
