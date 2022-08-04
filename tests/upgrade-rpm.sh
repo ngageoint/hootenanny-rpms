@@ -24,7 +24,7 @@ else
     # Install Hootenanny package.
     yum-config-manager --add-repo "${REPO_URL}/${REPO_PREFIX}/hoot.repo"
     yum makecache -y
-    yum install -y hootenanny-services-ui-0.2.72-2
+    yum install -y hootenanny-services-ui
 
     # Get the previous version.
     PREV_HOOT_VERSION="$(hoot version)"
