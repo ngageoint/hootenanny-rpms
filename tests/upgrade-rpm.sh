@@ -16,7 +16,7 @@
 set -euo pipefail
 
 REPO_URL="${REPO_URL:-https://s3.amazonaws.com/hoot-repo}"
-REPO_PREFIX="${REPO_PREFIX:-el7/release}"
+REPO_PREFIX="${REPO_PREFIX:-el7/master}"
 
 if [ -f el7/none.rpm ]; then
     echo "No new RPM to install and test with."
