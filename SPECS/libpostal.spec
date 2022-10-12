@@ -28,6 +28,11 @@
 # This will make compilation take a *long* time (~1 hour).
 %bcond_with optimize_scanner
 
+# The latest version of libpostal doesn't provide a new version of parser,
+# language_classifier, or libpostal_data, grab them from a previous version
+%global parser_version 1.0.0
+
+
 Name:           libpostal
 Version:        %{rpmbuild_version}
 Release:        %{rpmbuild_release}%{?dist}
@@ -35,18 +40,16 @@ Group:          Applications/Engineering
 Summary:        C library for parsing/normalizing street addresses around the world
 License:        MIT
 URL:            https://github.com/openvenues/libpostal/
-Source0:        https://github.com/openvenues/libpostal/archive/v%{version}/libpostal-%{version}.tar.gz
-Source1:        https://github.com/openvenues/libpostal/releases/download/v%{version}/parser.tar.gz
-Source2:        https://github.com/openvenues/libpostal/releases/download/v%{version}/language_classifier.tar.gz
-Source3:        https://github.com/openvenues/libpostal/releases/download/v%{version}/libpostal_data.tar.gz
+Source0:        https://github.com/openvenues/libpostal/archive/refs/tags/v%{version}.tar.gz
+Source1:        https://github.com/openvenues/libpostal/releases/download/v%{parser_version}/parser.tar.gz
+Source2:        https://github.com/openvenues/libpostal/releases/download/v%{parser_version}/language_classifier.tar.gz
+Source3:        https://github.com/openvenues/libpostal/releases/download/v%{parser_version}/libpostal_data.tar.gz
 
 # Modify build system to accomodate RPM build flags.
 Patch0:         libpostal-configure.patch
-
 # Calling `crf_context_destroy` at end of tests will cause a segfault,
 # must patch in order to run the test suite.
 Patch1:         libpostal-tests-fix.patch
-
 # Don't use -O0 when compiling the scanner.
 Patch2:         libpostal-optimize-scanner.patch
 
@@ -136,5 +139,7 @@ find %{buildroot}%{libpostal_data} -maxdepth 1 -type d -exec ln -s {} %{libposta
 
 
 %changelog
+* Wed Oct 12 2022 Ben Marchant <benjamin.marchant@maxar.com> - 1.1-1
+- Updated release, 1.1
 * Thu Nov 08 2018 Justin Bronn <justin.bronn@radiantsolutions.com> - 1.0.0-1
 - Initial release, 1.0.0.
