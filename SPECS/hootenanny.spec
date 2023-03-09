@@ -29,9 +29,6 @@
 %global hoot_version_tag %(echo %{hoot_version_gen} | %{__awk} -F_ '{ print $1 }')
 %global hoot_extra_version %(echo %{hoot_version_gen} | %{__awk} -F_ '{ print $2 }')
 
-# Include Hootenanny legacy UI files by default.
-%bcond_without hoot_ui_legacy
-
 # Only generate database package when requested.
 %bcond_with hoot_db
 
@@ -223,16 +220,6 @@ popd
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id
 %{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id/data
 %{__cp} -pr hoot-ui-2x/dist/* %{buildroot}%{tomcat_webapps}/%{name}-id/
-%{__install} -m 0644 hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{tomcat_webapps}/%{name}-id/data
-%{__install} -m 0644 hoot-ui/data/tdsv61_field_values.json %{buildroot}%{tomcat_webapps}/%{name}-id/data
-%if %{with hoot_ui_legacy}
-# Hootenanny legacy UI files.
-%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id-legacy
-%{__install} -d -m 0775 %{buildroot}%{tomcat_webapps}/%{name}-id-legacy/data
-%{__cp} -pr hoot-ui/dist/* %{buildroot}%{tomcat_webapps}/%{name}-id-legacy/
-%{__install} -m 0644 hoot-ui/data/osm-plus-taginfo.csv %{buildroot}%{tomcat_webapps}/%{name}-id-legacy/data
-%{__install} -m 0644 hoot-ui/data/tdsv61_field_values.json %{buildroot}%{tomcat_webapps}/%{name}-id-legacy/data
-%endif
 
 # Tomcat environment settings for Hootenanny.
 %{__cat} >> %{buildroot}%{tomcat_config}/conf.d/hoot.conf << 'EOF'
@@ -385,9 +372,6 @@ This package contains the UI and web services.
 %{tomcat_config}/conf.d/hoot.conf
 %{tomcat_webapps}/hoot-services.war
 %{tomcat_webapps}/%{name}-id
-%if %{with hoot_ui_legacy}
-%{tomcat_webapps}/%{name}-id-legacy
-%endif
 
 %defattr(-, tomcat, tomcat, 0775)
 %{hoot_home}/tmp
