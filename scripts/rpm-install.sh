@@ -23,6 +23,7 @@ if [ "$LSB_DIST" == 'centos' -o "$LSB_DIST" == 'fedora' -o "$LSB_DIST" == 'rhel'
 elif [ "$LSB_DIST" == 'debian' -o "$LSB_DIST" == 'ubuntu' ]; then
     count=0
     timeout=180
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D155B8E6A419C5BE
     while fuser /var/lib/dpkg/lock ; do
         sleep 1
         ((count = count + 1))
