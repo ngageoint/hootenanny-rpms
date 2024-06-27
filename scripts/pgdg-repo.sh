@@ -17,7 +17,7 @@
 set -euo pipefail
 
 POSTGRES_VERSION="${1}"
-PGDG_KEY="${PGDG_KEY:-/etc/pki/rpm-gpg/RPM-GPG-KEY-PGDG}"
+PGDG_KEY="${PGDG_KEY:-/etc/pki/rpm-gpg/PGDG-RPM-GPG-KEY-RHEL7}"
 PGDG_REPO="${PGDG_REPO:-/etc/yum.repos.d/pgdg-${POSTGRES_VERSION}-centos.repo}"
 PGDG_BASEURL="https://download.postgresql.org/pub/repos/yum"
 if [ "${POSTGRES_VERSION}" -ge 15 ]; then
