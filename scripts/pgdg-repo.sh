@@ -73,7 +73,7 @@ cat > "${PGDG_REPO}" <<EOF
 name=PostgreSQL ${POSTGRES_VERSION} \$releasever - \$basearch
 baseurl=${PGDG_BASEURL}/${POSTGRES_VERSION}/redhat/rhel-\$releasever-\$basearch
 enabled=1
-gpgcheck=0
+gpgcheck=1
 gpgkey=file://${PGDG_KEY}
 repo_gpgcheck=1
 
@@ -82,7 +82,7 @@ name=PostgreSQL ${POSTGRES_VERSION} \$releasever - \$basearch - Source
 failovermethod=priority
 baseurl=${PGDG_BASEURL}/srpms/${POSTGRES_VERSION}/redhat/rhel-\$releasever-\$basearch
 enabled=0
-gpgcheck=0
+gpgcheck=1
 gpgkey=file://${PGDG_KEY}
 repo_gpgcheck=1
 EOF
