@@ -21,6 +21,9 @@ LABEL \
 
 # Install basic development and RPM authoring tools.
 SHELL ["/bin/bash", "-c"]
+RUN sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo && \
+    sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/*.repo && \
+    sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/*.repo
 RUN yum-config-manager --save \
         --setopt=base.repo_gpgcheck=1 \
         --setopt=extras.repo_gpgcheck=1 \
