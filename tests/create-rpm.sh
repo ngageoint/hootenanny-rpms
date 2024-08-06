@@ -23,9 +23,11 @@ REPO_BUCKET="${REPO_BUCKET:-hoot-repo}"
 REPO_PREFIX="${REPO_PREFIX:-el7/$HOOT_BRANCH}"
 
 # Ensure directory structure in place for using the shell scripts
+echo "make directories"
+
 mkdir -p cache/m2 cache/npm el7 RPMS
 
-echo "make directories"
+echo "made directories"
 
 # Determine what the latest master archive is.
 LATEST_ARCHIVE="$(./scripts/latest-archive.sh -b "$ARCHIVE_BUCKET" -p "$ARCHIVE_PREFIX")"
