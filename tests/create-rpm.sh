@@ -16,7 +16,7 @@
 set -euo pipefail
 
 # Default variables.
-HOOT_BRANCH="${HOOT_BRANCH:-master}"
+HOOT_BRANCH="${HOOT_BRANCH:-tds-domains}"
 ARCHIVE_BUCKET="${ARCHIVE_BUCKET:-hoot-archives}"
 ARCHIVE_PREFIX="${ARCHIVE_PREFIX:-circle/$HOOT_BRANCH}"
 REPO_BUCKET="${REPO_BUCKET:-hoot-repo}"
@@ -28,7 +28,8 @@ echo "make directories"
 mkdir -p cache/m2 cache/npm el7 RPMS
 
 echo "made directories"
-
+echo "$ARCHIVE_BUCKET"
+echo "$ARCHIVE_PREFIX"
 # Determine what the latest master archive is.
 LATEST_ARCHIVE="$(./scripts/latest-archive.sh -b "$ARCHIVE_BUCKET" -p "$ARCHIVE_PREFIX")"
 
