@@ -50,10 +50,9 @@ fi
 # Use a query expression to determine the number of objects in the
 # bucket that match the prefix.
 echo "determine num_archives"
-NUM_ARCHIVES="$(aws s3api list-object-versions --bucket "$BUCKET" --prefix "$PREFIX" --query "type(Contents[]) == \`array\` && length(Contents[]) || \`0\`")"
+NUM_ARCHIVES="$(aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$PREFIX" --query "type(Contents[]) == \`array\` && length(Contents[]) || \`0\`")"
 
 echo "NUM_ARCHIVES: $NUM_ARCHIVES"
-exit
 
 if [ "$NUM_ARCHIVES" = "0" ]; then
     # Bail if no archives are found.
