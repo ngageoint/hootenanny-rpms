@@ -16,7 +16,7 @@
 set -euo pipefail
 
 # Default variables.
-HOOT_BRANCH="${HOOT_BRANCH:-tds-domains}"
+HOOT_BRANCH="${HOOT_BRANCH:-master}"
 ARCHIVE_BUCKET="${ARCHIVE_BUCKET:-hoot-archives}"
 ARCHIVE_PREFIX="${ARCHIVE_PREFIX:-circle/$HOOT_BRANCH}"
 REPO_BUCKET="${REPO_BUCKET:-hoot-repo}"
