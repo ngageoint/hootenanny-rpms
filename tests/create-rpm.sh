@@ -32,6 +32,8 @@ LATEST_ARCHIVE="$(./scripts/latest-archive.sh -b "$ARCHIVE_BUCKET" -p "$ARCHIVE_
 # archive's git hash.
 NUM_RPMS="$(./scripts/query-archive.sh -a "$LATEST_ARCHIVE" -b "$REPO_BUCKET" -p "$REPO_PREFIX")"
 
+echo "NUM_RPMS: $NUM_RPMS"
+
 if [ "$NUM_RPMS" = "0" ]; then
     # Retrieve the latest archive.
     aws s3 cp "s3://$ARCHIVE_BUCKET/$LATEST_ARCHIVE" SOURCES/ --quiet
