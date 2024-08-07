@@ -23,23 +23,14 @@ REPO_BUCKET="${REPO_BUCKET:-hoot-repo}"
 REPO_PREFIX="${REPO_PREFIX:-el7/$HOOT_BRANCH}"
 
 # Ensure directory structure in place for using the shell scripts
-echo "make directories"
-
 mkdir -p cache/m2 cache/npm el7 RPMS
 
-echo "made directories"
-echo "$ARCHIVE_BUCKET"
-echo "$ARCHIVE_PREFIX"
 # Determine what the latest master archive is.
 LATEST_ARCHIVE="$(./scripts/latest-archive.sh -b "$ARCHIVE_BUCKET" -p "$ARCHIVE_PREFIX")"
-
-echo "LATEST_ARCHIVE: $LATEST_ARCHIVE"
 
 # Query the master repository for number of RPMs with the
 # archive's git hash.
 NUM_RPMS="$(./scripts/query-archive.sh -a "$LATEST_ARCHIVE" -b "$REPO_BUCKET" -p "$REPO_PREFIX")"
-
-echo "NUM_RPMS: $NUM_RPMS"
 
 if [ "$NUM_RPMS" = "0" ]; then
     # Retrieve the latest archive.
