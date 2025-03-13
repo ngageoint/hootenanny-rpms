@@ -22,12 +22,19 @@ LABEL \
 ARG gpg_name="Hootenanny Packaging"
 ARG role_arn
 
+RUN sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo && \
+  sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/*.repo && \
+  sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/*.repo
+
 # Install RPM repository and AWS CLI tools.
 RUN yum-config-manager --save \
         --setopt=base.repo_gpgcheck=1 \
         --setopt=extras.repo_gpgcheck=1 \
         --setopt=updates.repo_gpgcheck=1 &> /dev/null && \
     yum -q -y install epel-release && \
+    sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo && \
+    sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/*.repo && \
+    sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/*.repo && \
     yum -q -y update && \
     yum -q -y install awscli createrepo groff less rpm-sign && \
     yum -q -y clean all

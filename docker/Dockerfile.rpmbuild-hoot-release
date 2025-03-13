@@ -42,6 +42,7 @@ RUN /tmp/geoint-repo.sh && \
     /tmp/hoot-repo.sh && \
     /tmp/nodejs-install.sh ${nodejs_version} ${v8_version} && \
     rm -f /tmp/*.sh && \
+    yum install -y npm && \
     npm install --silent -g mocha@${mocha_version}
 
 # Install Hootenanny dependencies.
