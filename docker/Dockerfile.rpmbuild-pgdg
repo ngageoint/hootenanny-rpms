@@ -31,8 +31,16 @@ USER root
 # Install PostgreSQL development files from PGDG for the desired version
 # as well as any additional packages.
 COPY scripts/pgdg-repo.sh /tmp/pgdg-repo.sh
+
+RUN sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo && \
+    sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/*.repo && \
+    sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/*.repo
+
 RUN /tmp/pgdg-repo.sh ${pg_version} && \
     rm /tmp/pgdg-repo.sh && \
+    sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo && \
+    sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/*.repo && \
+    sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/*.repo && \
     yum -q -y install postgresql${pg_version}-devel && \
     alternatives --install /usr/bin/pg_config pgsql-pg_config /usr/pgsql-${pg_version}/bin/pg_config 500 && \
     if [ -n "${packages:-}" ]; then yum -q -y install ${packages}; fi && \

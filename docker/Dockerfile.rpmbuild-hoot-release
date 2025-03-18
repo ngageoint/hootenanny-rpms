@@ -42,7 +42,15 @@ RUN /tmp/geoint-repo.sh && \
     /tmp/hoot-repo.sh && \
     /tmp/nodejs-install.sh ${nodejs_version} ${v8_version} && \
     rm -f /tmp/*.sh && \
+    yum install -y npm && \
     npm install --silent -g mocha@${mocha_version}
+
+RUN yum install -y nodejs-devel
+RUN node -v
+RUN npm -v
+RUN yum groupinstall -y "Development Tools"
+RUN npm install -g node-gyp@6.0.0
+RUN npm list -g node-gyp
 
 # Install Hootenanny dependencies.
 RUN yum install -y -q dumb-init su-exec tomcat8 && \
