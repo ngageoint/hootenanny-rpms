@@ -42,7 +42,8 @@ ENV LANG=${lang} \
     RPMBUILD_HOME=${rpmbuild_home}
 
 # Create unprivileged user for building RPMs, and setup basic macros.
-RUN groupadd -g ${rpmbuild_gid} ${rpmbuild_user} && \
+#RUN groupadd -g ${rpmbuild_gid} ${rpmbuild_user} && \
+RUN groupadd ${rpmbuild_user} && \
     useradd -d ${rpmbuild_home} -m -s /bin/bash -u ${rpmbuild_uid} -g ${rpmbuild_gid} ${rpmbuild_user} && \
     echo "%_hardened_build ${hardened_build}" >> ${rpmbuild_home}/.rpmmacros && \
     echo "%_smp_mflags -j%(nproc) -l%(expr %(nproc) + 2)" >> ${rpmbuild_home}/.rpmmacros && \
