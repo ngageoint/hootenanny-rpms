@@ -29,7 +29,7 @@ versions:
 
 maven:
   cache_url: &maven_cache_url https://hoot-maven.s3.amazonaws.com/m2-cache-2021-07-12.tar.gz
-  cache_sha1: &maven_cache_sha1 a98c09d93d4381d17ddbac45a7261da6af89b15e
+  cache_sha1: &maven_cache_sha1 dd2862d978dcdac26c87ee60d3effb50
 
 
 rpmbuild:
