@@ -85,7 +85,7 @@ libpostal library.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch -P 0 -p1
 %if %{with tests}
 %patch1 -p1
 %endif
