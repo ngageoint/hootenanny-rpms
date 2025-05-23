@@ -7,7 +7,7 @@
   * **Key ID**: 7036657A6767A174
   * **Name/E-Mail**: `Hootenanny Packaging <hoot-packaging@digitalglobe.com>`
 * `rpmbuild-repo` container
-  * Create with `make rpmbuild-repo`
+  * Create with `MAVEN_CACHE=0 make rpmbuild-repo`
 * AWS credentials with write privileges to the `s3://hoot-repo/el7/release`
   bucket and prefix.
 
@@ -23,12 +23,21 @@
    Note: The Hootenanny version tag for the version (e.g., `v0.2.41`
    for a `HOOT_VERSION_GEN=0.2.41`) *must* already exist.
 
+1. Copy m2-cache from S3
+
+   ```
+   cd cache/m2/
+   aws s3 cp s3://hoot-maven/m2-cache.tar.gz .
+   tar -xvf m2-cache.tar
+   rm m2-cache.tar
+   ```
+
 1. Next, the release archive must be created.  Specify the
    git tag using the [`GIT_COMMIT`](./config.md#git_commit)
    environment variable and run:
 
    ```
-   GIT_COMMIT=v$HOOT_VERSION_GEN make archive
+   GIT_COMMIT=v$HOOT_VERSION_GEN MAVEN_CACHE=0 make archive
    ```
 
    Because `GIT_COMMIT` refers to a git *tag*, don't forget to
