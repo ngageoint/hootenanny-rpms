@@ -166,6 +166,7 @@ This package contains the core algorithms and command line interface.
 %build
 # Enable the devtoolset-8 toolchain prior to building.
 . /opt/rh/devtoolset-8/enable
+export CXXFLAGS="${CXXFLAGS:-} -std=gnu++14"
 source ./SetupEnv.sh
 
 # Link in the dictionary file.

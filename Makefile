@@ -168,6 +168,7 @@ GIT_COMMIT ?= master
 	base \
 	clean \
 	deps \
+	FORCE \
 	hoot-archive \
 	hoot-rpm \
 	latest-archive \
@@ -300,9 +301,30 @@ wamerican-insane: rpmbuild-generic $(WAMERICAN_RPM)
 
 ## Build patterns.
 
-# Builds a container with Vagrant.
-.vagrant/machines/%/docker/id:
-	$(VAGRANT) up $*
+FORCE:
+
+.vagrant/machines/rpmbuild-base/docker/id: .vagrant/machines/rpmbuild/docker/id
+.vagrant/machines/rpmbuild-generic/docker/id: .vagrant/machines/rpmbuild-base/docker/id
+.vagrant/machines/rpmbuild-lint/docker/id: .vagrant/machines/rpmbuild/docker/id
+.vagrant/machines/rpmbuild-repo/docker/id: .vagrant/machines/rpmbuild/docker/id
+.vagrant/machines/rpmbuild-glpk/docker/id: .vagrant/machines/rpmbuild-generic/docker/id
+.vagrant/machines/rpmbuild-hoot-release/docker/id: .vagrant/machines/rpmbuild-pgdg/docker/id
+.vagrant/machines/rpmbuild-lcov/docker/id: .vagrant/machines/rpmbuild-generic/docker/id
+.vagrant/machines/rpmbuild-liboauthcpp/docker/id: .vagrant/machines/rpmbuild-generic/docker/id
+.vagrant/machines/rpmbuild-libphonenumber/docker/id: .vagrant/machines/rpmbuild-generic/docker/id
+.vagrant/machines/rpmbuild-libpostal/docker/id: .vagrant/machines/rpmbuild-base/docker/id
+.vagrant/machines/rpmbuild-nodejs/docker/id: .vagrant/machines/rpmbuild-generic/docker/id
+.vagrant/machines/rpmbuild-pgdg/docker/id: .vagrant/machines/rpmbuild-generic/docker/id
+.vagrant/machines/rpmbuild-sonarqube/docker/id: .vagrant/machines/rpmbuild-hoot-release/docker/id
+.vagrant/machines/run-base-release/docker/id: .vagrant/machines/run-base/docker/id
+
+# Builds a container with Vagrant. Vagrant can leave a "preparing" marker when
+# Docker fails before an image is created; clear that stale state before retrying.
+# Also rebuild child images when their parent Vagrant image marker is newer.
+.vagrant/machines/%/docker/id: FORCE
+	@if test -f $@ && test "$$(cat $@)" = "preparing"; then rm -f $@; fi
+	@if test -f $@ && test -n "$(filter-out FORCE,$?)"; then rm -f $@; fi
+	@if ! test -f $@; then $(VAGRANT) up $*; fi
 
 # Builds a Hootenanny RPM from the HOOT_ARCHIVE.
 RPMS/x86_64/hootenanny-%.rpm: .vagrant/machines/$(BUILD_IMAGE)/docker/id

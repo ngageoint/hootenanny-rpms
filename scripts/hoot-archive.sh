@@ -21,6 +21,17 @@ if [ ! -d "$HOOT_REPO/.git" ]; then
     exit 1
 fi
 
+# Match the toolchain used by the Hootenanny RPM build. Node 16 headers are
+# probed during configure, before qmake's C++14 flags are applied.
+if [ -f /opt/rh/devtoolset-8/enable ]; then
+    # shellcheck disable=SC1091
+    set +u
+    source /opt/rh/devtoolset-8/enable
+    set -u
+fi
+export CXXFLAGS="${CXXFLAGS:-} -std=gnu++14"
+export TAR_OPTIONS="${TAR_OPTIONS:-} --owner=0 --group=0"
+
 ARCHIVE_SCRIPT="$HOOT_REPO/scripts/ci/archive.sh"
 if [ -x "$ARCHIVE_SCRIPT" ]; then
     $ARCHIVE_SCRIPT
