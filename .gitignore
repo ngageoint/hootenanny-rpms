@@ -15,3 +15,8 @@ SOURCES/words1.sqlite.bz2
 el6-src/jdk-8*
 el7-src/jdk-8*
 **VagrantfileLocal
+SOURCES/*.tar.gz
+all-five-rpms/
+libkml-RPMS/
+libphonenumber-RPMS/
+stxxl-RPMS/

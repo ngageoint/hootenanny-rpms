@@ -26,8 +26,8 @@ USER root
 # Use GEOINT dependencies for more recent protobuf library.
 COPY scripts/geoint-repo.sh /tmp/
 RUN /tmp/geoint-repo.sh && rm -f /tmp/geoint-repo.sh && \
-    if [ -n "${packages}" ]; then yum -q -y install ${packages}; fi && \
-    yum -q -y clean all
+    if [ -n "${packages}" ]; then dnf -q -y install ${packages}; fi && \
+    dnf -q -y clean all
 
 # Use unprivleged RPM build user and work directory by default.
 USER $RPMBUILD_USER

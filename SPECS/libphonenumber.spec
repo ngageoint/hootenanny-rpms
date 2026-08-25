@@ -14,7 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Manually set CMake build directory.
-%global __cmake3_builddir cpp/build
+%global __cmake_builddir cpp/build
+%global _smp_mflags -j%(nproc)
 
 Name:           libphonenumber
 Version:        %{rpmbuild_version}
@@ -26,9 +27,7 @@ URL:            https://github.com/googlei18n/libphonenumber/
 Source0:        https://github.com/googlei18n/libphonenumber/archive/v%{version}/libphonenumber-%{version}.tar.gz
 
 BuildRequires:  boost-devel
-BuildRequires:  cmake3
-BuildRequires:  devtoolset-8-gcc
-BuildRequires:  devtoolset-8-gcc-c++
+BuildRequires:  cmake
 BuildRequires:  gtest-devel
 BuildRequires:  libicu-devel
 BuildRequires:  protobuf
@@ -55,19 +54,18 @@ applications which use the Google libphonenumber C++ library.
 
 
 %build
-. /opt/rh/devtoolset-8/enable
-%cmake3 -S cpp -B %{__cmake3_builddir}
-%__cmake3 --build %{__cmake3_builddir} -j%(nproc) --verbose
+%cmake -S cpp -B %{__cmake_builddir}
+%cmake_build
 
 
 %check
 # Run the compiled tests.
-./%{__cmake3_builddir}/geocoding_test_program
-./%{__cmake3_builddir}/libphonenumber_test
+./%{__cmake_builddir}/geocoding_test_program
+./%{__cmake_builddir}/libphonenumber_test
 
 
 %install
-DESTDIR=%{buildroot} %__cmake3 --install %{__cmake3_builddir}
+%cmake_install
 
 
 %files
