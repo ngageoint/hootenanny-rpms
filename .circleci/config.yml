@@ -32,7 +32,10 @@ jobs:
       - run:
           name: 'Building rpmbuild-hoot-release'
           command: |
-            make rpmbuild-hoot-release
+            export DOCKER_BUILDKIT=0
+            export DOCKER_BUILDKIT=0
+            docker version
+            MAVEN_CACHE=0 vagrant up rpmbuild --debug 2>&1 | tail -200
   master-rpm:
     machine:
       enabled: true

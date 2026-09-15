@@ -19,28 +19,15 @@ LABEL \
   name="Hootenanny Base RPM Build Image" \
   vendor="Maxar Technologies"
 
-RUN sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo && \
-  sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/*.repo && \
-  sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/*.repo
-
 # Install basic development and RPM authoring tools.
 SHELL ["/bin/bash", "-c"]
-RUN yum-config-manager --save \
-        --setopt=base.repo_gpgcheck=1 \
-        --setopt=extras.repo_gpgcheck=1 \
-        --setopt=updates.repo_gpgcheck=1 &> /dev/null && \
-    yum -q -y install centos-release-scl epel-release && \
-    yum-config-manager --enable rhel-server-rhscl-7-rpms && \
-    sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo && \
-    sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/*.repo && \
-    sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/*.repo && \
-    yum -q -y update && \
-    yum -q -y install \
+RUN dnf -q -y install epel-release && \
+    dnf -q -y update && \
+    dnf -q -y install \
         autoconf \
         autoconf-archive \
         automake \
         bzip2 \
-        devtoolset-8 \
         gcc \
         gcc-c++ \
         git \
@@ -48,7 +35,6 @@ RUN yum-config-manager --save \
         libtool \
         parallel \
         m4 \
-        redhat-lsb-core \
         redhat-rpm-config \
         rpm-build \
         rpmdevtools \
@@ -57,4 +43,4 @@ RUN yum-config-manager --save \
         vim \
         wget \
         zip && \
-    yum -q -y clean all
+    dnf -q -y clean all

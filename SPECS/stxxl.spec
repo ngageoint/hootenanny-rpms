@@ -6,7 +6,10 @@ Summary:	C++ STL drop-in replacement for extremely large datasets
 Group:		Development/Libraries
 License:	Boost
 URL:		http://%{name}.sourceforge.net
-Source0:	http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+Source0:	https://github.com/stxxl/stxxl/archive/refs/tags/%{version}.tar.gz
+%global __cmake_builddir build
+
+%global _smp_mflags -j%(nproc)
 
 %description
 %{name} provides an STL replacement using an abstraction layer to
@@ -26,63 +29,33 @@ Requires:	%{name} = %{version}-%{release}
 Development libraries for the %{name} library.
 
 %prep
-%setup -q
+%autosetup -n %{name}-%{version} -p1
 
 %build
-# Configure
-%{__make} config_gnu
-
-%{__cat} > make.settings.local <<EOF
-STXXL_ROOT	= $(pwd)
-ENABLE_SHARED	= yes
-COMPILER_GCC	= g++ -std=c++0x
-EOF
-
-# Total hack because 1.3.1 doesn't compile right on CentOS7
-%{__sed} -i 's/#include <sys\/mman.h>/#include <sys\/mman.h>\n#include <unistd.h>/g' ./utils/mlock.cpp
-
-%{__make} library_g++
+%cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DINSTALL_LIB_DIR=/usr/lib64 -DINSTALL_PKGCONFIG_DIR=/usr/lib64/pkgconfig -DINSTALL_CMAKE_DIR=/usr/lib64/cmake/stxxl
+%cmake_build
 
 %install
-# There is no install target provided. However the library consists of a .so
-# and a set of headers.  Let us install them, as required
-
-# Install the library
-%{__install} -p -D -m 0755 lib/libstxxl.so %{buildroot}%{_libdir}/libstxxl.so.%{version}
-
-# Install the header files
-%{__mkdir} -p %{buildroot}%{_includedir}
-%{__cp} -pr include/* %{buildroot}%{_includedir}
-
-pushd %{buildroot}%{_libdir}
-#link libSONAME.so.MAJOR to libSONAME.so.MAJOR.MINOR.MICRO
-%{__ln_s} libstxxl.so.%{version} libstxxl.so.1
-#link libSONAME.so to libSONAME.so.MAJOR
-%{__ln_s} libstxxl.so.1 libstxxl.so
-popd
-
-%post -p /sbin/ldconfig
-
-%postun -p /sbin/ldconfig
-
-%clean
-%{__rm} -rf %{buildroot}
+%cmake_install
 
 %files
-%defattr(-,root,root,-)
-%doc LICENSE_1_0.txt CHANGELOG TODO README TROUBLESHOOTING
-%{_libdir}/libstxxl.so.1
-%{_libdir}/libstxxl.so.%{version}
+%license LICENSE_1_0.txt
+%doc CHANGELOG TODO README
+%{_libdir}/libstxxl.so.1.4.1
+%{_bindir}/stxxl_tool
 
 %files devel
-%defattr(-,root,root,-)
-%doc config_example
-%dir %{_includedir}/bits
 %{_includedir}/%{name}.h
 %{_includedir}/%{name}
-%{_includedir}/bits/intel_compatibility.h
 %{_libdir}/libstxxl.so
+%{_libdir}/pkgconfig/*.pc
+%{_libdir}/libstxxl.a
+%{_libdir}/cmake/stxxl
 
 %changelog
+* Wed Aug 12 2026 Leia <leia@vantor.com> - 1.4.1-1
+- Rebase to CMake build system for RHEL 9 / Rocky 9. Drop CentOS7-only
+  mlock.cpp sed patch (not applicable to CMake build). Version bump
+  from 1.3.1.
 * Sat Jan 30 2016 Benjamin Marchant <benjamin.marchant(a!t)digitalglobe.com> 1.3.1-1
 - Create spec file

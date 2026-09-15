@@ -29,7 +29,7 @@ if [ "${LSB_DIST}" == "centos" ] || [ "${LSB_DIST}" == "fedora" ] || [ "${LSB_DI
         echo "Vagrant ${VAGRANT_VERSION} is already installed."
         exit 0
     fi
-    DOWNLOAD_COMMAND="curl -sSL -O"
+    DOWNLOAD_COMMAND="curl -sSL --connect-timeout 10 --max-time 60 -O"
     INSTALL_COMMAND="yum install -y"
     PACKAGE_SUFFIX="$(arch).rpm"
 elif [ "${LSB_DIST}" == "debian" ] || [ "${LSB_DIST}" == "ubuntu" ]; then
