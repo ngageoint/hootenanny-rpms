@@ -134,11 +134,11 @@ gpgcheck = 0
 
 [hoot-deps]
 name = Hootenanny Dependencies
-baseurl = https://hoot-repo.s3.amazonaws.com/el7/deps/release
+baseurl = https://hoot-repo.s3.amazonaws.com/el9/deps/release
 enabled = 1
 gpgcheck = 1
 repo_gpgcheck = 1
-gpgkey = https://hoot-repo.s3.amazonaws.com/el7/hoot.gpg
+gpgkey = https://hoot-repo.s3.amazonaws.com/el9/hoot.gpg
 EOF
     fi
 else
@@ -147,7 +147,7 @@ else
     DOWNLOAD_OPTS=(
         "$S3_URL"
         "$REPO"
-        "$QUIET"
+        ${QUIET:+"$QUIET"}
         "${AWS_COMMON_OPTS[@]}"
     )
     aws s3 sync "${DOWNLOAD_OPTS[@]}"
@@ -165,7 +165,7 @@ if [ "$UPLOAD" == "yes" ]; then
         "$REPO"
         "$S3_URL"
         "--delete"
-        "$QUIET"
+        ${QUIET:+"$QUIET"}
         "${AWS_COMMON_OPTS[@]}"
     )
     aws s3 sync "${UPLOAD_OPTS[@]}"
