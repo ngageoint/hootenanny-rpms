@@ -18,7 +18,7 @@
 %undefine _disable_source_fetch
 %{!?hoot_home: %global hoot_home %{_sharedstatedir}/hootenanny}
 %global hoot_dict %{hoot_home}/conf/dictionary
-%global words_checksum ac1c4597c7e1efc4c16979d0c92def1d523bbb75f26294026086ee9820a03ee2
+%global words_checksum 542083c1035b1d71a83b49b4401f1db9571b8c62084d9550ded4fc75037d67cd
 %global words_file words1.sqlite
 
 Name:		hoot-words
