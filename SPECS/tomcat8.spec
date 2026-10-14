@@ -47,6 +47,7 @@ Release:    %{rpmbuild_release}%{?dist}
 License:    ASL 2.0
 URL:        https://tomcat.apache.org/
 Source0:    https://downloads.apache.org/tomcat/tomcat-%{major_version}/v%{version}/bin/apache-tomcat-%{version}.tar.gz
+BuildRequires: systemd-rpm-macros
 Source1:    %{name}.conf
 Source2:    %{name}.functions
 Source3:    %{name}.logrotate

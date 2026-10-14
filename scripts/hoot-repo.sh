@@ -16,7 +16,7 @@
 set -euo pipefail
 
 HOOT_DEPS_CHANNEL="${HOOT_DEPS_CHANNEL:-stable}"
-HOOT_DEPS_BASEURL="${HOOT_DEPS_BASEURL:-https://hoot-repo.s3.amazonaws.com/el7/deps/${HOOT_DEPS_CHANNEL}}"
+HOOT_DEPS_BASEURL="${HOOT_DEPS_BASEURL:-https://hoot-repo.s3.amazonaws.com/el9/deps/${HOOT_DEPS_CHANNEL}}"
 HOOT_DEPS_KEY=/etc/pki/rpm-gpg/RPM-GPG-KEY-Hoot
 
 cat > $HOOT_DEPS_KEY <<EOF

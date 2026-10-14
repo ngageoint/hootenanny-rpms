@@ -1,3 +1,4 @@
+%global __cmake_in_source_build 1
 # Copyright (C) 2018 Radiant Solutions (http://www.radiantsolutions.com)
 #
 # This program is free software: you can redistribute it and/or modify

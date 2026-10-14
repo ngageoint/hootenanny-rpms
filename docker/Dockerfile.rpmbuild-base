@@ -22,6 +22,7 @@ LABEL \
 # Install basic development and RPM authoring tools.
 SHELL ["/bin/bash", "-c"]
 RUN dnf -q -y install epel-release && \
+    dnf -q -y config-manager --set-enabled crb && \
     dnf -q -y update && \
     dnf -q -y install \
         autoconf \
